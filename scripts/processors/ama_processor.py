@@ -29,30 +29,52 @@ class AMAProcessor:
     """Process Sharebird AMA sessions into chunks."""
 
     def __init__(self):
-        # Pattern to match questions (## Q: or **Q:** or similar)
+        # Pattern to match questions - Sharebird uses ### Q: format
         self.qa_patterns = [
+            re.compile(r'^###\s*Q:\s*(.+?)(?=^###\s*Q:|\Z)', re.MULTILINE | re.DOTALL),
             re.compile(r'^#{1,3}\s*Q[:\.]?\s*(.+?)(?=^#{1,3}\s*[QA][:\.]?|\Z)', re.MULTILINE | re.DOTALL),
             re.compile(r'^\*\*Q[:\.]?\*\*\s*(.+?)(?=^\*\*[QA][:\.]?\*\*|\Z)', re.MULTILINE | re.DOTALL),
             re.compile(r'^Q[:\.]?\s*(.+?)(?=^[QA][:\.]?\s|\Z)', re.MULTILINE | re.DOTALL),
         ]
-        # Pattern for speaker info in header
-        self.speaker_pattern = re.compile(r'^#\s*(.+?)\s*[-–]\s*(.+?)(?:\n|$)')
+        # Patterns for Sharebird AMA format: **Speaker:** and **Role:**
+        self.speaker_line_pattern = re.compile(r'^\*\*Speaker:\*\*\s*(.+?)$', re.MULTILINE)
+        self.role_line_pattern = re.compile(r'^\*\*Role:\*\*\s*(.+?)$', re.MULTILINE)
+        self.topic_pattern = re.compile(r'^#\s*Topic:\s*(.+?)$', re.MULTILINE)
 
     def extract_metadata(self, content: str, filepath: Path) -> dict:
         """Extract AMA speaker and role from content or filename."""
-        # Try to find speaker info in header
-        match = self.speaker_pattern.search(content)
-        if match:
-            speaker = match.group(1).strip()
-            role = match.group(2).strip()
-        else:
-            # Extract from filename
-            filename = filepath.stem
-            parts = filename.replace("_", " ").replace("-", " ").split()
-            speaker = " ".join(parts[:2]) if len(parts) >= 2 else filename
-            role = None
+        speaker = None
+        role = None
+        topic = None
 
-        title = f"AMA with {speaker}"
+        # Try to find speaker using **Speaker:** pattern
+        speaker_match = self.speaker_line_pattern.search(content)
+        if speaker_match:
+            speaker = speaker_match.group(1).strip()
+
+        # Try to find role using **Role:** pattern
+        role_match = self.role_line_pattern.search(content)
+        if role_match:
+            role = role_match.group(1).strip()
+
+        # Try to find topic using # Topic: pattern
+        topic_match = self.topic_pattern.search(content)
+        if topic_match:
+            topic = topic_match.group(1).strip()
+
+        # If no speaker found, extract from filename (format: 2025-01-07-Chandra_Patel.md)
+        if not speaker:
+            filename = filepath.stem
+            # Remove date prefix if present (YYYY-MM-DD-)
+            name_part = re.sub(r'^\d{4}-\d{2}-\d{2}-', '', filename)
+            # Replace underscores with spaces
+            speaker = name_part.replace("_", " ").strip()
+
+        # Build title
+        if topic:
+            title = f"AMA on {topic} with {speaker}"
+        else:
+            title = f"AMA with {speaker}"
         if role:
             title += f", {role}"
 
@@ -60,6 +82,7 @@ class AMAProcessor:
             "title": title,
             "author": speaker,
             "speaker_role": role,
+            "topic": topic,
             "tags": ["sharebird-ama", "ama"]
         }
 

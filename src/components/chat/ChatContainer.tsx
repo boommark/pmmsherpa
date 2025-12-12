@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useChatStore } from '@/stores/chatStore'
 import { useConversations, useConversationMessages } from '@/hooks/useConversations'
@@ -17,6 +17,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { createConversation } = useConversations()
   const { messages: dbMessages } = useConversationMessages(conversationId || null)
+  const [hasInitialized, setHasInitialized] = useState(false)
+  const lastConversationIdRef = useRef<string | undefined>(undefined)
 
   const {
     messages,
@@ -35,24 +37,38 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setStatusMessage,
   } = useChatStore()
 
-  // Sync messages from DB
+  // Sync messages from DB - only on initial load or conversation change
   useEffect(() => {
-    if (conversationId && dbMessages.length > 0) {
-      const chatMessages: ChatMessage[] = dbMessages.map((m) => ({
-        id: m.id,
-        role: m.role,
-        content: m.content,
-        citations: m.citations,
-        model: m.model || undefined,
-        createdAt: new Date(m.created_at),
-      }))
-      setMessages(chatMessages)
-      setConversationId(conversationId)
-    } else if (!conversationId) {
-      setMessages([])
-      setConversationId(null)
+    // Reset initialization when conversation changes
+    if (conversationId !== lastConversationIdRef.current) {
+      setHasInitialized(false)
+      lastConversationIdRef.current = conversationId
     }
-  }, [conversationId, dbMessages, setMessages, setConversationId])
+
+    // Only sync from DB on initial load, not during active chat
+    if (!hasInitialized && !isLoading) {
+      if (conversationId && dbMessages.length > 0) {
+        const chatMessages: ChatMessage[] = dbMessages.map((m) => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          citations: m.citations,
+          model: m.model || undefined,
+          createdAt: new Date(m.created_at),
+        }))
+        setMessages(chatMessages)
+        setConversationId(conversationId)
+        setHasInitialized(true)
+      } else if (!conversationId) {
+        setMessages([])
+        setConversationId(null)
+        setHasInitialized(true)
+      } else if (conversationId && dbMessages.length === 0) {
+        // New conversation with no messages yet
+        setHasInitialized(true)
+      }
+    }
+  }, [conversationId, dbMessages, setMessages, setConversationId, hasInitialized, isLoading])
 
   // Auto-scroll to bottom
   useEffect(() => {

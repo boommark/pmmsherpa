@@ -53,6 +53,7 @@ export async function retrieveContext({
     document_title: string
     source_type: 'book' | 'blog' | 'ama'
     author: string | null
+    speaker_role: string | null
     url: string | null
   }) => ({
     id: row.id,
@@ -62,6 +63,7 @@ export async function retrieveContext({
     documentTitle: row.document_title,
     sourceType: row.source_type,
     author: row.author,
+    speakerRole: row.speaker_role,
     pageNumber: row.page_number,
     sectionTitle: row.section_title,
     question: row.question,
@@ -95,6 +97,10 @@ function formatSourceInfo(chunk: RetrievedChunk): string {
     parts.push(`by ${chunk.author}`)
   }
 
+  if (chunk.speakerRole) {
+    parts.push(`(${chunk.speakerRole})`)
+  }
+
   if (chunk.sourceType === 'book' && chunk.pageNumber) {
     parts.push(`(Page ${chunk.pageNumber})`)
   } else if (chunk.sourceType === 'blog') {
@@ -118,6 +124,7 @@ export function extractCitations(chunks: RetrievedChunk[]): Citation[] {
     page_number: chunk.pageNumber,
     section_title: chunk.sectionTitle,
     question: chunk.question,
+    speaker_role: chunk.speakerRole,
   }))
 }
 
@@ -155,6 +162,7 @@ export async function semanticSearch(
     document_title: string
     source_type: 'book' | 'blog' | 'ama'
     author: string | null
+    speaker_role: string | null
     url: string | null
   }) => ({
     id: row.id,
@@ -164,6 +172,7 @@ export async function semanticSearch(
     documentTitle: row.document_title,
     sourceType: row.source_type,
     author: row.author,
+    speakerRole: row.speaker_role,
     pageNumber: row.page_number,
     sectionTitle: row.section_title,
     question: row.question,

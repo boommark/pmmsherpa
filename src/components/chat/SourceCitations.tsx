@@ -100,6 +100,9 @@ export function SourceCitations({ citations }: SourceCitationsProps) {
                         {citation.author && (
                           <span className="text-muted-foreground"> by <span className="font-medium text-foreground">{citation.author}</span></span>
                         )}
+                        {citation.speaker_role && (
+                          <span className="text-muted-foreground">, <span className="font-medium text-foreground">{citation.speaker_role}</span></span>
+                        )}
                         {citation.page_number && (
                           <span className="text-muted-foreground"> (p. {citation.page_number})</span>
                         )}

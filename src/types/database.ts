@@ -42,6 +42,7 @@ export interface Citation {
   page_number: number | null;
   section_title: string | null;
   question: string | null;
+  speaker_role: string | null;
 }
 
 export interface Document {

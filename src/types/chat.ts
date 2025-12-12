@@ -46,6 +46,7 @@ export interface RetrievedChunk {
   documentTitle: string
   sourceType: 'book' | 'blog' | 'ama'
   author: string | null
+  speakerRole: string | null
   pageNumber: number | null
   sectionTitle: string | null
   question: string | null

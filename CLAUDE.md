@@ -204,6 +204,19 @@ git add -A && git commit -m "message" && git push origin main
 - **Issue**: Citations weren't being set in messages
 - **Fix**: Added `setCitations` action to chatStore, implemented handler in `ChatContainer.tsx`
 
+### AMA Speaker Role Not Showing
+- **Issue**: Sharebird AMA citations didn't show speaker name/job title
+- **Fix**:
+  - Updated `ama_processor.py` regex to parse `**Speaker:**` and `**Role:**` format
+  - Updated 485 AMA documents in database with correct metadata
+  - Added `speaker_role` column to all search functions (hybrid_search, match_chunks, keyword_search_chunks)
+  - Updated TypeScript types (`Citation`, `RetrievedChunk`) to include `speakerRole`
+  - Updated `SourceCitations.tsx` to display speaker role (e.g., "by Mike Greenberg, Director of Product Marketing at SurveyMonkey")
+
+### Book Citations Missing Links
+- **Issue**: Book citations had no links
+- **Fix**: Added Amazon search URLs to all 16 books and updated `book_processor.py` to auto-generate URLs
+
 ---
 
 ## Pending Tasks / Future Improvements

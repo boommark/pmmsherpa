@@ -7,6 +7,7 @@ Target chunk size: 1000 tokens with 150 token overlap.
 """
 
 import re
+import urllib.parse
 from pathlib import Path
 from typing import Optional
 import tiktoken
@@ -31,6 +32,14 @@ class BookProcessor:
     def __init__(self):
         self.page_pattern = re.compile(r'^-{3,}\s*Page\s+(\d+)\s*-{3,}$', re.MULTILINE)
 
+    def generate_amazon_url(self, title: str, author: Optional[str]) -> str:
+        """Generate Amazon search URL for a book."""
+        search_query = title
+        if author:
+            search_query += " " + author
+        encoded_query = urllib.parse.quote_plus(search_query)
+        return f"https://www.amazon.com/s?k={encoded_query}"
+
     def extract_metadata(self, content: str, filepath: Path) -> dict:
         """Extract book title and author from filename or content."""
         filename = filepath.stem
@@ -47,9 +56,13 @@ class BookProcessor:
         # Clean up title
         title = title.replace("_", " ").strip()
 
+        # Generate Amazon search URL
+        url = self.generate_amazon_url(title, author)
+
         return {
             "title": title,
             "author": author,
+            "url": url,
             "tags": ["pmm-book"]
         }
 
