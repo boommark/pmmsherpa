@@ -35,13 +35,13 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
       <div
         className={cn(
-          'flex flex-col max-w-[85%] space-y-2',
+          'flex flex-col min-w-0 max-w-[calc(100%-3rem)] md:max-w-[85%] space-y-2',
           isUser ? 'items-end' : 'items-start'
         )}
       >
         <div
           className={cn(
-            'rounded-lg px-4 py-2',
+            'rounded-lg px-3 py-2 md:px-4 w-full',
             isUser
               ? 'bg-primary text-primary-foreground'
               : 'bg-muted text-foreground'
@@ -50,7 +50,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           {isUser ? (
             <p className="whitespace-pre-wrap">{message.content}</p>
           ) : (
-            <div className="prose prose-sm dark:prose-invert max-w-none">
+            <div className="prose prose-sm dark:prose-invert max-w-none break-words overflow-hidden">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{

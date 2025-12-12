@@ -8,22 +8,47 @@ import { getDbModelValue, type ModelProvider } from '@/lib/llm/provider-factory'
 export function useConversations() {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
 
   const fetchConversations = useCallback(async () => {
-    setLoading(true)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = await (supabase.from('conversations') as any)
-      .select('*')
-      .eq('is_archived', false)
-      .order('updated_at', { ascending: false })
+    try {
+      setLoading(true)
+      setError(null)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error: fetchError } = await (supabase.from('conversations') as any)
+        .select('*')
+        .eq('is_archived', false)
+        .order('updated_at', { ascending: false })
 
-    setConversations(data || [])
-    setLoading(false)
+      if (fetchError) {
+        console.error('Error fetching conversations:', fetchError)
+        setError('Failed to load conversations')
+        return
+      }
+
+      setConversations(data || [])
+    } catch (err) {
+      console.error('Error fetching conversations:', err)
+      setError('Failed to load conversations')
+    } finally {
+      setLoading(false)
+    }
   }, [supabase])
 
+  // Initial fetch
   useEffect(() => {
     fetchConversations()
+  }, [fetchConversations])
+
+  // Refresh on window focus
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchConversations()
+    }
+
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
   }, [fetchConversations])
 
   const createConversation = async (
@@ -102,6 +127,7 @@ export function useConversations() {
   return {
     conversations,
     loading,
+    error,
     refresh: fetchConversations,
     createConversation,
     updateConversation,
@@ -113,28 +139,42 @@ export function useConversations() {
 export function useConversationMessages(conversationId: string | null) {
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
 
-  useEffect(() => {
+  const fetchMessages = useCallback(async () => {
     if (!conversationId) {
       setMessages([])
       return
     }
 
-    const fetchMessages = async () => {
+    try {
       setLoading(true)
+      setError(null)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data } = await (supabase.from('messages') as any)
+      const { data, error: fetchError } = await (supabase.from('messages') as any)
         .select('*')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true })
 
+      if (fetchError) {
+        console.error('Error fetching messages:', fetchError)
+        setError('Failed to load messages')
+        return
+      }
+
       setMessages(data || [])
+    } catch (err) {
+      console.error('Error fetching messages:', err)
+      setError('Failed to load messages')
+    } finally {
       setLoading(false)
     }
-
-    fetchMessages()
   }, [conversationId, supabase])
+
+  useEffect(() => {
+    fetchMessages()
+  }, [fetchMessages])
 
   const addMessage = async (
     message: Omit<Message, 'id' | 'created_at'>
@@ -175,6 +215,8 @@ export function useConversationMessages(conversationId: string | null) {
   return {
     messages,
     loading,
+    error,
+    refetch: fetchMessages,
     addMessage,
     updateMessage,
   }

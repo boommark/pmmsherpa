@@ -98,6 +98,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     try {
       // Get or create conversation
       let activeConversationId = conversationId
+      let isNewConversation = false
 
       if (!activeConversationId) {
         // Create new conversation with first message as title
@@ -105,9 +106,10 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         const newConv = await createConversation(title, currentModel)
         if (newConv) {
           activeConversationId = newConv.id
+          isNewConversation = true
           setConversationId(newConv.id)
-          // Navigate to the new conversation
-          router.push(`/chat/${newConv.id}`)
+        } else {
+          throw new Error('Failed to create conversation')
         }
       }
 
@@ -153,6 +155,10 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                 } else if (data.type === 'done') {
                   setStatusMessage(null)
                   finishStreaming(assistantMessageId)
+                  // Navigate to new conversation after streaming completes
+                  if (isNewConversation && activeConversationId) {
+                    router.replace(`/chat/${activeConversationId}`)
+                  }
                 } else if (data.type === 'error') {
                   setError(data.message)
                   setStatusMessage(null)

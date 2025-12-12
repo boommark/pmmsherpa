@@ -12,8 +12,8 @@ interface MessageListProps {
 
 export function MessageList({ messages, statusMessage }: MessageListProps) {
   return (
-    <ScrollArea className="flex-1 h-full">
-      <div className="max-w-3xl mx-auto py-6 px-4 space-y-6">
+    <ScrollArea className="flex-1 h-full w-full">
+      <div className="w-full max-w-3xl mx-auto py-4 md:py-6 px-3 md:px-4 space-y-4 md:space-y-6">
         {messages.map((message) => (
           <MessageBubble key={message.id} message={message} />
         ))}

@@ -37,17 +37,17 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   }
 
   return (
-    <div className="border-t bg-background p-4">
-      <div className="max-w-3xl mx-auto">
+    <div className="border-t bg-background p-3 md:p-4">
+      <div className="w-full max-w-3xl mx-auto">
         <div className="relative flex items-end gap-2">
           <Textarea
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask PMMSherpa anything about product marketing..."
+            placeholder="Ask about product marketing..."
             disabled={disabled}
-            className="min-h-[44px] max-h-[200px] resize-none pr-12"
+            className="min-h-[44px] max-h-[200px] resize-none pr-12 text-base"
             rows={1}
           />
           <Button
@@ -63,7 +63,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
             )}
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2 text-center">
+        <p className="text-xs text-muted-foreground mt-2 text-center hidden sm:block">
           PMMSherpa draws from 1,280+ expert sources including PMM books, blogs, and AMAs.
         </p>
       </div>
