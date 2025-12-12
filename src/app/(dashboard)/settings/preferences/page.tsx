@@ -9,16 +9,34 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2, CheckCircle, Moon, Sun, Monitor } from 'lucide-react'
-import { MODEL_CONFIG } from '@/lib/llm/provider-factory'
+import { Loader2, CheckCircle, Moon, Sun, Monitor, Brain, Zap } from 'lucide-react'
+import { MODEL_CONFIG, getDbModelValue, type ModelProvider } from '@/lib/llm/provider-factory'
+
+// Group models by provider for preferences
+const modelGroups = {
+  anthropic: {
+    label: 'Anthropic',
+    models: ['claude-opus', 'claude-sonnet'] as ModelProvider[],
+  },
+  google: {
+    label: 'Google',
+    models: ['gemini-3-pro', 'gemini-2.5-thinking'] as ModelProvider[],
+  },
+  openai: {
+    label: 'OpenAI',
+    models: ['gpt-5.2', 'gpt-5.2-thinking'] as ModelProvider[],
+  },
+}
 
 export default function PreferencesPage() {
   const { profile, loading, updateProfile } = useProfile()
-  const [preferredModel, setPreferredModel] = useState<'claude' | 'gemini'>('claude')
+  const [preferredModel, setPreferredModel] = useState<ModelProvider>('claude-opus')
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system')
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -27,7 +45,12 @@ export default function PreferencesPage() {
   // Initialize from profile
   useState(() => {
     if (profile) {
-      setPreferredModel(profile.preferred_model)
+      // Map old db values to new model keys for backward compatibility
+      const dbModel = profile.preferred_model
+      if (dbModel === 'claude') setPreferredModel('claude-opus')
+      else if (dbModel === 'gemini') setPreferredModel('gemini-3-pro')
+      else if (dbModel === 'openai') setPreferredModel('gpt-5.2')
+      else setPreferredModel(dbModel as ModelProvider)
       setTheme(profile.theme)
     }
   })
@@ -37,8 +60,11 @@ export default function PreferencesPage() {
     setError(null)
     setSuccess(false)
 
+    // Store the provider family in DB for backward compatibility
+    const dbModelValue = getDbModelValue(preferredModel)
+
     const { error } = await updateProfile({
-      preferred_model: preferredModel,
+      preferred_model: dbModelValue,
       theme,
     })
 
@@ -110,24 +136,33 @@ export default function PreferencesPage() {
               <Label>Default Model</Label>
               <Select
                 value={preferredModel}
-                onValueChange={(v) => setPreferredModel(v as 'claude' | 'gemini')}
+                onValueChange={(v) => setPreferredModel(v as ModelProvider)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select model" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="claude">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-orange-500" />
-                      {MODEL_CONFIG.claude.name}
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="gemini">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-blue-500" />
-                      {MODEL_CONFIG.gemini.name}
-                    </div>
-                  </SelectItem>
+                  {Object.entries(modelGroups).map(([key, group]) => (
+                    <SelectGroup key={key}>
+                      <SelectLabel className="text-xs text-muted-foreground">{group.label}</SelectLabel>
+                      {group.models.map((modelKey) => {
+                        const config = MODEL_CONFIG[modelKey]
+                        return (
+                          <SelectItem key={modelKey} value={modelKey}>
+                            <div className="flex items-center gap-2">
+                              <span className={`w-2 h-2 rounded-full ${config.color}`} />
+                              <span>{config.name}</span>
+                              {config.isThinking ? (
+                                <Brain className="h-3 w-3 text-purple-500" />
+                              ) : (
+                                <Zap className="h-3 w-3 text-yellow-500" />
+                              )}
+                            </div>
+                          </SelectItem>
+                        )
+                      })}
+                    </SelectGroup>
+                  ))}
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">

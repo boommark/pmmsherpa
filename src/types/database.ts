@@ -3,7 +3,7 @@ export interface Profile {
   email: string;
   full_name: string | null;
   avatar_url: string | null;
-  preferred_model: 'claude' | 'gemini';
+  preferred_model: 'claude' | 'gemini' | 'openai';
   theme: 'light' | 'dark' | 'system';
   created_at: string;
   updated_at: string;
@@ -13,7 +13,7 @@ export interface Conversation {
   id: string;
   user_id: string;
   title: string;
-  model_used: 'claude' | 'gemini';
+  model_used: 'claude' | 'gemini' | 'openai';
   message_count: number;
   is_archived: boolean;
   created_at: string;
@@ -25,7 +25,7 @@ export interface Message {
   conversation_id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
-  model: 'claude' | 'gemini' | null;
+  model: 'claude' | 'gemini' | 'openai' | null;
   tokens_used: number | null;
   latency_ms: number | null;
   citations: Citation[];
@@ -79,7 +79,7 @@ export interface Chunk {
 export interface UsageLog {
   id: string;
   user_id: string;
-  model: 'claude' | 'gemini';
+  model: 'claude' | 'gemini' | 'openai';
   input_tokens: number;
   output_tokens: number;
   total_tokens: number;

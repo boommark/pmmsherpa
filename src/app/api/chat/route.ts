@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { streamText } from 'ai'
 import { createClient } from '@/lib/supabase/server'
-import { getModel, buildMessages, type ModelProvider } from '@/lib/llm/provider-factory'
+import { getModel, buildMessages, getModelDisplayName, getDbModelValue, type ModelProvider } from '@/lib/llm/provider-factory'
 import { retrieveContext, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
 
 export const runtime = 'nodejs'
@@ -91,11 +91,14 @@ export async function POST(request: NextRequest) {
           const llmModel = getModel(model)
 
           // Status: Generating response
-          const modelName = model === 'claude' ? 'Claude Opus 4.5' : 'Gemini 2.5 Pro'
+          const modelName = getModelDisplayName(model)
           sendStatus(`Generating response with ${modelName}...`)
 
           // Start streaming
           const startLLM = Date.now()
+
+          // Get the database model value for storage
+          const dbModel = getDbModelValue(model)
 
           const result = streamText({
             model: llmModel,
@@ -124,7 +127,7 @@ export async function POST(request: NextRequest) {
                   conversation_id: conversationId,
                   role: 'assistant',
                   content: text,
-                  model,
+                  model: dbModel,
                   tokens_used: (usage?.inputTokens || 0) + (usage?.outputTokens || 0) || null,
                   latency_ms: latencyMs,
                   citations,
@@ -136,7 +139,7 @@ export async function POST(request: NextRequest) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               await (supabase.from('usage_logs') as any).insert({
                 user_id: user.id,
-                model,
+                model: dbModel,
                 input_tokens: usage?.inputTokens || 0,
                 output_tokens: usage?.outputTokens || 0,
                 latency_ms: latencyMs,

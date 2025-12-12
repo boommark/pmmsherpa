@@ -28,7 +28,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
   isLoading: false,
   error: null,
-  currentModel: 'claude',
+  currentModel: 'claude-opus',
   conversationId: null,
   statusMessage: null,
 

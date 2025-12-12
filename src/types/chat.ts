@@ -1,11 +1,15 @@
 import type { Citation, Message } from './database'
+import type { ModelProvider, DbModelValue } from '@/lib/llm/provider-factory'
+
+// Model can be either the new provider key or legacy DB value
+export type ChatModelValue = ModelProvider | DbModelValue
 
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant' | 'system'
   content: string
   citations?: Citation[]
-  model?: 'claude' | 'gemini'
+  model?: ChatModelValue
   isStreaming?: boolean
   createdAt: Date
 }
@@ -14,14 +18,14 @@ export interface ChatState {
   messages: ChatMessage[]
   isLoading: boolean
   error: string | null
-  currentModel: 'claude' | 'gemini'
+  currentModel: ModelProvider
   conversationId: string | null
 }
 
 export interface SendMessageRequest {
   message: string
   conversationId?: string
-  model: 'claude' | 'gemini'
+  model: ModelProvider
 }
 
 export interface SendMessageResponse {
@@ -56,7 +60,7 @@ export interface RetrievedChunk {
 export interface ConversationSummary {
   id: string
   title: string
-  modelUsed: 'claude' | 'gemini'
+  modelUsed: string
   messageCount: number
   lastMessage: string
   createdAt: Date

@@ -76,13 +76,28 @@ Generate production-ready PMM deliverables including:
 - Proactively offer follow-up suggestions and related deliverables
 `
 
+import { MODEL_CONFIG, type ModelProvider } from './provider-factory'
+
 export const getSystemPromptWithContext = (
   retrievedContext: string,
-  modelName: 'claude' | 'gemini'
+  modelName: ModelProvider
 ): string => {
-  const modelSpecificInstructions = modelName === 'claude'
-    ? '\n\nYou are powered by Claude Opus 4.5. Leverage your advanced reasoning capabilities for complex strategic analysis.'
-    : '\n\nYou are powered by Gemini 3 Pro. Apply your multimodal understanding to analyze complex marketing scenarios.'
+  const config = MODEL_CONFIG[modelName]
+
+  // Model-specific instructions based on provider and capabilities
+  let modelSpecificInstructions = ''
+
+  if (config.provider === 'anthropic') {
+    modelSpecificInstructions = `\n\nYou are powered by ${config.name}. Leverage your advanced reasoning capabilities for complex strategic analysis.`
+  } else if (config.provider === 'google') {
+    modelSpecificInstructions = config.isThinking
+      ? `\n\nYou are powered by ${config.name} with extended thinking. Take time to reason through complex problems step-by-step.`
+      : `\n\nYou are powered by ${config.name}. Apply your multimodal understanding to analyze complex marketing scenarios.`
+  } else if (config.provider === 'openai') {
+    modelSpecificInstructions = config.isThinking
+      ? `\n\nYou are powered by ${config.name} with advanced reasoning. Engage in deep analysis for complex strategic problems.`
+      : `\n\nYou are powered by ${config.name}. Use your broad knowledge to provide comprehensive marketing insights.`
+  }
 
   return `${PMMSHERPA_SYSTEM_PROMPT}${modelSpecificInstructions}
 

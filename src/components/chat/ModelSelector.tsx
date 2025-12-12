@@ -4,10 +4,13 @@ import { MODEL_CONFIG, type ModelProvider } from '@/lib/llm/provider-factory'
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Brain, Zap } from 'lucide-react'
 
 interface ModelSelectorProps {
   value: ModelProvider
@@ -15,29 +18,62 @@ interface ModelSelectorProps {
   disabled?: boolean
 }
 
+// Group models by provider
+const modelGroups = {
+  anthropic: {
+    label: 'Anthropic',
+    models: ['claude-opus', 'claude-sonnet'] as ModelProvider[],
+  },
+  google: {
+    label: 'Google',
+    models: ['gemini-3-pro', 'gemini-2.5-thinking'] as ModelProvider[],
+  },
+  openai: {
+    label: 'OpenAI',
+    models: ['gpt-5.2', 'gpt-5.2-thinking'] as ModelProvider[],
+  },
+}
+
 export function ModelSelector({ value, onChange, disabled }: ModelSelectorProps) {
+  const currentConfig = MODEL_CONFIG[value]
+
   return (
     <Select
       value={value}
       onValueChange={(v) => onChange(v as ModelProvider)}
       disabled={disabled}
     >
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Select model" />
+      <SelectTrigger className="w-[220px]">
+        <SelectValue>
+          <div className="flex items-center gap-2">
+            <span className={`w-2 h-2 rounded-full ${currentConfig.color}`} />
+            <span className="truncate">{currentConfig.name}</span>
+            {currentConfig.isThinking && <Brain className="h-3 w-3 text-purple-500" />}
+          </div>
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="claude">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-orange-500" />
-            {MODEL_CONFIG.claude.name}
-          </div>
-        </SelectItem>
-        <SelectItem value="gemini">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-500" />
-            {MODEL_CONFIG.gemini.name}
-          </div>
-        </SelectItem>
+        {Object.entries(modelGroups).map(([key, group]) => (
+          <SelectGroup key={key}>
+            <SelectLabel className="text-xs text-muted-foreground">{group.label}</SelectLabel>
+            {group.models.map((modelKey) => {
+              const config = MODEL_CONFIG[modelKey]
+              return (
+                <SelectItem key={modelKey} value={modelKey}>
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${config.color}`} />
+                    <span>{config.name}</span>
+                    {config.isThinking ? (
+                      <Brain className="h-3 w-3 text-purple-500" />
+                    ) : (
+                      <Zap className="h-3 w-3 text-yellow-500" />
+                    )}
+                  </div>
+                </SelectItem>
+              )
+            })}
+          </SelectGroup>
+        ))}
       </SelectContent>
     </Select>
   )

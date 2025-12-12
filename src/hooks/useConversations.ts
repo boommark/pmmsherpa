@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Conversation, Message } from '@/types/database'
+import { getDbModelValue, type ModelProvider } from '@/lib/llm/provider-factory'
 
 export function useConversations() {
   const [conversations, setConversations] = useState<Conversation[]>([])
@@ -27,17 +28,20 @@ export function useConversations() {
 
   const createConversation = async (
     title: string,
-    model: 'claude' | 'gemini'
+    model: ModelProvider
   ): Promise<Conversation | null> => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
+
+    // Convert ModelProvider to DB value
+    const dbModel = getDbModelValue(model)
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.from('conversations') as any)
       .insert({
         user_id: user.id,
         title,
-        model_used: model,
+        model_used: dbModel,
       })
       .select()
       .single()
