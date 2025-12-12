@@ -29,7 +29,10 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setConversationId,
     startStreaming,
     appendToStream,
+    setCitations,
     finishStreaming,
+    statusMessage,
+    setStatusMessage,
   } = useChatStore()
 
   // Sync messages from DB
@@ -61,6 +64,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
     setIsLoading(true)
     setError(null)
+    setStatusMessage('Preparing your request...')
 
     // Create user message
     const userMessage: ChatMessage = {
@@ -122,12 +126,20 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             if (line.startsWith('data: ')) {
               try {
                 const data = JSON.parse(line.slice(6))
-                if (data.type === 'text') {
+                if (data.type === 'status') {
+                  setStatusMessage(data.message)
+                } else if (data.type === 'text') {
+                  // Clear status when text starts streaming
+                  setStatusMessage(null)
                   appendToStream(assistantMessageId, data.content)
                 } else if (data.type === 'citations') {
-                  // Handle citations
+                  setCitations(assistantMessageId, data.citations)
                 } else if (data.type === 'done') {
+                  setStatusMessage(null)
                   finishStreaming(assistantMessageId)
+                } else if (data.type === 'error') {
+                  setError(data.message)
+                  setStatusMessage(null)
                 }
               } catch {
                 // Ignore parse errors for partial JSON
@@ -138,9 +150,11 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred')
+      setStatusMessage(null)
       finishStreaming(assistantMessageId)
     } finally {
       setIsLoading(false)
+      setStatusMessage(null)
     }
   }, [
     isLoading,
@@ -149,18 +163,20 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     addMessage,
     startStreaming,
     appendToStream,
+    setCitations,
     finishStreaming,
     setIsLoading,
     setError,
+    setStatusMessage,
     setConversationId,
     createConversation,
     router,
   ])
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden">
       {messages.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center overflow-auto">
           <div className="text-center space-y-4 max-w-md px-4">
             <h2 className="text-2xl font-semibold">Welcome to PMMSherpa</h2>
             <p className="text-muted-foreground">
@@ -192,7 +208,9 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           </div>
         </div>
       ) : (
-        <MessageList messages={messages} />
+        <div className="flex-1 overflow-hidden min-h-0">
+          <MessageList messages={messages} statusMessage={statusMessage} />
+        </div>
       )}
       <div ref={messagesEndRef} />
       <ChatInput onSend={handleSendMessage} disabled={isLoading} />

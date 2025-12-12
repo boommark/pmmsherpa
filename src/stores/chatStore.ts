@@ -1,8 +1,11 @@
 import { create } from 'zustand'
 import type { ChatMessage, ChatState } from '@/types/chat'
+import type { Citation } from '@/types/database'
 import type { ModelProvider } from '@/lib/llm/provider-factory'
 
 interface ChatStore extends ChatState {
+  // Status message for inline updates
+  statusMessage: string | null
   // Actions
   setMessages: (messages: ChatMessage[]) => void
   addMessage: (message: ChatMessage) => void
@@ -12,9 +15,11 @@ interface ChatStore extends ChatState {
   setError: (error: string | null) => void
   setCurrentModel: (model: ModelProvider) => void
   setConversationId: (id: string | null) => void
+  setStatusMessage: (message: string | null) => void
   // Streaming helpers
   startStreaming: (messageId: string) => void
   appendToStream: (messageId: string, content: string) => void
+  setCitations: (messageId: string, citations: Citation[]) => void
   finishStreaming: (messageId: string) => void
 }
 
@@ -25,6 +30,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   error: null,
   currentModel: 'claude',
   conversationId: null,
+  statusMessage: null,
 
   // Actions
   setMessages: (messages) => set({ messages }),
@@ -50,6 +56,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   setCurrentModel: (currentModel) => set({ currentModel }),
 
   setConversationId: (conversationId) => set({ conversationId }),
+
+  setStatusMessage: (statusMessage) => set({ statusMessage }),
 
   // Streaming helpers
   startStreaming: (messageId) => {
@@ -84,6 +92,15 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       messages: state.messages.map((msg) =>
         msg.id === messageId
           ? { ...msg, content: msg.content + content }
+          : msg
+      ),
+    })),
+
+  setCitations: (messageId, citations) =>
+    set((state) => ({
+      messages: state.messages.map((msg) =>
+        msg.id === messageId
+          ? { ...msg, citations }
           : msg
       ),
     })),

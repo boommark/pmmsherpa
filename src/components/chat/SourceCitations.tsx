@@ -34,12 +34,23 @@ const sourceTypeConfig = {
 }
 
 export function SourceCitations({ citations }: SourceCitationsProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
 
   if (!citations || citations.length === 0) return null
 
+  // Deduplicate citations by source (title)
+  const uniqueCitations = citations.reduce((acc, citation) => {
+    const key = `${citation.source}-${citation.author || ''}-${citation.page_number || ''}`
+    if (!acc.has(key)) {
+      acc.set(key, citation)
+    }
+    return acc
+  }, new Map<string, Citation>())
+
+  const deduplicatedCitations = Array.from(uniqueCitations.values())
+
   // Group citations by source type
-  const groupedCitations = citations.reduce((acc, citation) => {
+  const groupedCitations = deduplicatedCitations.reduce((acc, citation) => {
     const type = citation.source_type
     if (!acc[type]) acc[type] = []
     acc[type].push(citation)
@@ -49,17 +60,18 @@ export function SourceCitations({ citations }: SourceCitationsProps) {
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
       <CollapsibleTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2 text-xs">
-          <span className="text-muted-foreground">
-            {citations.length} source{citations.length !== 1 ? 's' : ''}
+        <Button variant="ghost" size="sm" className="gap-2 text-xs hover:bg-transparent p-0">
+          <BookOpen className="h-3 w-3 text-primary" />
+          <span className="text-primary font-medium">
+            {deduplicatedCitations.length} source{deduplicatedCitations.length !== 1 ? 's' : ''} cited
           </span>
           <ChevronDown
-            className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            className={`h-3 w-3 transition-transform text-primary ${isOpen ? 'rotate-180' : ''}`}
           />
         </Button>
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-2">
-        <div className="space-y-3 text-sm">
+        <div className="space-y-3 text-sm border-l-2 border-primary/20 pl-3">
           {Object.entries(groupedCitations).map(([type, typeCitations]) => {
             const config = sourceTypeConfig[type as keyof typeof sourceTypeConfig]
             const Icon = config.icon
@@ -67,35 +79,35 @@ export function SourceCitations({ citations }: SourceCitationsProps) {
             return (
               <div key={type} className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <Icon className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-xs font-medium text-muted-foreground">
+                  <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                     {config.label}s ({typeCitations.length})
                   </span>
                 </div>
-                <div className="space-y-1 pl-5">
+                <div className="space-y-2 pl-5">
                   {typeCitations.map((citation, idx) => (
                     <div
                       key={idx}
-                      className="flex items-start gap-2 text-xs text-muted-foreground"
+                      className="flex items-start gap-2 text-xs"
                     >
-                      <Badge variant="outline" className={`text-[10px] ${config.color}`}>
+                      <Badge variant="outline" className={`text-[10px] shrink-0 ${config.color}`}>
                         {config.label}
                       </Badge>
                       <div className="flex-1">
-                        <span className="font-medium text-foreground">
-                          {citation.source}
+                        <span className="font-semibold text-foreground">
+                          &ldquo;{citation.source}&rdquo;
                         </span>
                         {citation.author && (
-                          <span> by {citation.author}</span>
+                          <span className="text-muted-foreground"> by <span className="font-medium text-foreground">{citation.author}</span></span>
                         )}
                         {citation.page_number && (
-                          <span> (Page {citation.page_number})</span>
+                          <span className="text-muted-foreground"> (p. {citation.page_number})</span>
                         )}
                         {citation.section_title && (
-                          <span> - {citation.section_title}</span>
+                          <span className="text-muted-foreground block mt-0.5">Section: {citation.section_title}</span>
                         )}
                         {citation.question && (
-                          <span className="italic"> &ldquo;{citation.question}&rdquo;</span>
+                          <span className="text-muted-foreground block mt-0.5 italic">Q: &ldquo;{citation.question}&rdquo;</span>
                         )}
                         {citation.url && (
                           <a

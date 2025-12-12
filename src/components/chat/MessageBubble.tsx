@@ -1,6 +1,7 @@
 'use client'
 
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { SourceCitations } from './SourceCitations'
@@ -51,6 +52,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           ) : (
             <div className="prose prose-sm dark:prose-invert max-w-none">
               <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
                 components={{
                   // Style markdown elements
                   h1: ({ children }) => (
