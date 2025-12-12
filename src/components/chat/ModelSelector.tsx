@@ -43,12 +43,12 @@ export function ModelSelector({ value, onChange, disabled }: ModelSelectorProps)
       onValueChange={(v) => onChange(v as ModelProvider)}
       disabled={disabled}
     >
-      <SelectTrigger className="w-[220px]">
+      <SelectTrigger className="w-[140px] sm:w-[180px] md:w-[220px]">
         <SelectValue>
-          <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${currentConfig.color}`} />
-            <span className="truncate">{currentConfig.name}</span>
-            {currentConfig.isThinking && <Brain className="h-3 w-3 text-purple-500" />}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className={`w-2 h-2 rounded-full shrink-0 ${currentConfig.color}`} />
+            <span className="truncate text-xs sm:text-sm">{currentConfig.name}</span>
+            {currentConfig.isThinking && <Brain className="h-3 w-3 text-purple-500 shrink-0 hidden sm:block" />}
           </div>
         </SelectValue>
       </SelectTrigger>

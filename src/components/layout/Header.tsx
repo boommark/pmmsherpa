@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useProfile, useSignOut } from '@/hooks/useSupabase'
 import { useChatStore } from '@/stores/chatStore'
+import { useUIStore } from '@/stores/uiStore'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -14,13 +15,14 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ModelSelector } from '@/components/chat/ModelSelector'
-import { LogOut, User, Settings } from 'lucide-react'
+import { LogOut, User, Settings, Menu } from 'lucide-react'
 
 export function Header() {
   const { profile } = useProfile()
   const signOut = useSignOut()
   const router = useRouter()
   const { currentModel, setCurrentModel } = useChatStore()
+  const { toggleMobileSidebar } = useUIStore()
 
   const handleSignOut = async () => {
     await signOut()
@@ -36,9 +38,18 @@ export function Header() {
     : profile?.email?.[0]?.toUpperCase() || 'U'
 
   return (
-    <header className="flex items-center justify-between px-6 py-3 border-b bg-background">
-      <div className="flex items-center gap-4">
-        <h1 className="text-lg font-semibold">PMMSherpa</h1>
+    <header className="flex items-center justify-between px-3 md:px-6 py-3 border-b bg-background">
+      <div className="flex items-center gap-2 md:gap-4">
+        {/* Mobile menu button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden shrink-0"
+          onClick={toggleMobileSidebar}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+        <h1 className="text-base md:text-lg font-semibold hidden sm:block">PMMSherpa</h1>
         <ModelSelector
           value={currentModel}
           onChange={setCurrentModel}
@@ -47,7 +58,7 @@ export function Header() {
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+          <Button variant="ghost" className="relative h-8 w-8 rounded-full shrink-0">
             <Avatar className="h-8 w-8">
               <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || ''} />
               <AvatarFallback>{initials}</AvatarFallback>

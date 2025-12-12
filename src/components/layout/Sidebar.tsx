@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useConversations } from '@/hooks/useConversations'
+import { useUIStore } from '@/stores/uiStore'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Sheet, SheetContent } from '@/components/ui/sheet'
 import {
   MessageSquare,
   History,
@@ -18,8 +20,18 @@ import {
   Trash2,
 } from 'lucide-react'
 
-export function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false)
+// Shared sidebar content
+function SidebarContent({
+  collapsed,
+  setCollapsed,
+  showCollapseButton = true,
+  onNavigate,
+}: {
+  collapsed: boolean
+  setCollapsed: (v: boolean) => void
+  showCollapseButton?: boolean
+  onNavigate?: () => void
+}) {
   const pathname = usePathname()
   const { conversations, deleteConversation } = useConversations()
 
@@ -31,36 +43,33 @@ export function Sidebar() {
   ]
 
   return (
-    <aside
-      className={cn(
-        'flex flex-col border-r bg-sidebar transition-all duration-300',
-        collapsed ? 'w-16' : 'w-64'
-      )}
-    >
+    <>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         {!collapsed && (
-          <Link href="/chat" className="font-semibold text-lg">
+          <Link href="/chat" className="font-semibold text-lg" onClick={onNavigate}>
             PMMSherpa
           </Link>
         )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setCollapsed(!collapsed)}
-          className={cn(collapsed && 'mx-auto')}
-        >
-          {collapsed ? (
-            <PanelLeft className="h-5 w-5" />
-          ) : (
-            <PanelLeftClose className="h-5 w-5" />
-          )}
-        </Button>
+        {showCollapseButton && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCollapsed(!collapsed)}
+            className={cn(collapsed && 'mx-auto')}
+          >
+            {collapsed ? (
+              <PanelLeft className="h-5 w-5" />
+            ) : (
+              <PanelLeftClose className="h-5 w-5" />
+            )}
+          </Button>
+        )}
       </div>
 
       {/* New Chat Button */}
       <div className="p-3">
-        <Link href="/chat">
+        <Link href="/chat" onClick={onNavigate}>
           <Button className="w-full" variant={collapsed ? 'ghost' : 'default'}>
             <Plus className="h-4 w-4" />
             {!collapsed && <span className="ml-2">New Chat</span>}
@@ -86,6 +95,7 @@ export function Sidebar() {
                 <Link
                   href={`/chat/${conv.id}`}
                   className="flex-1 truncate"
+                  onClick={onNavigate}
                 >
                   {conv.title}
                 </Link>
@@ -115,6 +125,7 @@ export function Sidebar() {
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  onClick={onNavigate}
                   className={cn(
                     'flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
                     'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
@@ -132,6 +143,49 @@ export function Sidebar() {
           })}
         </ul>
       </nav>
-    </aside>
+    </>
+  )
+}
+
+export function Sidebar() {
+  const [collapsed, setCollapsed] = useState(false)
+  const { mobileSidebarOpen, setMobileSidebarOpen } = useUIStore()
+  const pathname = usePathname()
+
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setMobileSidebarOpen(false)
+  }, [pathname, setMobileSidebarOpen])
+
+  return (
+    <>
+      {/* Mobile Sidebar (Sheet) */}
+      <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+        <SheetContent side="left" className="p-0 w-72">
+          <div className="flex flex-col h-full bg-sidebar">
+            <SidebarContent
+              collapsed={false}
+              setCollapsed={setCollapsed}
+              showCollapseButton={false}
+              onNavigate={() => setMobileSidebarOpen(false)}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar */}
+      <aside
+        className={cn(
+          'hidden md:flex flex-col border-r bg-sidebar transition-all duration-300',
+          collapsed ? 'w-16' : 'w-64'
+        )}
+      >
+        <SidebarContent
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          showCollapseButton={true}
+        />
+      </aside>
+    </>
   )
 }
