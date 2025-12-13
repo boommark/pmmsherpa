@@ -31,6 +31,7 @@ export interface Message {
   citations: Citation[];
   is_saved: boolean;
   rating: number | null;
+  attachment_ids: string[];
   created_at: string;
 }
 
@@ -94,6 +95,21 @@ export interface SavedResponse {
   message_id: string;
   note: string | null;
   tags: string[];
+  created_at: string;
+}
+
+export interface ConversationAttachment {
+  id: string;
+  conversation_id: string | null;
+  message_id: string | null;
+  user_id: string;
+  file_name: string;
+  file_type: string; // MIME type
+  file_size: number; // bytes
+  storage_path: string;
+  extracted_text: string | null;
+  thumbnail_path: string | null;
+  processing_status: 'pending' | 'processing' | 'completed' | 'failed';
   created_at: string;
 }
 

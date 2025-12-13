@@ -8,7 +8,9 @@ import { MessageList } from './MessageList'
 import { ChatInput, type ChatInputRef } from './ChatInput'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
-import type { ChatMessage } from '@/types/chat'
+import { Loader2 } from 'lucide-react'
+import type { ChatMessage, ChatAttachment } from '@/types/chat'
+import type { UploadedFile } from './FileUpload'
 
 interface ChatContainerProps {
   conversationId?: string
@@ -19,7 +21,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const chatInputRef = useRef<ChatInputRef>(null)
   const { createConversation } = useConversations()
-  const { messages: dbMessages } = useConversationMessages(conversationId || null)
+  const { messages: dbMessages, loading: messagesLoading } = useConversationMessages(conversationId || null)
   const [hasInitialized, setHasInitialized] = useState(false)
   const lastConversationIdRef = useRef<string | undefined>(undefined)
 
@@ -38,58 +40,90 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     finishStreaming,
     statusMessage,
     setStatusMessage,
+    webSearchEnabled,
   } = useChatStore()
 
-  // Sync messages from DB - only on initial load or conversation change
+  // Reset state when conversation changes
   useEffect(() => {
-    // Reset initialization when conversation changes
     if (conversationId !== lastConversationIdRef.current) {
+      console.log('Conversation changed from', lastConversationIdRef.current, 'to', conversationId)
       setHasInitialized(false)
       lastConversationIdRef.current = conversationId
-    }
 
-    // Only sync from DB on initial load, not during active chat
-    if (!hasInitialized && !isLoading) {
-      if (conversationId && dbMessages.length > 0) {
-        const chatMessages: ChatMessage[] = dbMessages.map((m) => ({
-          id: m.id,
-          role: m.role,
-          content: m.content,
-          citations: m.citations,
-          model: m.model || undefined,
-          createdAt: new Date(m.created_at),
-        }))
-        setMessages(chatMessages)
-        setConversationId(conversationId)
-        setHasInitialized(true)
-      } else if (!conversationId) {
+      // Clear messages immediately when switching conversations
+      if (conversationId !== lastConversationIdRef.current) {
         setMessages([])
-        setConversationId(null)
-        setHasInitialized(true)
-      } else if (conversationId && dbMessages.length === 0) {
-        // New conversation with no messages yet
-        setHasInitialized(true)
       }
     }
-  }, [conversationId, dbMessages, setMessages, setConversationId, hasInitialized, isLoading])
+  }, [conversationId, setMessages])
+
+  // Sync messages from DB when loaded
+  useEffect(() => {
+    // Don't sync while actively chatting
+    if (isLoading) return
+
+    // Wait for messages to load
+    if (messagesLoading) return
+
+    console.log('Syncing messages - conversationId:', conversationId, 'dbMessages:', dbMessages.length, 'hasInitialized:', hasInitialized)
+
+    if (conversationId && dbMessages.length > 0 && !hasInitialized) {
+      const chatMessages: ChatMessage[] = dbMessages.map((m) => ({
+        id: m.id,
+        role: m.role,
+        content: m.content,
+        citations: m.citations,
+        model: m.model || undefined,
+        createdAt: new Date(m.created_at),
+      }))
+      console.log('Setting messages from DB:', chatMessages.length)
+      setMessages(chatMessages)
+      setConversationId(conversationId)
+      setHasInitialized(true)
+    } else if (!conversationId && !hasInitialized) {
+      console.log('No conversation - clearing messages')
+      setMessages([])
+      setConversationId(null)
+      setHasInitialized(true)
+    } else if (conversationId && dbMessages.length === 0 && !messagesLoading && !hasInitialized) {
+      // Conversation exists but has no messages yet (new conversation)
+      console.log('New conversation with no messages yet')
+      setConversationId(conversationId)
+      setHasInitialized(true)
+    }
+  }, [conversationId, dbMessages, messagesLoading, setMessages, setConversationId, hasInitialized, isLoading])
 
   // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const handleSendMessage = useCallback(async (content: string) => {
-    if (!content.trim() || isLoading) return
+  const handleSendMessage = useCallback(async (content: string, attachments?: UploadedFile[]) => {
+    const hasContent = content.trim()
+    const hasAttachments = attachments && attachments.length > 0
+
+    if ((!hasContent && !hasAttachments) || isLoading) return
 
     setIsLoading(true)
     setError(null)
     setStatusMessage('Preparing your request...')
 
+    // Convert uploaded files to chat attachments
+    const chatAttachments: ChatAttachment[] | undefined = attachments?.map((a) => ({
+      id: a.id,
+      fileName: a.file.name,
+      fileType: a.file.type,
+      fileSize: a.file.size,
+      storagePath: a.storagePath || '',
+      extractedText: a.extractedText || null,
+    }))
+
     // Create user message
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content,
+      content: content || (hasAttachments ? `[Attached ${attachments!.length} file${attachments!.length > 1 ? 's' : ''}]` : ''),
+      attachments: chatAttachments,
       createdAt: new Date(),
     }
     addMessage(userMessage)
@@ -116,7 +150,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         }
       }
 
-      // Send to API
+      // Send to API with attachments
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -124,6 +158,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           message: content,
           conversationId: activeConversationId,
           model: currentModel,
+          attachments: chatAttachments,
+          webSearchEnabled,
         }),
       })
 
@@ -196,6 +232,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setConversationId,
     createConversation,
     router,
+    webSearchEnabled,
   ])
 
   // Handle editing a prompt - puts the content back in the input for editing
@@ -203,12 +240,23 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     chatInputRef.current?.setInput(content)
   }, [])
 
+  // Show loading state when fetching messages for existing conversation
+  const showLoadingState = conversationId && messagesLoading && messages.length === 0
+
   return (
     <div className="flex flex-col h-full overflow-hidden relative">
       {/* Background blobs - only show on welcome screen */}
-      {messages.length === 0 && <BlobBackground />}
+      {messages.length === 0 && !conversationId && <BlobBackground />}
 
-      {messages.length === 0 ? (
+      {showLoadingState ? (
+        // Loading state for existing conversations
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground text-sm">Loading conversation...</p>
+          </div>
+        </div>
+      ) : messages.length === 0 && !conversationId ? (
         <div className="flex-1 flex items-center justify-center overflow-auto">
           <div className="text-center space-y-6 max-w-lg px-4">
             {/* Animated AI Orb */}
@@ -270,7 +318,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         </div>
       )}
       <div ref={messagesEndRef} />
-      <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} />
+      <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />
     </div>
   )
 }

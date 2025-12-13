@@ -1,8 +1,18 @@
 import type { Citation, Message } from './database'
 import type { ModelProvider, DbModelValue } from '@/lib/llm/provider-factory'
 
-// Model can be either the new provider key or legacy DB value
-export type ChatModelValue = ModelProvider | DbModelValue
+// Model can be either the new provider key, legacy DB value, or 'openai' for backward compatibility with existing data
+export type ChatModelValue = ModelProvider | DbModelValue | 'openai'
+
+export interface ChatAttachment {
+  id: string
+  fileName: string
+  fileType: string
+  fileSize: number
+  storagePath: string
+  extractedText?: string | null
+  thumbnailPath?: string | null
+}
 
 export interface ChatMessage {
   id: string
@@ -11,6 +21,7 @@ export interface ChatMessage {
   citations?: Citation[]
   model?: ChatModelValue
   isStreaming?: boolean
+  attachments?: ChatAttachment[]
   createdAt: Date
 }
 

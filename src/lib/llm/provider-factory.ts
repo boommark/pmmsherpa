@@ -1,16 +1,13 @@
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
-import { createOpenAI } from '@ai-sdk/openai'
 import { getSystemPromptWithContext } from './system-prompt'
 
-// All available model providers
+// All available model providers (Anthropic and Google only)
 export type ModelProvider =
   | 'claude-opus'
   | 'claude-sonnet'
   | 'gemini-3-pro'
   | 'gemini-2.5-thinking'
-  | 'gpt-5.2'
-  | 'gpt-5.2-thinking'
 
 export const MODEL_CONFIG = {
   'claude-opus': {
@@ -20,6 +17,8 @@ export const MODEL_CONFIG = {
     maxTokens: 64000,
     isThinking: false,
     color: 'bg-orange-500',
+    // Claude uses web_search tool type
+    webSearchSupported: true,
   },
   'claude-sonnet': {
     id: 'claude-sonnet-4-5-20250929',
@@ -28,6 +27,7 @@ export const MODEL_CONFIG = {
     maxTokens: 64000,
     isThinking: false,
     color: 'bg-orange-400',
+    webSearchSupported: true,
   },
   'gemini-3-pro': {
     id: 'gemini-3-pro-preview',
@@ -36,6 +36,8 @@ export const MODEL_CONFIG = {
     maxTokens: 64000,
     isThinking: false,
     color: 'bg-blue-500',
+    // Gemini uses google_search grounding
+    webSearchSupported: true,
   },
   'gemini-2.5-thinking': {
     id: 'gemini-2.5-pro',
@@ -44,22 +46,7 @@ export const MODEL_CONFIG = {
     maxTokens: 64000,
     isThinking: true,
     color: 'bg-blue-600',
-  },
-  'gpt-5.2': {
-    id: 'gpt-5.2',
-    name: 'GPT-5.2',
-    provider: 'openai',
-    maxTokens: 128000,
-    isThinking: false,
-    color: 'bg-green-500',
-  },
-  'gpt-5.2-thinking': {
-    id: 'gpt-5.2-pro',
-    name: 'GPT-5.2 Pro (Thinking)',
-    provider: 'openai',
-    maxTokens: 128000,
-    isThinking: true,
-    color: 'bg-green-600',
+    webSearchSupported: true,
   },
 } as const
 
@@ -75,25 +62,21 @@ export function getGoogleClient() {
   })
 }
 
-export function getOpenAIClient() {
-  return createOpenAI({
-    apiKey: process.env.OPENAI_API_KEY!,
-  })
-}
-
 export function getModel(provider: ModelProvider) {
   const config = MODEL_CONFIG[provider]
 
   if (config.provider === 'anthropic') {
     const anthropic = getAnthropicClient()
     return anthropic(config.id)
-  } else if (config.provider === 'google') {
+  } else {
     const google = getGoogleClient()
     return google(config.id)
-  } else {
-    const openai = getOpenAIClient()
-    return openai(config.id)
   }
+}
+
+// Check if a model supports web search
+export function supportsWebSearch(provider: ModelProvider): boolean {
+  return MODEL_CONFIG[provider].webSearchSupported ?? false
 }
 
 export function buildMessages(
@@ -129,12 +112,11 @@ export function isThinkingModel(provider: ModelProvider): boolean {
 }
 
 // Database model type for storage
-export type DbModelValue = 'claude' | 'gemini' | 'openai'
+export type DbModelValue = 'claude' | 'gemini'
 
 // For database storage - maps new provider keys to simplified db values
 export function getDbModelValue(provider: ModelProvider): DbModelValue {
   const config = MODEL_CONFIG[provider]
   if (config.provider === 'anthropic') return 'claude'
-  if (config.provider === 'google') return 'gemini'
-  return 'openai'
+  return 'gemini'
 }

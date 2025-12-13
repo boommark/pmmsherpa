@@ -28,10 +28,6 @@ const modelGroups = {
     label: 'Google',
     models: ['gemini-3-pro', 'gemini-2.5-thinking'] as ModelProvider[],
   },
-  openai: {
-    label: 'OpenAI',
-    models: ['gpt-5.2', 'gpt-5.2-thinking'] as ModelProvider[],
-  },
 }
 
 export default function PreferencesPage() {
@@ -49,7 +45,6 @@ export default function PreferencesPage() {
       const dbModel = profile.preferred_model
       if (dbModel === 'claude') setPreferredModel('claude-opus')
       else if (dbModel === 'gemini') setPreferredModel('gemini-3-pro')
-      else if (dbModel === 'openai') setPreferredModel('gpt-5.2')
       else setPreferredModel(dbModel as ModelProvider)
       setTheme(profile.theme)
     }

@@ -28,10 +28,6 @@ const modelGroups = {
     label: 'Google',
     models: ['gemini-3-pro', 'gemini-2.5-thinking'] as ModelProvider[],
   },
-  openai: {
-    label: 'OpenAI',
-    models: ['gpt-5.2', 'gpt-5.2-thinking'] as ModelProvider[],
-  },
 }
 
 export function ModelSelector({ value, onChange, disabled }: ModelSelectorProps) {

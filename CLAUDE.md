@@ -15,7 +15,8 @@ npx vercel --prod  # Deploy to production
 
 **PMMSherpa** is an AI-powered Product Marketing assistant that combines:
 - **RAG Knowledge Base**: 15,985 chunks from 17 PMM books, 781 PMA blogs, 485 Sharebird AMAs
-- **Dual LLM Support**: Claude Opus 4.5 (primary) and Gemini 2.5 Pro (alternate)
+- **Multi-Model Support**: Claude Opus 4.5, Claude Sonnet 4.5, Gemini 3 Pro, Gemini 2.5 Pro (Thinking)
+- **Web Search**: Provider-native web search (Anthropic web_search, Google googleSearch)
 - **Streaming Responses**: Real-time SSE with status updates and citations
 
 **Live URL**: https://pmmsherpa.com (custom domain)
@@ -31,8 +32,8 @@ npx vercel --prod  # Deploy to production
 | Framework | Next.js 16 (App Router) | TypeScript, Turbopack |
 | Database | Supabase PostgreSQL + pgvector | Project: Flytr |
 | Auth | Supabase Auth | Email/password |
-| Primary LLM | Claude Opus 4.5 | `claude-opus-4-5-20251101` |
-| Alternate LLM | Gemini 2.5 Pro | `gemini-2.5-pro` |
+| LLM (Anthropic) | Claude Opus 4.5, Claude Sonnet 4.5 | `claude-opus-4-5-20251101`, `claude-sonnet-4-5-20250929` |
+| LLM (Google) | Gemini 3 Pro, Gemini 2.5 Pro (Thinking) | `gemini-3-pro-preview`, `gemini-2.5-pro` |
 | Embeddings | OpenAI | `text-embedding-3-small` (512 dim) |
 | UI | Tailwind CSS + shadcn/ui | Dark mode supported |
 | State | Zustand | `src/stores/chatStore.ts` |
@@ -328,6 +329,24 @@ git add -A && git commit -m "message" && git push origin main
 
 ## Change Log
 
+### December 12, 2025 - Model Configuration Update
+**Changes**:
+- Removed OpenAI models (gpt-4o, gpt-4o-mini) from configuration due to compatibility issues
+- Simplified to Anthropic (Claude Opus 4.5, Claude Sonnet 4.5) and Google (Gemini 3 Pro, Gemini 2.5 Pro Thinking) only
+- Added web search toggle in chat UI
+- Implemented provider-native web search tools:
+  - Anthropic: `anthropic.tools.webSearch_20250305()`
+  - Google: `google.tools.googleSearch()`
+- Maintained backward compatibility for existing database records with 'openai' model value
+
+**Files Changed**:
+- `src/lib/llm/provider-factory.ts` - Removed OpenAI models, imports, and handling
+- `src/components/chat/ModelSelector.tsx` - Removed OpenAI from model groups
+- `src/app/(dashboard)/settings/preferences/page.tsx` - Removed OpenAI from preferences
+- `src/app/api/chat/route.ts` - Simplified web search tools (Anthropic + Google only)
+- `src/lib/llm/system-prompt.ts` - Removed OpenAI provider handling
+- `src/types/chat.ts` - Added 'openai' to ChatModelValue for backward compatibility
+
 ### December 12, 2025 - Access Request Flow v2 (Password After Approval)
 **Problem**: Users couldn't log in because Supabase Auth doesn't accept pre-hashed passwords during user creation.
 
@@ -440,4 +459,4 @@ npx supabase gen types ts      # Generate TypeScript types
 
 ---
 
-*Last updated: December 12, 2025*
+*Last updated: December 12, 2025 - Model Configuration Update*
