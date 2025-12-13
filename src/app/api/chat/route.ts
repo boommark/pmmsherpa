@@ -201,6 +201,7 @@ export async function POST(request: NextRequest) {
 
           // Wait for the result to finalize to get usage stats
           const finalResult = await result
+          const usage = await finalResult.usage
 
           // Now save messages to database BEFORE closing the stream
           const latencyMs = Date.now() - startLLM
@@ -245,7 +246,7 @@ export async function POST(request: NextRequest) {
               role: 'assistant',
               content: fullResponseText,
               model: dbModel,
-              tokens_used: (finalResult.usage?.inputTokens || 0) + (finalResult.usage?.outputTokens || 0) || null,
+              tokens_used: (usage?.inputTokens || 0) + (usage?.outputTokens || 0) || null,
               latency_ms: latencyMs,
               citations,
               is_saved: false,
@@ -271,8 +272,8 @@ export async function POST(request: NextRequest) {
           const { error: usageError } = await (supabase.from('usage_logs') as any).insert({
             user_id: user.id,
             model: dbModel,
-            input_tokens: finalResult.usage?.inputTokens || 0,
-            output_tokens: finalResult.usage?.outputTokens || 0,
+            input_tokens: usage?.inputTokens || 0,
+            output_tokens: usage?.outputTokens || 0,
             latency_ms: latencyMs,
             endpoint: '/api/chat',
           })
