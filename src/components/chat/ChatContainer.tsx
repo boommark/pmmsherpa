@@ -18,13 +18,13 @@ interface ChatContainerProps {
 
 export function ChatContainer({ conversationId }: ChatContainerProps) {
   const router = useRouter()
-  const messagesEndRef = useRef<HTMLDivElement>(null)
   const chatInputRef = useRef<ChatInputRef>(null)
   const { createConversation } = useConversations()
   const { messages: dbMessages, loading: messagesLoading } = useConversationMessages(conversationId || null)
   const [hasInitialized, setHasInitialized] = useState(false)
   const lastConversationIdRef = useRef<string | undefined>(undefined)
   const isNavigatingToNewConversation = useRef(false)
+  const isStreamingRef = useRef(false)
 
   const {
     messages,
@@ -66,11 +66,19 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
   // Sync messages from DB when loaded
   useEffect(() => {
-    // Don't sync while actively chatting or loading
+    // Don't sync while actively chatting, loading, or streaming
     if (isLoading) return
+    if (isStreamingRef.current) return
 
     // Wait for messages to load from DB
     if (messagesLoading) return
+
+    // Check if any message is currently streaming
+    const hasStreamingMessage = messages.some(m => m.isStreaming)
+    if (hasStreamingMessage) {
+      console.log('Skipping sync - message is streaming')
+      return
+    }
 
     // If we just navigated to a new conversation we created, don't overwrite
     if (hasInitialized && messages.length > 0 && dbMessages.length === 0) {
@@ -116,11 +124,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     }
   }, [conversationId, dbMessages, messagesLoading, setMessages, setConversationId, hasInitialized, isLoading, messages])
 
-  // Auto-scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
   const handleSendMessage = useCallback(async (content: string, attachments?: UploadedFile[]) => {
     const hasContent = content.trim()
     const hasAttachments = attachments && attachments.length > 0
@@ -130,6 +133,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setIsLoading(true)
     setError(null)
     setStatusMessage('Preparing your request...')
+    isStreamingRef.current = true
 
     // Convert uploaded files to chat attachments
     const chatAttachments: ChatAttachment[] | undefined = attachments?.map((a) => ({
@@ -241,6 +245,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     } finally {
       setIsLoading(false)
       setStatusMessage(null)
+      isStreamingRef.current = false
     }
   }, [
     isLoading,
@@ -344,7 +349,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           />
         </div>
       )}
-      <div ref={messagesEndRef} />
       <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />
     </div>
   )
