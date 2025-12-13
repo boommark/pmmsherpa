@@ -54,17 +54,16 @@ export async function POST(request: NextRequest) {
           // Status: Loading context
           sendStatus('Loading conversation context...')
 
-          // Get conversation history if exists
+          // Get conversation history (last 10 messages for context window efficiency)
           let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
           if (conversationId) {
-            // First get the total count and fetch last 10 messages
-            // Order by created_at DESC to get most recent, then reverse for chronological order
+            // Fetch last 10 messages, ordered DESC to get most recent, then reverse for chronological
             const { data: messages, error: historyError } = await supabase
               .from('messages')
               .select('role, content, created_at')
               .eq('conversation_id', conversationId)
               .order('created_at', { ascending: false })
-              .limit(10) // Last 10 messages for context
+              .limit(10)
 
             if (historyError) {
               console.error('Error fetching conversation history:', historyError)
