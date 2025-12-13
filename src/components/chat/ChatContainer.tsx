@@ -289,20 +289,22 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           </div>
         </div>
       ) : messages.length === 0 && !conversationId ? (
-        <div className="flex-1 flex flex-col overflow-auto">
-          {/* Top section with orb and greeting - centered */}
-          <div className="flex-1 flex flex-col justify-center items-center px-3 md:px-4">
-            {/* Animated AI Orb */}
+        <div className="flex-1 flex flex-col">
+          {/* Top section with orb and greeting - smaller on mobile, centered on desktop */}
+          <div className="flex flex-col justify-center items-center px-3 md:px-4 py-4 md:py-8 md:flex-1">
+            {/* Animated AI Orb - smaller on mobile */}
             <div className="flex justify-center mb-2 md:mb-6">
-              <AnimatedOrb size="lg" />
+              <div className="md:block">
+                <AnimatedOrb size="lg" />
+              </div>
             </div>
 
-            {/* Greeting */}
-            <div className="text-center space-y-1.5 md:space-y-2">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+            {/* Greeting - more compact on mobile */}
+            <div className="text-center space-y-1 md:space-y-2">
+              <h2 className="text-xl md:text-3xl font-semibold tracking-tight">
                 Welcome to PMMSherpa
               </h2>
-              <p className="text-base md:text-lg text-muted-foreground/80">
+              <p className="text-sm md:text-lg text-muted-foreground/80">
                 How can I assist you today?
               </p>
             </div>
@@ -314,8 +316,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />
 
             {/* Quick action suggestions - below the chat input */}
-            <div className="w-full max-w-3xl mx-auto px-4 md:px-6 pb-4 md:pb-6">
-              <div className="flex flex-col gap-2">
+            <div className="w-full max-w-3xl mx-auto px-3 md:px-6 pb-3 md:pb-6">
+              <div className="flex flex-col gap-1.5 md:gap-2">
                 <button
                   className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
                   onClick={() => handleSendMessage("What is April Dunford's positioning framework?")}
