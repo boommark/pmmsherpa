@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { MessageBubble } from './MessageBubble'
 import { StatusIndicator } from './StatusIndicator'
@@ -13,40 +13,121 @@ interface MessageListProps {
 }
 
 export function MessageList({ messages, statusMessage, onEditPrompt }: MessageListProps) {
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const prevMessageCountRef = useRef(0)
+  const isUserScrollingRef = useRef(false)
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const shouldAutoScrollRef = useRef(true)
 
-  // Auto-scroll to bottom when messages change or during streaming
-  useEffect(() => {
-    // Use requestAnimationFrame to ensure DOM has updated
-    requestAnimationFrame(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-    })
-  }, [messages, statusMessage])
+  // Check if any message is currently streaming
+  const isStreaming = messages.some(m => m.isStreaming)
 
-  // Also scroll when a message is streaming (content updates)
+  // Scroll to bottom of messages
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    if (!isUserScrollingRef.current && shouldAutoScrollRef.current) {
+      const container = scrollContainerRef.current?.querySelector('[data-radix-scroll-area-viewport]')
+      if (container) {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior
+        })
+      }
+    }
+  }, [])
+
+  // Detect when user is manually scrolling
   useEffect(() => {
-    const streamingMessage = messages.find(m => m.isStreaming)
-    if (streamingMessage) {
+    const container = scrollContainerRef.current?.querySelector('[data-radix-scroll-area-viewport]')
+    if (!container) return
+
+    const handleScroll = () => {
+      // Check if user is near the bottom (within 100px)
+      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100
+
+      // If user scrolls up while streaming, pause auto-scroll
+      if (!isNearBottom && isStreaming) {
+        isUserScrollingRef.current = true
+        shouldAutoScrollRef.current = false
+      } else if (isNearBottom) {
+        // If user scrolls back to bottom, resume auto-scroll
+        shouldAutoScrollRef.current = true
+      }
+
+      // Clear any existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
+
+      // Reset the flag after user stops scrolling for 2 seconds
+      scrollTimeoutRef.current = setTimeout(() => {
+        isUserScrollingRef.current = false
+      }, 2000)
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      container.removeEventListener('scroll', handleScroll)
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
+    }
+  }, [isStreaming])
+
+  // Scroll when new messages are added
+  useEffect(() => {
+    const currentCount = messages.length
+    const prevCount = prevMessageCountRef.current
+
+    // When a new message is added (user sends a message or assistant starts responding)
+    if (currentCount > prevCount) {
+      // Reset auto-scroll when user sends a new message
+      const lastMessage = messages[messages.length - 1]
+      if (lastMessage?.role === 'user') {
+        isUserScrollingRef.current = false
+        shouldAutoScrollRef.current = true
+      }
+
+      // Scroll to bottom for new messages
       requestAnimationFrame(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+        scrollToBottom('smooth')
       })
     }
-  }, [messages])
+
+    prevMessageCountRef.current = currentCount
+  }, [messages.length, scrollToBottom])
+
+  // Auto-scroll while streaming (follow the response as it grows)
+  useEffect(() => {
+    if (isStreaming && shouldAutoScrollRef.current) {
+      scrollToBottom('auto')
+    }
+  }, [messages, isStreaming, scrollToBottom])
+
+  // On initial load of a conversation, scroll to bottom
+  useEffect(() => {
+    if (messages.length > 0 && prevMessageCountRef.current === 0) {
+      // Initial load - scroll to bottom to show latest
+      requestAnimationFrame(() => {
+        scrollToBottom('auto')
+      })
+      prevMessageCountRef.current = messages.length
+    }
+  }, [messages.length, scrollToBottom])
 
   return (
-    <ScrollArea className="flex-1 h-full w-full" ref={scrollRef}>
-      <div className="w-full max-w-3xl mx-auto py-4 md:py-6 px-3 md:px-4 space-y-4 md:space-y-6">
+    <ScrollArea className="flex-1 h-full w-full" ref={scrollContainerRef}>
+      <div className="w-full max-w-3xl mx-auto py-3 md:py-6 px-3 md:px-4 space-y-3 md:space-y-6">
         {messages.map((message) => (
-          <MessageBubble
-            key={message.id}
-            message={message}
-            onEditPrompt={onEditPrompt}
-          />
+          <div key={message.id}>
+            <MessageBubble
+              message={message}
+              onEditPrompt={onEditPrompt}
+            />
+          </div>
         ))}
         {statusMessage && <StatusIndicator message={statusMessage} />}
-        {/* Scroll anchor at bottom */}
-        <div ref={bottomRef} />
+        <div ref={messagesEndRef} />
       </div>
     </ScrollArea>
   )

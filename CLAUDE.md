@@ -329,6 +329,23 @@ git add -A && git commit -m "message" && git push origin main
 
 ## Change Log
 
+### December 13, 2025 - Mobile Chat Bug Fixes
+**Problems Fixed**:
+1. **Messages disappearing**: After assistant response completed, messages would disappear leaving only first response
+2. **Auto-scroll not working**: Screen didn't scroll to show current question when user sent a message
+
+**Root Causes**:
+1. DB sync logic was overwriting local messages with stale/empty DB data during streaming
+2. Scroll logic only triggered on user messages, didn't follow streaming assistant responses
+
+**Solutions**:
+1. Added guards in message sync to prevent DB overwrite when local messages are ahead of DB
+2. Rewrote scroll behavior to auto-scroll during streaming and follow response as it grows
+
+**Files Changed**:
+- `src/components/chat/ChatContainer.tsx` - Message sync protection (lines 83-101, 120)
+- `src/components/chat/MessageList.tsx` - New auto-scroll during streaming (lines 23-116)
+
 ### December 13, 2025 - Welcome Screen Mobile Optimization
 **Changes**:
 - Restructured welcome screen layout for better mobile experience
@@ -512,4 +529,4 @@ npx supabase gen types ts      # Generate TypeScript types
 
 ---
 
-*Last updated: December 13, 2025 - Welcome Screen Mobile Optimization*
+*Last updated: December 13, 2025 - Mobile Chat Bug Fixes (scroll & messages disappearing)*

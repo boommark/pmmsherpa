@@ -80,9 +80,23 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       return
     }
 
-    // If we just navigated to a new conversation we created, don't overwrite
-    if (hasInitialized && messages.length > 0 && dbMessages.length === 0) {
+    // If we have local messages that haven't been saved to DB yet, don't overwrite them
+    // This handles the case where we just sent messages and they're not in DB yet
+    if (messages.length > 0 && dbMessages.length === 0) {
       console.log('Skipping sync - have local messages, DB is empty (messages being saved)')
+      if (!hasInitialized) {
+        setHasInitialized(true)
+      }
+      return
+    }
+
+    // If we have more local messages than DB messages, we likely have unsaved messages
+    // Don't overwrite local state with stale DB state
+    if (messages.length > dbMessages.length && dbMessages.length > 0) {
+      console.log('Skipping sync - local messages ahead of DB (unsaved messages)')
+      if (!hasInitialized) {
+        setHasInitialized(true)
+      }
       return
     }
 
@@ -99,11 +113,11 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         createdAt: new Date(m.created_at),
       }))
 
-      // Only update if messages are different (avoid infinite loops)
+      // Only update if we don't have local messages or DB has more/different messages
       const currentIds = messages.map(m => m.id).join(',')
       const newIds = chatMessages.map(m => m.id).join(',')
 
-      if (currentIds !== newIds) {
+      if (messages.length === 0 || (currentIds !== newIds && dbMessages.length >= messages.length)) {
         console.log('Setting messages from DB:', chatMessages.length)
         setMessages(chatMessages)
         setConversationId(conversationId)
