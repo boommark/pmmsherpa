@@ -289,53 +289,51 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           </div>
         </div>
       ) : messages.length === 0 && !conversationId ? (
-        <div className="flex-1 flex items-center justify-center overflow-auto">
-          <div className="text-center space-y-6 max-w-lg px-4">
+        <div className="flex-1 flex flex-col overflow-auto">
+          {/* Top section with orb and greeting - centered on desktop, pushed up on mobile */}
+          <div className="flex-1 flex flex-col justify-center items-center px-3 md:px-4">
             {/* Animated AI Orb */}
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mb-2 md:mb-6">
               <AnimatedOrb size="lg" />
             </div>
 
             {/* Greeting */}
-            <div className="space-y-2">
-              <h2 className="text-3xl font-semibold tracking-tight">
+            <div className="text-center space-y-1.5 md:space-y-2">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
                 Welcome to PMMSherpa
               </h2>
-              <p className="text-lg text-muted-foreground/80">
+              <p className="text-base md:text-lg text-muted-foreground/80">
                 How can I assist you today?
               </p>
             </div>
+          </div>
 
+          {/* Bottom section with suggestions - sits above the chat input */}
+          <div className="w-full max-w-lg mx-auto px-3 md:px-4 pb-2 md:pb-4">
             {/* Quick action suggestions */}
-            <div className="flex flex-wrap justify-center gap-2 pt-4">
+            <div className="flex flex-col gap-2">
               <button
-                className="px-4 py-2 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md"
-                onClick={() => handleSendMessage('Help me create a positioning statement for a new SaaS product')}
+                className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
+                onClick={() => handleSendMessage("What is April Dunford's positioning framework?")}
               >
-                Positioning Statement
+                What is April Dunford&apos;s positioning framework?
               </button>
               <button
-                className="px-4 py-2 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md"
-                onClick={() => handleSendMessage('Create a competitive battlecard template')}
+                className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
+                onClick={() => handleSendMessage('How can PMMs earn respect from PMs?')}
               >
-                Battlecard Template
+                How can PMMs earn respect from PMs?
               </button>
               <button
-                className="px-4 py-2 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md"
-                onClick={() => handleSendMessage('Help me develop a go-to-market strategy')}
+                className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
+                onClick={() => handleSendMessage('What messaging strategies deliver success?')}
               >
-                GTM Strategy
-              </button>
-              <button
-                className="px-4 py-2 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md"
-                onClick={() => handleSendMessage('What are the key differences between product marketing and product management?')}
-              >
-                PMM vs PM
+                What messaging strategies deliver success?
               </button>
             </div>
 
             {/* Subtle hint */}
-            <p className="text-xs text-muted-foreground/60 pt-4">
+            <p className="text-xs text-muted-foreground/60 pt-3 text-center hidden md:block">
               Powered by 1,280+ expert sources
             </p>
           </div>
