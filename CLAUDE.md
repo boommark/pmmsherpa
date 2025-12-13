@@ -329,6 +329,23 @@ git add -A && git commit -m "message" && git push origin main
 
 ## Change Log
 
+### December 12, 2025 - Branding Update
+**Changes**:
+- Updated chat bubble and send button from black to teal-cyan gradient
+- Updated PMMSherpa logo text to indigo-purple gradient (matching homepage)
+
+**UI Updates**:
+- User message bubbles: `bg-gradient-to-br from-teal-500 to-cyan-600`
+- User avatar: Same teal-cyan gradient
+- Send button: Teal-cyan gradient with hover state (`from-teal-600 to-cyan-700`)
+- PMMSherpa text: `bg-gradient-to-r from-indigo-600 to-purple-600` (sidebar + header)
+
+**Files Changed**:
+- `src/components/chat/MessageBubble.tsx` - User bubble and avatar gradient
+- `src/components/chat/ChatInput.tsx` - Send button gradient
+- `src/components/layout/Sidebar.tsx` - Logo text gradient
+- `src/components/layout/Header.tsx` - Logo text gradient
+
 ### December 12, 2025 - Chat History Bug Fix
 **Problem**: Model says "I don't see any previous chat history" even though prior messages exist in conversation.
 
