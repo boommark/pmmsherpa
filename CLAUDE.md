@@ -329,6 +329,23 @@ git add -A && git commit -m "message" && git push origin main
 
 ## Change Log
 
+### December 12, 2025 - Chat History Bug Fix
+**Problem**: Model says "I don't see any previous chat history" even though prior messages exist in conversation.
+
+**Root Cause**:
+- The conversation history was fetched with `.order('created_at', { ascending: true }).limit(10)` which gets the FIRST 10 messages, not the LAST 10
+- Missing logging made debugging difficult
+
+**Fix**:
+- Changed to `.order('created_at', { ascending: false }).limit(10)` then reverse for chronological order
+- Added comprehensive logging throughout the chat flow for debugging
+- Added auth check in useConversations hook
+
+**Files Changed**:
+- `src/app/api/chat/route.ts` - Fixed history fetch order, added logging
+- `src/lib/llm/provider-factory.ts` - Added logging to buildMessages
+- `src/hooks/useConversations.ts` - Added auth check and logging
+
 ### December 12, 2025 - Model Configuration Update
 **Changes**:
 - Removed OpenAI models (gpt-4o, gpt-4o-mini) from configuration due to compatibility issues
@@ -459,4 +476,4 @@ npx supabase gen types ts      # Generate TypeScript types
 
 ---
 
-*Last updated: December 12, 2025 - Model Configuration Update*
+*Last updated: December 12, 2025 - Chat History Bug Fix*
