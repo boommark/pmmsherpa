@@ -24,6 +24,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   const { messages: dbMessages, loading: messagesLoading } = useConversationMessages(conversationId || null)
   const [hasInitialized, setHasInitialized] = useState(false)
   const lastConversationIdRef = useRef<string | undefined>(undefined)
+  const isNavigatingToNewConversation = useRef(false)
 
   const {
     messages,
@@ -48,26 +49,39 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     if (conversationId !== lastConversationIdRef.current) {
       console.log('Conversation changed from', lastConversationIdRef.current, 'to', conversationId)
 
-      // Clear messages immediately when switching conversations
-      setMessages([])
-      setHasInitialized(false)
+      // Don't clear messages if we're navigating to a new conversation we just created
+      // (messages are already in state from the current session)
+      if (isNavigatingToNewConversation.current) {
+        console.log('Navigating to new conversation - keeping messages')
+        isNavigatingToNewConversation.current = false
+        setHasInitialized(true) // Mark as initialized so we don't overwrite
+      } else {
+        // Clear messages when switching to a different conversation
+        setMessages([])
+        setHasInitialized(false)
+      }
       lastConversationIdRef.current = conversationId
     }
   }, [conversationId, setMessages])
 
   // Sync messages from DB when loaded
   useEffect(() => {
-    // Don't sync while actively chatting
+    // Don't sync while actively chatting or loading
     if (isLoading) return
 
-    // Wait for messages to load
+    // Wait for messages to load from DB
     if (messagesLoading) return
+
+    // If we just navigated to a new conversation we created, don't overwrite
+    if (hasInitialized && messages.length > 0 && dbMessages.length === 0) {
+      console.log('Skipping sync - have local messages, DB is empty (messages being saved)')
+      return
+    }
 
     console.log('Syncing messages - conversationId:', conversationId, 'dbMessages:', dbMessages.length, 'hasInitialized:', hasInitialized, 'storeMessages:', messages.length)
 
     if (conversationId && dbMessages.length > 0) {
-      // Always sync messages from DB when available (not just on first init)
-      // This ensures messages are always displayed correctly
+      // Sync from DB when we have DB messages
       const chatMessages: ChatMessage[] = dbMessages.map((m) => ({
         id: m.id,
         role: m.role,
@@ -81,10 +95,12 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       const currentIds = messages.map(m => m.id).join(',')
       const newIds = chatMessages.map(m => m.id).join(',')
 
-      if (currentIds !== newIds || !hasInitialized) {
+      if (currentIds !== newIds) {
         console.log('Setting messages from DB:', chatMessages.length)
         setMessages(chatMessages)
         setConversationId(conversationId)
+        setHasInitialized(true)
+      } else if (!hasInitialized) {
         setHasInitialized(true)
       }
     } else if (!conversationId && !hasInitialized) {
@@ -203,6 +219,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                   finishStreaming(assistantMessageId)
                   // Navigate to new conversation after streaming completes
                   if (isNewConversation && activeConversationId) {
+                    // Set flag before navigation to prevent message clearing
+                    isNavigatingToNewConversation.current = true
                     router.replace(`/chat/${activeConversationId}`)
                   }
                 } else if (data.type === 'error') {

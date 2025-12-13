@@ -217,26 +217,12 @@ export async function POST(request: NextRequest) {
               content: message || '[Attachments only]',
               model: null,
               citations: [],
-              is_saved: false,
-              attachment_ids: attachmentIds.length > 0 ? attachmentIds : null,
             }).select('id').single()
 
             if (userMsgError) {
               console.error('Error saving user message:', userMsgError)
             } else {
               console.log('User message saved:', userMessageData?.id)
-            }
-
-            // Link attachments to the user message
-            if (userMessageData && attachmentIds.length > 0) {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const { error: attachError } = await (supabase.from('conversation_attachments') as any)
-                .update({ message_id: userMessageData.id, conversation_id: conversationId })
-                .in('id', attachmentIds)
-
-              if (attachError) {
-                console.error('Error linking attachments:', attachError)
-              }
             }
 
             // Save assistant message
@@ -246,10 +232,9 @@ export async function POST(request: NextRequest) {
               role: 'assistant',
               content: fullResponseText,
               model: dbModel,
-              tokens_used: (usage?.inputTokens || 0) + (usage?.outputTokens || 0) || null,
+              token_count: (usage?.inputTokens || 0) + (usage?.outputTokens || 0) || null,
               latency_ms: latencyMs,
               citations,
-              is_saved: false,
             }).select('id').single()
 
             if (assistantMsgError) {
