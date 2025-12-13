@@ -216,7 +216,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 onClick={handleSubmit}
                 disabled={!canSubmit || disabled}
                 size="icon"
-                className="h-10 w-10 rounded-xl shrink-0 bg-primary hover:bg-primary/90 shadow-lg"
+                className="h-10 w-10 rounded-xl shrink-0 bg-gradient-to-br from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 shadow-lg text-white"
               >
                 {disabled || isUploading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
