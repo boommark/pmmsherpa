@@ -87,15 +87,30 @@ export function buildMessages(
 ) {
   const systemPrompt = getSystemPromptWithContext(retrievedContext, provider)
 
+  // Log conversation history for debugging
+  if (conversationHistory.length > 0) {
+    console.log('[buildMessages] Conversation history:')
+    conversationHistory.forEach((msg, i) => {
+      const preview = msg.content.substring(0, 100).replace(/\n/g, ' ')
+      console.log(`  [${i}] ${msg.role}: "${preview}${msg.content.length > 100 ? '...' : ''}"`)
+    })
+  } else {
+    console.log('[buildMessages] No conversation history provided')
+  }
+
+  const messages = [
+    ...conversationHistory.map((msg) => ({
+      role: msg.role as 'user' | 'assistant',
+      content: msg.content,
+    })),
+    { role: 'user' as const, content: userMessage },
+  ]
+
+  console.log(`[buildMessages] Final message array: ${messages.length} messages`)
+
   return {
     system: systemPrompt,
-    messages: [
-      ...conversationHistory.map((msg) => ({
-        role: msg.role as 'user' | 'assistant',
-        content: msg.content,
-      })),
-      { role: 'user' as const, content: userMessage },
-    ],
+    messages,
   }
 }
 

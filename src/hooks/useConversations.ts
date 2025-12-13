@@ -17,6 +17,18 @@ export function useConversations() {
     try {
       setLoading(true)
       setError(null)
+
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        console.log('[useConversations] No authenticated user, skipping fetch')
+        setConversations([])
+        setLoading(false)
+        return
+      }
+
+      console.log('[useConversations] Fetching conversations for user:', user.id)
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error: fetchError } = await (supabase.from('conversations') as any)
         .select('*')
@@ -24,14 +36,15 @@ export function useConversations() {
         .order('updated_at', { ascending: false })
 
       if (fetchError) {
-        console.error('Error fetching conversations:', fetchError)
+        console.error('[useConversations] Error fetching conversations:', fetchError)
         setError('Failed to load conversations')
         return
       }
 
+      console.log('[useConversations] Fetched', data?.length || 0, 'conversations')
       setConversations(data || [])
     } catch (err) {
-      console.error('Error fetching conversations:', err)
+      console.error('[useConversations] Error fetching conversations:', err)
       setError('Failed to load conversations')
     } finally {
       setLoading(false)

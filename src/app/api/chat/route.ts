@@ -57,19 +57,30 @@ export async function POST(request: NextRequest) {
           // Get conversation history if exists
           let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
           if (conversationId) {
-            const { data: messages } = await supabase
+            // First get the total count and fetch last 10 messages
+            // Order by created_at DESC to get most recent, then reverse for chronological order
+            const { data: messages, error: historyError } = await supabase
               .from('messages')
-              .select('role, content')
+              .select('role, content, created_at')
               .eq('conversation_id', conversationId)
-              .order('created_at', { ascending: true })
+              .order('created_at', { ascending: false })
               .limit(10) // Last 10 messages for context
 
+            if (historyError) {
+              console.error('Error fetching conversation history:', historyError)
+            }
+
             if (messages && Array.isArray(messages)) {
-              conversationHistory = messages.map((m: { role: string; content: string }) => ({
+              // Reverse to get chronological order (oldest to newest)
+              const chronologicalMessages = messages.reverse()
+              conversationHistory = chronologicalMessages.map((m: { role: string; content: string }) => ({
                 role: m.role as 'user' | 'assistant',
                 content: m.content,
               }))
+              console.log(`Loaded ${conversationHistory.length} messages from conversation history for ${conversationId}`)
             }
+          } else {
+            console.log('No conversationId provided - starting fresh conversation')
           }
 
           // Status: Processing attachments if any
@@ -113,12 +124,15 @@ export async function POST(request: NextRequest) {
           const fullContext = attachmentContext
             ? retrievedContext + '\n\n--- User Attached Files ---' + attachmentContext
             : retrievedContext
+
+          console.log(`Building messages with ${conversationHistory.length} history messages for model: ${model}`)
           const { system, messages: allMessages } = buildMessages(
             message || '[User sent attachments without a message]',
             fullContext,
             model,
             conversationHistory
           )
+          console.log(`Total messages being sent to LLM: ${allMessages.length} (${conversationHistory.length} history + 1 new)`)
 
           // Get the appropriate model
           const llmModel = getModel(model)
