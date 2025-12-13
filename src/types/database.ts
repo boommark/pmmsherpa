@@ -20,6 +20,22 @@ export interface Conversation {
   updated_at: string;
 }
 
+// Web citation from Perplexity research (stored in DB)
+export interface WebCitationDb {
+  title: string;
+  url: string;
+  date?: string;
+  snippet?: string;
+}
+
+// Expanded research from Perplexity (stored in DB)
+export interface ExpandedResearchDb {
+  content: string;
+  webCitations: WebCitationDb[];
+  relatedQuestions?: string[];
+  researchType: 'quick' | 'deep';
+}
+
 export interface Message {
   id: string;
   conversation_id: string;
@@ -29,6 +45,7 @@ export interface Message {
   tokens_used: number | null;
   latency_ms: number | null;
   citations: Citation[];
+  expanded_research: ExpandedResearchDb | null;
   is_saved: boolean;
   rating: number | null;
   attachment_ids: string[];

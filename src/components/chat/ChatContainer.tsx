@@ -116,6 +116,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         role: m.role,
         content: m.content,
         citations: m.citations,
+        expandedResearch: m.expanded_research || undefined,
         model: m.model || undefined,
         createdAt: new Date(m.created_at),
       }))

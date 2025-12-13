@@ -16,8 +16,9 @@ import { SourceCitations } from './SourceCitations'
 import { ExpandedResearch } from './ExpandedResearch'
 import { User, Bot, Loader2, Copy, ChevronDown, FileText, Type, Pencil, Check, Sparkles, Search } from 'lucide-react'
 import { toast } from 'sonner'
-import { copyAsMarkdown, copyAsPlainText, copyForGoogleDocs } from '@/lib/utils/clipboard'
+import { copyAsMarkdown, copyAsPlainText, copyForGoogleDocs, type CopyOptions } from '@/lib/utils/clipboard'
 import type { ChatMessage } from '@/types/chat'
+import type { Citation } from '@/types/database'
 
 interface MessageBubbleProps {
   message: ChatMessage
@@ -31,19 +32,25 @@ export function MessageBubble({ message, onEditPrompt, onExpandWithResearch }: M
   const isResearching = message.isResearching
   const [copied, setCopied] = useState(false)
 
+  // Build copy options to include citations and research when copying assistant messages
+  const copyOptions: CopyOptions | undefined = !isUser ? {
+    citations: message.citations as Citation[] | undefined,
+    expandedResearch: message.expandedResearch,
+  } : undefined
+
   const handleCopy = async (format: 'markdown' | 'plain' | 'gdocs') => {
     try {
       switch (format) {
         case 'markdown':
-          await copyAsMarkdown(message.content)
+          await copyAsMarkdown(message.content, copyOptions)
           toast.success('Copied as Markdown')
           break
         case 'plain':
-          await copyAsPlainText(message.content)
+          await copyAsPlainText(message.content, copyOptions)
           toast.success('Copied as plain text')
           break
         case 'gdocs':
-          await copyForGoogleDocs(message.content)
+          await copyForGoogleDocs(message.content, copyOptions)
           toast.success('Copied for Google Docs')
           break
       }

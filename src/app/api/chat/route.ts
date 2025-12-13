@@ -262,6 +262,16 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
           // Collect full response text while streaming
           let fullResponseText = ''
 
+          // Build expanded research object for database storage
+          const expandedResearchForDb = perplexityResult && webCitations.length > 0
+            ? {
+                content: perplexityResult.content,
+                webCitations,
+                relatedQuestions,
+                researchType: deepResearchEnabled ? 'deep' : 'quick'
+              }
+            : null
+
           // Stream text chunks
           for await (const chunk of result.textStream) {
             fullResponseText += chunk
@@ -296,7 +306,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
               console.log('User message saved:', userMessageData?.id)
             }
 
-            // Save assistant message
+            // Save assistant message with citations and expanded research
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { data: assistantMsgData, error: assistantMsgError } = await (supabase.from('messages') as any).insert({
               conversation_id: conversationId,
@@ -306,6 +316,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
               token_count: (usage?.inputTokens || 0) + (usage?.outputTokens || 0) || null,
               latency_ms: latencyMs,
               citations,
+              expanded_research: expandedResearchForDb,
             }).select('id').single()
 
             if (assistantMsgError) {

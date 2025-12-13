@@ -616,4 +616,19 @@ npx supabase gen types ts      # Generate TypeScript types
 
 ---
 
-*Last updated: December 13, 2025 - UX Fixes: New Chat navigation, Citations render after streaming*
+### December 13, 2025 - Perplexity Research Persistence & Enhanced Copy
+- **Perplexity Research Persistence**: Web research (expandedResearch) now saved to database with messages
+- **Load from History**: Past conversations display citations and web research sections
+- **Enhanced Copy**: All copy formats (Markdown, Plain Text, Google Docs) include citations and web research
+- Database migration: `008_add_expanded_research.sql` - Added `expanded_research JSONB` column to messages table
+
+**Files Modified**:
+- `src/app/api/chat/route.ts` - Save expanded_research when persisting assistant messages
+- `src/types/database.ts` - Added WebCitationDb, ExpandedResearchDb interfaces
+- `src/components/chat/ChatContainer.tsx` - Map expanded_research from DB when loading conversations
+- `src/components/chat/MessageBubble.tsx` - Pass citations/research to copy functions
+- `src/lib/utils/clipboard.ts` - Format citations and web research in all copy formats
+
+---
+
+*Last updated: December 13, 2025 - Perplexity Research Persistence & Enhanced Copy*

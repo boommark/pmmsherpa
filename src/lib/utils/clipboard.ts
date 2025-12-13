@@ -2,19 +2,116 @@
  * Clipboard utilities for copying content in different formats
  */
 
+import type { Citation } from '@/types/database'
+import type { ExpandedResearch } from '@/types/chat'
+
 /**
- * Copy text as Markdown (preserves formatting)
+ * Format citations as markdown
  */
-export async function copyAsMarkdown(content: string): Promise<void> {
-  await navigator.clipboard.writeText(content)
+function formatCitationsMarkdown(citations: Citation[]): string {
+  if (!citations || citations.length === 0) return ''
+
+  const lines = ['\n---\n**Sources:**']
+  citations.forEach((c, i) => {
+    let source = `${i + 1}. **${c.source}**`
+    if (c.author) source += ` by ${c.author}`
+    if (c.source_type === 'ama' && c.speaker_role) {
+      source += ` (${c.speaker_role})`
+    }
+    if (c.page_number) source += ` - p. ${c.page_number}`
+    if (c.url) source += ` - [Link](${c.url})`
+    lines.push(source)
+  })
+  return lines.join('\n')
 }
 
 /**
- * Copy text as plain text (strips markdown formatting)
+ * Format expanded research as markdown
  */
-export async function copyAsPlainText(content: string): Promise<void> {
-  // Strip markdown formatting
-  const plainText = content
+function formatResearchMarkdown(research: ExpandedResearch): string {
+  if (!research) return ''
+
+  const lines = ['\n---\n**Web Research:**', research.content]
+
+  if (research.webCitations && research.webCitations.length > 0) {
+    lines.push('\n**Web Sources:**')
+    research.webCitations.forEach((c, i) => {
+      let source = `${i + 1}. [${c.title}](${c.url})`
+      if (c.date) source += ` - ${c.date}`
+      lines.push(source)
+    })
+  }
+
+  return lines.join('\n')
+}
+
+/**
+ * Format citations as plain text
+ */
+function formatCitationsPlain(citations: Citation[]): string {
+  if (!citations || citations.length === 0) return ''
+
+  const lines = ['\n---\nSources:']
+  citations.forEach((c, i) => {
+    let source = `${i + 1}. ${c.source}`
+    if (c.author) source += ` by ${c.author}`
+    if (c.source_type === 'ama' && c.speaker_role) {
+      source += ` (${c.speaker_role})`
+    }
+    if (c.page_number) source += ` - p. ${c.page_number}`
+    if (c.url) source += ` - ${c.url}`
+    lines.push(source)
+  })
+  return lines.join('\n')
+}
+
+/**
+ * Format expanded research as plain text
+ */
+function formatResearchPlain(research: ExpandedResearch): string {
+  if (!research) return ''
+
+  const lines = ['\n---\nWeb Research:', research.content]
+
+  if (research.webCitations && research.webCitations.length > 0) {
+    lines.push('\nWeb Sources:')
+    research.webCitations.forEach((c, i) => {
+      let source = `${i + 1}. ${c.title} - ${c.url}`
+      if (c.date) source += ` (${c.date})`
+      lines.push(source)
+    })
+  }
+
+  return lines.join('\n')
+}
+
+export interface CopyOptions {
+  citations?: Citation[]
+  expandedResearch?: ExpandedResearch
+}
+
+/**
+ * Copy text as Markdown (preserves formatting)
+ */
+export async function copyAsMarkdown(content: string, options?: CopyOptions): Promise<void> {
+  let fullContent = content
+
+  if (options?.citations && options.citations.length > 0) {
+    fullContent += formatCitationsMarkdown(options.citations)
+  }
+
+  if (options?.expandedResearch) {
+    fullContent += formatResearchMarkdown(options.expandedResearch)
+  }
+
+  await navigator.clipboard.writeText(fullContent)
+}
+
+/**
+ * Strip markdown formatting from content
+ */
+function stripMarkdown(content: string): string {
+  return content
     // Remove headers
     .replace(/^#{1,6}\s+/gm, '')
     // Remove bold
@@ -41,7 +138,23 @@ export async function copyAsPlainText(content: string): Promise<void> {
     // Clean up multiple newlines
     .replace(/\n{3,}/g, '\n\n')
     .trim()
+}
 
+/**
+ * Copy text as plain text (strips markdown formatting)
+ */
+export async function copyAsPlainText(content: string, options?: CopyOptions): Promise<void> {
+  let fullContent = content
+
+  if (options?.citations && options.citations.length > 0) {
+    fullContent += formatCitationsPlain(options.citations)
+  }
+
+  if (options?.expandedResearch) {
+    fullContent += formatResearchPlain(options.expandedResearch)
+  }
+
+  const plainText = stripMarkdown(fullContent)
   await navigator.clipboard.writeText(plainText)
 }
 
@@ -49,13 +162,23 @@ export async function copyAsPlainText(content: string): Promise<void> {
  * Copy as rich text (HTML) for Google Docs compatibility
  * Uses ClipboardItem API to write HTML that Google Docs can paste with formatting
  */
-export async function copyForGoogleDocs(content: string): Promise<void> {
+export async function copyForGoogleDocs(content: string, options?: CopyOptions): Promise<void> {
+  let fullContent = content
+
+  if (options?.citations && options.citations.length > 0) {
+    fullContent += formatCitationsMarkdown(options.citations)
+  }
+
+  if (options?.expandedResearch) {
+    fullContent += formatResearchMarkdown(options.expandedResearch)
+  }
+
   // Convert markdown to HTML
-  const html = markdownToHtml(content)
+  const html = markdownToHtml(fullContent)
 
   // Create clipboard item with both HTML and plain text fallback
   const htmlBlob = new Blob([html], { type: 'text/html' })
-  const textBlob = new Blob([content], { type: 'text/plain' })
+  const textBlob = new Blob([fullContent], { type: 'text/plain' })
 
   const clipboardItem = new ClipboardItem({
     'text/html': htmlBlob,
