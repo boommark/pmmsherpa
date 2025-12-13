@@ -42,6 +42,10 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     statusMessage,
     setStatusMessage,
     webSearchEnabled,
+    perplexityEnabled,
+    deepResearchEnabled,
+    setMessageResearching,
+    setExpandedResearch,
   } = useChatStore()
 
   // Reset state when conversation changes
@@ -201,6 +205,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           model: currentModel,
           attachments: chatAttachments,
           webSearchEnabled,
+          perplexityEnabled,
+          deepResearchEnabled,
         }),
       })
 
@@ -232,6 +238,9 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                   appendToStream(assistantMessageId, data.content)
                 } else if (data.type === 'citations') {
                   setCitations(assistantMessageId, data.citations)
+                } else if (data.type === 'expandedResearch') {
+                  // Handle Perplexity expanded research
+                  setExpandedResearch(assistantMessageId, data.expandedResearch)
                 } else if (data.type === 'done') {
                   setStatusMessage(null)
                   finishStreaming(assistantMessageId)
@@ -277,12 +286,44 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     createConversation,
     router,
     webSearchEnabled,
+    perplexityEnabled,
+    deepResearchEnabled,
+    setExpandedResearch,
   ])
 
   // Handle editing a prompt - puts the content back in the input for editing
   const handleEditPrompt = useCallback((content: string) => {
     chatInputRef.current?.setInput(content)
   }, [])
+
+  // Handle expanding a message with web research
+  const handleExpandWithResearch = useCallback(async (messageId: string, content: string, deepResearch: boolean) => {
+    setMessageResearching(messageId, true)
+    try {
+      const response = await fetch('/api/research', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messageId,
+          originalContent: content,
+          query: content,
+          deepResearch
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success && data.expandedResearch) {
+        setExpandedResearch(messageId, data.expandedResearch)
+      } else {
+        console.error('Research failed:', data.error)
+      }
+    } catch (error) {
+      console.error('Research request failed:', error)
+    } finally {
+      setMessageResearching(messageId, false)
+    }
+  }, [setMessageResearching, setExpandedResearch])
 
   // Show loading state when:
   // 1. We have a conversationId and messages are loading, OR
@@ -366,6 +407,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
               messages={messages}
               statusMessage={statusMessage}
               onEditPrompt={handleEditPrompt}
+              onExpandWithResearch={handleExpandWithResearch}
             />
           </div>
           <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />

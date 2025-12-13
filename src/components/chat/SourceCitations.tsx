@@ -70,8 +70,8 @@ export function SourceCitations({ citations }: SourceCitationsProps) {
           />
         </Button>
       </CollapsibleTrigger>
-      <CollapsibleContent className="mt-2">
-        <div className="space-y-3 text-sm border-l-2 border-primary/20 pl-3">
+      <CollapsibleContent className="mt-1.5 md:mt-2">
+        <div className="space-y-2 md:space-y-3 text-xs md:text-sm border-l-2 border-primary/20 pl-2 md:pl-3">
           {Object.entries(groupedCitations).map(([type, typeCitations]) => {
             const config = sourceTypeConfig[type as keyof typeof sourceTypeConfig]
             const Icon = config.icon

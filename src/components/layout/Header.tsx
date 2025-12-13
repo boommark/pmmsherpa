@@ -38,16 +38,16 @@ export function Header() {
     : profile?.email?.[0]?.toUpperCase() || 'U'
 
   return (
-    <header className="flex items-center justify-between px-3 md:px-6 py-3 border-b bg-background">
-      <div className="flex items-center gap-2 md:gap-4">
+    <header className="flex items-center justify-between px-2 md:px-6 py-2 md:py-3 border-b bg-background">
+      <div className="flex items-center gap-1.5 md:gap-4">
         {/* Mobile menu button */}
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden shrink-0"
+          className="md:hidden shrink-0 h-8 w-8"
           onClick={toggleMobileSidebar}
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-4 w-4" />
         </Button>
         <div className="hidden sm:flex items-center gap-2">
           <div className="w-7 h-7 rounded-md bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-sm">

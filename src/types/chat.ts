@@ -14,6 +14,22 @@ export interface ChatAttachment {
   thumbnailPath?: string | null
 }
 
+// Web citations from Perplexity research
+export interface WebCitation {
+  title: string
+  url: string
+  date?: string
+  snippet?: string
+}
+
+// Expanded research content from Perplexity
+export interface ExpandedResearch {
+  content: string
+  webCitations: WebCitation[]
+  relatedQuestions?: string[]
+  researchType: 'quick' | 'deep'
+}
+
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant' | 'system'
@@ -22,6 +38,8 @@ export interface ChatMessage {
   model?: ChatModelValue
   isStreaming?: boolean
   attachments?: ChatAttachment[]
+  expandedResearch?: ExpandedResearch
+  isResearching?: boolean
   createdAt: Date
 }
 

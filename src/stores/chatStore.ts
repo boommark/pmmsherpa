@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { ChatMessage, ChatState } from '@/types/chat'
+import type { ChatMessage, ChatState, ExpandedResearch } from '@/types/chat'
 import type { Citation } from '@/types/database'
 import type { ModelProvider } from '@/lib/llm/provider-factory'
 
@@ -8,6 +8,9 @@ interface ChatStore extends ChatState {
   statusMessage: string | null
   // Web search toggle
   webSearchEnabled: boolean
+  // Perplexity research toggles
+  perplexityEnabled: boolean
+  deepResearchEnabled: boolean
   // Actions
   setMessages: (messages: ChatMessage[]) => void
   addMessage: (message: ChatMessage) => void
@@ -19,11 +22,16 @@ interface ChatStore extends ChatState {
   setConversationId: (id: string | null) => void
   setStatusMessage: (message: string | null) => void
   setWebSearchEnabled: (enabled: boolean) => void
+  setPerplexityEnabled: (enabled: boolean) => void
+  setDeepResearchEnabled: (enabled: boolean) => void
   // Streaming helpers
   startStreaming: (messageId: string) => void
   appendToStream: (messageId: string, content: string) => void
   setCitations: (messageId: string, citations: Citation[]) => void
   finishStreaming: (messageId: string) => void
+  // Research helpers
+  setMessageResearching: (messageId: string, isResearching: boolean) => void
+  setExpandedResearch: (messageId: string, research: ExpandedResearch) => void
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -35,6 +43,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   conversationId: null,
   statusMessage: null,
   webSearchEnabled: false,
+  perplexityEnabled: false,
+  deepResearchEnabled: false,
 
   // Actions
   setMessages: (messages) => set({ messages }),
@@ -64,6 +74,10 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   setStatusMessage: (statusMessage) => set({ statusMessage }),
 
   setWebSearchEnabled: (webSearchEnabled) => set({ webSearchEnabled }),
+
+  setPerplexityEnabled: (perplexityEnabled) => set({ perplexityEnabled }),
+
+  setDeepResearchEnabled: (deepResearchEnabled) => set({ deepResearchEnabled }),
 
   // Streaming helpers
   startStreaming: (messageId) => {
@@ -115,6 +129,23 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     set((state) => ({
       messages: state.messages.map((msg) =>
         msg.id === messageId ? { ...msg, isStreaming: false } : msg
+      ),
+    })),
+
+  // Research helpers
+  setMessageResearching: (messageId, isResearching) =>
+    set((state) => ({
+      messages: state.messages.map((msg) =>
+        msg.id === messageId ? { ...msg, isResearching } : msg
+      ),
+    })),
+
+  setExpandedResearch: (messageId, research) =>
+    set((state) => ({
+      messages: state.messages.map((msg) =>
+        msg.id === messageId
+          ? { ...msg, expandedResearch: research, isResearching: false }
+          : msg
       ),
     })),
 }))

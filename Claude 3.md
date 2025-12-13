@@ -59,7 +59,7 @@ npx vercel --prod  # Deploy to production
 
 ### LLM Integration
 - `src/lib/llm/provider-factory.ts` - LLM provider abstraction
-- `src/lib/llm/system-prompt.ts` - PMM expert system prompt (April Dunford tone)
+- `src/lib/llm/system-prompt.ts` - PMM expert system prompt
 
 ### Database
 - `src/lib/supabase/server.ts` - Server-side Supabase client
@@ -115,51 +115,6 @@ OPENAI_API_KEY=sk-...
 # App
 NEXT_PUBLIC_APP_URL=https://pmmsherpa.vercel.app
 ```
-
----
-
-## System Prompt & AI Personality
-
-The system prompt in `src/lib/llm/system-prompt.ts` defines PMMSherpa's personality:
-
-### Communication Style (April Dunford-inspired)
-- **Direct and practical** - Cut the fluff, get to the point
-- **Confident but not arrogant** - Speak from experience and expertise
-- **Opinionated** - Take clear positions, don't hedge everything
-- **Real-world focused** - Theory is useless without application
-- **Slightly irreverent** - Call out BS, challenge assumptions
-- **Action-oriented** - Every response should move things forward
-
-### Artifact Creation Rules
-When generating deliverables (positioning statements, battlecards, etc.):
-
-**Option A: Rationale First**
-1. Brief explanation of approach (2-3 sentences max)
-2. Clear separator (`---`)
-3. **THE ARTIFACT** - clean, complete, ready to copy/paste
-4. No commentary mixed into the artifact itself
-
-**Option B: Artifact First**
-1. **THE ARTIFACT** - clean, complete, ready to copy/paste
-2. Clear separator (`---`)
-3. Brief rationale explaining choices
-
-**Artifact Formatting Rules:**
-- CLEAN - No `[insert X here]` placeholders if info is available
-- COMPLETE - Don't leave sections empty
-- COPY-READY - Someone can paste it directly into a doc
-- SEPARATE - Never mix explanatory comments into the artifact
-
-### Conversation Context
-The system prompt explicitly instructs the LLM to:
-1. Read ALL previous messages in the conversation thread
-2. Understand the full context of what's been discussed
-3. Reference and build upon earlier points
-4. Use product details, customer info, or competitive context shared earlier
-
-### Conversation History
-- Chat API fetches **last 10 messages** from the conversation for context
-- Uses Supabase query with `limit(10)` ordered DESC, then reversed for chronological order
 
 ---
 
@@ -244,27 +199,6 @@ git add -A && git commit -m "message" && git push origin main
 ### Scroll Issues
 - **Issue**: Couldn't scroll through long responses
 - **Fix**: Added `h-full`, `min-h-0`, `overflow-hidden` to flex containers in `MessageList.tsx` and `ChatContainer.tsx`
-
-### Auto-Scroll Not Working (December 2024)
-- **Issue**: When user sends a new message, chat stayed stuck at top instead of scrolling to latest
-- **Cause**: The scroll anchor (`messagesEndRef`) was placed OUTSIDE the `<ScrollArea>` component
-- **Fix**: Complete rewrite of `MessageList.tsx`:
-  - Added `scrollRef` and `bottomRef` refs
-  - Moved scroll anchor INSIDE the ScrollArea
-  - Added `useEffect` that scrolls to bottom when `messages` or `statusMessage` changes
-  - Added second `useEffect` that scrolls when a message has `isStreaming: true`
-  - Used `requestAnimationFrame` to ensure DOM updates before scrolling
-  - Removed obsolete `messagesEndRef` from `ChatContainer.tsx`
-
-### Streaming Response Disappearing Mid-Generation (December 2024)
-- **Issue**: AI response would start streaming, then disappear in the middle
-- **Cause**: Race condition - the DB sync `useEffect` in `ChatContainer.tsx` was running during streaming and overwriting messages
-- **Fix**: Added streaming protection to `ChatContainer.tsx`:
-  - Added `isStreamingRef = useRef(false)` to track streaming state
-  - Modified DB sync effect to check `isStreamingRef.current` and skip if streaming
-  - Added check for `hasStreamingMessage = messages.some(m => m.isStreaming)`
-  - Set `isStreamingRef.current = true` at start of `handleSendMessage`
-  - Set `isStreamingRef.current = false` in finally block
 
 ### Citations Not Displaying
 - **Issue**: Citations weren't being set in messages
@@ -434,4 +368,4 @@ Admin can access all data via RLS policies. Super admin email is hardcoded in:
 
 ---
 
-*Last updated: December 12, 2024*
+*Last updated: December 2024*

@@ -10,9 +10,10 @@ interface MessageListProps {
   messages: ChatMessage[]
   statusMessage?: string | null
   onEditPrompt?: (content: string) => void
+  onExpandWithResearch?: (messageId: string, content: string, deepResearch: boolean) => void
 }
 
-export function MessageList({ messages, statusMessage, onEditPrompt }: MessageListProps) {
+export function MessageList({ messages, statusMessage, onEditPrompt, onExpandWithResearch }: MessageListProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const prevMessageCountRef = useRef(0)
@@ -123,6 +124,7 @@ export function MessageList({ messages, statusMessage, onEditPrompt }: MessageLi
             <MessageBubble
               message={message}
               onEditPrompt={onEditPrompt}
+              onExpandWithResearch={onExpandWithResearch}
             />
           </div>
         ))}

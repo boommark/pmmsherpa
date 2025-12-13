@@ -2,10 +2,18 @@
 
 import { useState, useRef, useEffect, useImperativeHandle, forwardRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Send, Loader2, Globe } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu'
+import { Send, Loader2, Globe, ChevronDown, Search, Microscope } from 'lucide-react'
 import { FileUpload, type UploadedFile, getFileCategory } from './FileUpload'
 import { AttachmentPreview } from './AttachmentPreview'
 import { useChatStore } from '@/stores/chatStore'
+import { PerplexityIcon } from '@/components/icons/PerplexityIcon'
 
 interface ChatInputProps {
   onSend: (message: string, attachments?: UploadedFile[]) => void
@@ -23,7 +31,14 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const [input, setInput] = useState('')
     const [attachments, setAttachments] = useState<UploadedFile[]>([])
     const textareaRef = useRef<HTMLTextAreaElement>(null)
-    const { webSearchEnabled, setWebSearchEnabled } = useChatStore()
+    const {
+      webSearchEnabled,
+      setWebSearchEnabled,
+      perplexityEnabled,
+      setPerplexityEnabled,
+      deepResearchEnabled,
+      setDeepResearchEnabled
+    } = useChatStore()
 
     // Expose methods to parent
     useImperativeHandle(ref, () => ({
@@ -166,10 +181,10 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const canSubmit = (input.trim() || attachments.some((a) => a.status === 'completed')) && !isUploading
 
     return (
-      <div className="p-4 md:p-6">
+      <div className="p-2 md:p-4 lg:p-6">
         <div className="w-full max-w-3xl mx-auto">
           {/* Glassmorphism container */}
-          <div className="relative rounded-2xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/20 dark:border-zinc-700/50">
+          <div className="relative rounded-xl md:rounded-2xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-[0_4px_16px_rgba(0,0,0,0.08)] md:shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)] md:dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/20 dark:border-zinc-700/50">
             {/* Attachment previews */}
             <AttachmentPreview
               files={attachments}
@@ -177,7 +192,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               disabled={disabled}
             />
 
-            <div className="relative flex items-end gap-2 p-3">
+            <div className="relative flex items-end gap-1.5 md:gap-2 p-2 md:p-3">
               {/* File upload button */}
               <FileUpload
                 onFilesSelected={handleFilesSelected}
@@ -192,31 +207,93 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 size="icon"
                 onClick={() => setWebSearchEnabled(!webSearchEnabled)}
                 disabled={disabled}
-                className={`h-10 w-10 rounded-xl shrink-0 transition-all ${
+                className={`h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 transition-all ${
                   webSearchEnabled
                     ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800/40'
                     : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50'
                 }`}
                 title={webSearchEnabled ? 'Web search enabled' : 'Enable web search'}
               >
-                <Globe className="h-5 w-5" />
+                <Globe className="h-4 w-4 md:h-5 md:w-5" />
               </Button>
+
+              {/* Perplexity research dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={disabled}
+                    className={`h-9 md:h-10 px-2 md:px-3 rounded-lg md:rounded-xl shrink-0 transition-all gap-1 ${
+                      perplexityEnabled
+                        ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-800/40'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50'
+                    }`}
+                    title="Research options"
+                  >
+                    <PerplexityIcon size={18} className="md:w-5 md:h-5" />
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setPerplexityEnabled(false)
+                      setDeepResearchEnabled(false)
+                    }}
+                    className="gap-2"
+                  >
+                    <div className={`w-2 h-2 rounded-full ${!perplexityEnabled ? 'bg-indigo-500' : 'bg-transparent border border-muted-foreground/30'}`} />
+                    <span>Knowledge Base Only</span>
+                    <span className="ml-auto text-xs text-muted-foreground">Default</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setPerplexityEnabled(true)
+                      setDeepResearchEnabled(false)
+                    }}
+                    className="gap-2"
+                  >
+                    <div className={`w-2 h-2 rounded-full ${perplexityEnabled && !deepResearchEnabled ? 'bg-indigo-500' : 'bg-transparent border border-muted-foreground/30'}`} />
+                    <Search className="h-4 w-4" />
+                    <div className="flex flex-col">
+                      <span>Quick Research</span>
+                      <span className="text-xs text-muted-foreground">Add current web data</span>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setPerplexityEnabled(true)
+                      setDeepResearchEnabled(true)
+                    }}
+                    className="gap-2"
+                  >
+                    <div className={`w-2 h-2 rounded-full ${perplexityEnabled && deepResearchEnabled ? 'bg-indigo-500' : 'bg-transparent border border-muted-foreground/30'}`} />
+                    <Microscope className="h-4 w-4" />
+                    <div className="flex flex-col">
+                      <span>Deep Research</span>
+                      <span className="text-xs text-muted-foreground">Comprehensive analysis</span>
+                    </div>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={attachments.length > 0 ? "Add a message or send files..." : "Ask about product marketing..."}
+                placeholder={attachments.length > 0 ? "Add a message..." : "Ask about product marketing..."}
                 disabled={disabled}
-                className="flex-1 min-h-[44px] max-h-[200px] resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-base placeholder:text-muted-foreground/60 disabled:opacity-50"
+                className="flex-1 min-h-[40px] md:min-h-[44px] max-h-[150px] md:max-h-[200px] resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-sm md:text-base placeholder:text-muted-foreground/60 disabled:opacity-50"
                 rows={1}
               />
               <Button
                 onClick={handleSubmit}
                 disabled={!canSubmit || disabled}
                 size="icon"
-                className="h-10 w-10 rounded-xl shrink-0 bg-gradient-to-br from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 shadow-lg text-white"
+                className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 bg-gradient-to-br from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 shadow-md md:shadow-lg text-white"
               >
                 {disabled || isUploading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -226,7 +303,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               </Button>
             </div>
           </div>
-          <p className="text-xs text-muted-foreground/70 mt-3 text-center hidden sm:block">
+          <p className="text-xs text-muted-foreground/70 mt-2 md:mt-3 text-center hidden sm:block">
             PMMSherpa draws from 1,280+ expert sources. Attach PDFs, images, or documents for context.
           </p>
         </div>

@@ -6,26 +6,48 @@ import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { SourceCitations } from './SourceCitations'
-import { User, Bot, Loader2, Copy, Check, Pencil } from 'lucide-react'
+import { ExpandedResearch } from './ExpandedResearch'
+import { User, Bot, Loader2, Copy, ChevronDown, FileText, Type, Pencil, Check, Sparkles, Search } from 'lucide-react'
 import { toast } from 'sonner'
+import { copyAsMarkdown, copyAsPlainText, copyForGoogleDocs } from '@/lib/utils/clipboard'
 import type { ChatMessage } from '@/types/chat'
 
 interface MessageBubbleProps {
   message: ChatMessage
   onEditPrompt?: (content: string) => void
+  onExpandWithResearch?: (messageId: string, content: string, deepResearch: boolean) => void
 }
 
-export function MessageBubble({ message, onEditPrompt }: MessageBubbleProps) {
+export function MessageBubble({ message, onEditPrompt, onExpandWithResearch }: MessageBubbleProps) {
   const isUser = message.role === 'user'
   const isStreaming = message.isStreaming
+  const isResearching = message.isResearching
   const [copied, setCopied] = useState(false)
 
-  const handleCopy = async () => {
+  const handleCopy = async (format: 'markdown' | 'plain' | 'gdocs') => {
     try {
-      await navigator.clipboard.writeText(message.content)
+      switch (format) {
+        case 'markdown':
+          await copyAsMarkdown(message.content)
+          toast.success('Copied as Markdown')
+          break
+        case 'plain':
+          await copyAsPlainText(message.content)
+          toast.success('Copied as plain text')
+          break
+        case 'gdocs':
+          await copyForGoogleDocs(message.content)
+          toast.success('Copied for Google Docs')
+          break
+      }
       setCopied(true)
-      toast.success('Copied to clipboard')
       setTimeout(() => setCopied(false), 2000)
     } catch {
       toast.error('Failed to copy')
@@ -41,29 +63,29 @@ export function MessageBubble({ message, onEditPrompt }: MessageBubbleProps) {
   return (
     <div
       className={cn(
-        'flex gap-3 group',
+        'flex gap-2 md:gap-3 group',
         isUser ? 'flex-row-reverse' : 'flex-row'
       )}
     >
-      <Avatar className={cn('h-8 w-8', isUser ? 'bg-gradient-to-br from-indigo-500 to-purple-500' : 'bg-secondary')}>
+      <Avatar className={cn('h-7 w-7 md:h-8 md:w-8 shrink-0', isUser ? 'bg-gradient-to-br from-indigo-500 to-purple-500' : 'bg-secondary')}>
         <AvatarFallback>
           {isUser ? (
-            <User className="h-4 w-4" />
+            <User className="h-3.5 w-3.5 md:h-4 md:w-4" />
           ) : (
-            <Bot className="h-4 w-4" />
+            <Bot className="h-3.5 w-3.5 md:h-4 md:w-4" />
           )}
         </AvatarFallback>
       </Avatar>
 
       <div
         className={cn(
-          'flex flex-col min-w-0 max-w-[calc(100%-3rem)] md:max-w-[85%] space-y-2',
+          'flex flex-col min-w-0 max-w-[calc(100%-2.5rem)] md:max-w-[85%] space-y-1.5 md:space-y-2',
           isUser ? 'items-end' : 'items-start'
         )}
       >
         <div
           className={cn(
-            'rounded-lg px-3 py-2 md:px-4 w-full relative',
+            'rounded-lg px-2.5 py-1.5 md:px-4 md:py-2 w-full relative',
             isUser
               ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white'
               : 'bg-muted text-foreground'
@@ -149,19 +171,37 @@ export function MessageBubble({ message, onEditPrompt }: MessageBubbleProps) {
             isUser ? 'flex-row-reverse' : 'flex-row',
             'opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100'
           )}>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
-              onClick={handleCopy}
-            >
-              {copied ? (
-                <Check className="h-3 w-3 mr-1" />
-              ) : (
-                <Copy className="h-3 w-3 mr-1" />
-              )}
-              {copied ? 'Copied' : 'Copy'}
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground gap-1"
+                >
+                  {copied ? (
+                    <Check className="h-3 w-3" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
+                  {copied ? 'Copied' : 'Copy'}
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem onClick={() => handleCopy('markdown')}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  Copy as Markdown
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleCopy('plain')}>
+                  <Type className="h-4 w-4 mr-2" />
+                  Copy as Plain Text
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleCopy('gdocs')}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  Copy for Google Docs
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             {isUser && onEditPrompt && (
               <Button
                 variant="ghost"
@@ -179,6 +219,56 @@ export function MessageBubble({ message, onEditPrompt }: MessageBubbleProps) {
         {/* Citations */}
         {!isUser && message.citations && message.citations.length > 0 && (
           <SourceCitations citations={message.citations} />
+        )}
+
+        {/* Expanded Research */}
+        {!isUser && message.expandedResearch && (
+          <ExpandedResearch research={message.expandedResearch} />
+        )}
+
+        {/* Expand with Research button */}
+        {!isUser && !isStreaming && !message.expandedResearch && onExpandWithResearch && (
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isResearching}
+                  className="h-7 px-2.5 text-xs gap-1.5 border-dashed"
+                >
+                  {isResearching ? (
+                    <>
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Researching...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="h-3 w-3" />
+                      Expand with Research
+                      <ChevronDown className="h-3 w-3" />
+                    </>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem
+                  onClick={() => onExpandWithResearch(message.id, message.content, false)}
+                >
+                  <Search className="h-4 w-4 mr-2" />
+                  Quick Search
+                  <span className="ml-auto text-xs text-muted-foreground">~5s</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => onExpandWithResearch(message.id, message.content, true)}
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Deep Research
+                  <span className="ml-auto text-xs text-muted-foreground">~30s</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         )}
 
         {/* Model indicator */}

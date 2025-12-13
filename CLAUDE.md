@@ -134,6 +134,9 @@ OPENAI_API_KEY=sk-...
 # Email (Resend - for transactional emails)
 RESEND_API_KEY=re_...
 
+# Web Research (Perplexity)
+PERPLEXITY_API_KEY=pplx-...
+
 # App
 NEXT_PUBLIC_APP_URL=https://pmmsherpa.com
 ```
@@ -328,6 +331,90 @@ git add -A && git commit -m "message" && git push origin main
 ---
 
 ## Change Log
+
+### December 13, 2025 - Perplexity Research Integration v2 (Parallel + Dropdown)
+
+**Feature: Parallel RAG + Perplexity with Unified Dropdown**
+Combines PMM knowledge base with real-time web research in parallel, synthesizing both into unified responses.
+
+**UI Controls**:
+- **Perplexity dropdown button** (indigo when active) - Single dropdown with three modes:
+  - **Knowledge Base Only** (default) - RAG search only
+  - **Quick Research** - RAG + Perplexity `sonar-pro` (month recency)
+  - **Deep Research** - RAG + Perplexity `sonar-deep-research` (year recency)
+- **Web Search globe toggle** (blue) - Provider-native web search (Anthropic/Google)
+
+**Key Architecture Change**:
+- **BEFORE**: Sequential (RAG → LLM → Perplexity enrichment post-response)
+- **AFTER**: Parallel (RAG + Perplexity simultaneously → combined context → LLM synthesizes)
+
+**Flow**:
+```
+User Message
+    ↓
+┌─────────────────┬─────────────────┐
+│  RAG Search     │  Perplexity     │  ← Promise.all() parallel
+│  (hybrid_search)│  (if enabled)   │
+└────────┬────────┴────────┬────────┘
+         │                 │
+         └────────┬────────┘
+                  ↓
+         Combined Context
+         (RAG + Web Research)
+                  ↓
+         LLM Synthesizes Response
+                  ↓
+         Streamed to User
+         (with both citation types)
+```
+
+**Files Created**:
+- `src/lib/llm/perplexity-client.ts` - Perplexity API client using OpenAI SDK
+- `src/app/api/research/route.ts` - Research expansion endpoint (for on-demand)
+- `src/components/chat/ExpandedResearch.tsx` - Research display component
+- `src/components/icons/PerplexityIcon.tsx` - Custom Perplexity logo SVG (uses `currentColor`)
+
+**Files Modified**:
+- `src/stores/chatStore.ts` - Added `perplexityEnabled`, `deepResearchEnabled` state
+- `src/types/chat.ts` - Added `WebCitation`, `ExpandedResearch` types
+- `src/components/chat/ChatInput.tsx` - Replaced toggle buttons with Perplexity dropdown menu
+- `src/components/chat/ChatContainer.tsx` - Added Perplexity flags in API call
+- `src/components/chat/MessageBubble.tsx` - Added "Expand with Research" button
+- `src/app/api/chat/route.ts` - **Major refactor**: Parallel RAG + Perplexity execution
+
+**Parallel Execution Code** (route.ts):
+```typescript
+const ragPromise = retrieveContext({ query: searchQuery })
+const perplexityPromise = perplexityEnabled
+  ? conductResearch(searchQuery, undefined, {
+      model: deepResearchEnabled ? 'sonar-deep-research' : 'sonar-pro',
+      recencyFilter: deepResearchEnabled ? 'year' : 'month'
+    }).catch(err => null)
+  : Promise.resolve(null)
+
+const [ragResult, perplexityResult] = await Promise.all([ragPromise, perplexityPromise])
+```
+
+**Environment Variable**:
+- `PERPLEXITY_API_KEY` - Perplexity API key (added to Vercel)
+
+---
+
+**Feature 2: Enhanced Clipboard Copy**
+Replaced simple copy button with dropdown menu supporting multiple formats.
+
+**Copy Formats**:
+- **Copy as Markdown** - Preserves all formatting
+- **Copy as Plain Text** - Strips markdown syntax
+- **Copy for Google Docs** - Rich HTML that pastes with formatting in Google Docs/Word
+
+**Files Created**:
+- `src/lib/utils/clipboard.ts` - Clipboard utility functions (`copyAsMarkdown`, `copyAsPlainText`, `copyForGoogleDocs`)
+
+**Files Modified**:
+- `src/components/chat/MessageBubble.tsx` - Replaced copy button with DropdownMenu, added copy format handlers
+
+---
 
 ### December 13, 2025 - Mobile Chat Bug Fixes
 **Problems Fixed**:
@@ -529,4 +616,4 @@ npx supabase gen types ts      # Generate TypeScript types
 
 ---
 
-*Last updated: December 13, 2025 - Mobile Chat Bug Fixes (scroll & messages disappearing)*
+*Last updated: December 13, 2025 - Perplexity Parallel Integration v2 with Dropdown Menu*
