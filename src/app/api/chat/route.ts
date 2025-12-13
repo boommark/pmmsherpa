@@ -181,55 +181,6 @@ export async function POST(request: NextRequest) {
 
           const result = streamText({
             ...streamOptions,
-            onFinish: async ({ text, usage }) => {
-              const latencyMs = Date.now() - startLLM
-
-              // Save user message
-              if (conversationId) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { data: userMessageData } = await (supabase.from('messages') as any).insert({
-                  conversation_id: conversationId,
-                  role: 'user',
-                  content: message || '[Attachments only]',
-                  model: null,
-                  citations: [],
-                  is_saved: false,
-                  attachment_ids: attachmentIds.length > 0 ? attachmentIds : null,
-                }).select('id').single()
-
-                // Link attachments to the user message
-                if (userMessageData && attachmentIds.length > 0) {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  await (supabase.from('conversation_attachments') as any)
-                    .update({ message_id: userMessageData.id, conversation_id: conversationId })
-                    .in('id', attachmentIds)
-                }
-
-                // Save assistant message
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await (supabase.from('messages') as any).insert({
-                  conversation_id: conversationId,
-                  role: 'assistant',
-                  content: text,
-                  model: dbModel,
-                  tokens_used: (usage?.inputTokens || 0) + (usage?.outputTokens || 0) || null,
-                  latency_ms: latencyMs,
-                  citations,
-                  is_saved: false,
-                })
-              }
-
-              // Log usage
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              await (supabase.from('usage_logs') as any).insert({
-                user_id: user.id,
-                model: dbModel,
-                input_tokens: usage?.inputTokens || 0,
-                output_tokens: usage?.outputTokens || 0,
-                latency_ms: latencyMs,
-                endpoint: '/api/chat',
-              })
-            },
           })
 
           // Send citations
@@ -237,11 +188,97 @@ export async function POST(request: NextRequest) {
             encoder.encode(`data: ${JSON.stringify({ type: 'citations', citations })}\n\n`)
           )
 
+          // Collect full response text while streaming
+          let fullResponseText = ''
+
           // Stream text chunks
           for await (const chunk of result.textStream) {
+            fullResponseText += chunk
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ type: 'text', content: chunk })}\n\n`)
             )
+          }
+
+          // Wait for the result to finalize to get usage stats
+          const finalResult = await result
+
+          // Now save messages to database BEFORE closing the stream
+          const latencyMs = Date.now() - startLLM
+
+          if (conversationId) {
+            console.log(`Saving messages to conversation ${conversationId}`)
+
+            // Save user message
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { data: userMessageData, error: userMsgError } = await (supabase.from('messages') as any).insert({
+              conversation_id: conversationId,
+              role: 'user',
+              content: message || '[Attachments only]',
+              model: null,
+              citations: [],
+              is_saved: false,
+              attachment_ids: attachmentIds.length > 0 ? attachmentIds : null,
+            }).select('id').single()
+
+            if (userMsgError) {
+              console.error('Error saving user message:', userMsgError)
+            } else {
+              console.log('User message saved:', userMessageData?.id)
+            }
+
+            // Link attachments to the user message
+            if (userMessageData && attachmentIds.length > 0) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const { error: attachError } = await (supabase.from('conversation_attachments') as any)
+                .update({ message_id: userMessageData.id, conversation_id: conversationId })
+                .in('id', attachmentIds)
+
+              if (attachError) {
+                console.error('Error linking attachments:', attachError)
+              }
+            }
+
+            // Save assistant message
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { data: assistantMsgData, error: assistantMsgError } = await (supabase.from('messages') as any).insert({
+              conversation_id: conversationId,
+              role: 'assistant',
+              content: fullResponseText,
+              model: dbModel,
+              tokens_used: (finalResult.usage?.inputTokens || 0) + (finalResult.usage?.outputTokens || 0) || null,
+              latency_ms: latencyMs,
+              citations,
+              is_saved: false,
+            }).select('id').single()
+
+            if (assistantMsgError) {
+              console.error('Error saving assistant message:', assistantMsgError)
+            } else {
+              console.log('Assistant message saved:', assistantMsgData?.id)
+            }
+
+            // Update conversation's updated_at timestamp
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (supabase.from('conversations') as any)
+              .update({ updated_at: new Date().toISOString() })
+              .eq('id', conversationId)
+          } else {
+            console.log('No conversationId provided, skipping message save')
+          }
+
+          // Log usage
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error: usageError } = await (supabase.from('usage_logs') as any).insert({
+            user_id: user.id,
+            model: dbModel,
+            input_tokens: finalResult.usage?.inputTokens || 0,
+            output_tokens: finalResult.usage?.outputTokens || 0,
+            latency_ms: latencyMs,
+            endpoint: '/api/chat',
+          })
+
+          if (usageError) {
+            console.error('Error logging usage:', usageError)
           }
 
           // Signal completion
