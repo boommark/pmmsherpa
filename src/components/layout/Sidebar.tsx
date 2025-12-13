@@ -87,8 +87,21 @@ function SidebarContent({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         {!collapsed && (
-          <Link href="/chat" className="font-semibold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent" onClick={onNavigate}>
-            PMMSherpa
+          <Link href="/chat" className="flex items-center gap-2" onClick={onNavigate}>
+            <div className="w-7 h-7 rounded-md bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-sm">
+              <svg
+                viewBox="0 0 24 24"
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M2 20L7 10l5 6 4-10 6 14" />
+              </svg>
+            </div>
+            <span className="font-semibold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">PMMSherpa</span>
           </Link>
         )}
         {showCollapseButton && (
@@ -110,7 +123,13 @@ function SidebarContent({
       {/* New Chat Button */}
       <div className="p-3">
         <Link href="/chat" onClick={onNavigate}>
-          <Button className="w-full" variant={collapsed ? 'ghost' : 'default'}>
+          <Button
+            className={cn(
+              "w-full",
+              !collapsed && "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-md hover:shadow-lg transition-all"
+            )}
+            variant={collapsed ? 'ghost' : 'default'}
+          >
             <Plus className="h-4 w-4" />
             {!collapsed && <span className="ml-2">New Chat</span>}
           </Button>

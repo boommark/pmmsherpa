@@ -10,8 +10,24 @@ import {
   FileText,
   Users,
   ArrowRight,
-  Sparkles,
 } from "lucide-react";
+
+// Mountain peak icon component for branding
+function MountainIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M2 20L7 10l5 6 4-10 6 14" />
+    </svg>
+  );
+}
 
 const features = [
   {
@@ -69,7 +85,7 @@ export default function LandingPage() {
         <nav className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-              <Sparkles className="h-4 w-4 text-white" />
+              <MountainIcon className="h-4 w-4 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               PMMSherpa
@@ -99,7 +115,7 @@ export default function LandingPage() {
           </div>
 
           <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 px-4 py-2 text-sm shadow-sm">
-            <Sparkles className="h-4 w-4 text-indigo-500" />
+            <MountainIcon className="h-4 w-4 text-indigo-500" />
             <span className="text-muted-foreground">Powered by Claude Opus 4.5 & Gemini</span>
           </div>
           <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
@@ -233,7 +249,7 @@ export default function LandingPage() {
         <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 text-sm text-muted-foreground sm:flex-row">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-              <Sparkles className="h-3 w-3 text-white" />
+              <MountainIcon className="h-3 w-3 text-white" />
             </div>
             <span className="font-medium">PMMSherpa</span>
           </div>

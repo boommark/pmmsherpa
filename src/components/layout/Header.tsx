@@ -49,7 +49,22 @@ export function Header() {
         >
           <Menu className="h-5 w-5" />
         </Button>
-        <h1 className="text-base md:text-lg font-semibold hidden sm:block bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">PMMSherpa</h1>
+        <div className="hidden sm:flex items-center gap-2">
+          <div className="w-7 h-7 rounded-md bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-sm">
+            <svg
+              viewBox="0 0 24 24"
+              className="w-4 h-4 text-white"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M2 20L7 10l5 6 4-10 6 14" />
+            </svg>
+          </div>
+          <h1 className="text-base md:text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">PMMSherpa</h1>
+        </div>
         <ModelSelector
           value={currentModel}
           onChange={setCurrentModel}

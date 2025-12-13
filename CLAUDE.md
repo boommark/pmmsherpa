@@ -15,10 +15,12 @@ npx vercel --prod  # Deploy to production
 
 **PMMSherpa** is an AI-powered Product Marketing assistant that combines:
 - **RAG Knowledge Base**: 15,985 chunks from 17 PMM books, 781 PMA blogs, 485 Sharebird AMAs
-- **Dual LLM Support**: Claude Opus 4.5 (primary) and Gemini 2.5 Pro (alternate)
+- **Multi-Model Support**: Claude Opus 4.5, Claude Sonnet 4.5, Gemini 3 Pro, Gemini 2.5 Pro (Thinking)
+- **Web Search**: Provider-native web search (Anthropic web_search, Google googleSearch)
 - **Streaming Responses**: Real-time SSE with status updates and citations
 
-**Live URL**: https://pmmsherpa.vercel.app
+**Live URL**: https://pmmsherpa.com (custom domain)
+**Vercel URL**: https://pmmsherpa.vercel.app
 **GitHub**: https://github.com/boommark/pmmsherpa
 
 ---
@@ -30,8 +32,8 @@ npx vercel --prod  # Deploy to production
 | Framework | Next.js 16 (App Router) | TypeScript, Turbopack |
 | Database | Supabase PostgreSQL + pgvector | Project: Flytr |
 | Auth | Supabase Auth | Email/password |
-| Primary LLM | Claude Opus 4.5 | `claude-opus-4-5-20251101` |
-| Alternate LLM | Gemini 2.5 Pro | `gemini-2.5-pro` |
+| LLM (Anthropic) | Claude Opus 4.5, Claude Sonnet 4.5 | `claude-opus-4-5-20251101`, `claude-sonnet-4-5-20250929` |
+| LLM (Google) | Gemini 3 Pro, Gemini 2.5 Pro (Thinking) | `gemini-3-pro-preview`, `gemini-2.5-pro` |
 | Embeddings | OpenAI | `text-embedding-3-small` (512 dim) |
 | UI | Tailwind CSS + shadcn/ui | Dark mode supported |
 | State | Zustand | `src/stores/chatStore.ts` |
@@ -43,6 +45,8 @@ npx vercel --prod  # Deploy to production
 
 ### API Routes
 - `src/app/api/chat/route.ts` - Main streaming chat endpoint (SSE)
+- `src/app/api/access-request/route.ts` - Submit access request (public)
+- `src/app/api/access-request/approve/route.ts` - Approve request, create user, send email (admin only)
 
 ### Chat Components
 - `src/components/chat/ChatContainer.tsx` - Main chat orchestrator
@@ -65,6 +69,20 @@ npx vercel --prod  # Deploy to production
 - `src/lib/supabase/server.ts` - Server-side Supabase client
 - `src/lib/supabase/client.ts` - Browser Supabase client
 
+### Email
+- `src/lib/email/templates.ts` - Email templates (admin notification, user approval, welcome draft)
+
+### Auth Pages
+- `src/app/(auth)/login/page.tsx` - Login page with forgot password link
+- `src/app/(auth)/request-access/page.tsx` - Access request form (replaces signup)
+- `src/app/(auth)/set-password/page.tsx` - Password setup page (after approval)
+- `src/app/(auth)/forgot-password/page.tsx` - Self-service password reset
+- `src/app/auth/callback/route.ts` - Supabase auth callback handler
+
+### Admin Pages
+- `src/app/(admin)/admin/approve/page.tsx` - One-click approval confirmation page
+- `src/app/(admin)/admin/requests/page.tsx` - Access requests management dashboard
+
 ### State Management
 - `src/stores/chatStore.ts` - Zustand store for chat state
 
@@ -84,6 +102,7 @@ messages          -- Messages with content, citations, model
 documents         -- Source document metadata
 chunks            -- Embedded chunks with vector (512 dim)
 usage_logs        -- API usage analytics
+access_requests   -- Waitlist/access requests (see Access Request Flow below)
 ```
 
 ### Key SQL Functions
@@ -112,8 +131,11 @@ GOOGLE_API_KEY=AIza...
 # Embeddings
 OPENAI_API_KEY=sk-...
 
+# Email (Resend - for transactional emails)
+RESEND_API_KEY=re_...
+
 # App
-NEXT_PUBLIC_APP_URL=https://pmmsherpa.vercel.app
+NEXT_PUBLIC_APP_URL=https://pmmsherpa.com
 ```
 
 ---
@@ -161,6 +183,77 @@ data: {"type": "done"}
 // Error
 data: {"type": "error", "message": "..."}
 ```
+
+---
+
+## Access Request Flow (Waitlist with Admin Approval)
+
+**Important**: Direct signup is disabled. Users must request access and be approved by admin.
+
+### User Flow
+```
+1. User visits https://pmmsherpa.com → clicks "Get Started"
+2. User fills out Request Access form:
+   - Full Name (required)
+   - Email (required)
+   - Phone (optional)
+   - Profession (optional)
+   - Company (optional)
+   - LinkedIn URL (required) - validated format: linkedin.com/in/username
+   - Use Cases (multi-select checkboxes)
+3. User submits → sees "Thank you" confirmation
+4. Admin (abhishekratna@gmail.com) receives email notification
+5. Admin clicks "Approve Access" link → opens admin confirmation page
+6. Admin confirms → account created in Supabase Auth
+7. User receives approval email with "Set Up Your Password" button
+8. User clicks link → redirected to /set-password page
+9. User creates password → logged in automatically → redirected to /chat
+```
+
+### Key Implementation Details
+
+**No password during signup**: Users don't provide a password when requesting access. They set it AFTER approval via a recovery-type link.
+
+**Password Setup Flow**:
+- Approval API calls `supabase.auth.admin.generateLink({ type: 'recovery', ... })`
+- Link redirects to `/auth/callback?redirect_to=/set-password`
+- Auth callback verifies OTP token and creates session
+- `/set-password` page lets user create their password
+- Password requirements: 8+ chars, uppercase, lowercase, number
+
+**LinkedIn Validation**:
+- Required field (not optional)
+- Regex: `/^https?:\/\/(www\.)?linkedin\.com\/in\/[\w-]+\/?$/i`
+- Validated on both client and server
+
+**Admin Email**: abhishekratna@gmail.com (hardcoded in `src/lib/constants.ts`)
+
+**Email Service**: Resend (domain: pmmsherpa.com, verified)
+
+### Database: access_requests table
+```sql
+CREATE TABLE access_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT NOT NULL UNIQUE,
+  full_name TEXT NOT NULL,
+  phone TEXT,
+  profession TEXT,
+  company TEXT,
+  linkedin_url TEXT NOT NULL,
+  use_cases TEXT[],
+  password_hash TEXT,  -- NULLABLE (not used in new flow)
+  status TEXT NOT NULL DEFAULT 'pending',  -- pending, approved, rejected
+  approval_token UUID DEFAULT gen_random_uuid(),
+  approved_at TIMESTAMPTZ,
+  approved_by UUID REFERENCES auth.users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### Migrations Applied
+- `005_access_requests.sql` - Created access_requests table
+- `006_make_password_hash_nullable.sql` - Made password_hash nullable
 
 ---
 
@@ -217,6 +310,10 @@ git add -A && git commit -m "message" && git push origin main
 - **Issue**: Book citations had no links
 - **Fix**: Added Amazon search URLs to all 16 books and updated `book_processor.py` to auto-generate URLs
 
+### Password Login Not Working After Approval
+- **Issue**: Users couldn't log in with password they provided during signup (Supabase doesn't accept pre-hashed passwords)
+- **Fix**: Completely removed password from signup. Users now set password AFTER approval via recovery link flow.
+
 ---
 
 ## Pending Tasks / Future Improvements
@@ -226,6 +323,105 @@ git add -A && git commit -m "message" && git push origin main
 3. **Implement saved responses** - Star/bookmark individual responses
 4. **Usage analytics dashboard** - Show token usage, query counts
 5. **PMM operational tools** - Structured deliverable generators (battlecards, positioning canvas, etc.)
+6. **File upload in conversations** - Allow PDFs, docs, images in chat context
+
+---
+
+## Change Log
+
+### December 12, 2025 - Branding Update
+**Changes**:
+- Updated chat bubble and send button from black to teal-cyan gradient
+- Updated PMMSherpa logo text to indigo-purple gradient (matching homepage)
+
+**UI Updates**:
+- User message bubbles: `bg-gradient-to-br from-teal-500 to-cyan-600`
+- User avatar: Same teal-cyan gradient
+- Send button: Teal-cyan gradient with hover state (`from-teal-600 to-cyan-700`)
+- PMMSherpa text: `bg-gradient-to-r from-indigo-600 to-purple-600` (sidebar + header)
+
+**Files Changed**:
+- `src/components/chat/MessageBubble.tsx` - User bubble and avatar gradient
+- `src/components/chat/ChatInput.tsx` - Send button gradient
+- `src/components/layout/Sidebar.tsx` - Logo text gradient
+- `src/components/layout/Header.tsx` - Logo text gradient
+
+### December 12, 2025 - Chat History Bug Fix
+**Problem**: Model says "I don't see any previous chat history" even though prior messages exist in conversation.
+
+**Root Cause**:
+- The conversation history was fetched with `.order('created_at', { ascending: true }).limit(10)` which gets the FIRST 10 messages, not the LAST 10
+- Missing logging made debugging difficult
+
+**Fix**:
+- Changed to `.order('created_at', { ascending: false }).limit(10)` then reverse for chronological order
+- Added comprehensive logging throughout the chat flow for debugging
+- Added auth check in useConversations hook
+
+**Files Changed**:
+- `src/app/api/chat/route.ts` - Fixed history fetch order, added logging
+- `src/lib/llm/provider-factory.ts` - Added logging to buildMessages
+- `src/hooks/useConversations.ts` - Added auth check and logging
+
+### December 12, 2025 - Model Configuration Update
+**Changes**:
+- Removed OpenAI models (gpt-4o, gpt-4o-mini) from configuration due to compatibility issues
+- Simplified to Anthropic (Claude Opus 4.5, Claude Sonnet 4.5) and Google (Gemini 3 Pro, Gemini 2.5 Pro Thinking) only
+- Added web search toggle in chat UI
+- Implemented provider-native web search tools:
+  - Anthropic: `anthropic.tools.webSearch_20250305()`
+  - Google: `google.tools.googleSearch()`
+- Maintained backward compatibility for existing database records with 'openai' model value
+
+**Files Changed**:
+- `src/lib/llm/provider-factory.ts` - Removed OpenAI models, imports, and handling
+- `src/components/chat/ModelSelector.tsx` - Removed OpenAI from model groups
+- `src/app/(dashboard)/settings/preferences/page.tsx` - Removed OpenAI from preferences
+- `src/app/api/chat/route.ts` - Simplified web search tools (Anthropic + Google only)
+- `src/lib/llm/system-prompt.ts` - Removed OpenAI provider handling
+- `src/types/chat.ts` - Added 'openai' to ChatModelValue for backward compatibility
+
+### December 12, 2025 - Access Request Flow v2 (Password After Approval)
+**Problem**: Users couldn't log in because Supabase Auth doesn't accept pre-hashed passwords during user creation.
+
+**Solution**: Completely redesigned the flow:
+- Removed password fields from request access form
+- Made LinkedIn URL mandatory (was optional)
+- Added `/set-password` page for users to create password after approval
+- Added `/forgot-password` page for self-service password reset
+- Created `/auth/callback` route to handle Supabase recovery tokens
+- Updated approval API to generate recovery link instead of using stored password
+- Updated email templates to include password setup link
+
+**Files Changed**:
+- `src/app/(auth)/request-access/page.tsx` - Removed password fields, made LinkedIn required
+- `src/app/api/access-request/route.ts` - Removed bcrypt, password hashing
+- `src/app/api/access-request/approve/route.ts` - Generate recovery link, updated email
+- `src/lib/email/templates.ts` - Added passwordSetupLink to approval email
+- `src/app/(auth)/login/page.tsx` - Added forgot password link, changed signup to request-access
+
+**Files Created**:
+- `src/app/(auth)/set-password/page.tsx` - Password setup after approval
+- `src/app/(auth)/forgot-password/page.tsx` - Self-service password reset
+- `src/app/auth/callback/route.ts` - Supabase auth callback handler
+- `supabase/migrations/006_make_password_hash_nullable.sql`
+
+### December 11, 2025 - Access Request Flow v1
+- Implemented waitlist/approval flow replacing direct signup
+- Created access_requests table and migrations
+- Added admin notification emails via Resend
+- Created admin approval pages
+
+### December 10, 2025 - Custom Domain & Email Setup
+- Connected pmmsherpa.com custom domain to Vercel
+- Set up Resend for transactional emails
+- Verified pmmsherpa.com domain in Resend
+
+### Earlier - Core Features
+- RAG knowledge base with 15,985 chunks
+- Dual LLM support (Claude Opus 4.5, Gemini 2.5 Pro)
+- Streaming SSE responses with citations
+- Chat interface with conversation history
 
 ---
 
@@ -297,75 +493,4 @@ npx supabase gen types ts      # Generate TypeScript types
 
 ---
 
-## Testing
-
-### Automated Test Suite
-
-A comprehensive Playwright-based test suite is available at `/tmp/pmmsherpa_test.py`:
-
-```bash
-# Run tests (requires admin password)
-cd /tmp
-ADMIN_PASSWORD='<password>' python pmmsherpa_test.py
-```
-
-**Test Coverage:**
-| Test | Description | Status |
-|------|-------------|--------|
-| Landing Page | Logo, hero, CTAs, features | ✅ PASS |
-| Request Access | Form fields, validation | ✅ PASS |
-| Login Page | Email/password fields, submit | ✅ PASS |
-| Login Flow | Authentication, redirect to chat | ✅ PASS |
-| Chat Interface | Input, sidebar, model selector | ✅ PASS |
-| Send Message | Type message, get AI response | ✅ PASS |
-| Conversation History | Sidebar conversations, date groups | ✅ PASS |
-| Model Selector | Claude/Gemini dropdown | ✅ PASS |
-| Settings Page | Profile, account info | ✅ PASS |
-| Branding | Gradient elements | ✅ PASS |
-
-**Screenshots saved to:** `/tmp/pmmsherpa_tests/`
-
-### Manual Testing Checklist
-
-Before deploying, verify:
-- [ ] Login with admin credentials works
-- [ ] Chat sends messages and receives streaming responses
-- [ ] Citations display correctly with source links
-- [ ] Model selector switches between Claude/Gemini
-- [ ] Conversation history shows in sidebar
-- [ ] Settings page shows profile info
-- [ ] Mobile responsive layout works
-
----
-
-## Branding & Styling
-
-### Color Palette
-
-| Element | Gradient | Tailwind Classes |
-|---------|----------|------------------|
-| PMMSherpa Logo | Indigo → Purple | `from-indigo-600 to-purple-600` |
-| User Chat Bubbles | Teal → Cyan | `from-teal-500 to-cyan-500` |
-| Send Button | Teal → Cyan | `from-teal-500 to-cyan-500` |
-| Hover States | Teal → Cyan (darker) | `from-teal-600 to-cyan-600` |
-
-### Key Styled Components
-
-- **Header.tsx**: PMMSherpa logo with indigo-purple gradient text
-- **Sidebar.tsx**: PMMSherpa logo with indigo-purple gradient text
-- **MessageBubble.tsx**: User messages with teal-cyan gradient background
-- **ChatInput.tsx**: Send button with teal-cyan gradient
-
----
-
-## Admin Access
-
-**Admin Email:** `abhishekratna@gmail.com`
-
-Admin can access all data via RLS policies. Super admin email is hardcoded in:
-- `src/lib/constants.ts` (if exists)
-- Supabase RLS policies
-
----
-
-*Last updated: December 2024*
+*Last updated: December 12, 2025 - Chat History Bug Fix*

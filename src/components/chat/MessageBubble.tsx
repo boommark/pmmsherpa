@@ -45,7 +45,7 @@ export function MessageBubble({ message, onEditPrompt }: MessageBubbleProps) {
         isUser ? 'flex-row-reverse' : 'flex-row'
       )}
     >
-      <Avatar className={cn('h-8 w-8', isUser ? 'bg-gradient-to-br from-teal-500 to-cyan-600' : 'bg-secondary')}>
+      <Avatar className={cn('h-8 w-8', isUser ? 'bg-gradient-to-br from-indigo-500 to-purple-500' : 'bg-secondary')}>
         <AvatarFallback>
           {isUser ? (
             <User className="h-4 w-4" />
@@ -65,7 +65,7 @@ export function MessageBubble({ message, onEditPrompt }: MessageBubbleProps) {
           className={cn(
             'rounded-lg px-3 py-2 md:px-4 w-full relative',
             isUser
-              ? 'bg-gradient-to-br from-teal-500 to-cyan-600 text-white'
+              ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white'
               : 'bg-muted text-foreground'
           )}
         >
