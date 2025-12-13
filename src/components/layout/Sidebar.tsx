@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -20,6 +20,26 @@ import {
   Trash2,
 } from 'lucide-react'
 
+// Helper to group conversations by date
+function getDateGroup(date: Date): string {
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+  const weekAgo = new Date(today)
+  weekAgo.setDate(weekAgo.getDate() - 7)
+  const monthAgo = new Date(today)
+  monthAgo.setDate(monthAgo.getDate() - 30)
+
+  const convDate = new Date(date)
+
+  if (convDate >= today) return 'Today'
+  if (convDate >= yesterday) return 'Yesterday'
+  if (convDate >= weekAgo) return 'Previous 7 Days'
+  if (convDate >= monthAgo) return 'Previous 30 Days'
+  return 'Older'
+}
+
 // Shared sidebar content
 function SidebarContent({
   collapsed,
@@ -34,6 +54,26 @@ function SidebarContent({
 }) {
   const pathname = usePathname()
   const { conversations, deleteConversation } = useConversations()
+
+  // Group conversations by date
+  const groupedConversations = useMemo(() => {
+    const groups: Record<string, typeof conversations> = {}
+    const sortedConvs = [...conversations].sort(
+      (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+    )
+
+    sortedConvs.slice(0, 15).forEach((conv) => {
+      const group = getDateGroup(new Date(conv.updated_at))
+      if (!groups[group]) {
+        groups[group] = []
+      }
+      groups[group].push(conv)
+    })
+
+    return groups
+  }, [conversations])
+
+  const groupOrder = ['Today', 'Yesterday', 'Previous 7 Days', 'Previous 30 Days', 'Older']
 
   const navItems = [
     { href: '/chat', icon: MessageSquare, label: 'New Chat' },
@@ -77,41 +117,52 @@ function SidebarContent({
         </Link>
       </div>
 
-      {/* Conversations */}
+      {/* Conversations grouped by date */}
       {!collapsed && (
         <ScrollArea className="flex-1 px-3">
-          <div className="space-y-1 py-2">
-            <p className="text-xs font-medium text-muted-foreground px-2 py-1">
-              Recent Conversations
-            </p>
-            {conversations.slice(0, 10).map((conv) => (
-              <div
-                key={conv.id}
-                className={cn(
-                  'group flex items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent',
-                  pathname === `/chat/${conv.id}` && 'bg-sidebar-accent'
-                )}
-              >
-                <Link
-                  href={`/chat/${conv.id}`}
-                  className="flex-1 truncate"
-                  onClick={onNavigate}
-                >
-                  {conv.title}
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 opacity-0 group-hover:opacity-100"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    deleteConversation(conv.id)
-                  }}
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              </div>
-            ))}
+          <div className="space-y-4 py-2">
+            {groupOrder.map((groupName) => {
+              const convs = groupedConversations[groupName]
+              if (!convs || convs.length === 0) return null
+
+              return (
+                <div key={groupName}>
+                  <p className="text-xs font-medium text-muted-foreground/70 px-2 py-1.5 uppercase tracking-wider">
+                    {groupName}
+                  </p>
+                  <div className="space-y-0.5">
+                    {convs.map((conv) => (
+                      <div
+                        key={conv.id}
+                        className={cn(
+                          'group flex items-center justify-between rounded-lg px-2 py-2 text-sm hover:bg-sidebar-accent/50 transition-colors',
+                          pathname === `/chat/${conv.id}` && 'bg-sidebar-accent'
+                        )}
+                      >
+                        <Link
+                          href={`/chat/${conv.id}`}
+                          className="flex-1 truncate"
+                          onClick={onNavigate}
+                        >
+                          {conv.title}
+                        </Link>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            deleteConversation(conv.id)
+                          }}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </ScrollArea>
       )}
@@ -127,8 +178,8 @@ function SidebarContent({
                   href={item.href}
                   onClick={onNavigate}
                   className={cn(
-                    'flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                    'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                    'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    'hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
                     isActive
                       ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                       : 'text-sidebar-foreground',

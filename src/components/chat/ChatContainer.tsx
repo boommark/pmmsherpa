@@ -6,6 +6,8 @@ import { useChatStore } from '@/stores/chatStore'
 import { useConversations, useConversationMessages } from '@/hooks/useConversations'
 import { MessageList } from './MessageList'
 import { ChatInput, type ChatInputRef } from './ChatInput'
+import { BlobBackground } from '@/components/ui/blob-background'
+import { AnimatedOrb } from '@/components/ui/animated-orb'
 import type { ChatMessage } from '@/types/chat'
 
 interface ChatContainerProps {
@@ -202,37 +204,60 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   }, [])
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden relative">
+      {/* Background blobs - only show on welcome screen */}
+      {messages.length === 0 && <BlobBackground />}
+
       {messages.length === 0 ? (
         <div className="flex-1 flex items-center justify-center overflow-auto">
-          <div className="text-center space-y-4 max-w-md px-4">
-            <h2 className="text-2xl font-semibold">Welcome to PMMSherpa</h2>
-            <p className="text-muted-foreground">
-              Your AI-powered product marketing assistant. Ask me anything about
-              PMM strategy, positioning, messaging, or request deliverables like
-              battlecards, launch plans, and more.
-            </p>
-            <div className="grid gap-2 text-sm text-muted-foreground">
-              <p className="font-medium text-foreground">Try asking:</p>
+          <div className="text-center space-y-6 max-w-lg px-4">
+            {/* Animated AI Orb */}
+            <div className="flex justify-center mb-8">
+              <AnimatedOrb size="lg" />
+            </div>
+
+            {/* Greeting */}
+            <div className="space-y-2">
+              <h2 className="text-3xl font-semibold tracking-tight">
+                Welcome to PMMSherpa
+              </h2>
+              <p className="text-lg text-muted-foreground/80">
+                How can I assist you today?
+              </p>
+            </div>
+
+            {/* Quick action suggestions */}
+            <div className="flex flex-wrap justify-center gap-2 pt-4">
               <button
-                className="text-left px-4 py-2 rounded-lg border hover:bg-accent transition-colors"
+                className="px-4 py-2 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md"
                 onClick={() => handleSendMessage('Help me create a positioning statement for a new SaaS product')}
               >
-                &ldquo;Help me create a positioning statement for a new SaaS product&rdquo;
+                Positioning Statement
               </button>
               <button
-                className="text-left px-4 py-2 rounded-lg border hover:bg-accent transition-colors"
-                onClick={() => handleSendMessage('What are the key differences between product marketing and product management?')}
-              >
-                &ldquo;What are the key differences between product marketing and product management?&rdquo;
-              </button>
-              <button
-                className="text-left px-4 py-2 rounded-lg border hover:bg-accent transition-colors"
+                className="px-4 py-2 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md"
                 onClick={() => handleSendMessage('Create a competitive battlecard template')}
               >
-                &ldquo;Create a competitive battlecard template&rdquo;
+                Battlecard Template
+              </button>
+              <button
+                className="px-4 py-2 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md"
+                onClick={() => handleSendMessage('Help me develop a go-to-market strategy')}
+              >
+                GTM Strategy
+              </button>
+              <button
+                className="px-4 py-2 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md"
+                onClick={() => handleSendMessage('What are the key differences between product marketing and product management?')}
+              >
+                PMM vs PM
               </button>
             </div>
+
+            {/* Subtle hint */}
+            <p className="text-xs text-muted-foreground/60 pt-4">
+              Powered by 1,280+ expert sources
+            </p>
           </div>
         </div>
       ) : (

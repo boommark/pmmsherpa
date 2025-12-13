@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { Send, Loader2 } from 'lucide-react'
 
 interface ChatInputProps {
@@ -55,33 +54,36 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     }
 
     return (
-      <div className="border-t bg-background p-3 md:p-4">
+      <div className="p-4 md:p-6">
         <div className="w-full max-w-3xl mx-auto">
-          <div className="relative flex items-end gap-2">
-            <Textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask about product marketing..."
-              disabled={disabled}
-              className="min-h-[44px] max-h-[200px] resize-none pr-12 text-base"
-              rows={1}
-            />
-            <Button
-              onClick={handleSubmit}
-              disabled={!input.trim() || disabled}
-              size="icon"
-              className="absolute right-2 bottom-2 h-8 w-8"
-            >
-              {disabled ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-            </Button>
+          {/* Glassmorphism container */}
+          <div className="relative rounded-2xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/20 dark:border-zinc-700/50">
+            <div className="relative flex items-end gap-2 p-3">
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask about product marketing..."
+                disabled={disabled}
+                className="flex-1 min-h-[44px] max-h-[200px] resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-base placeholder:text-muted-foreground/60 disabled:opacity-50"
+                rows={1}
+              />
+              <Button
+                onClick={handleSubmit}
+                disabled={!input.trim() || disabled}
+                size="icon"
+                className="h-10 w-10 rounded-xl shrink-0 bg-primary hover:bg-primary/90 shadow-lg"
+              >
+                {disabled ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center hidden sm:block">
+          <p className="text-xs text-muted-foreground/70 mt-3 text-center hidden sm:block">
             PMMSherpa draws from 1,280+ expert sources including PMM books, blogs, and AMAs.
           </p>
         </div>
