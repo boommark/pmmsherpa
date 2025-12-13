@@ -63,9 +63,11 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     // Wait for messages to load
     if (messagesLoading) return
 
-    console.log('Syncing messages - conversationId:', conversationId, 'dbMessages:', dbMessages.length, 'hasInitialized:', hasInitialized)
+    console.log('Syncing messages - conversationId:', conversationId, 'dbMessages:', dbMessages.length, 'hasInitialized:', hasInitialized, 'storeMessages:', messages.length)
 
-    if (conversationId && dbMessages.length > 0 && !hasInitialized) {
+    if (conversationId && dbMessages.length > 0) {
+      // Always sync messages from DB when available (not just on first init)
+      // This ensures messages are always displayed correctly
       const chatMessages: ChatMessage[] = dbMessages.map((m) => ({
         id: m.id,
         role: m.role,
@@ -74,10 +76,17 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         model: m.model || undefined,
         createdAt: new Date(m.created_at),
       }))
-      console.log('Setting messages from DB:', chatMessages.length)
-      setMessages(chatMessages)
-      setConversationId(conversationId)
-      setHasInitialized(true)
+
+      // Only update if messages are different (avoid infinite loops)
+      const currentIds = messages.map(m => m.id).join(',')
+      const newIds = chatMessages.map(m => m.id).join(',')
+
+      if (currentIds !== newIds || !hasInitialized) {
+        console.log('Setting messages from DB:', chatMessages.length)
+        setMessages(chatMessages)
+        setConversationId(conversationId)
+        setHasInitialized(true)
+      }
     } else if (!conversationId && !hasInitialized) {
       console.log('No conversation - clearing messages')
       setMessages([])
@@ -89,7 +98,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       setConversationId(conversationId)
       setHasInitialized(true)
     }
-  }, [conversationId, dbMessages, messagesLoading, setMessages, setConversationId, hasInitialized, isLoading])
+  }, [conversationId, dbMessages, messagesLoading, setMessages, setConversationId, hasInitialized, isLoading, messages])
 
   // Auto-scroll to bottom
   useEffect(() => {
