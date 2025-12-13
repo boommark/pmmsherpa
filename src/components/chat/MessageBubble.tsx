@@ -216,13 +216,13 @@ export function MessageBubble({ message, onEditPrompt, onExpandWithResearch }: M
           </div>
         )}
 
-        {/* Citations */}
-        {!isUser && message.citations && message.citations.length > 0 && (
+        {/* Citations - only show after streaming completes */}
+        {!isUser && !isStreaming && message.citations && message.citations.length > 0 && (
           <SourceCitations citations={message.citations} />
         )}
 
-        {/* Expanded Research */}
-        {!isUser && message.expandedResearch && (
+        {/* Expanded Research - only show after streaming completes */}
+        {!isUser && !isStreaming && message.expandedResearch && (
           <ExpandedResearch research={message.expandedResearch} />
         )}
 

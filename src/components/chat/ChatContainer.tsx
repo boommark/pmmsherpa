@@ -61,12 +61,15 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         setHasInitialized(true) // Mark as initialized so we don't overwrite
       } else {
         // Clear messages when switching to a different conversation
+        // This includes going from /chat/[id] to /chat (no conversationId)
+        console.log('Clearing messages for new/different conversation')
         setMessages([])
+        setConversationId(null)
         setHasInitialized(false)
       }
       lastConversationIdRef.current = conversationId
     }
-  }, [conversationId, setMessages])
+  }, [conversationId, setMessages, setConversationId])
 
   // Sync messages from DB when loaded
   useEffect(() => {

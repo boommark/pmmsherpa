@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useConversations } from '@/hooks/useConversations'
 import { useUIStore } from '@/stores/uiStore'
+import { useChatStore } from '@/stores/chatStore'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
@@ -53,7 +54,21 @@ function SidebarContent({
   onNavigate?: () => void
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const { conversations, deleteConversation } = useConversations()
+  const { clearMessages, setConversationId } = useChatStore()
+
+  // Handle new chat click - clear state and navigate
+  const handleNewChat = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    // Clear the chat store state
+    clearMessages()
+    setConversationId(null)
+    // Navigate to /chat
+    router.push('/chat')
+    // Call onNavigate callback (for closing mobile sidebar)
+    onNavigate?.()
+  }, [clearMessages, setConversationId, router, onNavigate])
 
   // Group conversations by date
   const groupedConversations = useMemo(() => {
@@ -87,7 +102,7 @@ function SidebarContent({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         {!collapsed && (
-          <Link href="/chat" className="flex items-center gap-2" onClick={onNavigate}>
+          <a href="/chat" className="flex items-center gap-2 cursor-pointer" onClick={handleNewChat}>
             <div className="w-7 h-7 rounded-md bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-sm">
               <svg
                 viewBox="0 0 24 24"
@@ -102,7 +117,7 @@ function SidebarContent({
               </svg>
             </div>
             <span className="font-semibold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">PMMSherpa</span>
-          </Link>
+          </a>
         )}
         {showCollapseButton && (
           <Button
@@ -122,18 +137,17 @@ function SidebarContent({
 
       {/* New Chat Button */}
       <div className="p-3">
-        <Link href="/chat" onClick={onNavigate}>
-          <Button
-            className={cn(
-              "w-full",
-              !collapsed && "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-md hover:shadow-lg transition-all"
-            )}
-            variant={collapsed ? 'ghost' : 'default'}
-          >
-            <Plus className="h-4 w-4" />
-            {!collapsed && <span className="ml-2">New Chat</span>}
-          </Button>
-        </Link>
+        <Button
+          onClick={handleNewChat}
+          className={cn(
+            "w-full",
+            !collapsed && "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-md hover:shadow-lg transition-all"
+          )}
+          variant={collapsed ? 'ghost' : 'default'}
+        >
+          <Plus className="h-4 w-4" />
+          {!collapsed && <span className="ml-2">New Chat</span>}
+        </Button>
       </div>
 
       {/* Conversations grouped by date */}

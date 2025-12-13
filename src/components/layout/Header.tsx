@@ -21,12 +21,22 @@ export function Header() {
   const { profile } = useProfile()
   const signOut = useSignOut()
   const router = useRouter()
-  const { currentModel, setCurrentModel } = useChatStore()
+  const { currentModel, setCurrentModel, clearMessages, setConversationId } = useChatStore()
   const { toggleMobileSidebar } = useUIStore()
 
   const handleSignOut = async () => {
     await signOut()
     router.push('/login')
+  }
+
+  // Handle clicking the logo to start a new chat
+  const handleNewChat = (e: React.MouseEvent) => {
+    e.preventDefault()
+    // Clear the chat store state
+    clearMessages()
+    setConversationId(null)
+    // Navigate to /chat
+    router.push('/chat')
   }
 
   const initials = profile?.full_name
@@ -49,7 +59,7 @@ export function Header() {
         >
           <Menu className="h-4 w-4" />
         </Button>
-        <div className="hidden sm:flex items-center gap-2">
+        <a href="/chat" onClick={handleNewChat} className="hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
           <div className="w-7 h-7 rounded-md bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-sm">
             <svg
               viewBox="0 0 24 24"
@@ -64,7 +74,7 @@ export function Header() {
             </svg>
           </div>
           <h1 className="text-base md:text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">PMMSherpa</h1>
-        </div>
+        </a>
         <ModelSelector
           value={currentModel}
           onChange={setCurrentModel}

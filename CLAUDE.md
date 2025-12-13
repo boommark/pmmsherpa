@@ -616,4 +616,4 @@ npx supabase gen types ts      # Generate TypeScript types
 
 ---
 
-*Last updated: December 13, 2025 - Perplexity Parallel Integration v2 with Dropdown Menu*
+*Last updated: December 13, 2025 - UX Fixes: New Chat navigation, Citations render after streaming*
