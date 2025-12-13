@@ -87,7 +87,7 @@ function SidebarContent({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         {!collapsed && (
-          <Link href="/chat" className="font-semibold text-lg" onClick={onNavigate}>
+          <Link href="/chat" className="font-semibold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent" onClick={onNavigate}>
             PMMSherpa
           </Link>
         )}

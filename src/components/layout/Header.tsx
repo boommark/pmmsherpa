@@ -49,7 +49,7 @@ export function Header() {
         >
           <Menu className="h-5 w-5" />
         </Button>
-        <h1 className="text-base md:text-lg font-semibold hidden sm:block">PMMSherpa</h1>
+        <h1 className="text-base md:text-lg font-semibold hidden sm:block bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">PMMSherpa</h1>
         <ModelSelector
           value={currentModel}
           onChange={setCurrentModel}
