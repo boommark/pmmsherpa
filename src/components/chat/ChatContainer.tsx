@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useChatStore } from '@/stores/chatStore'
 import { useConversations, useConversationMessages } from '@/hooks/useConversations'
 import { MessageList } from './MessageList'
-import { ChatInput } from './ChatInput'
+import { ChatInput, type ChatInputRef } from './ChatInput'
 import type { ChatMessage } from '@/types/chat'
 
 interface ChatContainerProps {
@@ -15,6 +15,7 @@ interface ChatContainerProps {
 export function ChatContainer({ conversationId }: ChatContainerProps) {
   const router = useRouter()
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const chatInputRef = useRef<ChatInputRef>(null)
   const { createConversation } = useConversations()
   const { messages: dbMessages } = useConversationMessages(conversationId || null)
   const [hasInitialized, setHasInitialized] = useState(false)
@@ -195,6 +196,11 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     router,
   ])
 
+  // Handle editing a prompt - puts the content back in the input for editing
+  const handleEditPrompt = useCallback((content: string) => {
+    chatInputRef.current?.setInput(content)
+  }, [])
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {messages.length === 0 ? (
@@ -231,11 +237,15 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         </div>
       ) : (
         <div className="flex-1 overflow-hidden min-h-0">
-          <MessageList messages={messages} statusMessage={statusMessage} />
+          <MessageList
+            messages={messages}
+            statusMessage={statusMessage}
+            onEditPrompt={handleEditPrompt}
+          />
         </div>
       )}
       <div ref={messagesEndRef} />
-      <ChatInput onSend={handleSendMessage} disabled={isLoading} />
+      <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} />
     </div>
   )
 }

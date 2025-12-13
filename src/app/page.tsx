@@ -70,8 +70,8 @@ export default function LandingPage() {
             <Link href="/login">
               <Button variant="ghost">Log in</Button>
             </Link>
-            <Link href="/signup">
-              <Button>Get Started</Button>
+            <Link href="/request-access">
+              <Button>Request Access</Button>
             </Link>
           </div>
         </nav>
@@ -95,9 +95,9 @@ export default function LandingPage() {
             to help you create world-class product marketing.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link href="/signup">
+            <Link href="/request-access">
               <Button size="lg" className="gap-2">
-                Start Free <ArrowRight className="h-4 w-4" />
+                Request Access <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/login">
@@ -169,9 +169,9 @@ export default function LandingPage() {
           <p className="mb-8 text-lg text-muted-foreground">
             Join PMMSherpa and get AI-powered guidance for all your PMM needs.
           </p>
-          <Link href="/signup">
+          <Link href="/request-access">
             <Button size="lg" className="gap-2">
-              Get Started Free <ArrowRight className="h-4 w-4" />
+              Request Access <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
         </div>

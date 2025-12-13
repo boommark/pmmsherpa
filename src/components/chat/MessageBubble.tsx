@@ -1,25 +1,47 @@
 'use client'
 
+import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import { SourceCitations } from './SourceCitations'
-import { User, Bot, Loader2 } from 'lucide-react'
+import { User, Bot, Loader2, Copy, Check, Pencil } from 'lucide-react'
+import { toast } from 'sonner'
 import type { ChatMessage } from '@/types/chat'
 
 interface MessageBubbleProps {
   message: ChatMessage
+  onEditPrompt?: (content: string) => void
 }
 
-export function MessageBubble({ message }: MessageBubbleProps) {
+export function MessageBubble({ message, onEditPrompt }: MessageBubbleProps) {
   const isUser = message.role === 'user'
   const isStreaming = message.isStreaming
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(message.content)
+      setCopied(true)
+      toast.success('Copied to clipboard')
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      toast.error('Failed to copy')
+    }
+  }
+
+  const handleEdit = () => {
+    if (onEditPrompt) {
+      onEditPrompt(message.content)
+    }
+  }
 
   return (
     <div
       className={cn(
-        'flex gap-3',
+        'flex gap-3 group',
         isUser ? 'flex-row-reverse' : 'flex-row'
       )}
     >
@@ -41,7 +63,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       >
         <div
           className={cn(
-            'rounded-lg px-3 py-2 md:px-4 w-full',
+            'rounded-lg px-3 py-2 md:px-4 w-full relative',
             isUser
               ? 'bg-primary text-primary-foreground'
               : 'bg-muted text-foreground'
@@ -119,6 +141,40 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             </div>
           )}
         </div>
+
+        {/* Action buttons - show on hover or always on mobile */}
+        {!isStreaming && (
+          <div className={cn(
+            'flex items-center gap-1 transition-opacity',
+            isUser ? 'flex-row-reverse' : 'flex-row',
+            'opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100'
+          )}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+              onClick={handleCopy}
+            >
+              {copied ? (
+                <Check className="h-3 w-3 mr-1" />
+              ) : (
+                <Copy className="h-3 w-3 mr-1" />
+              )}
+              {copied ? 'Copied' : 'Copy'}
+            </Button>
+            {isUser && onEditPrompt && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                onClick={handleEdit}
+              >
+                <Pencil className="h-3 w-3 mr-1" />
+                Edit
+              </Button>
+            )}
+          </div>
+        )}
 
         {/* Citations */}
         {!isUser && message.citations && message.citations.length > 0 && (
