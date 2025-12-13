@@ -290,7 +290,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         </div>
       ) : messages.length === 0 && !conversationId ? (
         <div className="flex-1 flex flex-col overflow-auto">
-          {/* Top section with orb and greeting - centered on desktop, pushed up on mobile */}
+          {/* Top section with orb and greeting - centered */}
           <div className="flex-1 flex flex-col justify-center items-center px-3 md:px-4">
             {/* Animated AI Orb */}
             <div className="flex justify-center mb-2 md:mb-6">
@@ -308,46 +308,53 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             </div>
           </div>
 
-          {/* Bottom section with suggestions - sits above the chat input */}
-          <div className="w-full max-w-lg mx-auto px-3 md:px-4 pb-2 md:pb-4">
-            {/* Quick action suggestions */}
-            <div className="flex flex-col gap-2">
-              <button
-                className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
-                onClick={() => handleSendMessage("What is April Dunford's positioning framework?")}
-              >
-                What is April Dunford&apos;s positioning framework?
-              </button>
-              <button
-                className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
-                onClick={() => handleSendMessage('How can PMMs earn respect from PMs?')}
-              >
-                How can PMMs earn respect from PMs?
-              </button>
-              <button
-                className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
-                onClick={() => handleSendMessage('What messaging strategies deliver success?')}
-              >
-                What messaging strategies deliver success?
-              </button>
-            </div>
+          {/* Bottom section: Chat input first, then suggestions below */}
+          <div className="w-full">
+            {/* Chat input */}
+            <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />
 
-            {/* Subtle hint */}
-            <p className="text-xs text-muted-foreground/60 pt-3 text-center hidden md:block">
-              Powered by 1,280+ expert sources
-            </p>
+            {/* Quick action suggestions - below the chat input */}
+            <div className="w-full max-w-3xl mx-auto px-4 md:px-6 pb-4 md:pb-6">
+              <div className="flex flex-col gap-2">
+                <button
+                  className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
+                  onClick={() => handleSendMessage("What is April Dunford's positioning framework?")}
+                >
+                  What is April Dunford&apos;s positioning framework?
+                </button>
+                <button
+                  className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
+                  onClick={() => handleSendMessage('How can PMMs earn respect from PMs?')}
+                >
+                  How can PMMs earn respect from PMs?
+                </button>
+                <button
+                  className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
+                  onClick={() => handleSendMessage('What messaging strategies deliver success?')}
+                >
+                  What messaging strategies deliver success?
+                </button>
+              </div>
+
+              {/* Subtle hint */}
+              <p className="text-xs text-muted-foreground/60 pt-3 text-center hidden md:block">
+                Powered by 1,280+ expert sources
+              </p>
+            </div>
           </div>
         </div>
       ) : (
-        <div className="flex-1 overflow-hidden min-h-0">
-          <MessageList
-            messages={messages}
-            statusMessage={statusMessage}
-            onEditPrompt={handleEditPrompt}
-          />
-        </div>
+        <>
+          <div className="flex-1 overflow-hidden min-h-0">
+            <MessageList
+              messages={messages}
+              statusMessage={statusMessage}
+              onEditPrompt={handleEditPrompt}
+            />
+          </div>
+          <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />
+        </>
       )}
-      <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />
     </div>
   )
 }
