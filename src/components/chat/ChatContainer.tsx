@@ -47,13 +47,11 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   useEffect(() => {
     if (conversationId !== lastConversationIdRef.current) {
       console.log('Conversation changed from', lastConversationIdRef.current, 'to', conversationId)
-      setHasInitialized(false)
-      lastConversationIdRef.current = conversationId
 
       // Clear messages immediately when switching conversations
-      if (conversationId !== lastConversationIdRef.current) {
-        setMessages([])
-      }
+      setMessages([])
+      setHasInitialized(false)
+      lastConversationIdRef.current = conversationId
     }
   }, [conversationId, setMessages])
 
@@ -240,8 +238,10 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     chatInputRef.current?.setInput(content)
   }, [])
 
-  // Show loading state when fetching messages for existing conversation
-  const showLoadingState = conversationId && messagesLoading && messages.length === 0
+  // Show loading state when:
+  // 1. We have a conversationId and messages are loading, OR
+  // 2. We have a conversationId but haven't initialized yet (waiting for DB sync)
+  const showLoadingState = conversationId && (messagesLoading || !hasInitialized) && messages.length === 0
 
   return (
     <div className="flex flex-col h-full overflow-hidden relative">
