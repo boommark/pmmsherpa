@@ -102,7 +102,7 @@ export function MessageBubble({ message, onEditPrompt, onExpandWithResearch }: M
 
       <div
         className={cn(
-          'flex flex-col min-w-0 max-w-[calc(100%-2rem)] sm:max-w-[calc(100%-2.5rem)] md:max-w-[85%] space-y-1 sm:space-y-1.5 md:space-y-2',
+          'flex flex-col min-w-0 max-w-[calc(100%-2.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[85%] space-y-1 sm:space-y-1.5 md:space-y-2 overflow-hidden',
           isUser ? 'items-end' : 'items-start'
         )}
       >
