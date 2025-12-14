@@ -15,8 +15,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2, CheckCircle, Moon, Sun, Monitor, Brain, Zap } from 'lucide-react'
+import { Loader2, CheckCircle, Moon, Sun, Monitor, Brain, Zap, Volume2 } from 'lucide-react'
 import { MODEL_CONFIG, getDbModelValue, type ModelProvider } from '@/lib/llm/provider-factory'
+import type { TTSVoice } from '@/types/database'
+
+// Available TTS voices with descriptions
+const TTS_VOICES: { id: TTSVoice; name: string; description: string }[] = [
+  { id: 'nova', name: 'Nova', description: 'Warm and friendly' },
+  { id: 'alloy', name: 'Alloy', description: 'Balanced and versatile' },
+  { id: 'echo', name: 'Echo', description: 'Soft and conversational' },
+  { id: 'fable', name: 'Fable', description: 'Expressive and dynamic' },
+  { id: 'onyx', name: 'Onyx', description: 'Deep and authoritative' },
+  { id: 'shimmer', name: 'Shimmer', description: 'Clear and energetic' },
+  { id: 'ash', name: 'Ash', description: 'Calm and measured' },
+  { id: 'ballad', name: 'Ballad', description: 'Melodic and smooth' },
+  { id: 'coral', name: 'Coral', description: 'Bright and engaging' },
+  { id: 'sage', name: 'Sage', description: 'Thoughtful and wise' },
+]
 
 // Apply theme to document
 function applyTheme(theme: 'light' | 'dark' | 'system') {
@@ -51,9 +66,12 @@ export default function PreferencesPage() {
   const { profile, loading, updateProfile } = useProfile()
   const [preferredModel, setPreferredModel] = useState<ModelProvider>('claude-opus')
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system')
+  const [voicePreference, setVoicePreference] = useState<TTSVoice>('nova')
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isPlayingPreview, setIsPlayingPreview] = useState(false)
+  const previewAudioRef = useState<HTMLAudioElement | null>(null)
 
   // Initialize from profile
   useEffect(() => {
@@ -65,6 +83,8 @@ export default function PreferencesPage() {
       else setPreferredModel(dbModel as ModelProvider)
       setTheme(profile.theme)
       applyTheme(profile.theme)
+      // Set voice preference with fallback
+      setVoicePreference(profile.voice_preference || 'nova')
     }
   }, [profile])
 
@@ -74,6 +94,43 @@ export default function PreferencesPage() {
     applyTheme(newTheme)
     // Save to profile in background
     await updateProfile({ theme: newTheme })
+  }
+
+  // Preview voice
+  const handleVoicePreview = async (voiceId: TTSVoice) => {
+    if (isPlayingPreview) return
+
+    setIsPlayingPreview(true)
+    try {
+      const response = await fetch('/api/voice/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: `Hello! I'm ${TTS_VOICES.find(v => v.id === voiceId)?.name || voiceId}. This is how I sound as your voice assistant.`,
+          voice: voiceId
+        })
+      })
+
+      if (!response.ok) throw new Error('Failed to generate preview')
+
+      const audioBlob = await response.blob()
+      const audioUrl = URL.createObjectURL(audioBlob)
+      const audio = new Audio(audioUrl)
+
+      audio.onended = () => {
+        setIsPlayingPreview(false)
+        URL.revokeObjectURL(audioUrl)
+      }
+      audio.onerror = () => {
+        setIsPlayingPreview(false)
+        URL.revokeObjectURL(audioUrl)
+      }
+
+      await audio.play()
+    } catch (err) {
+      console.error('Voice preview error:', err)
+      setIsPlayingPreview(false)
+    }
   }
 
   const handleSave = async () => {
@@ -86,6 +143,7 @@ export default function PreferencesPage() {
 
     const { error } = await updateProfile({
       preferred_model: dbModelValue,
+      voice_preference: voicePreference,
     })
 
     if (error) {
@@ -218,6 +276,58 @@ export default function PreferencesPage() {
               </Select>
               <p className="text-xs text-muted-foreground">
                 Theme changes are applied instantly
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Voice Preferences */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Voice Settings</CardTitle>
+            <CardDescription>
+              Choose your preferred AI voice for voice chat
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Voice</Label>
+              <div className="flex gap-2">
+                <Select
+                  value={voicePreference}
+                  onValueChange={(v) => setVoicePreference(v as TTSVoice)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select voice" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TTS_VOICES.map((voice) => (
+                      <SelectItem key={voice.id} value={voice.id}>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{voice.name}</span>
+                          <span className="text-xs text-muted-foreground">{voice.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleVoicePreview(voicePreference)}
+                  disabled={isPlayingPreview}
+                  title="Preview voice"
+                >
+                  {isPlayingPreview ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Volume2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Click the speaker icon to preview the selected voice
               </p>
             </div>
           </CardContent>

@@ -7,49 +7,22 @@ interface UseVoiceInputOptions {
   onError?: (error: Error) => void
 }
 
-// Extend Window interface for Web Speech API
-interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResultList
-  resultIndex: number
-}
-
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string
-  message?: string
-}
-
-interface SpeechRecognition extends EventTarget {
-  continuous: boolean
-  interimResults: boolean
-  lang: string
-  start: () => void
-  stop: () => void
-  abort: () => void
-  onresult: ((event: SpeechRecognitionEvent) => void) | null
-  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null
-  onend: (() => void) | null
-  onstart: (() => void) | null
-}
-
-declare global {
-  interface Window {
-    SpeechRecognition: new () => SpeechRecognition
-    webkitSpeechRecognition: new () => SpeechRecognition
-  }
-}
-
 export function useVoiceInput({ onTranscript, onError }: UseVoiceInputOptions) {
   const [isRecording, setIsRecording] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
-  const finalTranscriptRef = useRef<string>('')
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
+  const streamRef = useRef<MediaStream | null>(null)
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.abort()
-        recognitionRef.current = null
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop())
+        streamRef.current = null
+      }
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop()
       }
     }
   }, [])
@@ -58,125 +31,131 @@ export function useVoiceInput({ onTranscript, onError }: UseVoiceInputOptions) {
     try {
       setIsProcessing(true)
 
-      // Check for browser support
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-
-      if (!SpeechRecognition) {
-        throw new Error('Speech recognition not supported in this browser. Try Chrome or Edge.')
-      }
-
-      // Request microphone permission first
-      await navigator.mediaDevices.getUserMedia({ audio: true })
-
-      // Initialize Web Speech API
-      const recognition = new SpeechRecognition()
-      recognitionRef.current = recognition
-
-      // Configure recognition
-      recognition.continuous = true
-      recognition.interimResults = true
-      recognition.lang = 'en-US'
-
-      // Reset final transcript
-      finalTranscriptRef.current = ''
-
-      // Handle results
-      recognition.onresult = (event: SpeechRecognitionEvent) => {
-        let interimTranscript = ''
-        let finalTranscript = ''
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const result = event.results[i]
-          const transcript = result[0].transcript
-
-          if (result.isFinal) {
-            finalTranscript += transcript
-          } else {
-            interimTranscript += transcript
-          }
+      // Request microphone permission and get stream
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 16000
         }
+      })
+      streamRef.current = stream
 
-        // Send final transcript
-        if (finalTranscript) {
-          finalTranscriptRef.current += finalTranscript
-          onTranscript(finalTranscript, true)
-        }
+      // Determine best supported mime type
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm')
+        ? 'audio/webm'
+        : 'audio/mp4'
 
-        // Send interim transcript
-        if (interimTranscript) {
-          onTranscript(interimTranscript, false)
+      const mediaRecorder = new MediaRecorder(stream, { mimeType })
+      mediaRecorderRef.current = mediaRecorder
+      audioChunksRef.current = []
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data)
         }
       }
 
-      // Handle errors
-      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-        console.error('Speech recognition error:', event.error)
-
-        let errorMessage = 'Speech recognition error'
-        switch (event.error) {
-          case 'not-allowed':
-            errorMessage = 'Microphone access denied. Please allow microphone access.'
-            break
-          case 'no-speech':
-            errorMessage = 'No speech detected. Please try again.'
-            break
-          case 'network':
-            errorMessage = 'Network error. Please check your connection.'
-            break
-          case 'aborted':
-            // User stopped recording, not an error
-            return
-          default:
-            errorMessage = `Speech recognition error: ${event.error}`
-        }
-
-        onError?.(new Error(errorMessage))
-        setIsRecording(false)
-        setIsProcessing(false)
-      }
-
-      // Handle end
-      recognition.onend = () => {
-        setIsRecording(false)
-        setIsProcessing(false)
-      }
-
-      // Handle start
-      recognition.onstart = () => {
+      mediaRecorder.onstart = () => {
         setIsProcessing(false)
         setIsRecording(true)
       }
 
-      // Start recognition
-      recognition.start()
+      mediaRecorder.onerror = () => {
+        setIsRecording(false)
+        setIsProcessing(false)
+        onError?.(new Error('Recording failed'))
+      }
 
+      // Start recording with timeslice for streaming chunks
+      mediaRecorder.start(100)
     } catch (error) {
       console.error('Error starting recording:', error)
       setIsProcessing(false)
 
-      if (error instanceof Error && error.name === 'NotAllowedError') {
-        onError?.(new Error('Microphone access denied. Please allow microphone access in your browser settings.'))
-      } else {
-        onError?.(error as Error)
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+          onError?.(new Error('Microphone access denied. Please allow microphone access in your browser settings.'))
+        } else if (error.name === 'NotFoundError') {
+          onError?.(new Error('No microphone found. Please connect a microphone and try again.'))
+        } else {
+          onError?.(error)
+        }
       }
     }
-  }, [onTranscript, onError])
+  }, [onError])
 
   const stopRecording = useCallback(async () => {
-    setIsProcessing(true)
-
-    try {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop()
-      }
-    } catch (error) {
-      console.error('Error stopping recognition:', error)
+    if (!mediaRecorderRef.current || mediaRecorderRef.current.state === 'inactive') {
+      return
     }
 
-    recognitionRef.current = null
-    setIsRecording(false)
-    setIsProcessing(false)
-  }, [])
+    setIsProcessing(true)
+
+    return new Promise<void>((resolve) => {
+      const mediaRecorder = mediaRecorderRef.current!
+
+      mediaRecorder.onstop = async () => {
+        // Stop all tracks to release the microphone
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop())
+          streamRef.current = null
+        }
+
+        // Create audio blob from collected chunks
+        const mimeType = mediaRecorder.mimeType
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
+
+        // Check if we have any audio data
+        if (audioBlob.size === 0) {
+          setIsRecording(false)
+          setIsProcessing(false)
+          onError?.(new Error('No audio recorded. Please try again.'))
+          resolve()
+          return
+        }
+
+        try {
+          // Send to Whisper API for transcription
+          const formData = new FormData()
+
+          // Determine file extension based on mime type
+          const extension = mimeType.includes('webm') ? 'webm' : 'mp4'
+          formData.append('audio', audioBlob, `recording.${extension}`)
+
+          const response = await fetch('/api/voice/transcribe', {
+            method: 'POST',
+            body: formData
+          })
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}))
+            throw new Error(errorData.error || 'Transcription failed')
+          }
+
+          const { text } = await response.json()
+
+          if (text && text.trim()) {
+            onTranscript(text.trim(), true)
+          } else {
+            onError?.(new Error('No speech detected. Please try again.'))
+          }
+        } catch (error) {
+          console.error('Transcription error:', error)
+          onError?.(error instanceof Error ? error : new Error('Transcription failed'))
+        } finally {
+          setIsRecording(false)
+          setIsProcessing(false)
+          audioChunksRef.current = []
+          resolve()
+        }
+      }
+
+      mediaRecorder.stop()
+    })
+  }, [onTranscript, onError])
 
   return {
     isRecording,

@@ -1,3 +1,6 @@
+// Available TTS voices from OpenAI
+export type TTSVoice = 'alloy' | 'ash' | 'ballad' | 'coral' | 'echo' | 'fable' | 'nova' | 'onyx' | 'sage' | 'shimmer';
+
 export interface Profile {
   id: string;
   email: string;
@@ -5,6 +8,7 @@ export interface Profile {
   avatar_url: string | null;
   preferred_model: 'claude' | 'gemini' | 'openai';
   theme: 'light' | 'dark' | 'system';
+  voice_preference: TTSVoice;
   created_at: string;
   updated_at: string;
 }
