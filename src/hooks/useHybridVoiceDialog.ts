@@ -243,7 +243,7 @@ export function useHybridVoiceDialog({
                 if (line.startsWith('data: ')) {
                   try {
                     const data = JSON.parse(line.slice(6))
-                    if (data.type === 'token' && data.content) {
+                    if (data.type === 'text' && data.content) {
                       fullResponse += data.content
                       setAiResponse(fullResponse)
                     } else if (data.type === 'done') {

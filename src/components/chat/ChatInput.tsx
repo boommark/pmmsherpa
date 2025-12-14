@@ -94,10 +94,11 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       model: profile?.preferred_model === 'gemini' ? 'gemini-3-pro' : 'claude-sonnet',
       voice: profile?.voice_preference || 'nova',
       onMessage: (message) => {
-        // When voice dialog produces a message, send it through the normal flow
-        if (message.role === 'user' && message.content) {
-          onSend(message.content)
-        }
+        // Voice dialog handles the full flow internally (STT → Chat API → TTS)
+        // Messages are already sent to /api/chat by the hook itself
+        // This callback is for notification only (e.g., logging, UI updates)
+        // Do NOT call onSend here as it would duplicate the API call
+        console.log('Voice dialog message:', message.role, message.content?.substring(0, 50))
       },
       onError: (error) => {
         toast.error(`Voice chat error: ${error.message}`)
