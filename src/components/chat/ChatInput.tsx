@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { Send, Loader2, Globe, ChevronDown, Search, Microscope, Mic, MicOff, Phone } from 'lucide-react'
+import { Send, Loader2, Globe, ChevronDown, Search, Microscope, Mic, MicOff, Phone, Square } from 'lucide-react'
 import { FileUpload, type UploadedFile, getFileCategory } from './FileUpload'
 import { AttachmentPreview } from './AttachmentPreview'
 import { useChatStore } from '@/stores/chatStore'
@@ -45,7 +45,9 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       perplexityEnabled,
       setPerplexityEnabled,
       deepResearchEnabled,
-      setDeepResearchEnabled
+      setDeepResearchEnabled,
+      isLoading,
+      abortStreaming
     } = useChatStore()
 
     // Voice input hook
@@ -407,18 +409,29 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                   <Phone className="h-4 w-4" />
                 )}
               </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={!canSubmit || disabled}
-                size="icon"
-                className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 bg-gradient-to-br from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 shadow-md md:shadow-lg text-white"
-              >
-                {disabled || isUploading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
+              {isLoading ? (
+                <Button
+                  onClick={abortStreaming}
+                  size="icon"
+                  className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 bg-gradient-to-br from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 shadow-md md:shadow-lg text-white"
+                  title="Stop generating"
+                >
+                  <Square className="h-4 w-4 fill-current" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!canSubmit || disabled}
+                  size="icon"
+                  className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 bg-gradient-to-br from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 shadow-md md:shadow-lg text-white"
+                >
+                  {disabled || isUploading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              )}
             </div>
           </div>
           <p className="text-xs text-muted-foreground/70 mt-2 md:mt-3 text-center hidden sm:block">

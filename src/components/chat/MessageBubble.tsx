@@ -23,11 +23,12 @@ import { useVoiceOutput } from '@/hooks/useVoiceOutput'
 
 interface MessageBubbleProps {
   message: ChatMessage
-  onEditPrompt?: (content: string) => void
+  messageIndex?: number
+  onEditPrompt?: (content: string, messageIndex: number) => void
   onExpandWithResearch?: (messageId: string, content: string, deepResearch: boolean) => void
 }
 
-export function MessageBubble({ message, onEditPrompt, onExpandWithResearch }: MessageBubbleProps) {
+export function MessageBubble({ message, messageIndex, onEditPrompt, onExpandWithResearch }: MessageBubbleProps) {
   const isUser = message.role === 'user'
   const isStreaming = message.isStreaming
   const isResearching = message.isResearching
@@ -78,8 +79,8 @@ export function MessageBubble({ message, onEditPrompt, onExpandWithResearch }: M
   }
 
   const handleEdit = () => {
-    if (onEditPrompt) {
-      onEditPrompt(message.content)
+    if (onEditPrompt && messageIndex !== undefined) {
+      onEditPrompt(message.content, messageIndex)
     }
   }
 

@@ -9,7 +9,7 @@ import type { ChatMessage } from '@/types/chat'
 interface MessageListProps {
   messages: ChatMessage[]
   statusMessage?: string | null
-  onEditPrompt?: (content: string) => void
+  onEditPrompt?: (content: string, messageIndex: number) => void
   onExpandWithResearch?: (messageId: string, content: string, deepResearch: boolean) => void
 }
 
@@ -119,10 +119,11 @@ export function MessageList({ messages, statusMessage, onEditPrompt, onExpandWit
   return (
     <ScrollArea className="flex-1 h-full w-full" ref={scrollContainerRef}>
       <div className="w-full max-w-3xl mx-auto py-3 md:py-6 px-3 sm:px-4 md:px-6 space-y-3 md:space-y-6 overflow-x-hidden">
-        {messages.map((message) => (
+        {messages.map((message, index) => (
           <div key={message.id} className="w-full overflow-hidden">
             <MessageBubble
               message={message}
+              messageIndex={index}
               onEditPrompt={onEditPrompt}
               onExpandWithResearch={onExpandWithResearch}
             />

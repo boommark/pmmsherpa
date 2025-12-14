@@ -11,10 +11,13 @@ interface ChatStore extends ChatState {
   // Perplexity research toggles
   perplexityEnabled: boolean
   deepResearchEnabled: boolean
+  // Abort controller for canceling streaming
+  abortController: AbortController | null
   // Actions
   setMessages: (messages: ChatMessage[]) => void
   addMessage: (message: ChatMessage) => void
   updateMessage: (id: string, updates: Partial<ChatMessage>) => void
+  removeMessagesFromIndex: (index: number) => void
   clearMessages: () => void
   setIsLoading: (isLoading: boolean) => void
   setError: (error: string | null) => void
@@ -29,6 +32,9 @@ interface ChatStore extends ChatState {
   appendToStream: (messageId: string, content: string) => void
   setCitations: (messageId: string, citations: Citation[]) => void
   finishStreaming: (messageId: string) => void
+  // Abort streaming
+  setAbortController: (controller: AbortController | null) => void
+  abortStreaming: () => void
   // Research helpers
   setMessageResearching: (messageId: string, isResearching: boolean) => void
   setExpandedResearch: (messageId: string, research: ExpandedResearch) => void
@@ -45,6 +51,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   webSearchEnabled: false,
   perplexityEnabled: false,
   deepResearchEnabled: false,
+  abortController: null,
 
   // Actions
   setMessages: (messages) => set({ messages }),
@@ -59,6 +66,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       messages: state.messages.map((msg) =>
         msg.id === id ? { ...msg, ...updates } : msg
       ),
+    })),
+
+  removeMessagesFromIndex: (index) =>
+    set((state) => ({
+      messages: state.messages.slice(0, index),
     })),
 
   clearMessages: () => set({ messages: [], conversationId: null }),
@@ -78,6 +90,26 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   setPerplexityEnabled: (perplexityEnabled) => set({ perplexityEnabled }),
 
   setDeepResearchEnabled: (deepResearchEnabled) => set({ deepResearchEnabled }),
+
+  // Abort controller
+  setAbortController: (abortController) => set({ abortController }),
+
+  abortStreaming: () => {
+    const { abortController, messages } = get()
+    if (abortController) {
+      abortController.abort()
+      set({ abortController: null, isLoading: false, statusMessage: null })
+      // Mark any streaming messages as finished
+      const streamingMessages = messages.filter(m => m.isStreaming)
+      streamingMessages.forEach(msg => {
+        set((state) => ({
+          messages: state.messages.map((m) =>
+            m.id === msg.id ? { ...m, isStreaming: false } : m
+          ),
+        }))
+      })
+    }
+  },
 
   // Streaming helpers
   startStreaming: (messageId) => {

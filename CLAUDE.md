@@ -833,4 +833,54 @@ This hybrid approach preserves the RAG knowledge base (unlike OpenAI Realtime AP
 
 ---
 
-*Last updated: December 13, 2025 - Homepage Messaging Refresh*
+### December 14, 2025 - Voice Dialog Fixes & Stop/Edit/Regenerate Features
+
+**Voice Dialog Bug Fixes**:
+1. **SSE Parsing Fixed**: Chat API response parsing now correctly handles SSE format in useHybridVoiceDialog
+   - Fixed: Response lines prefixed with `data: ` now properly parsed
+   - Fixed: Handles `type: 'done'` event to complete response
+
+2. **Duplicate Message Prevention**:
+   - Messages from voice dialog no longer duplicated in conversation
+
+**New Chat Control Features**:
+
+1. **Stop Streaming Button**:
+   - Red/orange stop button appears during AI response generation
+   - Allows users to immediately cancel an in-progress response
+   - Uses AbortController to cleanly abort fetch request
+   - Gracefully handles abort without showing error toast
+
+2. **Edit User Messages**:
+   - Edit button on user messages puts content back in input field
+   - Message index tracked for regeneration
+
+3. **Regenerate from Edit**:
+   - When user sends edited message, all subsequent messages are removed
+   - New response generated from the edited prompt
+   - Uses `removeMessagesFromIndex` from chatStore
+
+**Implementation Details**:
+
+- `AbortController` stored in Zustand store for cross-component access
+- `editingMessageIndexRef` tracks which message is being edited
+- `messageIndex` prop added to MessageBubble for edit tracking
+
+**Files Modified**:
+- `src/stores/chatStore.ts` - Added `abortController`, `setAbortController`, `abortStreaming` actions
+- `src/components/chat/ChatInput.tsx` - Stop button (Square icon), conditional render with send button
+- `src/components/chat/ChatContainer.tsx` - AbortController in fetch, AbortError handling, edit regeneration logic
+- `src/components/chat/MessageBubble.tsx` - Added `messageIndex` prop, updated `onEditPrompt` signature
+- `src/components/chat/MessageList.tsx` - Pass `messageIndex` to MessageBubble
+- `src/hooks/useHybridVoiceDialog.ts` - Fixed SSE parsing for voice dialog
+
+**UI Flow**:
+```
+User typing → Send button (purple gradient)
+AI streaming → Stop button (red/orange gradient)
+Edit message → Content in input → Send → Messages truncated → Regenerate
+```
+
+---
+
+*Last updated: December 14, 2025 - Voice Dialog Fixes & Stop/Edit/Regenerate*

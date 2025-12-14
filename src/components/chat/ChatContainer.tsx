@@ -25,11 +25,13 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   const lastConversationIdRef = useRef<string | undefined>(undefined)
   const isNavigatingToNewConversation = useRef(false)
   const isStreamingRef = useRef(false)
+  const editingMessageIndexRef = useRef<number | null>(null)
 
   const {
     messages,
     setMessages,
     addMessage,
+    removeMessagesFromIndex,
     isLoading,
     setIsLoading,
     setError,
@@ -46,6 +48,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     deepResearchEnabled,
     setMessageResearching,
     setExpandedResearch,
+    setAbortController,
+    abortStreaming,
   } = useChatStore()
 
   // Reset state when conversation changes
@@ -157,6 +161,12 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setStatusMessage('Preparing your request...')
     isStreamingRef.current = true
 
+    // If editing a previous message, remove all messages from that index onwards
+    if (editingMessageIndexRef.current !== null) {
+      removeMessagesFromIndex(editingMessageIndexRef.current)
+      editingMessageIndexRef.current = null
+    }
+
     // Convert uploaded files to chat attachments
     const chatAttachments: ChatAttachment[] | undefined = attachments?.map((a) => ({
       id: a.id,
@@ -199,6 +209,10 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         }
       }
 
+      // Create abort controller for this request
+      const abortController = new AbortController()
+      setAbortController(abortController)
+
       // Send to API with attachments
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -212,6 +226,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           perplexityEnabled,
           deepResearchEnabled,
         }),
+        signal: abortController.signal,
       })
 
       if (!response.ok) {
@@ -266,19 +281,27 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         }
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
-      setStatusMessage(null)
-      finishStreaming(assistantMessageId)
+      // Don't show error for user-initiated abort
+      if (error instanceof Error && error.name === 'AbortError') {
+        // User stopped the generation - just finish streaming without error
+        finishStreaming(assistantMessageId)
+      } else {
+        setError(error instanceof Error ? error.message : 'An error occurred')
+        setStatusMessage(null)
+        finishStreaming(assistantMessageId)
+      }
     } finally {
       setIsLoading(false)
       setStatusMessage(null)
       isStreamingRef.current = false
+      setAbortController(null)
     }
   }, [
     isLoading,
     conversationId,
     currentModel,
     addMessage,
+    removeMessagesFromIndex,
     startStreaming,
     appendToStream,
     setCitations,
@@ -293,10 +316,12 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     perplexityEnabled,
     deepResearchEnabled,
     setExpandedResearch,
+    setAbortController,
   ])
 
   // Handle editing a prompt - puts the content back in the input for editing
-  const handleEditPrompt = useCallback((content: string) => {
+  const handleEditPrompt = useCallback((content: string, messageIndex: number) => {
+    editingMessageIndexRef.current = messageIndex
     chatInputRef.current?.setInput(content)
   }, [])
 
