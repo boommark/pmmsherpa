@@ -704,7 +704,7 @@ Comprehensive mobile-first responsive fixes to ensure clean, professional render
 
 ---
 
-### December 13, 2025 - Voice Capabilities
+### December 13, 2025 - Voice Capabilities (Basic)
 
 **Features Added**:
 1. **Voice Input (STT)**: Microphone button in ChatInput for dictating messages
@@ -726,8 +726,6 @@ Comprehensive mobile-first responsive fixes to ensure clean, professional render
 **Files Modified**:
 - `src/components/chat/ChatInput.tsx` - Added microphone button (purple, right side)
 - `src/components/chat/MessageBubble.tsx` - Added speaker button to action row
-
-**Note**: Initially implemented with Speechmatics API but switched to browser Web Speech API due to authorization issues. Speechmatics can be re-enabled later if needed.
 
 ---
 
@@ -751,4 +749,88 @@ Comprehensive mobile-first responsive fixes to ensure clean, professional render
 
 ---
 
-*Last updated: December 13, 2025 - Voice Capabilities *Last updated: December 13, 2025 - Voice Capabilities & Mobile Fixes* Mobile Fixes**
+### December 13, 2025 - Hybrid Voice Dialog with OpenAI APIs
+
+**Major Upgrade**: Full voice conversation mode using OpenAI Whisper + TTS
+
+**Architecture**:
+```
+User Speech → MediaRecorder → Whisper STT → Claude/RAG Pipeline → TTS → Audio Playback
+```
+
+This hybrid approach preserves the RAG knowledge base (unlike OpenAI Realtime API which bypasses it).
+
+**Features Added**:
+1. **Hybrid Voice Dialog**: Phone button in ChatInput launches full-screen voice conversation
+   - Recording → Whisper transcription → Claude/RAG → OpenAI TTS response
+   - Visual states: Connecting → Listening → Processing → Generating → Speaking
+   - User can tap "Done speaking" to manually end recording
+   - Conversation messages sync to chat history
+
+2. **Voice Preference Settings**: Settings → Preferences → Voice Settings
+   - 10 OpenAI TTS voices: Nova, Alloy, Echo, Fable, Onyx, Shimmer, Ash, Ballad, Coral, Sage
+   - Preview button to hear voice before selecting
+   - Preference saved to user profile
+
+**Files Created**:
+- `src/hooks/useHybridVoiceDialog.ts` - Main hook for hybrid voice flow (STT→Claude→TTS)
+- `src/hooks/useVoiceDialog.ts` - OpenAI Realtime API hook (for future use)
+- `src/components/chat/VoiceDialogOverlay.tsx` - Full-screen voice conversation UI
+- `src/app/api/voice/transcribe/route.ts` - Whisper STT endpoint
+- `src/app/api/voice/speak/route.ts` - OpenAI TTS endpoint
+- `src/app/api/voice/realtime-token/route.ts` - Ephemeral token for Realtime API
+- `supabase/migrations/010_add_voice_preference.sql` - Voice preference column
+
+**Files Modified**:
+- `src/components/chat/ChatInput.tsx` - Added Phone button for voice dialog, useHybridVoiceDialog
+- `src/app/(dashboard)/settings/preferences/page.tsx` - Voice selection UI with preview
+- `src/types/database.ts` - Added TTSVoice type and voice_preference to Profile
+
+**Database Changes**:
+- Added `voice_preference` column to `profiles` table (TEXT, default 'nova')
+- Check constraint for valid voice values
+
+**Cost Notes**:
+- Whisper: $0.006/minute
+- TTS (tts-1): $0.015/1K characters
+
+---
+
+### December 13, 2025 - Homepage Messaging Refresh
+
+**Major Update**: Refreshed all marketing copy across the platform to better capture PMMSherpa's value proposition as a "second brain for product marketing."
+
+**Key Messaging Changes**:
+- **Hero Headline**: "Your Second Brain for Product Marketing" (previously "Your AI-Powered Product Marketing Assistant")
+- **Badge**: "Where PMM Legends Meet Frontier AI" (previously "Powered by Claude Opus 4.5 & Gemini")
+- **Subheadline**: "Expert knowledge. Real-time research. Voice conversations."
+- **CTA**: "Think Clearly. Ship Faster."
+
+**Guidelines Applied**:
+- NO author names (April Dunford, etc.) or book titles (copyright discretion)
+- Numbers ARE okay for credibility (e.g., "1,200+ expert resources")
+- Focus on capability and value, not underlying source details
+
+**Capabilities Section Redesign**:
+- Replaced specific source counts (17 books, 781 blogs, 485 AMAs) with capability cards:
+  - "1,200+ Expert Resources" - Positioning, messaging, and GTM frameworks
+  - "Live Market Intelligence" - Real-time competitive insights via Perplexity
+  - "Voice & Text" - Conversations that adapt to you
+
+**Features Grid Updated**:
+- Strategic Foundation, Positioning & Messaging, Go-to-Market Planning
+- Ready-to-Use Outputs, Customer Intelligence, Talk or Type
+
+**Animated Gradient Effect**:
+- "Product Marketing" text now has animated gradient effect (shifting indigo-purple)
+- CSS keyframes added for `gradient-shift` animation
+
+**Files Modified**:
+- `src/app/page.tsx` - Hero, capabilities, features, CTA sections
+- `src/app/globals.css` - Added gradient animation keyframes
+- `src/app/(auth)/request-access/page.tsx` - Updated subtitle messaging
+- `src/lib/email/templates.ts` - Aligned email copy with new messaging
+
+---
+
+*Last updated: December 13, 2025 - Homepage Messaging Refresh*

@@ -10,6 +10,7 @@ import {
   FileText,
   Users,
   ArrowRight,
+  Globe,
 } from "lucide-react";
 
 // Mountain peak icon component for branding
@@ -32,46 +33,58 @@ function MountainIcon({ className }: { className?: string }) {
 const features = [
   {
     icon: BookOpen,
-    title: "Expert Knowledge Base",
+    title: "Strategic Foundation",
     description:
-      "Powered by 1,200+ curated PMM resources including books, blog posts, and AMA sessions from industry leaders.",
+      "Grounded in proven PMM frameworks—positioning, messaging, competitive strategy—so every answer has depth.",
   },
   {
     icon: Target,
-    title: "Strategic Positioning",
+    title: "Positioning & Messaging",
     description:
-      "Craft compelling positioning statements, value propositions, and messaging frameworks that resonate.",
+      "Craft positioning statements, value props, and messaging frameworks that actually differentiate.",
   },
   {
     icon: Zap,
-    title: "GTM Strategy",
+    title: "Go-to-Market Planning",
     description:
-      "Build comprehensive go-to-market strategies with launch plans, battlecards, and competitive analysis.",
+      "Build launch plans, define segments, map buyer journeys—with real competitive context.",
   },
   {
     icon: FileText,
-    title: "Deliverable Generation",
+    title: "Ready-to-Use Outputs",
     description:
-      "Generate sales decks, one-pagers, case studies, and other PMM deliverables instantly.",
+      "Get battlecards, one-pagers, pitch decks, and sales enablement you can use immediately.",
   },
   {
     icon: Users,
-    title: "Customer Research",
+    title: "Customer Intelligence",
     description:
-      "Create interview guides, persona frameworks, and JTBD analyses to understand your customers.",
+      "Interview guides, persona frameworks, JTBD analysis—understand what drives decisions.",
   },
   {
     icon: MessageSquare,
-    title: "Conversational Interface",
+    title: "Talk or Type",
     description:
-      "Natural chat interface with source citations, conversation history, and export capabilities.",
+      "Voice conversations for thinking out loud. Text for precision. Your PMM co-pilot, your way.",
   },
 ];
 
-const knowledgeSources = [
-  { count: "17", label: "PMM Books", description: "Industry classics" },
-  { count: "781", label: "Blog Posts", description: "PMA articles" },
-  { count: "485", label: "AMA Sessions", description: "Expert Q&As" },
+const capabilities = [
+  {
+    icon: BookOpen,
+    title: "1,200+ Expert Resources",
+    description: "Positioning, messaging, and GTM frameworks from leading PMM practitioners",
+  },
+  {
+    icon: Globe,
+    title: "Live Market Intelligence",
+    description: "Real-time competitive insights and trends via Perplexity",
+  },
+  {
+    icon: MessageSquare,
+    title: "Voice & Text",
+    description: "Think out loud or type—conversations that adapt to you",
+  },
 ];
 
 export default function LandingPage() {
@@ -116,20 +129,19 @@ export default function LandingPage() {
 
           <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 px-4 py-2 text-sm shadow-sm">
             <MountainIcon className="h-4 w-4 text-indigo-500" />
-            <span className="text-muted-foreground">Powered by Claude Opus 4.5 & Gemini</span>
+            <span className="text-muted-foreground">Where PMM Legends Meet Frontier AI</span>
           </div>
           <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-            Your AI-Powered
+            Your Second Brain for
             <br />
-            <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
               Product Marketing
-            </span>{" "}
-            Sherpa
+            </span>
           </h1>
           <p className="mb-10 text-lg text-muted-foreground/80 sm:text-xl max-w-2xl mx-auto">
-            Get expert guidance on positioning, messaging, GTM strategy, and
-            more. PMMSherpa combines the wisdom of 1,200+ PMM resources with AI
-            to help you create world-class product marketing.
+            Expert knowledge. Real-time research. Voice conversations.
+            PMMSherpa combines deep PMM expertise with live market intelligence
+            to help you think clearly and move faster.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/request-access">
@@ -153,7 +165,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Knowledge Sources */}
+      {/* Capabilities Section */}
       <section className="py-20 relative">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
@@ -161,21 +173,21 @@ export default function LandingPage() {
             <div className="rounded-3xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-xl border border-white/20 dark:border-zinc-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-8 md:p-12">
               <div className="mb-8 text-center">
                 <h2 className="text-2xl md:text-3xl font-bold">
-                  Built on Industry-Leading Knowledge
+                  Deep Expertise Meets Real-Time Intelligence
                 </h2>
                 <p className="mt-2 text-muted-foreground">
-                  Curated from the best product marketing resources
+                  Grounded in proven PMM frameworks, enriched with live market data
                 </p>
               </div>
               <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-                {knowledgeSources.map((source) => (
-                  <div key={source.label} className="text-center">
-                    <p className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                      {source.count}
-                    </p>
-                    <p className="font-semibold mt-1">{source.label}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {source.description}
+                {capabilities.map((capability) => (
+                  <div key={capability.title} className="text-center">
+                    <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center">
+                      <capability.icon className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <p className="font-semibold text-lg">{capability.title}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {capability.description}
                     </p>
                   </div>
                 ))}
@@ -223,13 +235,14 @@ export default function LandingPage() {
             {/* Glassmorphism CTA card */}
             <div className="rounded-3xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-indigo-500/10 backdrop-blur-xl border border-white/20 dark:border-zinc-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-8 md:p-12 text-center">
               <h2 className="mb-4 text-3xl md:text-4xl font-bold">
-                Ready to Level Up Your{" "}
+                Think Clearly.{" "}
                 <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  Product Marketing?
+                  Ship Faster.
                 </span>
               </h2>
               <p className="mb-8 text-lg text-muted-foreground max-w-xl mx-auto">
-                Join PMMSherpa and get AI-powered guidance for all your PMM needs.
+                Stop second-guessing your positioning. Stop searching for frameworks.
+                Start with expert guidance and real-time market intelligence.
               </p>
               <Link href="/request-access">
                 <Button

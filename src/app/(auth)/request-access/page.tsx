@@ -108,7 +108,7 @@ export default function RequestAccessPage() {
             </div>
             <h1 className="text-2xl font-bold mb-2">Request Submitted!</h1>
             <p className="text-muted-foreground mb-6">
-              Thank you for your interest in PMMSherpa. We&apos;ll review your request and get back to you shortly.
+              Thank you for your interest in PMMSherpa. We&apos;re reviewing your request and will be in touch soon.
             </p>
             <p className="text-sm text-muted-foreground mb-6 p-4 rounded-xl bg-white/50 dark:bg-zinc-800/50">
               You&apos;ll receive an email at <strong className="text-foreground">{formData.email}</strong> once your access is approved with instructions to set up your password.
@@ -151,7 +151,7 @@ export default function RequestAccessPage() {
 
             <h1 className="text-2xl font-bold">Request Access</h1>
             <p className="text-muted-foreground text-sm">
-              Join the waitlist for your AI-powered product marketing assistant
+              Your second brain for product marketing—expert knowledge, real-time research, voice conversations
             </p>
           </div>
 

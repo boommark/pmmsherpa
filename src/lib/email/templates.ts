@@ -346,7 +346,7 @@ export function getUserApprovalEmail(data: { fullName: string; email: string; pa
               </div>
               <div class="content">
                 <p style="font-size: 16px;">Hi ${firstName},</p>
-                <p>Great news! Your access to PMMSherpa has been approved. You're now part of a community of product marketing professionals using AI to create world-class marketing.</p>
+                <p>Great news! Your access to PMMSherpa has been approved. You now have your own second brain for product marketing—expert knowledge, real-time research, and voice conversations at your fingertips.</p>
 
                 <p><strong>To get started, set up your password:</strong></p>
 
@@ -385,7 +385,7 @@ export function getUserApprovalEmail(data: { fullName: string; email: string; pa
                   </div>
                 </div>
 
-                <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">Powered by 1,280+ expert sources including PMM books, blogs, and AMAs.</p>
+                <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">Grounded in 1,200+ expert resources from leading PMM practitioners.</p>
               </div>
               <div class="footer">
                 <p>Welcome to the PMMSherpa community!</p>
@@ -399,7 +399,7 @@ export function getUserApprovalEmail(data: { fullName: string; email: string; pa
     text: `
 Hi ${firstName},
 
-Great news! Your access to PMMSherpa has been approved.
+Great news! Your access to PMMSherpa has been approved. You now have your own second brain for product marketing—expert knowledge, real-time research, and voice conversations at your fingertips.
 
 To get started, please set up your password by visiting this link:
 ${data.passwordSetupLink}
@@ -414,7 +414,7 @@ What you can do with PMMSherpa:
 - Plan go-to-market strategies and product launches
 - Conduct customer research and build personas
 
-Powered by 1,280+ expert sources including PMM books, blogs, and AMAs.
+Grounded in 1,200+ expert resources from leading PMM practitioners.
 
 Welcome to the PMMSherpa community!
     `.trim()
@@ -431,7 +431,7 @@ export function getWelcomeEmailDraft(data: { fullName: string; email: string }) 
 
 Welcome to PMMSherpa! I'm excited to have you on board.
 
-PMMSherpa is your AI-powered product marketing assistant, built from 1,280+ expert sources including PMM books, blogs, and AMAs from top product marketers.
+PMMSherpa is your second brain for product marketing—combining 1,200+ expert resources with real-time market intelligence and voice conversations.
 
 Here's what you can do with PMMSherpa:
 
