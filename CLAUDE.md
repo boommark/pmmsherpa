@@ -280,9 +280,16 @@ python ingest_documents.py
 
 ### Deploy to production
 ```bash
-git add -A && git commit -m "message" && git push origin main
-# Vercel auto-deploys on push
+git add -A && git commit -m "message" && git push origin main && ./deploy.sh
 ```
+
+**IMPORTANT**: Always run `./deploy.sh` after pushing to GitHub to ensure Vercel deployment completes. The deploy script:
+1. Pushes to GitHub (if not already pushed)
+2. Triggers Vercel production deployment
+3. Waits for deployment to complete
+4. Shows the live URL
+
+Never leave a push without running the deployment script.
 
 ---
 
@@ -697,4 +704,51 @@ Comprehensive mobile-first responsive fixes to ensure clean, professional render
 
 ---
 
-*Last updated: December 13, 2025 - Mobile Spacing *Last updated: December 13, 2025 - Mobile Spacing *Last updated: December 13, 2025 - Mobile Spacing & Layout Fixes* Layout Fixes** Layout Fixes* Layout Fixes***
+### December 13, 2025 - Voice Capabilities
+
+**Features Added**:
+1. **Voice Input (STT)**: Microphone button in ChatInput for dictating messages
+   - Uses browser's native Web Speech API (SpeechRecognition)
+   - Real-time partial transcripts shown in placeholder
+   - Final transcript appended to input field
+   - Purple styling with pulse animation when recording
+
+2. **Voice Output (TTS)**: Speaker button on assistant messages
+   - Uses browser's Web Speech API (SpeechSynthesis)
+   - Click to start/stop playback
+   - Volume2/VolumeX icons for state indication
+
+**Files Created**:
+- `src/hooks/useVoiceInput.ts` - Voice recording hook with Web Speech API
+- `src/hooks/useVoiceOutput.ts` - TTS playback hook with Web Speech API
+- `src/app/api/voice/token/route.ts` - JWT token endpoint (for future Speechmatics use)
+
+**Files Modified**:
+- `src/components/chat/ChatInput.tsx` - Added microphone button (purple, right side)
+- `src/components/chat/MessageBubble.tsx` - Added speaker button to action row
+
+**Note**: Initially implemented with Speechmatics API but switched to browser Web Speech API due to authorization issues. Speechmatics can be re-enabled later if needed.
+
+---
+
+### December 13, 2025 - Mobile Action Buttons & Safe Area Fixes
+
+**Problems Fixed**:
+1. **Copy/Listen buttons not visible on mobile**: Buttons only appeared on hover (desktop-only behavior)
+2. **Input area cut off at bottom**: iOS home indicator overlapping chat input
+
+**Solutions**:
+1. Changed opacity classes from hover-only to always-visible on mobile:
+   - `opacity-100 sm:opacity-0 sm:group-hover:opacity-100`
+2. Added iOS safe-area support:
+   - `pb-[max(0.5rem,env(safe-area-inset-bottom))]` in ChatInput
+   - `viewportFit: "cover"` in layout.tsx viewport config
+
+**Files Modified**:
+- `src/components/chat/MessageBubble.tsx` - Action buttons always visible on mobile
+- `src/components/chat/ChatInput.tsx` - Safe area bottom padding
+- `src/app/layout.tsx` - Viewport configuration for iOS safe areas
+
+---
+
+*Last updated: December 13, 2025 - Voice Capabilities & Mobile Fixes*
