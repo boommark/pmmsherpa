@@ -27,6 +27,12 @@ export const metadata: Metadata = {
     "product marketing manager",
   ],
   authors: [{ name: "PMMSherpa" }],
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    viewportFit: "cover",
+  },
   openGraph: {
     title: "PMMSherpa - Your Product Marketing AI Assistant",
     description:

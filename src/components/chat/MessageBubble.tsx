@@ -187,12 +187,12 @@ export function MessageBubble({ message, onEditPrompt, onExpandWithResearch }: M
           )}
         </div>
 
-        {/* Action buttons - show on hover or always on mobile */}
+        {/* Action buttons - always visible on mobile, hover on desktop */}
         {!isStreaming && (
           <div className={cn(
             'flex items-center gap-0.5 sm:gap-1 transition-opacity',
             isUser ? 'flex-row-reverse' : 'flex-row',
-            'opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100'
+            'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
           )}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

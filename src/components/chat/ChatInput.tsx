@@ -213,7 +213,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const canSubmit = (input.trim() || attachments.some((a) => a.status === 'completed')) && !isUploading
 
     return (
-      <div className="p-2 sm:p-3 md:p-4 lg:p-6">
+      <div className="p-2 sm:p-3 md:p-4 lg:p-6 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:pb-3 md:pb-4 lg:pb-6">
         <div className="w-full max-w-3xl mx-auto">
           {/* Glassmorphism container */}
           <div className="relative rounded-xl md:rounded-2xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-[0_4px_16px_rgba(0,0,0,0.08)] md:shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)] md:dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/20 dark:border-zinc-700/50">
