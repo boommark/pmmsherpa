@@ -86,7 +86,7 @@ export function MessageBubble({ message, onEditPrompt, onExpandWithResearch }: M
   return (
     <div
       className={cn(
-        'flex gap-2 sm:gap-2.5 md:gap-3 group',
+        'flex gap-2 sm:gap-2.5 md:gap-3 group w-full overflow-hidden',
         isUser ? 'flex-row-reverse' : 'flex-row'
       )}
     >
@@ -117,7 +117,7 @@ export function MessageBubble({ message, onEditPrompt, onExpandWithResearch }: M
           {isUser ? (
             <p className="whitespace-pre-wrap text-sm sm:text-base break-words">{message.content}</p>
           ) : (
-            <div className="prose prose-sm dark:prose-invert max-w-none break-words overflow-hidden [&_*]:break-words">
+            <div className="prose prose-sm dark:prose-invert max-w-none break-words overflow-hidden [&_*]:break-words [word-break:break-word]">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
