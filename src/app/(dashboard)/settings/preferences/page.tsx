@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useProfile } from '@/hooks/useSupabase'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -17,6 +17,23 @@ import {
 } from '@/components/ui/select'
 import { Loader2, CheckCircle, Moon, Sun, Monitor, Brain, Zap } from 'lucide-react'
 import { MODEL_CONFIG, getDbModelValue, type ModelProvider } from '@/lib/llm/provider-factory'
+
+// Apply theme to document
+function applyTheme(theme: 'light' | 'dark' | 'system') {
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark')
+  } else if (theme === 'light') {
+    document.documentElement.classList.remove('dark')
+  } else {
+    // System preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    if (prefersDark) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }
+}
 
 // Group models by provider for preferences
 const modelGroups = {
@@ -39,7 +56,7 @@ export default function PreferencesPage() {
   const [error, setError] = useState<string | null>(null)
 
   // Initialize from profile
-  useState(() => {
+  useEffect(() => {
     if (profile) {
       // Map old db values to new model keys for backward compatibility
       const dbModel = profile.preferred_model
@@ -47,8 +64,17 @@ export default function PreferencesPage() {
       else if (dbModel === 'gemini') setPreferredModel('gemini-3-pro')
       else setPreferredModel(dbModel as ModelProvider)
       setTheme(profile.theme)
+      applyTheme(profile.theme)
     }
-  })
+  }, [profile])
+
+  // Handle theme change - apply immediately and save to DB
+  const handleThemeChange = async (newTheme: 'light' | 'dark' | 'system') => {
+    setTheme(newTheme)
+    applyTheme(newTheme)
+    // Save to profile in background
+    await updateProfile({ theme: newTheme })
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -60,7 +86,6 @@ export default function PreferencesPage() {
 
     const { error } = await updateProfile({
       preferred_model: dbModelValue,
-      theme,
     })
 
     if (error) {
@@ -68,21 +93,6 @@ export default function PreferencesPage() {
     } else {
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
-
-      // Apply theme
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark')
-      } else if (theme === 'light') {
-        document.documentElement.classList.remove('dark')
-      } else {
-        // System preference
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        if (prefersDark) {
-          document.documentElement.classList.add('dark')
-        } else {
-          document.documentElement.classList.remove('dark')
-        }
-      }
     }
 
     setSaving(false)
@@ -180,7 +190,7 @@ export default function PreferencesPage() {
               <Label>Theme</Label>
               <Select
                 value={theme}
-                onValueChange={(v) => setTheme(v as 'light' | 'dark' | 'system')}
+                onValueChange={(v) => handleThemeChange(v as 'light' | 'dark' | 'system')}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select theme" />
@@ -206,6 +216,9 @@ export default function PreferencesPage() {
                   </SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground">
+                Theme changes are applied instantly
+              </p>
             </div>
           </CardContent>
         </Card>

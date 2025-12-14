@@ -631,4 +631,70 @@ npx supabase gen types ts      # Generate TypeScript types
 
 ---
 
-*Last updated: December 13, 2025 - Perplexity Research Persistence & Enhanced Copy*
+### December 13, 2025 - Settings Page Enhancements
+- **Dark Mode Toggle**: Added appearance section with Light/Dark/System theme options
+- **Avatar Upload**: Profile picture upload with Supabase storage integration
+- **Profile Section in Sidebar**: User avatar and name now displayed at bottom of sidebar
+- Database migration: `009_create_avatars_bucket.sql` - Created avatars storage bucket
+
+**Files Created**:
+- `src/components/providers/ThemeProvider.tsx` - Theme context provider with localStorage + DB sync
+- `supabase/migrations/009_create_avatars_bucket.sql` - Storage bucket for avatars
+
+**Files Modified**:
+- `src/app/(dashboard)/settings/page.tsx` - Added Appearance and Avatar sections
+- `src/components/layout/Sidebar.tsx` - Added user profile section with avatar
+- `src/app/layout.tsx` - Added pre-hydration theme script to prevent flash
+
+---
+
+### December 13, 2025 - Mobile Spacing & Layout Fixes
+Comprehensive mobile-first responsive fixes to ensure clean, professional rendering on all screen sizes.
+
+**Problems Fixed**:
+1. **Text overflow/spillover**: Long content was breaking layout boundaries on mobile
+2. **Spacing too large**: Elements had excessive spacing on small screens
+3. **Buttons too large**: Action buttons were oversized for mobile viewports
+4. **Dark mode on mobile**: Theme toggle wasn't properly visible/accessible on mobile
+
+**Solutions Applied**:
+- Added intermediate `sm:` breakpoint classes for smoother responsive transitions
+- Applied `overflow-hidden`, `break-words`, `min-w-0`, `truncate`, `line-clamp-2` for text overflow
+- Reduced element sizes on mobile with patterns like `h-6 sm:h-7 md:h-8`
+- Hidden text labels on mobile, showing only icons with `hidden sm:inline`
+
+**Files Modified**:
+- `src/components/chat/MessageBubble.tsx`:
+  - Responsive gaps: `gap-2 sm:gap-2.5 md:gap-3`
+  - Smaller avatars on mobile: `h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8`
+  - Added overflow protection to message bubble and prose
+  - Responsive table styling with negative margins on mobile
+  - Action buttons with hidden text labels on mobile
+  - Research button shows "Research" on mobile vs "Expand with Research" on desktop
+
+- `src/components/chat/SourceCitations.tsx`:
+  - Added `overflow-hidden` to Collapsible wrapper
+  - Responsive trigger button sizing
+  - Badge sizing reduced for mobile: `text-[8px] sm:text-[10px]`
+  - Added `truncate` and `line-clamp-2` for long citation content
+
+- `src/components/chat/ExpandedResearch.tsx`:
+  - Responsive container margins and padding
+  - Trigger button sizing with responsive classes
+  - Added overflow protection throughout
+  - Web sources button: "Sources" on mobile vs "Web Sources" on desktop
+
+- `src/components/chat/FileUpload.tsx`:
+  - Responsive button sizing: `h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10`
+
+- `src/components/chat/ChatInput.tsx`:
+  - Responsive container padding: `p-2 sm:p-3 md:p-4 lg:p-6`
+  - Responsive button sizing for all action buttons
+  - Responsive textarea sizing
+
+- `src/components/providers/ThemeProvider.tsx`:
+  - Fixed TypeScript type casting for Supabase profile theme query
+
+---
+
+*Last updated: December 13, 2025 - Mobile Spacing & Layout Fixes*

@@ -126,10 +126,10 @@ export function FileUpload({ onFilesSelected, disabled, maxFiles = 5 }: FileUplo
         size="icon"
         onClick={handleClick}
         disabled={disabled}
-        className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50"
+        className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50"
         title="Attach files (PDF, images, documents)"
       >
-        <Paperclip className="h-4 w-4 md:h-5 md:w-5" />
+        <Paperclip className="h-4 w-4" />
       </Button>
     </>
   )

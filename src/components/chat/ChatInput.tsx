@@ -181,7 +181,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const canSubmit = (input.trim() || attachments.some((a) => a.status === 'completed')) && !isUploading
 
     return (
-      <div className="p-2 md:p-4 lg:p-6">
+      <div className="p-2 sm:p-3 md:p-4 lg:p-6">
         <div className="w-full max-w-3xl mx-auto">
           {/* Glassmorphism container */}
           <div className="relative rounded-xl md:rounded-2xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-[0_4px_16px_rgba(0,0,0,0.08)] md:shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)] md:dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/20 dark:border-zinc-700/50">
@@ -192,7 +192,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               disabled={disabled}
             />
 
-            <div className="relative flex items-end gap-1.5 md:gap-2 p-2 md:p-3">
+            <div className="relative flex items-end gap-1 sm:gap-1.5 md:gap-2 p-1.5 sm:p-2 md:p-3">
               {/* File upload button */}
               <FileUpload
                 onFilesSelected={handleFilesSelected}
@@ -207,14 +207,14 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 size="icon"
                 onClick={() => setWebSearchEnabled(!webSearchEnabled)}
                 disabled={disabled}
-                className={`h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 transition-all ${
+                className={`h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 transition-all ${
                   webSearchEnabled
                     ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800/40'
                     : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50'
                 }`}
                 title={webSearchEnabled ? 'Web search enabled' : 'Enable web search'}
               >
-                <Globe className="h-4 w-4 md:h-5 md:w-5" />
+                <Globe className="h-4 w-4" />
               </Button>
 
               {/* Perplexity research dropdown */}
@@ -224,15 +224,15 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                     type="button"
                     variant="ghost"
                     disabled={disabled}
-                    className={`h-9 md:h-10 px-2 md:px-3 rounded-lg md:rounded-xl shrink-0 transition-all gap-1 ${
+                    className={`h-8 sm:h-9 md:h-10 px-1.5 sm:px-2 md:px-3 rounded-lg md:rounded-xl shrink-0 transition-all gap-0.5 sm:gap-1 ${
                       perplexityEnabled
                         ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-800/40'
                         : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50'
                     }`}
                     title="Research options"
                   >
-                    <PerplexityIcon size={18} className="md:w-5 md:h-5" />
-                    <ChevronDown className="h-3 w-3" />
+                    <PerplexityIcon size={16} className="sm:w-[18px] sm:h-[18px]" />
+                    <ChevronDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56">
@@ -286,14 +286,14 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 onKeyDown={handleKeyDown}
                 placeholder={attachments.length > 0 ? "Add a message..." : "Ask about product marketing..."}
                 disabled={disabled}
-                className="flex-1 min-h-[40px] md:min-h-[44px] max-h-[150px] md:max-h-[200px] resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-sm md:text-base placeholder:text-muted-foreground/60 disabled:opacity-50"
+                className="flex-1 min-h-[36px] sm:min-h-[40px] md:min-h-[44px] max-h-[120px] sm:max-h-[150px] md:max-h-[200px] resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-sm md:text-base placeholder:text-muted-foreground/60 disabled:opacity-50 py-2"
                 rows={1}
               />
               <Button
                 onClick={handleSubmit}
                 disabled={!canSubmit || disabled}
                 size="icon"
-                className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 bg-gradient-to-br from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 shadow-md md:shadow-lg text-white"
+                className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 bg-gradient-to-br from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 shadow-md md:shadow-lg text-white"
               >
                 {disabled || isUploading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

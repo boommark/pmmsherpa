@@ -5,11 +5,13 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useConversations } from '@/hooks/useConversations'
+import { useProfile } from '@/hooks/useSupabase'
 import { useUIStore } from '@/stores/uiStore'
 import { useChatStore } from '@/stores/chatStore'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   MessageSquare,
   History,
@@ -57,6 +59,16 @@ function SidebarContent({
   const router = useRouter()
   const { conversations, deleteConversation } = useConversations()
   const { clearMessages, setConversationId } = useChatStore()
+  const { profile } = useProfile()
+
+  // Get initials for avatar fallback
+  const initials = profile?.full_name
+    ? profile.full_name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+    : profile?.email?.[0]?.toUpperCase() || 'U'
 
   // Handle new chat click - clear state and navigate
   const handleNewChat = useCallback((e: React.MouseEvent) => {
@@ -226,6 +238,46 @@ function SidebarContent({
             )
           })}
         </ul>
+
+        {/* User Profile Section */}
+        {!collapsed && profile && (
+          <div className="mt-3 pt-3 border-t">
+            <Link
+              href="/settings"
+              onClick={onNavigate}
+              className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-sidebar-accent/50 transition-colors"
+            >
+              <Avatar className="h-8 w-8">
+                <AvatarImage
+                  src={profile.avatar_url || undefined}
+                  alt={profile.full_name || ''}
+                />
+                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">
+                  {profile.full_name || 'User'}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {profile.email}
+                </p>
+              </div>
+            </Link>
+          </div>
+        )}
+        {collapsed && profile && (
+          <div className="mt-3 pt-3 border-t flex justify-center">
+            <Link href="/settings" onClick={onNavigate}>
+              <Avatar className="h-8 w-8">
+                <AvatarImage
+                  src={profile.avatar_url || undefined}
+                  alt={profile.full_name || ''}
+                />
+                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+              </Avatar>
+            </Link>
+          </div>
+        )}
       </nav>
     </>
   )
