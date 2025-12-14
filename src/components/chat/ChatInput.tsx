@@ -9,11 +9,14 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { Send, Loader2, Globe, ChevronDown, Search, Microscope } from 'lucide-react'
+import { Send, Loader2, Globe, ChevronDown, Search, Microscope, Mic, MicOff } from 'lucide-react'
 import { FileUpload, type UploadedFile, getFileCategory } from './FileUpload'
 import { AttachmentPreview } from './AttachmentPreview'
 import { useChatStore } from '@/stores/chatStore'
 import { PerplexityIcon } from '@/components/icons/PerplexityIcon'
+import { useVoiceInput } from '@/hooks/useVoiceInput'
+import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 
 interface ChatInputProps {
   onSend: (message: string, attachments?: UploadedFile[]) => void
@@ -30,6 +33,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
   function ChatInput({ onSend, disabled, conversationId }, ref) {
     const [input, setInput] = useState('')
     const [attachments, setAttachments] = useState<UploadedFile[]>([])
+    const [partialTranscript, setPartialTranscript] = useState('')
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const {
       webSearchEnabled,
@@ -39,6 +43,34 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       deepResearchEnabled,
       setDeepResearchEnabled
     } = useChatStore()
+
+    // Voice input hook
+    const { isRecording, isProcessing, startRecording, stopRecording } = useVoiceInput({
+      onTranscript: (text, isFinal) => {
+        if (isFinal) {
+          // Append final transcript to input
+          setInput(prev => {
+            const separator = prev.trim() ? ' ' : ''
+            return prev.trim() + separator + text
+          })
+          setPartialTranscript('')
+        } else {
+          // Show partial transcript
+          setPartialTranscript(text)
+        }
+      },
+      onError: (error) => {
+        toast.error(`Voice input failed: ${error.message}`)
+      }
+    })
+
+    const handleMicClick = useCallback(() => {
+      if (isRecording) {
+        stopRecording()
+      } else {
+        startRecording()
+      }
+    }, [isRecording, startRecording, stopRecording])
 
     // Expose methods to parent
     useImperativeHandle(ref, () => ({
@@ -279,13 +311,45 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 </DropdownMenuContent>
               </DropdownMenu>
 
+              {/* Voice input button */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleMicClick}
+                disabled={disabled || isProcessing}
+                className={cn(
+                  'h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 transition-all',
+                  isRecording
+                    ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/40 animate-pulse'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50'
+                )}
+                title={isRecording ? 'Stop recording' : 'Voice input'}
+              >
+                {isProcessing ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : isRecording ? (
+                  <MicOff className="h-4 w-4" />
+                ) : (
+                  <Mic className="h-4 w-4" />
+                )}
+              </Button>
+
               <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={attachments.length > 0 ? "Add a message..." : "Ask about product marketing..."}
-                disabled={disabled}
+                placeholder={
+                  isRecording && partialTranscript
+                    ? partialTranscript
+                    : isRecording
+                    ? "Listening..."
+                    : attachments.length > 0
+                    ? "Add a message..."
+                    : "Ask about product marketing..."
+                }
+                disabled={disabled || isRecording}
                 className="flex-1 min-h-[36px] sm:min-h-[40px] md:min-h-[44px] max-h-[120px] sm:max-h-[150px] md:max-h-[200px] resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-sm md:text-base placeholder:text-muted-foreground/60 disabled:opacity-50 py-2"
                 rows={1}
               />

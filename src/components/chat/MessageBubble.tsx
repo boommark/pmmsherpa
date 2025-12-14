@@ -14,11 +14,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { SourceCitations } from './SourceCitations'
 import { ExpandedResearch } from './ExpandedResearch'
-import { User, Bot, Loader2, Copy, ChevronDown, FileText, Type, Pencil, Check, Sparkles, Search } from 'lucide-react'
+import { User, Bot, Loader2, Copy, ChevronDown, FileText, Type, Pencil, Check, Sparkles, Search, Volume2, VolumeX } from 'lucide-react'
 import { toast } from 'sonner'
 import { copyAsMarkdown, copyAsPlainText, copyForGoogleDocs, type CopyOptions } from '@/lib/utils/clipboard'
 import type { ChatMessage } from '@/types/chat'
 import type { Citation } from '@/types/database'
+import { useVoiceOutput } from '@/hooks/useVoiceOutput'
 
 interface MessageBubbleProps {
   message: ChatMessage
@@ -31,6 +32,21 @@ export function MessageBubble({ message, onEditPrompt, onExpandWithResearch }: M
   const isStreaming = message.isStreaming
   const isResearching = message.isResearching
   const [copied, setCopied] = useState(false)
+
+  // Voice output hook
+  const { isPlaying, isLoading: isVoiceLoading, speak, stop } = useVoiceOutput({
+    onError: (error) => {
+      toast.error(`Voice playback failed: ${error.message}`)
+    }
+  })
+
+  const handleSpeak = () => {
+    if (isPlaying) {
+      stop()
+    } else {
+      speak(message.content)
+    }
+  }
 
   // Build copy options to include citations and research when copying assistant messages
   const copyOptions: CopyOptions | undefined = !isUser ? {
@@ -209,6 +225,25 @@ export function MessageBubble({ message, onEditPrompt, onExpandWithResearch }: M
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            {/* Voice playback button - only for assistant messages */}
+            {!isUser && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSpeak}
+                disabled={isVoiceLoading}
+                className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs text-muted-foreground hover:text-foreground gap-0.5 sm:gap-1"
+              >
+                {isVoiceLoading ? (
+                  <Loader2 className="h-2.5 w-2.5 sm:h-3 sm:w-3 animate-spin" />
+                ) : isPlaying ? (
+                  <VolumeX className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                ) : (
+                  <Volume2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                )}
+                <span className="hidden sm:inline">{isPlaying ? 'Stop' : 'Listen'}</span>
+              </Button>
+            )}
             {isUser && onEditPrompt && (
               <Button
                 variant="ghost"
