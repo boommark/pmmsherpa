@@ -311,30 +311,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Voice input button */}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={handleMicClick}
-                disabled={disabled || isProcessing}
-                className={cn(
-                  'h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 transition-all',
-                  isRecording
-                    ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/40 animate-pulse'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50'
-                )}
-                title={isRecording ? 'Stop recording' : 'Voice input'}
-              >
-                {isProcessing ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : isRecording ? (
-                  <MicOff className="h-4 w-4" />
-                ) : (
-                  <Mic className="h-4 w-4" />
-                )}
-              </Button>
-
               <textarea
                 ref={textareaRef}
                 value={input}
@@ -353,6 +329,29 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 className="flex-1 min-h-[36px] sm:min-h-[40px] md:min-h-[44px] max-h-[120px] sm:max-h-[150px] md:max-h-[200px] resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-sm md:text-base placeholder:text-muted-foreground/60 disabled:opacity-50 py-2"
                 rows={1}
               />
+              {/* Voice input button - purple styling */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleMicClick}
+                disabled={disabled || isProcessing}
+                className={cn(
+                  'h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 transition-all',
+                  isRecording
+                    ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/40 animate-pulse'
+                    : 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-800/40'
+                )}
+                title={isRecording ? 'Stop recording' : 'Voice input'}
+              >
+                {isProcessing ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : isRecording ? (
+                  <MicOff className="h-4 w-4" />
+                ) : (
+                  <Mic className="h-4 w-4" />
+                )}
+              </Button>
               <Button
                 onClick={handleSubmit}
                 disabled={!canSubmit || disabled}
