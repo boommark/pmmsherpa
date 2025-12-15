@@ -9,6 +9,7 @@ import { ChatInput, type ChatInputRef } from './ChatInput'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
 import { Loader2 } from 'lucide-react'
+import { shouldAutoEnableWebSearch } from '@/lib/utils/search-detection'
 import type { ChatMessage, ChatAttachment } from '@/types/chat'
 import type { UploadedFile } from './FileUpload'
 
@@ -161,6 +162,14 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setStatusMessage('Preparing your request...')
     isStreamingRef.current = true
 
+    // Intelligently auto-enable web search if URLs or research triggers detected
+    // Only auto-enable if not already manually enabled
+    const searchDetection = shouldAutoEnableWebSearch(content)
+    const autoWebSearch = searchDetection.shouldEnable && !webSearchEnabled
+    if (autoWebSearch) {
+      console.log(`Auto-enabling web search (reason: ${searchDetection.reason})`)
+    }
+
     // If editing a previous message, remove all messages from that index onwards
     if (editingMessageIndexRef.current !== null) {
       removeMessagesFromIndex(editingMessageIndexRef.current)
@@ -214,6 +223,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       setAbortController(abortController)
 
       // Send to API with attachments
+      // Use auto-detected web search OR manually enabled web search
+      const effectiveWebSearch = webSearchEnabled || autoWebSearch
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -222,7 +233,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           conversationId: activeConversationId,
           model: currentModel,
           attachments: chatAttachments,
-          webSearchEnabled,
+          webSearchEnabled: effectiveWebSearch,
           perplexityEnabled,
           deepResearchEnabled,
         }),

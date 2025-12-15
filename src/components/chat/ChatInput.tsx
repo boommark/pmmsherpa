@@ -9,15 +9,12 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { Send, Loader2, Globe, ChevronDown, Search, Microscope, Mic, MicOff, Phone, Square } from 'lucide-react'
+import { Send, Loader2, Globe, ChevronDown, Search, Microscope, Mic, MicOff, Square } from 'lucide-react'
 import { FileUpload, type UploadedFile, getFileCategory } from './FileUpload'
 import { AttachmentPreview } from './AttachmentPreview'
 import { useChatStore } from '@/stores/chatStore'
 import { PerplexityIcon } from '@/components/icons/PerplexityIcon'
 import { useVoiceInput } from '@/hooks/useVoiceInput'
-import { useHybridVoiceDialog } from '@/hooks/useHybridVoiceDialog'
-import { VoiceDialogOverlay } from './VoiceDialogOverlay'
-import { useProfile } from '@/hooks/useSupabase'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
@@ -38,7 +35,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const [attachments, setAttachments] = useState<UploadedFile[]>([])
     const [partialTranscript, setPartialTranscript] = useState('')
     const textareaRef = useRef<HTMLTextAreaElement>(null)
-    const { profile } = useProfile()
     const {
       webSearchEnabled,
       setWebSearchEnabled,
@@ -77,35 +73,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
         startRecording()
       }
     }, [isRecording, startRecording, stopRecording])
-
-    // Hybrid voice dialog hook for full voice conversations (STT → Claude/RAG → TTS)
-    const {
-      isActive: isVoiceDialogActive,
-      isConnecting: isVoiceDialogConnecting,
-      isListening,
-      isProcessing: isVoiceProcessing,
-      isGenerating,
-      isSpeaking,
-      transcript: voiceTranscript,
-      aiResponse,
-      startDialog,
-      endDialog,
-      stopRecordingAndProcess
-    } = useHybridVoiceDialog({
-      conversationId,
-      model: profile?.preferred_model === 'gemini' ? 'gemini-3-pro' : 'claude-sonnet',
-      voice: profile?.voice_preference || 'nova',
-      onMessage: (message) => {
-        // Voice dialog handles the full flow internally (STT → Chat API → TTS)
-        // Messages are already sent to /api/chat by the hook itself
-        // This callback is for notification only (e.g., logging, UI updates)
-        // Do NOT call onSend here as it would duplicate the API call
-        console.log('Voice dialog message:', message.role, message.content?.substring(0, 50))
-      },
-      onError: (error) => {
-        toast.error(`Voice chat error: ${error.message}`)
-      }
-    })
 
     // Expose methods to parent
     useImperativeHandle(ref, () => ({
@@ -248,7 +215,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const canSubmit = (input.trim() || attachments.some((a) => a.status === 'completed')) && !isUploading
 
     return (
-      <>
       <div className="p-2 sm:p-3 md:p-4 lg:p-6 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-3 md:pb-4 lg:pb-6">
         <div className="w-full max-w-3xl mx-auto">
           {/* Glassmorphism container */}
@@ -388,27 +354,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                   <Mic className="h-4 w-4" />
                 )}
               </Button>
-              {/* Voice dialog button - green styling for call mode */}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={startDialog}
-                disabled={disabled || isVoiceDialogConnecting || isVoiceDialogActive || isRecording}
-                className={cn(
-                  'h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 transition-all',
-                  isVoiceDialogConnecting
-                    ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 animate-pulse'
-                    : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-800/40'
-                )}
-                title="Start voice conversation"
-              >
-                {isVoiceDialogConnecting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Phone className="h-4 w-4" />
-                )}
-              </Button>
               {isLoading ? (
                 <Button
                   onClick={abortStreaming}
@@ -439,21 +384,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
           </p>
         </div>
       </div>
-
-      {/* Voice Dialog Overlay - full screen when active */}
-      <VoiceDialogOverlay
-        isActive={isVoiceDialogActive}
-        isConnecting={isVoiceDialogConnecting}
-        isListening={isListening}
-        isProcessing={isVoiceProcessing}
-        isGenerating={isGenerating}
-        isSpeaking={isSpeaking}
-        transcript={voiceTranscript}
-        aiResponse={aiResponse}
-        onEnd={endDialog}
-        onStopRecording={stopRecordingAndProcess}
-      />
-    </>
     )
   }
 )

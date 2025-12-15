@@ -2,37 +2,31 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 
-type TTSVoice = 'alloy' | 'ash' | 'ballad' | 'coral' | 'echo' | 'fable' | 'nova' | 'onyx' | 'sage' | 'shimmer'
-
 interface UseVoiceOutputOptions {
-  voice?: TTSVoice
   onPlaybackComplete?: () => void
   onError?: (error: Error) => void
 }
 
 export function useVoiceOutput({
-  voice = 'nova',
   onPlaybackComplete,
   onError
 }: UseVoiceOutputOptions = {}) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const audioUrlRef = useRef<string | null>(null)
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
+  const isCancelledRef = useRef(false)
+
+  // Check if native speech synthesis is available
+  const isSupported = typeof window !== 'undefined' && 'speechSynthesis' in window
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause()
-        audioRef.current = null
-      }
-      if (audioUrlRef.current) {
-        URL.revokeObjectURL(audioUrlRef.current)
-        audioUrlRef.current = null
+      if (isSupported && window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel()
       }
     }
-  }, [])
+  }, [isSupported])
 
   const speak = useCallback(async (text: string) => {
     if (!text || !text.trim()) {
@@ -40,19 +34,18 @@ export function useVoiceOutput({
       return
     }
 
+    if (!isSupported) {
+      onError?.(new Error('Speech synthesis is not supported in this browser'))
+      return
+    }
+
     try {
       setIsLoading(true)
+      isCancelledRef.current = false
 
-      // Stop any currently playing audio
-      if (audioRef.current) {
-        audioRef.current.pause()
-        audioRef.current.currentTime = 0
-      }
-
-      // Revoke previous audio URL to free memory
-      if (audioUrlRef.current) {
-        URL.revokeObjectURL(audioUrlRef.current)
-        audioUrlRef.current = null
+      // Stop any currently playing speech
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel()
       }
 
       // Strip markdown formatting for cleaner speech
@@ -68,85 +61,100 @@ export function useVoiceOutput({
         .replace(/\s+/g, ' ')               // Multiple spaces to single
         .trim()
 
-      // Truncate if too long (4096 char limit)
-      const truncatedText = cleanText.length > 4000
-        ? cleanText.substring(0, 4000) + '...'
-        : cleanText
+      // Create speech utterance
+      const utterance = new SpeechSynthesisUtterance(cleanText)
+      utteranceRef.current = utterance
 
-      const response = await fetch('/api/voice/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: truncatedText, voice })
-      })
+      // Configure speech settings
+      utterance.rate = 1.0
+      utterance.pitch = 1.0
+      utterance.volume = 1.0
+      utterance.lang = 'en-US'
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Speech generation failed')
+      // Try to get a natural-sounding voice
+      const voices = window.speechSynthesis.getVoices()
+
+      // Prefer higher quality voices (often those with "enhanced" or "premium" in name)
+      // On iOS/macOS, look for "Samantha" or similar high-quality voices
+      // On Android/Chrome, look for "Google" voices
+      const preferredVoice = voices.find(v =>
+        v.name.includes('Samantha') ||
+        v.name.includes('Karen') ||
+        v.name.includes('Daniel') ||
+        v.name.includes('Google US English') ||
+        (v.lang.startsWith('en') && v.localService)
+      ) || voices.find(v => v.lang.startsWith('en'))
+
+      if (preferredVoice) {
+        utterance.voice = preferredVoice
       }
 
-      const audioBlob = await response.blob()
-      const audioUrl = URL.createObjectURL(audioBlob)
-      audioUrlRef.current = audioUrl
-
-      const audio = new Audio(audioUrl)
-      audioRef.current = audio
-
-      audio.onended = () => {
-        setIsPlaying(false)
-        onPlaybackComplete?.()
+      utterance.onstart = () => {
+        if (!isCancelledRef.current) {
+          setIsLoading(false)
+          setIsPlaying(true)
+        }
       }
 
-      audio.onerror = () => {
+      utterance.onend = () => {
         setIsPlaying(false)
         setIsLoading(false)
-        onError?.(new Error('Audio playback failed'))
+        if (!isCancelledRef.current) {
+          onPlaybackComplete?.()
+        }
       }
 
-      audio.oncanplaythrough = () => {
-        setIsLoading(false)
-        setIsPlaying(true)
-        audio.play().catch((e) => {
+      utterance.onerror = (event) => {
+        // Don't report error if we cancelled intentionally
+        if (event.error === 'canceled' || isCancelledRef.current) {
           setIsPlaying(false)
-          onError?.(new Error(`Playback failed: ${e.message}`))
-        })
+          setIsLoading(false)
+          return
+        }
+
+        console.error('Speech synthesis error:', event.error)
+        setIsPlaying(false)
+        setIsLoading(false)
+        onError?.(new Error(`Speech synthesis failed: ${event.error}`))
       }
 
-      // Load the audio
-      audio.load()
+      // Some browsers need a small delay after cancel
+      setTimeout(() => {
+        if (!isCancelledRef.current) {
+          window.speechSynthesis.speak(utterance)
+        }
+      }, 50)
 
     } catch (error) {
       console.error('TTS error:', error)
       setIsLoading(false)
       setIsPlaying(false)
-      onError?.(error instanceof Error ? error : new Error('Speech generation failed'))
+      onError?.(error instanceof Error ? error : new Error('Speech synthesis failed'))
     }
-  }, [voice, onPlaybackComplete, onError])
+  }, [isSupported, onPlaybackComplete, onError])
 
   const stop = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.currentTime = 0
+    isCancelledRef.current = true
+    if (isSupported && window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel()
     }
     setIsPlaying(false)
     setIsLoading(false)
-  }, [])
+  }, [isSupported])
 
   const pause = useCallback(() => {
-    if (audioRef.current && isPlaying) {
-      audioRef.current.pause()
+    if (isSupported && window.speechSynthesis.speaking) {
+      window.speechSynthesis.pause()
       setIsPlaying(false)
     }
-  }, [isPlaying])
+  }, [isSupported])
 
   const resume = useCallback(() => {
-    if (audioRef.current && !isPlaying) {
-      audioRef.current.play().then(() => {
-        setIsPlaying(true)
-      }).catch((e) => {
-        onError?.(new Error(`Resume failed: ${e.message}`))
-      })
+    if (isSupported && window.speechSynthesis.paused) {
+      window.speechSynthesis.resume()
+      setIsPlaying(true)
     }
-  }, [isPlaying, onError])
+  }, [isSupported])
 
   return {
     isPlaying,
@@ -154,6 +162,7 @@ export function useVoiceOutput({
     speak,
     stop,
     pause,
-    resume
+    resume,
+    isSupported
   }
 }

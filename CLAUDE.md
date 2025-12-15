@@ -883,4 +883,54 @@ Edit message → Content in input → Send → Messages truncated → Regenerate
 
 ---
 
-*Last updated: December 14, 2025 - Voice Dialog Fixes & Stop/Edit/Regenerate*
+### December 15, 2025 - Voice Simplification & Mobile Fixes & Intelligent Web Search
+
+**Task 1: Removed OpenAI Realtime Voice Mode**
+- Removed Phone icon from ChatInput
+- Removed `useHybridVoiceDialog` hook import and usage
+- Removed `VoiceDialogOverlay` component import
+- Removed `useProfile` hook import
+- OpenAI voice code preserved in codebase for future use, just deactivated
+
+**Task 2: Restored Native STT/TTS with Web Speech API**
+- Rewrote `useVoiceInput.ts` to use native Web Speech API (SpeechRecognition)
+  - Uses `window.SpeechRecognition || window.webkitSpeechRecognition`
+  - Real-time partial transcripts with `onPartialTranscript` callback
+  - Continuous mode with interim results
+- Rewrote `useVoiceOutput.ts` to use native Web Speech API (SpeechSynthesis)
+  - Preferred voice selection: Samantha, Karen, Daniel, Google US English
+  - Falls back to first available voice
+  - Strips markdown formatting before speaking
+
+**Task 3: Fixed Mobile Rendering Issues**
+- Fixed table overflow in `MessageBubble.tsx`:
+  - Added `max-w-[calc(100vw-4rem)]` to table wrapper
+  - Added `table-fixed` to table element
+  - Added `break-words` to th/td cells
+  - Added `sm:max-w-full` for larger screens
+
+**Task 4: Intelligent Web Search Auto-Invocation**
+- Created `src/lib/utils/search-detection.ts` with:
+  - URL detection regex: `https?://[^\s<>\"{}|\\^`[\]]+`
+  - Research triggers: 'search for', 'latest', 'recent', 'current', 'news', 'competitor analysis', etc.
+  - PMM-specific triggers: 'competitive analysis', 'market trends', 'pricing page', 'gtm strategy', etc.
+  - Question detection: 'what is the latest', 'how much does', 'where can i find', etc.
+- Updated `ChatContainer.tsx`:
+  - Imports `shouldAutoEnableWebSearch` utility
+  - Auto-detects URLs and research queries in user messages
+  - Enables web search automatically without affecting manual toggle
+  - Logs auto-enable reason (url/research_trigger/question)
+
+**Files Created**:
+- `src/lib/utils/search-detection.ts` - Web search auto-detection utility
+
+**Files Modified**:
+- `src/components/chat/ChatInput.tsx` - Removed Phone icon, voice dialog, profile hook
+- `src/hooks/useVoiceInput.ts` - Rewrote for native Web Speech API
+- `src/hooks/useVoiceOutput.ts` - Rewrote for native SpeechSynthesis
+- `src/components/chat/MessageBubble.tsx` - Fixed mobile table overflow
+- `src/components/chat/ChatContainer.tsx` - Added intelligent web search auto-invocation
+
+---
+
+*Last updated: December 15, 2025 - Voice Simplification & Mobile Fixes & Intelligent Web Search*

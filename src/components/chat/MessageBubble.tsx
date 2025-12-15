@@ -156,19 +156,19 @@ export function MessageBubble({ message, messageIndex, onEditPrompt, onExpandWit
                     </pre>
                   ),
                   table: ({ children }) => (
-                    <div className="overflow-x-auto my-2 -mx-2 sm:mx-0">
-                      <table className="min-w-full border-collapse border border-border text-xs sm:text-sm">
+                    <div className="overflow-x-auto my-2 -mx-2 sm:mx-0 max-w-[calc(100vw-4rem)] sm:max-w-full">
+                      <table className="w-full border-collapse border border-border text-xs sm:text-sm table-fixed">
                         {children}
                       </table>
                     </div>
                   ),
                   th: ({ children }) => (
-                    <th className="border border-border px-2 py-1.5 sm:px-3 sm:py-2 bg-muted font-medium text-left whitespace-nowrap">
+                    <th className="border border-border px-1.5 py-1 sm:px-3 sm:py-2 bg-muted font-medium text-left text-xs sm:text-sm break-words">
                       {children}
                     </th>
                   ),
                   td: ({ children }) => (
-                    <td className="border border-border px-2 py-1.5 sm:px-3 sm:py-2">{children}</td>
+                    <td className="border border-border px-1.5 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm break-words">{children}</td>
                   ),
                   blockquote: ({ children }) => (
                     <blockquote className="border-l-4 border-primary pl-4 my-2 italic">
