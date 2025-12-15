@@ -19,6 +19,8 @@ export default function RequestAccessPage() {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
+    password: '',
+    confirmPassword: '',
     phone: '',
     profession: '',
     company: '',
@@ -51,6 +53,21 @@ export default function RequestAccessPage() {
       return
     }
 
+    if (!formData.password || !formData.confirmPassword) {
+      setError('Please enter and confirm your password')
+      return
+    }
+
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters')
+      return
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
     if (!formData.linkedinUrl) {
       setError('LinkedIn profile is required')
       return
@@ -75,6 +92,7 @@ export default function RequestAccessPage() {
         body: JSON.stringify({
           fullName: formData.fullName,
           email: formData.email,
+          password: formData.password,
           phone: formData.phone,
           profession: formData.profession,
           company: formData.company,
@@ -111,7 +129,7 @@ export default function RequestAccessPage() {
               Thank you for your interest in PMMSherpa. We&apos;re reviewing your request and will be in touch soon.
             </p>
             <p className="text-sm text-muted-foreground mb-6 p-4 rounded-xl bg-white/50 dark:bg-zinc-800/50">
-              You&apos;ll receive an email at <strong className="text-foreground">{formData.email}</strong> once your access is approved with instructions to set up your password.
+              You&apos;ll receive an email at <strong className="text-foreground">{formData.email}</strong> once your access is approved. You can then sign in with the password you just created.
             </p>
             <Link href="/">
               <Button
@@ -183,6 +201,33 @@ export default function RequestAccessPage() {
                   placeholder="john@company.com"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  required
+                  className="h-11 rounded-xl bg-white/50 dark:bg-zinc-800/50 border-white/20 dark:border-zinc-700/50 focus:border-indigo-500 focus:ring-indigo-500/20"
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">Password *</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Min 8 characters"
+                  value={formData.password}
+                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  required
+                  className="h-11 rounded-xl bg-white/50 dark:bg-zinc-800/50 border-white/20 dark:border-zinc-700/50 focus:border-indigo-500 focus:ring-indigo-500/20"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password *</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirm password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                   required
                   className="h-11 rounded-xl bg-white/50 dark:bg-zinc-800/50 border-white/20 dark:border-zinc-700/50 focus:border-indigo-500 focus:ring-indigo-500/20"
                 />

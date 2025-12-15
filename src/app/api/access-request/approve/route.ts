@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Approve the request and create user account
+// POST: Approve the request - simply unban the already-created user
 export async function POST(request: NextRequest) {
   try {
     // Verify the requester is a super admin
@@ -127,53 +127,36 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create user in Supabase Auth using the stored password hash
-    // Note: We need to create with a temp password then update
-    // because createUser doesn't accept a hash directly
-    const tempPassword = `temp_${Date.now()}_${Math.random().toString(36)}`
-
-    const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email: accessRequest.email,
-      password: tempPassword,
-      email_confirm: true, // Auto-confirm email since we verified during request
-      user_metadata: {
-        full_name: accessRequest.full_name,
-      },
-    })
-
-    if (createError || !newUser.user) {
-      console.error('Error creating user:', createError)
+    // Check if user_id exists (new flow - user already created during request)
+    if (!accessRequest.user_id) {
+      // Legacy request without user_id - need to create user
+      // This handles any requests made before the new flow was implemented
       return NextResponse.json(
-        { error: 'Failed to create user account' },
+        { error: 'This is a legacy request. Please ask the user to submit a new access request.' },
+        { status: 400 }
+      )
+    }
+
+    // Unban the user - this is all we need to do!
+    // The user was created with their password during the access request
+    const { error: updateUserError } = await supabaseAdmin.auth.admin.updateUserById(
+      accessRequest.user_id,
+      { ban_duration: 'none' } // Removes the ban
+    )
+
+    if (updateUserError) {
+      console.error('Error unbanning user:', updateUserError)
+      return NextResponse.json(
+        { error: 'Failed to activate user account' },
         { status: 500 }
       )
     }
 
-    // Update the user's password to the original one they provided
-    // We need to use the stored hash - but Supabase doesn't support direct hash update
-    // So we'll need to use a workaround: update via raw SQL or keep the bcrypt hash for manual validation
-    // For now, let's generate a secure random password and include it in the approval email
-    // Actually, let's just let them use the password they provided during signup
-    // We'll need to store it temporarily or use password reset flow
-
-    // Better approach: Store the plain password encrypted, or use password reset
-    // For MVP: Let's use password reset flow - send them a password reset email
-
-    // Actually, the cleanest solution is to let them log in with their original password
-    // We stored the bcrypt hash, so we need to either:
-    // 1. Update Supabase auth.users directly (requires direct DB access)
-    // 2. Use a custom login that checks our hash (more work)
-    // 3. Send password reset email (cleanest for MVP)
-
-    // For now, let's update the user with a known password flow
-    // The user will need to reset their password on first login
-    // OR we update the password hash directly in the database
-
-    // Create profile for the user
+    // Create/update profile for the user
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
       .upsert({
-        id: newUser.user.id,
+        id: accessRequest.user_id,
         full_name: accessRequest.full_name,
         email: accessRequest.email,
         phone: accessRequest.phone,
@@ -185,7 +168,7 @@ export async function POST(request: NextRequest) {
 
     if (profileError) {
       console.error('Error creating profile:', profileError)
-      // Don't fail - user is created, profile can be fixed
+      // Don't fail - user is activated, profile can be fixed
     }
 
     // Update access request status
@@ -202,28 +185,12 @@ export async function POST(request: NextRequest) {
       console.error('Error updating access request:', updateError)
     }
 
-    // Generate password setup link (using recovery link type which allows setting password)
-    const { data: resetData, error: resetError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'recovery',
-      email: accessRequest.email,
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?redirect_to=/set-password`,
-      },
-    })
-
-    if (resetError) {
-      console.error('Error generating password setup link:', resetError)
-    }
-
-    // The action_link from generateLink points to Supabase's /auth/v1/verify endpoint
-    // which will validate the token and redirect to our callback URL
-    const passwordSetupLink = resetData?.properties?.action_link || `${process.env.NEXT_PUBLIC_APP_URL}/login`
-
-    // Send approval email to user with password setup link
+    // Send approval email to user - they can now log in with their password
+    const loginLink = `${process.env.NEXT_PUBLIC_APP_URL}/login`
     const emailTemplate = getUserApprovalEmail({
       fullName: accessRequest.full_name,
       email: accessRequest.email,
-      passwordSetupLink,
+      passwordSetupLink: loginLink, // Just link to login - they already have their password
     })
 
     try {
@@ -246,13 +213,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'User approved and account created successfully',
+      message: 'User approved and access granted successfully',
       user: {
-        id: newUser.user.id,
+        id: accessRequest.user_id,
         email: accessRequest.email,
         fullName: accessRequest.full_name,
       },
-      passwordResetLink: resetData?.properties?.action_link || null,
       welcomeEmailDraft,
     })
   } catch (error) {

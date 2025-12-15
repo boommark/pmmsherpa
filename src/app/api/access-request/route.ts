@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
     const {
       fullName,
       email,
+      password,
       phone,
       profession,
       company,
@@ -32,9 +33,17 @@ export async function POST(request: NextRequest) {
     } = body
 
     // Validate required fields
-    if (!fullName || !email || !linkedinUrl || !useCases || useCases.length === 0) {
+    if (!fullName || !email || !password || !linkedinUrl || !useCases || useCases.length === 0) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+    // Validate password length
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: 'Password must be at least 8 characters' },
         { status: 400 }
       )
     }
@@ -57,7 +66,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if email already exists in access_requests
+    // Check if email already exists in access_requests or auth
     const { data: existingRequest } = await supabase
       .from('access_requests')
       .select('id, status')
@@ -67,7 +76,7 @@ export async function POST(request: NextRequest) {
     if (existingRequest) {
       if (existingRequest.status === 'pending') {
         return NextResponse.json(
-          { error: 'An access request for this email is already pending' },
+          { error: 'An access request for this email is already pending. Please wait for approval.' },
           { status: 400 }
         )
       } else if (existingRequest.status === 'approved') {
@@ -76,21 +85,40 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
+      // If rejected, allow them to try again (will create new user below)
     }
 
-    // Check if user already exists in auth using listUsers with filter
-    const { data: existingUsers } = await supabase.auth.admin.listUsers()
-    const existingUser = existingUsers?.users?.find(
-      (u) => u.email?.toLowerCase() === email.toLowerCase()
-    )
-    if (existingUser) {
+    // Create user in Supabase Auth immediately, but as banned (pending approval)
+    const { data: newUser, error: createUserError } = await supabase.auth.admin.createUser({
+      email: email.toLowerCase(),
+      password: password,
+      email_confirm: true, // Skip email confirmation since admin will verify
+      user_metadata: {
+        full_name: fullName,
+        phone: phone || null,
+        profession: profession || null,
+        company: company || null,
+        linkedin_url: linkedinUrl,
+      },
+      ban_duration: '876000h', // Ban for ~100 years (essentially forever until approved)
+    })
+
+    if (createUserError) {
+      console.error('Error creating user:', createUserError)
+      // Check if user already exists
+      if (createUserError.message?.includes('already')) {
+        return NextResponse.json(
+          { error: 'An account with this email already exists. Please log in or contact support.' },
+          { status: 400 }
+        )
+      }
       return NextResponse.json(
-        { error: 'An account with this email already exists. Please log in.' },
-        { status: 400 }
+        { error: 'Failed to create account. Please try again.' },
+        { status: 500 }
       )
     }
 
-    // Insert access request (no password - user will set it after approval)
+    // Insert access request record linking to the new user
     const { data: accessRequest, error: insertError } = await supabase
       .from('access_requests')
       .insert({
@@ -102,12 +130,17 @@ export async function POST(request: NextRequest) {
         linkedin_url: linkedinUrl,
         use_cases: useCases,
         status: 'pending',
+        user_id: newUser.user?.id, // Link to the created user
       })
       .select()
       .single()
 
     if (insertError) {
       console.error('Error inserting access request:', insertError)
+      // Clean up: delete the created user since the request record failed
+      if (newUser.user?.id) {
+        await supabase.auth.admin.deleteUser(newUser.user.id)
+      }
       return NextResponse.json(
         { error: 'Failed to submit access request' },
         { status: 500 }

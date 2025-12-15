@@ -276,8 +276,20 @@ export function getAdminNotificationEmail(data: AccessRequestData) {
                     ${data.useCases.map(u => `<div class="use-case-item"><span class="use-case-dot"></span>${u}</div>`).join('')}
                   </div>
                 </div>
+                <div class="note" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%); border: 1px solid rgba(16, 185, 129, 0.3); color: #065f46;">
+                  <strong>How to approve this user:</strong>
+                  <ol style="margin: 12px 0 0 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
+                    <li>Click the green "Approve in Supabase" button below</li>
+                    <li>You'll see the user <strong>${data.email}</strong> in the list (already filtered)</li>
+                    <li>Click on the user row to open their details panel on the right</li>
+                    <li>Scroll down in the panel and look for <strong>"User banned until..."</strong></li>
+                    <li>Click the <strong>"Remove ban"</strong> button to activate their account</li>
+                    <li>The user can now log in with the password they set during signup!</li>
+                  </ol>
+                  <p style="margin-top: 12px; font-size: 13px; color: #047857;"><strong>Note:</strong> The user already set their password when requesting access. Once you remove the ban, they can immediately log in at <a href="${APP_URL}/login" style="color: #047857;">${APP_URL}/login</a></p>
+                </div>
                 <div class="buttons">
-                  <a href="${APP_URL}/admin/approve?token=${data.approvalToken}" class="button button-success">✓ Approve Access</a>
+                  <a href="https://supabase.com/dashboard/project/nhwcpjfjsjsslxuqpuoy/auth/users?search=${encodeURIComponent(data.email)}" class="button button-success">✓ Approve in Supabase</a>
                   <a href="${APP_URL}/admin/requests" class="button button-outline">View All Requests</a>
                 </div>
               </div>
@@ -298,19 +310,25 @@ ${data.phone ? `Phone: ${data.phone}\n` : ''}${data.profession ? `Profession: ${
 Use Cases:
 ${useCasesFormatted}
 
-Approve Access: ${APP_URL}/admin/approve?token=${data.approvalToken}
+HOW TO APPROVE:
+1. Click the Supabase link below
+2. Search for ${data.email}
+3. Click on the user row
+4. Click "Remove ban" to activate their account
+
+Approve in Supabase: https://supabase.com/dashboard/project/nhwcpjfjsjsslxuqpuoy/auth/users?search=${encodeURIComponent(data.email)}
 View All Requests: ${APP_URL}/admin/requests
     `.trim()
   }
 }
 
-// Email sent to user when their access is approved - includes password setup link
+// Email sent to user when their access is approved - they can now log in
 export function getUserApprovalEmail(data: { fullName: string; email: string; passwordSetupLink: string }) {
   const firstName = data.fullName.split(' ')[0]
 
   return {
     to: data.email,
-    subject: '🎉 Your PMMSherpa Access is Approved!',
+    subject: 'Your PMMSherpa Access is Approved!',
     html: `
       <!DOCTYPE html>
       <html>
@@ -341,25 +359,21 @@ export function getUserApprovalEmail(data: { fullName: string; email: string; pa
                   <div class="logo-icon">✨</div>
                   <span class="logo-text">PMMSherpa</span>
                 </div>
-                <h1>You're In! 🎉</h1>
+                <h1>You're In!</h1>
                 <p>Your access to PMMSherpa has been approved</p>
               </div>
               <div class="content">
                 <p style="font-size: 16px;">Hi ${firstName},</p>
                 <p>Great news! Your access to PMMSherpa has been approved. You now have your own second brain for product marketing—expert knowledge, real-time research, and voice conversations at your fingertips.</p>
 
-                <p><strong>To get started, set up your password:</strong></p>
+                <p><strong>You can now log in with the password you created during signup:</strong></p>
 
                 <div class="buttons" style="margin: 28px 0;">
-                  <a href="${data.passwordSetupLink}" class="button">Set Up Your Password →</a>
-                </div>
-
-                <div class="note">
-                  <strong>⏰ Important:</strong> This link will expire in 24 hours. If it expires, you can request a new one from the login page using "Forgot password".
+                  <a href="${data.passwordSetupLink}" class="button">Sign In to PMMSherpa →</a>
                 </div>
 
                 <div class="highlight">
-                  <p style="margin: 0; font-size: 14px;">Once you've set your password, log in with:</p>
+                  <p style="margin: 0; font-size: 14px;">Log in with your email:</p>
                   <p style="margin: 8px 0 0 0;"><span class="email-highlight">${data.email}</span></p>
                 </div>
 
@@ -385,11 +399,11 @@ export function getUserApprovalEmail(data: { fullName: string; email: string; pa
                   </div>
                 </div>
 
-                <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">Grounded in 1,200+ expert resources from leading PMM practitioners.</p>
+                <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">Built on the collective wisdom of hundreds of leading PMM practitioners worldwide.</p>
               </div>
               <div class="footer">
                 <p>Welcome to the PMMSherpa community!</p>
-                <p style="margin-top: 8px;"><a href="${APP_URL}">pmmsherpa.vercel.app</a></p>
+                <p style="margin-top: 8px;"><a href="${APP_URL}">pmmsherpa.com</a></p>
               </div>
             </div>
           </div>
@@ -401,12 +415,10 @@ Hi ${firstName},
 
 Great news! Your access to PMMSherpa has been approved. You now have your own second brain for product marketing—expert knowledge, real-time research, and voice conversations at your fingertips.
 
-To get started, please set up your password by visiting this link:
+You can now log in with the password you created during signup:
 ${data.passwordSetupLink}
 
-Note: This link will expire in 24 hours. If it expires, you can request a new one from the login page using "Forgot password".
-
-Once you've set your password, you can log in with your email: ${data.email}
+Log in with your email: ${data.email}
 
 What you can do with PMMSherpa:
 - Get expert advice on positioning and messaging strategy
@@ -414,7 +426,7 @@ What you can do with PMMSherpa:
 - Plan go-to-market strategies and product launches
 - Conduct customer research and build personas
 
-Grounded in 1,200+ expert resources from leading PMM practitioners.
+Built on the collective wisdom of hundreds of leading PMM practitioners worldwide.
 
 Welcome to the PMMSherpa community!
     `.trim()
