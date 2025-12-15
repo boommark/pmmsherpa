@@ -33,9 +33,9 @@ function MountainIcon({ className }: { className?: string }) {
 const features = [
   {
     icon: BookOpen,
-    title: "Strategic Foundation",
+    title: "Expert-Curated Foundations",
     description:
-      "Grounded in proven PMM frameworks—positioning, messaging, competitive strategy—so every answer has depth.",
+      "Knowledge distilled from hundreds of PMM leaders—positioning, messaging, competitive strategy—so every answer has depth.",
   },
   {
     icon: Target,
@@ -71,9 +71,9 @@ const features = [
 
 const capabilities = [
   {
-    icon: BookOpen,
-    title: "1,200+ Expert Resources",
-    description: "Positioning, messaging, and GTM frameworks from leading PMM practitioners",
+    icon: Users,
+    title: "Hundreds of PMM Experts",
+    description: "Collective wisdom from leading technology product marketers and PMM pundits worldwide",
   },
   {
     icon: Globe,
@@ -129,7 +129,7 @@ export default function LandingPage() {
 
           <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 px-4 py-2 text-sm shadow-sm">
             <MountainIcon className="h-4 w-4 text-indigo-500" />
-            <span className="text-muted-foreground">Where PMM Legends Meet Frontier AI</span>
+            <span className="text-muted-foreground">Powered by Hundreds of World-Class PMM Leaders</span>
           </div>
           <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
             Your Second Brain for
@@ -139,9 +139,10 @@ export default function LandingPage() {
             </span>
           </h1>
           <p className="mb-10 text-lg text-muted-foreground/80 sm:text-xl max-w-2xl mx-auto">
-            Expert knowledge. Real-time research. Voice conversations.
-            PMMSherpa combines deep PMM expertise with live market intelligence
-            to help you think clearly and move faster.
+            Built on the thought leadership, experience, and insights of hundreds
+            of leading technology product marketers from around the world.
+            PMMSherpa combines this collective PMM wisdom with real-time market
+            intelligence to help you think clearly and move faster.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/request-access">
@@ -173,10 +174,10 @@ export default function LandingPage() {
             <div className="rounded-3xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-xl border border-white/20 dark:border-zinc-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-8 md:p-12">
               <div className="mb-8 text-center">
                 <h2 className="text-2xl md:text-3xl font-bold">
-                  Deep Expertise Meets Real-Time Intelligence
+                  World-Class PMM Expertise Meets Real-Time Intelligence
                 </h2>
                 <p className="mt-2 text-muted-foreground">
-                  Grounded in proven PMM frameworks, enriched with live market data
+                  Grounded in insights from top PMM practitioners globally, enriched with live market data
                 </p>
               </div>
               <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
@@ -207,7 +208,7 @@ export default function LandingPage() {
             </span>
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            From strategic guidance to tactical execution
+            Insights from top PMM practitioners, from strategic guidance to tactical execution
           </p>
         </div>
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -242,7 +243,7 @@ export default function LandingPage() {
               </h2>
               <p className="mb-8 text-lg text-muted-foreground max-w-xl mx-auto">
                 Stop second-guessing your positioning. Stop searching for frameworks.
-                Start with expert guidance and real-time market intelligence.
+                Start with the collective wisdom of PMM experts worldwide and real-time market intelligence.
               </p>
               <Link href="/request-access">
                 <Button
