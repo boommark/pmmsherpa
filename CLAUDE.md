@@ -193,36 +193,41 @@ data: {"type": "error", "message": "..."}
 
 **Important**: Direct signup is disabled. Users must request access and be approved by admin.
 
-### User Flow
+### User Flow (v3 - Password Upfront, Banned Until Approved)
 ```
 1. User visits https://pmmsherpa.com → clicks "Get Started"
 2. User fills out Request Access form:
    - Full Name (required)
    - Email (required)
+   - Password + Confirm Password (required, min 8 chars)
    - Phone (optional)
    - Profession (optional)
    - Company (optional)
    - LinkedIn URL (required) - validated format: linkedin.com/in/username
    - Use Cases (multi-select checkboxes)
-3. User submits → sees "Thank you" confirmation
-4. Admin (abhishekratna@gmail.com) receives email notification
-5. Admin clicks "Approve Access" link → opens admin confirmation page
-6. Admin confirms → account created in Supabase Auth
-7. User receives approval email with "Set Up Your Password" button
-8. User clicks link → redirected to /set-password page
-9. User creates password → logged in automatically → redirected to /chat
+3. User submits → Account created IMMEDIATELY in Supabase Auth (but BANNED)
+4. User sees "Thank you" confirmation with message that they can log in with their password once approved
+5. Admin (abhishekratna@gmail.com) receives email notification with step-by-step approval instructions
+6. Admin clicks "Approve in Supabase" → opens Supabase Auth dashboard filtered to user
+7. Admin clicks "Remove ban" on user → user is now active
+8. User receives approval email → can immediately log in with password they set during signup
 ```
 
 ### Key Implementation Details
 
-**No password during signup**: Users don't provide a password when requesting access. They set it AFTER approval via a recovery-type link.
+**Password collected upfront**: Users provide their password when requesting access. The account is created immediately but BANNED until admin approves.
 
-**Password Setup Flow**:
-- Approval API calls `supabase.auth.admin.generateLink({ type: 'recovery', ... })`
-- Link redirects to `/auth/callback?redirect_to=/set-password`
-- Auth callback verifies OTP token and creates session
-- `/set-password` page lets user create their password
-- Password requirements: 8+ chars, uppercase, lowercase, number
+**Banned User Flow**:
+- `supabase.auth.admin.createUser()` called with `ban_duration: '876000h'` (~100 years)
+- User cannot log in until ban is removed
+- Approval simply removes the ban with `ban_duration: 'none'`
+- No password reset link needed - user already has their password
+
+**Admin Approval via Supabase Dashboard**:
+- Admin notification email links directly to Supabase Auth Users page
+- URL: `https://supabase.com/dashboard/project/nhwcpjfjsjsslxuqpuoy/auth/users?search=${email}`
+- Admin clicks user row → scrolls to "User banned until..." → clicks "Remove ban"
+- This is simpler than the previous in-app approval flow (avoids auth issues)
 
 **LinkedIn Validation**:
 - Required field (not optional)
@@ -244,7 +249,8 @@ CREATE TABLE access_requests (
   company TEXT,
   linkedin_url TEXT NOT NULL,
   use_cases TEXT[],
-  password_hash TEXT,  -- NULLABLE (not used in new flow)
+  password_hash TEXT,  -- NULLABLE (not used - password goes directly to Supabase Auth)
+  user_id UUID REFERENCES auth.users(id),  -- Links to the banned user created during request
   status TEXT NOT NULL DEFAULT 'pending',  -- pending, approved, rejected
   approval_token UUID DEFAULT gen_random_uuid(),
   approved_at TIMESTAMPTZ,
@@ -257,6 +263,7 @@ CREATE TABLE access_requests (
 ### Migrations Applied
 - `005_access_requests.sql` - Created access_requests table
 - `006_make_password_hash_nullable.sql` - Made password_hash nullable
+- `011_add_user_id_to_access_requests.sql` - Added user_id column to link request to auth user
 
 ---
 
@@ -933,4 +940,37 @@ Edit message → Content in input → Send → Messages truncated → Regenerate
 
 ---
 
-*Last updated: December 15, 2025 - Voice Simplification & Mobile Fixes & Intelligent Web Search*
+### December 15, 2025 - Access Request Flow v3 (Password Upfront, Banned Until Approved)
+
+**Major Redesign**: Simplified the access request flow to collect password upfront and use Supabase banning mechanism.
+
+**Problem with Previous Flow**:
+- Users set password AFTER approval via recovery link
+- Admin approval page required authentication (caused "Unauthorized" errors when clicked from email)
+- Complex multi-step process with potential points of failure
+
+**New Flow**:
+1. User provides password during access request
+2. Account created immediately with `ban_duration: '876000h'` (~100 years ban)
+3. Admin gets email with direct link to Supabase Auth dashboard
+4. Admin clicks "Remove ban" on user in Supabase UI
+5. User can immediately log in with their password
+
+**Benefits**:
+- Simpler approval process (just remove ban in Supabase)
+- No auth issues (admin already logged into Supabase dashboard)
+- User already has their password - no recovery link needed
+- Clearer admin notification email with step-by-step instructions
+
+**Files Modified**:
+- `src/app/(auth)/request-access/page.tsx` - Added password fields, confirmation message updated
+- `src/app/api/access-request/route.ts` - Creates banned user immediately, links user_id to request
+- `src/app/api/access-request/approve/route.ts` - Simplified to just unban user
+- `src/lib/email/templates.ts` - Updated admin email with step-by-step Supabase approval instructions
+
+**Database Migration**:
+- `011_add_user_id_to_access_requests.sql` - Added `user_id` column to link access_requests to auth.users
+
+---
+
+*Last updated: December 15, 2025 - Access Request Flow v3 (Password Upfront, Banned Until Approved)*
