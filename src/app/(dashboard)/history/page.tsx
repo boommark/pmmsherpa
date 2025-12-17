@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useConversations } from '@/hooks/useConversations'
 import { Button } from '@/components/ui/button'
@@ -19,11 +19,52 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Search, MessageSquare, Trash2, Archive, Loader2 } from 'lucide-react'
+import { Search, MessageSquare, Trash2, Archive, Loader2, Pencil, Check, X } from 'lucide-react'
 
 export default function HistoryPage() {
-  const { conversations, loading, deleteConversation, archiveConversation } = useConversations()
+  const { conversations, loading, deleteConversation, archiveConversation, updateConversation } = useConversations()
   const [searchQuery, setSearchQuery] = useState('')
+
+  // Rename state
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingTitle, setEditingTitle] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Focus input when editing starts
+  useEffect(() => {
+    if (editingId && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [editingId])
+
+  // Handle rename
+  const handleStartRename = (convId: string, currentTitle: string) => {
+    setEditingId(convId)
+    setEditingTitle(currentTitle)
+  }
+
+  const handleSaveRename = async () => {
+    if (editingId && editingTitle.trim()) {
+      await updateConversation(editingId, { title: editingTitle.trim() })
+    }
+    setEditingId(null)
+    setEditingTitle('')
+  }
+
+  const handleCancelRename = () => {
+    setEditingId(null)
+    setEditingTitle('')
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSaveRename()
+    } else if (e.key === 'Escape') {
+      handleCancelRename()
+    }
+  }
 
   const filteredConversations = conversations.filter((conv) =>
     conv.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -90,54 +131,97 @@ export default function HistoryPage() {
               <Card key={conv.id} className="hover:bg-accent/50 transition-colors">
                 <CardHeader className="p-4">
                   <div className="flex items-start justify-between">
-                    <Link href={`/chat/${conv.id}`} className="flex-1">
-                      <CardTitle className="text-base font-medium line-clamp-1">
-                        {conv.title}
-                      </CardTitle>
-                      <CardDescription className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className="text-xs">
-                          {conv.model_used === 'claude' ? 'Claude' : 'Gemini'}
-                        </Badge>
-                        <span>{conv.message_count} messages</span>
-                        <span>•</span>
-                        <span>{formatDate(conv.updated_at)}</span>
-                      </CardDescription>
-                    </Link>
-                    <div className="flex gap-1 ml-4">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => archiveConversation(conv.id)}
-                      >
-                        <Archive className="h-4 w-4" />
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
-                            <Trash2 className="h-4 w-4" />
+                    {editingId === conv.id ? (
+                      // Inline editing mode
+                      <div className="flex-1 flex items-center gap-2">
+                        <Input
+                          ref={inputRef}
+                          value={editingTitle}
+                          onChange={(e) => setEditingTitle(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                          onBlur={handleSaveRename}
+                          className="h-8 text-base font-medium"
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0"
+                          onClick={handleSaveRename}
+                        >
+                          <Check className="h-4 w-4 text-green-500" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0"
+                          onClick={handleCancelRename}
+                        >
+                          <X className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+                    ) : (
+                      // Normal display mode
+                      <>
+                        <Link href={`/chat/${conv.id}`} className="flex-1">
+                          <CardTitle className="text-base font-medium line-clamp-1">
+                            {conv.title}
+                          </CardTitle>
+                          <CardDescription className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              {conv.model_used === 'claude' ? 'Claude' : 'Gemini'}
+                            </Badge>
+                            <span>{conv.message_count} messages</span>
+                            <span>•</span>
+                            <span>{formatDate(conv.updated_at)}</span>
+                          </CardDescription>
+                        </Link>
+                        <div className="flex gap-1 ml-4">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleStartRename(conv.id, conv.title)}
+                            title="Rename conversation"
+                          >
+                            <Pencil className="h-4 w-4" />
                           </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete conversation?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will permanently delete this conversation and all its messages.
-                              This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => deleteConversation(conv.id)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => archiveConversation(conv.id)}
+                            title="Archive conversation"
+                          >
+                            <Archive className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" title="Delete conversation">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete conversation?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This will permanently delete this conversation and all its messages.
+                                  This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => deleteConversation(conv.id)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </CardHeader>
               </Card>

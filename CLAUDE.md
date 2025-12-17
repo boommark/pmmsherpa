@@ -973,4 +973,28 @@ Edit message → Content in input → Send → Messages truncated → Regenerate
 
 ---
 
-*Last updated: December 15, 2025 - Access Request Flow v3 (Password Upfront, Banned Until Approved)*
+### December 17, 2025 - Conversation Rename Feature
+
+**Feature**: Users can now rename conversations in both the sidebar and history page.
+
+**How It Works**:
+- **Sidebar**: Hover over a conversation → click the Pencil icon → edit inline → press Enter to save or Escape to cancel
+- **History Page**: Click the Pencil icon next to any conversation → edit inline → press Enter to save or Escape to cancel
+- Renamed titles persist to the database via the existing `updateConversation` function
+
+**UI Details**:
+- Inline editing with Input component
+- Check (green) and X (red) buttons for save/cancel
+- Auto-focus and select-all when editing starts
+- Keyboard shortcuts: Enter to save, Escape to cancel
+- onBlur also saves changes
+
+**Files Modified**:
+- `src/components/layout/Sidebar.tsx` - Added rename state, inline editing UI with Pencil/Check/X icons
+- `src/app/(dashboard)/history/page.tsx` - Added rename state, inline editing UI with Pencil/Check/X icons
+
+**No Database Changes Required**: Uses existing `updateConversation` function which updates the `title` column in `conversations` table.
+
+---
+
+*Last updated: December 17, 2025 - Conversation Rename Feature*

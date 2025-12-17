@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Input } from '@/components/ui/input'
 import {
   MessageSquare,
   History,
@@ -21,6 +22,9 @@ import {
   PanelLeftClose,
   PanelLeft,
   Trash2,
+  Pencil,
+  Check,
+  X,
 } from 'lucide-react'
 
 // Helper to group conversations by date
@@ -57,9 +61,50 @@ function SidebarContent({
 }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { conversations, deleteConversation } = useConversations()
+  const { conversations, deleteConversation, updateConversation } = useConversations()
   const { clearMessages, setConversationId } = useChatStore()
   const { profile } = useProfile()
+
+  // Rename state
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingTitle, setEditingTitle] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Focus input when editing starts
+  useEffect(() => {
+    if (editingId && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [editingId])
+
+  // Handle rename
+  const handleStartRename = (convId: string, currentTitle: string) => {
+    setEditingId(convId)
+    setEditingTitle(currentTitle)
+  }
+
+  const handleSaveRename = async () => {
+    if (editingId && editingTitle.trim()) {
+      await updateConversation(editingId, { title: editingTitle.trim() })
+    }
+    setEditingId(null)
+    setEditingTitle('')
+  }
+
+  const handleCancelRename = () => {
+    setEditingId(null)
+    setEditingTitle('')
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSaveRename()
+    } else if (e.key === 'Escape') {
+      handleCancelRename()
+    }
+  }
 
   // Get initials for avatar fallback
   const initials = profile?.full_name
@@ -184,24 +229,70 @@ function SidebarContent({
                           pathname === `/chat/${conv.id}` && 'bg-sidebar-accent'
                         )}
                       >
-                        <Link
-                          href={`/chat/${conv.id}`}
-                          className="flex-1 truncate"
-                          onClick={onNavigate}
-                        >
-                          {conv.title}
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            deleteConversation(conv.id)
-                          }}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+                        {editingId === conv.id ? (
+                          // Inline editing mode
+                          <div className="flex-1 flex items-center gap-1">
+                            <Input
+                              ref={inputRef}
+                              value={editingTitle}
+                              onChange={(e) => setEditingTitle(e.target.value)}
+                              onKeyDown={handleKeyDown}
+                              onBlur={handleSaveRename}
+                              className="h-6 text-sm px-1.5 py-0"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-5 w-5 shrink-0"
+                              onClick={handleSaveRename}
+                            >
+                              <Check className="h-3 w-3 text-green-500" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-5 w-5 shrink-0"
+                              onClick={handleCancelRename}
+                            >
+                              <X className="h-3 w-3 text-red-500" />
+                            </Button>
+                          </div>
+                        ) : (
+                          // Normal display mode
+                          <>
+                            <Link
+                              href={`/chat/${conv.id}`}
+                              className="flex-1 truncate"
+                              onClick={onNavigate}
+                            >
+                              {conv.title}
+                            </Link>
+                            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  handleStartRename(conv.id, conv.title)
+                                }}
+                              >
+                                <Pencil className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  deleteConversation(conv.id)
+                                }}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </>
+                        )}
                       </div>
                     ))}
                   </div>
