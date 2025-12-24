@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2, CheckCircle, Moon, Sun, Monitor, Upload, X } from 'lucide-react'
+import { Loader2, CheckCircle, Moon, Sun, Monitor, Upload, X, Mail, Shield } from 'lucide-react'
 
 // Apply theme to document
 function applyTheme(theme: 'light' | 'dark' | 'system') {
@@ -44,8 +44,13 @@ export default function SettingsPage() {
   const [error, setError] = useState<string | null>(null)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [sendingEmails, setSendingEmails] = useState(false)
+  const [emailResult, setEmailResult] = useState<{ success?: string; error?: string } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
+
+  // Check if current user is admin
+  const isAdmin = profile?.email === 'abhishekratna@gmail.com'
 
   // Initialize form when profile loads
   useEffect(() => {
@@ -187,6 +192,37 @@ export default function SettingsPage() {
         .join('')
         .toUpperCase()
     : profile?.email?.[0]?.toUpperCase() || 'U'
+
+  // Send approval emails (admin only)
+  const handleSendApprovalEmails = async () => {
+    if (!isAdmin) return
+
+    setSendingEmails(true)
+    setEmailResult(null)
+
+    try {
+      const response = await fetch('/api/admin/send-approval-emails', {
+        method: 'POST',
+      })
+      const data = await response.json()
+
+      if (response.ok) {
+        if (data.sent > 0) {
+          setEmailResult({ success: `Sent ${data.sent} welcome email(s) successfully!` })
+        } else {
+          setEmailResult({ success: 'No new users to send emails to.' })
+        }
+      } else {
+        setEmailResult({ error: data.error || 'Failed to send emails' })
+      }
+    } catch (err) {
+      setEmailResult({ error: err instanceof Error ? err.message : 'Failed to send emails' })
+    } finally {
+      setSendingEmails(false)
+      // Clear result after 5 seconds
+      setTimeout(() => setEmailResult(null), 5000)
+    }
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -427,6 +463,54 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Admin Section - Only visible to abhishekratna@gmail.com */}
+        {isAdmin && (
+          <Card className="border-amber-500/50 bg-amber-50/50 dark:bg-amber-950/20">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-amber-600 dark:text-amber-500" />
+                <CardTitle>Admin Tools</CardTitle>
+              </div>
+              <CardDescription>
+                Administrative functions for managing the platform
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {emailResult?.success && (
+                <Alert>
+                  <CheckCircle className="h-4 w-4" />
+                  <AlertDescription>{emailResult.success}</AlertDescription>
+                </Alert>
+              )}
+              {emailResult?.error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{emailResult.error}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="space-y-2">
+                <Label>Send Approval Emails</Label>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Send welcome emails to newly unbanned users who haven&apos;t received one yet
+                </p>
+                <Button
+                  onClick={handleSendApprovalEmails}
+                  disabled={sendingEmails}
+                  variant="outline"
+                  className="border-amber-500/50 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+                >
+                  {sendingEmails ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Mail className="mr-2 h-4 w-4" />
+                  )}
+                  {sendingEmails ? 'Sending...' : 'Send Approval Emails'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   )

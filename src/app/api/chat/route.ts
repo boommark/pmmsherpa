@@ -9,7 +9,7 @@ import { conductResearch } from '@/lib/llm/perplexity-client'
 import type { ChatAttachment, WebCitation } from '@/types/chat'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60
+export const maxDuration = 120 // 2 minutes to handle deep research + complex RAG queries
 
 export async function POST(request: NextRequest) {
   const encoder = new TextEncoder()

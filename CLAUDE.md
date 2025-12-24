@@ -997,4 +997,4 @@ Edit message → Content in input → Send → Messages truncated → Regenerate
 
 ---
 
-*Last updated: December 17, 2025 - Conversation Rename Feature*
+*Last updated: December 24, 2025 - Conversation Rename Feature**

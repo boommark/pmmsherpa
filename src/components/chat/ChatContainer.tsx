@@ -244,50 +244,94 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         throw new Error('Failed to send message')
       }
 
-      // Handle streaming response
+      // Handle streaming response with timeout protection
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
 
       if (reader) {
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
+        let receivedDone = false
+        let lastActivityTime = Date.now()
+        const STREAM_TIMEOUT_MS = 90000 // 90 seconds total timeout
+        const INACTIVITY_TIMEOUT_MS = 30000 // 30 seconds without any data
 
-          const chunk = decoder.decode(value)
-          const lines = chunk.split('\n')
+        const checkTimeout = () => {
+          const now = Date.now()
+          const totalElapsed = now - (lastActivityTime - INACTIVITY_TIMEOUT_MS) // Rough start time
+          if (now - lastActivityTime > INACTIVITY_TIMEOUT_MS) {
+            throw new Error('Stream timed out - no data received for 30 seconds')
+          }
+          if (totalElapsed > STREAM_TIMEOUT_MS) {
+            throw new Error('Stream timed out - total time exceeded')
+          }
+        }
 
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const data = JSON.parse(line.slice(6))
-                if (data.type === 'status') {
-                  setStatusMessage(data.message)
-                } else if (data.type === 'text') {
-                  // Clear status when text starts streaming
-                  setStatusMessage(null)
-                  appendToStream(assistantMessageId, data.content)
-                } else if (data.type === 'citations') {
-                  setCitations(assistantMessageId, data.citations)
-                } else if (data.type === 'expandedResearch') {
-                  // Handle Perplexity expanded research
-                  setExpandedResearch(assistantMessageId, data.expandedResearch)
-                } else if (data.type === 'done') {
-                  setStatusMessage(null)
-                  finishStreaming(assistantMessageId)
-                  // Navigate to new conversation after streaming completes
-                  if (isNewConversation && activeConversationId) {
-                    // Set flag before navigation to prevent message clearing
-                    isNavigatingToNewConversation.current = true
-                    router.replace(`/chat/${activeConversationId}`)
+        try {
+          while (true) {
+            // Race between reading and timeout check
+            const readPromise = reader.read()
+            const timeoutPromise = new Promise<never>((_, reject) => {
+              const timeoutId = setTimeout(() => {
+                checkTimeout()
+                reject(new Error('Stream read timeout'))
+              }, INACTIVITY_TIMEOUT_MS)
+              readPromise.then(() => clearTimeout(timeoutId)).catch(() => clearTimeout(timeoutId))
+            })
+
+            const { done, value } = await Promise.race([readPromise, timeoutPromise])
+            lastActivityTime = Date.now()
+
+            if (done) {
+              // Stream ended - check if we got a proper 'done' event
+              if (!receivedDone) {
+                console.warn('Stream ended without done event - server may have disconnected')
+              }
+              break
+            }
+
+            const chunk = decoder.decode(value)
+            const lines = chunk.split('\n')
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(line.slice(6))
+                  if (data.type === 'status') {
+                    setStatusMessage(data.message)
+                  } else if (data.type === 'text') {
+                    // Clear status when text starts streaming
+                    setStatusMessage(null)
+                    appendToStream(assistantMessageId, data.content)
+                  } else if (data.type === 'citations') {
+                    setCitations(assistantMessageId, data.citations)
+                  } else if (data.type === 'expandedResearch') {
+                    // Handle Perplexity expanded research
+                    setExpandedResearch(assistantMessageId, data.expandedResearch)
+                  } else if (data.type === 'done') {
+                    receivedDone = true
+                    setStatusMessage(null)
+                    finishStreaming(assistantMessageId)
+                    // Navigate to new conversation after streaming completes
+                    if (isNewConversation && activeConversationId) {
+                      // Set flag before navigation to prevent message clearing
+                      isNavigatingToNewConversation.current = true
+                      router.replace(`/chat/${activeConversationId}`)
+                    }
+                  } else if (data.type === 'error') {
+                    setError(data.message)
+                    setStatusMessage(null)
                   }
-                } else if (data.type === 'error') {
-                  setError(data.message)
-                  setStatusMessage(null)
+                } catch {
+                  // Ignore parse errors for partial JSON
                 }
-              } catch {
-                // Ignore parse errors for partial JSON
               }
             }
+          }
+        } finally {
+          // Always cancel the reader when done to clean up resources
+          try {
+            reader.cancel()
+          } catch {
+            // Ignore cancel errors
           }
         }
       }
@@ -297,7 +341,18 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         // User stopped the generation - just finish streaming without error
         finishStreaming(assistantMessageId)
       } else {
-        setError(error instanceof Error ? error.message : 'An error occurred')
+        // Provide user-friendly error messages
+        let errorMessage = 'An error occurred'
+        if (error instanceof Error) {
+          if (error.message.includes('timed out') || error.message.includes('timeout')) {
+            errorMessage = 'The response took too long. Please try again with a simpler question, or disable deep research.'
+          } else if (error.message.includes('Failed to fetch') || error.message.includes('network')) {
+            errorMessage = 'Connection lost. Please check your internet and try again.'
+          } else {
+            errorMessage = error.message
+          }
+        }
+        setError(errorMessage)
         setStatusMessage(null)
         finishStreaming(assistantMessageId)
       }

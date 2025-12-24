@@ -469,6 +469,220 @@ P.S. Check out the "Try asking" suggestions on the chat page for inspiration!`
   }
 }
 
+// Celebratory welcome email sent when user is approved/unbanned
+export function getCelebratoryWelcomeEmail(data: { fullName: string; email: string }) {
+  const firstName = data.fullName.split(' ')[0]
+
+  return {
+    to: data.email,
+    subject: '🎉 Welcome to PMMSherpa - You\'re In!',
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>${emailStyles}
+            .header-celebration {
+              background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            }
+            .confetti {
+              font-size: 32px;
+              text-align: center;
+              margin-bottom: 16px;
+            }
+            .highlight-box {
+              background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+              padding: 20px;
+              border-radius: 16px;
+              margin: 24px 0;
+              text-align: center;
+            }
+            .email-highlight {
+              font-weight: 600;
+              color: #6366f1;
+              font-size: 18px;
+            }
+            .quick-start {
+              background: #fafafa;
+              border-radius: 12px;
+              padding: 20px;
+              margin: 24px 0;
+            }
+            .quick-start h3 {
+              margin: 0 0 16px 0;
+              color: #1f2937;
+              font-size: 16px;
+            }
+            .step {
+              display: flex;
+              align-items: flex-start;
+              gap: 12px;
+              margin-bottom: 12px;
+            }
+            .step-number {
+              background: linear-gradient(135deg, #6366f1, #8b5cf6);
+              color: white;
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 12px;
+              font-weight: 600;
+              flex-shrink: 0;
+            }
+            .step-text {
+              font-size: 14px;
+              color: #374151;
+              line-height: 1.5;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="wrapper">
+            <div class="container">
+              <div class="header header-celebration">
+                <div class="confetti">🎉 🚀 ✨</div>
+                <div class="logo" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                  <div style="width: 44px; height: 44px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 20L7 10l5 6 4-10 6 14" />
+                    </svg>
+                  </div>
+                  <span class="logo-text">PMMSherpa</span>
+                </div>
+                <h1>Welcome to the Team!</h1>
+                <p>Your access has been approved</p>
+              </div>
+              <div class="content">
+                <p style="font-size: 18px; margin-bottom: 8px;">Hey ${firstName}! 👋</p>
+                <p style="font-size: 16px; color: #374151;">
+                  <strong>You're officially in!</strong> Your PMMSherpa access has been approved, and I couldn't be more excited to have you on board.
+                </p>
+
+                <div class="highlight-box">
+                  <p style="margin: 0 0 8px 0; font-size: 14px; color: #6b7280;">Log in with your email:</p>
+                  <p style="margin: 0;"><span class="email-highlight">${data.email}</span></p>
+                  <p style="margin: 12px 0 0 0; font-size: 13px; color: #9ca3af;">Use the password you created when you signed up</p>
+                </div>
+
+                <div class="buttons" style="margin: 28px 0; text-align: center;">
+                  <a href="${APP_URL}/login" class="button" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%); font-size: 16px; padding: 18px 36px;">Start Using PMMSherpa →</a>
+                </div>
+
+                <div class="divider"></div>
+
+                <h2 style="font-size: 18px; margin-bottom: 16px; color: #1f2937;">What You've Just Unlocked 🔓</h2>
+
+                <div class="features">
+                  <div class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-text"><strong>Expert PMM Knowledge</strong> — Access insights from 1,280+ curated sources including books, blogs, and AMAs from industry leaders</div>
+                  </div>
+                  <div class="feature-item">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-text"><strong>Real-Time Research</strong> — Get up-to-date market intelligence with integrated web search and deep research capabilities</div>
+                  </div>
+                  <div class="feature-item">
+                    <div class="feature-icon">🗣️</div>
+                    <div class="feature-text"><strong>Voice Conversations</strong> — Talk through your PMM challenges and get instant guidance</div>
+                  </div>
+                  <div class="feature-item">
+                    <div class="feature-icon">📎</div>
+                    <div class="feature-text"><strong>Document Analysis</strong> — Upload positioning docs, competitive intel, or customer research for personalized advice</div>
+                  </div>
+                </div>
+
+                <div class="quick-start">
+                  <h3>🚀 Quick Start Guide</h3>
+                  <div class="step">
+                    <span class="step-number">1</span>
+                    <span class="step-text">Sign in at <a href="${APP_URL}/login" style="color: #6366f1;">pmmsherpa.com/login</a> with your email and password</span>
+                  </div>
+                  <div class="step">
+                    <span class="step-number">2</span>
+                    <span class="step-text">Try asking: <em>"What is April Dunford's positioning framework?"</em> or <em>"How can PMMs earn respect from PMs?"</em></span>
+                  </div>
+                  <div class="step">
+                    <span class="step-number">3</span>
+                    <span class="step-text">Upload a document or enable Deep Research for more comprehensive answers</span>
+                  </div>
+                </div>
+
+                <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">
+                  Got questions or feedback? Write to me at <a href="mailto:abhishekratna@gmail.com" style="color: #6366f1;">abhishekratna@gmail.com</a> — I'd love to hear from you!
+                </p>
+
+                <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+                  <p style="margin: 0 0 16px 0; color: #374151; font-size: 15px;">Talk soon,</p>
+                  <table cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td style="vertical-align: middle;">
+                        <strong style="font-size: 17px; color: #1f2937;">Abhishek</strong>
+                      </td>
+                      <td style="vertical-align: middle; padding-left: 10px;">
+                        <a href="https://www.linkedin.com/in/abhishekratna" style="display: inline-block; width: 26px; height: 26px; background: #0A66C2; border-radius: 5px; text-align: center; line-height: 26px; text-decoration: none;" title="Connect on LinkedIn">
+                          <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" width="14" height="14" style="vertical-align: middle; margin-top: 5px;" />
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                  <p style="margin: 6px 0 0 0; color: #6b7280; font-size: 14px;">Creator of PMMSherpa</p>
+                </div>
+              </div>
+              <div class="footer">
+                <p>Welcome to the PMMSherpa community! 🎉</p>
+                <p style="margin-top: 8px;"><a href="${APP_URL}">pmmsherpa.com</a></p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+Hey ${firstName}! 👋
+
+You're officially in! Your PMMSherpa access has been approved, and I couldn't be more excited to have you on board.
+
+Log in with your email: ${data.email}
+Use the password you created when you signed up.
+
+Start using PMMSherpa: ${APP_URL}/login
+
+WHAT YOU'VE JUST UNLOCKED
+========================
+
+🎯 Expert PMM Knowledge — Access insights from 1,280+ curated sources including books, blogs, and AMAs from industry leaders
+
+🔍 Real-Time Research — Get up-to-date market intelligence with integrated web search and deep research capabilities
+
+🗣️ Voice Conversations — Talk through your PMM challenges and get instant guidance
+
+📎 Document Analysis — Upload positioning docs, competitive intel, or customer research for personalized advice
+
+QUICK START GUIDE
+=================
+
+1. Sign in at ${APP_URL}/login with your email and password
+
+2. Try asking: "What is April Dunford's positioning framework?" or "How can PMMs earn respect from PMs?"
+
+3. Upload a document or enable Deep Research for more comprehensive answers
+
+Got questions or feedback? Write to me at abhishekratna@gmail.com — I'd love to hear from you!
+
+Talk soon,
+Abhishek
+Creator of PMMSherpa
+
+---
+Welcome to the PMMSherpa community! 🎉
+    `.trim()
+  }
+}
+
 // Password reset email
 export function getPasswordResetEmail(data: { fullName: string; email: string; resetLink: string }) {
   const firstName = data.fullName.split(' ')[0]
