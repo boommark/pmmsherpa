@@ -29,6 +29,29 @@ These demos are designed to be:
 | 40-45s | Copy action | Click "Copy for Google Docs" → Paste into Google Doc with perfect formatting |
 | 45-50s | End card | "Expert knowledge. Production-ready output. Your second brain for PMM." |
 
+### Narration Script
+
+> **[0-3s]** *(Urgent tone)*
+> "Your VP just pinged you. She needs a positioning statement for the board deck. In an hour."
+>
+> **[3-8s]** *(Calm, confident)*
+> "Instead of panicking, you open PMMSherpa and describe what you need."
+>
+> **[8-15s]** *(Building anticipation)*
+> "Watch what happens. It's searching through frameworks from the best minds in product marketing..."
+>
+> **[15-25s]** *(Impressed)*
+> "And there it is. A complete positioning statement. Not a template with blanks to fill—actual, usable copy."
+>
+> **[25-35s]** *(Pointing out details)*
+> "Notice the structure: the 'For... Who... Our product is... That... Unlike...' format. Classic positioning canvas, done right."
+>
+> **[35-45s]** *(Practical payoff)*
+> "One click to copy. Paste it into your doc. Formatting intact. Done."
+>
+> **[45-50s]** *(Confident close)*
+> "That's PMMSherpa. Expert knowledge. Production-ready output. Your second brain for product marketing."
+
 ### Why It Works
 - Shows the core value prop in under a minute
 - Demonstrates zero-placeholder output (a huge differentiator vs ChatGPT)
@@ -54,6 +77,29 @@ These demos are designed to be:
 | 50-60s | Expand research | Click to show Web Research panel with all sources |
 | End | End card | "Expert strategy + live intel. Synthesized in seconds." |
 
+### Narration Script
+
+> **[0-5s]** *(Tense, relatable)*
+> "Your competitor just dropped a major product update. Your CEO saw it on LinkedIn. Now everyone's asking: 'What's our response?'"
+>
+> **[5-12s]** *(Smart, knowing)*
+> "You paste their announcement into PMMSherpa. Notice something? It automatically detected you need live data and enabled web search."
+>
+> **[12-18s]** *(Technical but accessible)*
+> "Now here's where it gets interesting. Click 'Deep Research.' This runs two engines in parallel—expert frameworks AND real-time competitive intel."
+>
+> **[18-30s]** *(Building excitement)*
+> "Watch the status. It's pulling from proven PMM playbooks while simultaneously scanning the latest market data."
+>
+> **[30-45s]** *(Delivering the goods)*
+> "And here's your competitive response. Strategic frameworks grounded in expert methodology... combined with what's actually happening in the market right now."
+>
+> **[45-55s]** *(Proof point)*
+> "Expand the research panel—every claim is sourced. Expert citations here, live web sources here."
+>
+> **[55-60s]** *(Powerful close)*
+> "Expert strategy meets live intelligence. That's how you respond to competitive threats in real-time."
+
 ### Why It Works
 - Shows the unique RAG + Perplexity parallel architecture
 - Addresses a real, time-sensitive PMM pain point
@@ -78,6 +124,29 @@ These demos are designed to be:
 | 55-60s | Copy output | Click "Copy as Markdown" → Show it's ready for Notion/Confluence |
 | End | End card | "47 pages → 1 actionable battlecard. In under a minute." |
 
+### Narration Script
+
+> **[0-5s]** *(Overwhelmed, sympathetic)*
+> "Sound familiar? Forty-seven pages of competitor documentation just landed in your inbox. Sales needs a battlecard. By tomorrow."
+>
+> **[5-12s]** *(Taking control)*
+> "Here's how you turn chaos into clarity. Upload the document to PMMSherpa. It accepts PDFs, Word docs, even images."
+>
+> **[12-20s]** *(Directing the AI)*
+> "Now tell it exactly what you need: a competitive battlecard focused on enterprise security and pricing. Be specific—it responds to specificity."
+>
+> **[20-35s]** *(Watching the magic)*
+> "Watch it work. It's not just summarizing—it's analyzing through the lens of competitive positioning frameworks, structuring this into something your sales team can actually use."
+>
+> **[35-45s]** *(Showcasing the output)*
+> "Positioning comparison. Key differentiators. Objection handlers. Proof points. All structured, all complete, all based on what was actually in that document."
+>
+> **[45-55s]** *(Trust but verify)*
+> "And here's the best part—expand the citations. It shows you exactly where each insight came from. Your uploaded doc here, expert frameworks here."
+>
+> **[55-65s]** *(Triumphant close)*
+> "Forty-seven pages to one actionable battlecard. That's not just faster—that's a different way of working."
+
 ### Why It Works
 - Shows multimodal capability (file upload)
 - Demonstrates practical deliverable generation
@@ -98,6 +167,9 @@ For email distribution, these ultra-short clips work as GIFs or short videos:
 
 **Use case**: Addresses AI trust concerns
 
+**Narration (15s)**:
+> "Ask about positioning strategy. Get an answer. But here's what makes it different—click citations. That insight? Page 47 of Obviously Awesome. Every claim, sourced."
+
 ---
 
 ### Micro-Demo B: "The Voice Moment"
@@ -107,6 +179,9 @@ For email distribution, these ultra-short clips work as GIFs or short videos:
 **Caption**: *"Think out loud. Get answers hands-free."*
 
 **Use case**: Shows accessibility and modern UX
+
+**Narration (15s)**:
+> "In a meeting? Multitasking? Just click the mic and talk. It transcribes, thinks, and speaks the answer back. Hands-free PMM expertise."
 
 ---
 
@@ -118,6 +193,9 @@ For email distribution, these ultra-short clips work as GIFs or short videos:
 
 **Use case**: Highlights practical workflow integration
 
+**Narration (15s)**:
+> "Here's the output. Click copy, choose 'Google Docs.' Paste. Headers, bullets, formatting—all intact. No cleanup needed."
+
 ---
 
 ### Micro-Demo D: "The Model Switch"
@@ -127,6 +205,9 @@ For email distribution, these ultra-short clips work as GIFs or short videos:
 **Caption**: *"Different AI brains for different tasks."*
 
 **Use case**: Shows advanced users the model flexibility
+
+**Narration (15s)**:
+> "Need deeper analysis? Switch to Gemini Thinking. Watch the brain icon—it's actually reasoning through the problem step by step."
 
 ---
 
