@@ -52,7 +52,7 @@ export default function SettingsPage() {
 
   // Check if current user is admin (check both profile email and auth user email)
   const userEmail = profile?.email || user?.email
-  const isAdmin = userEmail === 'abhishekratna@gmail.com'
+  const isAdmin = userEmail?.toLowerCase().trim() === 'abhishekratna@gmail.com'
 
   // Initialize form when profile loads
   useEffect(() => {
