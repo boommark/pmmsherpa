@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useProfile } from '@/hooks/useSupabase'
+import { useProfile, useUser } from '@/hooks/useSupabase'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -37,6 +37,7 @@ function applyTheme(theme: 'light' | 'dark' | 'system') {
 
 export default function SettingsPage() {
   const { profile, loading, updateProfile } = useProfile()
+  const { user } = useUser()
   const [fullName, setFullName] = useState('')
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system')
   const [saving, setSaving] = useState(false)
@@ -49,8 +50,9 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
-  // Check if current user is admin
-  const isAdmin = profile?.email === 'abhishekratna@gmail.com'
+  // Check if current user is admin (check both profile email and auth user email)
+  const userEmail = profile?.email || user?.email
+  const isAdmin = userEmail === 'abhishekratna@gmail.com'
 
   // Initialize form when profile loads
   useEffect(() => {
