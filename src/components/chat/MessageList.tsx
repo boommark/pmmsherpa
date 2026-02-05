@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { MessageBubble } from './MessageBubble'
 import { StatusIndicator } from './StatusIndicator'
+import { SkeletonMessage } from '@/components/ui/skeleton-message'
 import type { ChatMessage } from '@/types/chat'
 
 interface MessageListProps {
@@ -129,7 +130,12 @@ export function MessageList({ messages, statusMessage, onEditPrompt, onExpandWit
             />
           </div>
         ))}
-        {statusMessage && <StatusIndicator message={statusMessage} />}
+        {statusMessage && (
+          <div className="space-y-3">
+            <SkeletonMessage />
+            <StatusIndicator message={statusMessage} />
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
     </ScrollArea>

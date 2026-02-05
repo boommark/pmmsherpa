@@ -156,8 +156,8 @@ export function MessageBubble({ message, messageIndex, onEditPrompt, onExpandWit
                     </pre>
                   ),
                   table: ({ children }) => (
-                    <div className="overflow-x-auto my-2 -mx-2 sm:mx-0 max-w-[calc(100vw-4rem)] sm:max-w-full">
-                      <table className="w-full border-collapse border border-border text-xs sm:text-sm table-fixed">
+                    <div className="overflow-x-auto my-2 -mx-2 sm:mx-0 max-w-[calc(100vw-5rem)] sm:max-w-full rounded-md border border-border">
+                      <table className="w-full border-collapse text-xs sm:text-sm min-w-full">
                         {children}
                       </table>
                     </div>

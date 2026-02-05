@@ -119,6 +119,16 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Focus visible styles for accessibility */
+  *:focus-visible {
+    outline: 2px solid rgb(20 184 166 / 0.5);
+    outline-offset: 2px;
+  }
+
+  .dark *:focus-visible {
+    outline-color: rgb(20 184 166 / 0.3);
+  }
 }
 
 /* Animated gradient for hero text */
@@ -136,4 +146,21 @@
 
 .animate-gradient {
   animation: gradient-shift 3s ease infinite;
+  will-change: background-position;
+  transform: translateZ(0);
+}
+
+/* Smooth scroll behavior (respects user preference) */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-gradient {
+    animation: none;
+  }
 }

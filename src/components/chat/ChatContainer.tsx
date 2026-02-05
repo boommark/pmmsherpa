@@ -8,7 +8,7 @@ import { MessageList } from './MessageList'
 import { ChatInput, type ChatInputRef } from './ChatInput'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Target, Users, Sparkles } from 'lucide-react'
 import { shouldAutoEnableWebSearch } from '@/lib/utils/search-detection'
 import type { ChatMessage, ChatAttachment } from '@/types/chat'
 import type { UploadedFile } from './FileUpload'
@@ -450,13 +450,24 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             </div>
 
             {/* Greeting - more compact on mobile */}
-            <div className="text-center space-y-1 md:space-y-2">
+            <div className="text-center space-y-2 md:space-y-3 max-w-2xl mx-auto">
               <h2 className="text-xl md:text-3xl font-semibold tracking-tight">
                 Welcome to PMMSherpa
               </h2>
               <p className="text-sm md:text-lg text-muted-foreground/80">
-                How can I assist you today?
+                Your second brain for product marketing
               </p>
+              <div className="flex flex-wrap gap-2 justify-center pt-2">
+                <span className="px-3 py-1 rounded-full bg-teal-500/10 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 text-xs font-medium">
+                  Expert Knowledge
+                </span>
+                <span className="px-3 py-1 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-medium">
+                  Real-time Research
+                </span>
+                <span className="px-3 py-1 rounded-full bg-purple-500/10 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs font-medium">
+                  Voice & Text
+                </span>
+              </div>
             </div>
           </div>
 
@@ -467,29 +478,35 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
             {/* Quick action suggestions - below the chat input */}
             <div className="w-full max-w-3xl mx-auto px-3 md:px-6 pb-3 md:pb-6">
+              <p className="text-xs text-muted-foreground/70 mb-2 md:mb-3 text-center md:text-left">
+                Try asking about:
+              </p>
               <div className="flex flex-col gap-1.5 md:gap-2">
                 <button
-                  className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
+                  className="group px-3 py-2.5 md:px-4 md:py-3 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left flex items-center gap-2"
                   onClick={() => handleSendMessage("What is April Dunford's positioning framework?")}
                 >
-                  What is April Dunford&apos;s positioning framework?
+                  <Target className="h-4 w-4 text-teal-600 dark:text-teal-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                  <span>What is April Dunford&apos;s positioning framework?</span>
                 </button>
                 <button
-                  className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
+                  className="group px-3 py-2.5 md:px-4 md:py-3 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left flex items-center gap-2"
                   onClick={() => handleSendMessage('How can PMMs earn respect from PMs?')}
                 >
-                  How can PMMs earn respect from PMs?
+                  <Users className="h-4 w-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                  <span>How can PMMs earn respect from PMs?</span>
                 </button>
                 <button
-                  className="px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left"
+                  className="group px-3 py-2.5 md:px-4 md:py-3 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left flex items-center gap-2"
                   onClick={() => handleSendMessage('What messaging strategies deliver success?')}
                 >
-                  What messaging strategies deliver success?
+                  <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                  <span>What messaging strategies deliver success?</span>
                 </button>
               </div>
 
               {/* Subtle hint */}
-              <p className="text-xs text-muted-foreground/60 pt-3 text-center hidden md:block">
+              <p className="text-xs text-muted-foreground/60 pt-3 text-center">
                 Powered by 1,280+ expert sources
               </p>
             </div>
