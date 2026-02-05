@@ -1085,4 +1085,47 @@ Edit message → Content in input → Send → Messages truncated → Regenerate
 
 ---
 
-*Last updated: February 5, 2026 - UX/UI Quick Wins****
+### February 5, 2026 - Mobile Text Wrapping Fix (Part 2)
+
+**Issue**: Text content was overflowing on mobile screens, with no horizontal scroll and poor aesthetics. User reported: "text doesn't look aesthetic and we can't scroll to the right".
+
+**Root Cause**:
+- Message bubbles had `overflow-hidden` preventing natural text flow
+- Long words, URLs, and inline code breaking layout boundaries
+- Missing global word-breaking rules for mobile screens
+
+**Fixes Applied**:
+
+1. **MessageBubble.tsx** - Aggressive word breaking and overflow handling:
+   - **Removed** `overflow-hidden` from message containers (line 106, 112)
+   - **Added** inline styles: `word-break: 'break-word'`, `overflowWrap: 'anywhere'`
+   - **Updated** list items and paragraphs with `break-words` class
+   - **Added** `break-all` to links (for long URLs) and inline code
+   - **Added** proper link component with `target="_blank"` and `rel="noopener noreferrer"`
+
+2. **globals.css** - Global word-breaking rules:
+   ```css
+   /* Prevent text overflow on mobile */
+   p, span, div, li, h1, h2, h3, h4, h5, h6 {
+     word-wrap: break-word;
+     overflow-wrap: break-word;
+   }
+   ```
+
+**Why This Works**:
+- `word-break: break-word` - Breaks words at arbitrary points if needed
+- `overflow-wrap: anywhere` - Most aggressive wrapping, breaks anywhere to prevent overflow
+- `break-all` for URLs/code - Forces breaking even within words (important for long URLs)
+
+**Testing**:
+- ✅ Production build compiles successfully (12.3s)
+- ✅ No TypeScript errors
+- ✅ Ready for mobile testing
+
+**Files Modified**:
+- `src/components/chat/MessageBubble.tsx` - Overflow removal, word-breaking improvements
+- `src/app/globals.css` - Global word-breaking rules
+
+---
+
+*Last updated: February 5, 2026 - Mobile Text Wrapping Fix****

@@ -129,6 +129,12 @@
   .dark *:focus-visible {
     outline-color: rgb(20 184 166 / 0.3);
   }
+
+  /* Prevent text overflow on mobile */
+  p, span, div, li, h1, h2, h3, h4, h5, h6 {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
 }
 
 /* Animated gradient for hero text */

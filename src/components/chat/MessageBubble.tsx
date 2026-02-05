@@ -103,22 +103,23 @@ export function MessageBubble({ message, messageIndex, onEditPrompt, onExpandWit
 
       <div
         className={cn(
-          'flex flex-col min-w-0 max-w-[calc(100%-2.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[85%] space-y-1 sm:space-y-1.5 md:space-y-2 overflow-hidden',
+          'flex flex-col min-w-0 max-w-[calc(100%-2.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[85%] space-y-1 sm:space-y-1.5 md:space-y-2',
           isUser ? 'items-end' : 'items-start'
         )}
       >
         <div
           className={cn(
-            'rounded-lg px-2 py-1.5 sm:px-2.5 sm:py-2 md:px-4 md:py-2.5 w-full relative overflow-hidden',
+            'rounded-lg px-2 py-1.5 sm:px-2.5 sm:py-2 md:px-4 md:py-2.5 w-full relative',
             isUser
               ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white'
               : 'bg-muted text-foreground'
           )}
+          style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
         >
           {isUser ? (
-            <p className="whitespace-pre-wrap text-sm sm:text-base break-words">{message.content}</p>
+            <p className="whitespace-pre-wrap text-sm sm:text-base break-words overflow-wrap-anywhere">{message.content}</p>
           ) : (
-            <div className="prose prose-sm dark:prose-invert max-w-none break-words overflow-hidden [&_*]:break-words [word-break:break-word]">
+            <div className="prose prose-sm dark:prose-invert max-w-none" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
@@ -138,12 +139,17 @@ export function MessageBubble({ message, messageIndex, onEditPrompt, onExpandWit
                   ol: ({ children }) => (
                     <ol className="list-decimal pl-4 my-2 space-y-1">{children}</ol>
                   ),
-                  li: ({ children }) => <li className="my-0.5">{children}</li>,
-                  p: ({ children }) => <p className="my-2">{children}</p>,
+                  li: ({ children }) => <li className="my-0.5 break-words">{children}</li>,
+                  p: ({ children }) => <p className="my-2 break-words">{children}</p>,
+                  a: ({ children, href }) => (
+                    <a href={href} className="text-primary underline break-all" target="_blank" rel="noopener noreferrer">
+                      {children}
+                    </a>
+                  ),
                   code: ({ className, children }) => {
                     const isInline = !className
                     return isInline ? (
-                      <code className="bg-black/10 dark:bg-white/10 px-1 py-0.5 rounded text-sm">
+                      <code className="bg-black/10 dark:bg-white/10 px-1 py-0.5 rounded text-sm break-all">
                         {children}
                       </code>
                     ) : (
