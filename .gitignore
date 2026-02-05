@@ -45,3 +45,5 @@ __pycache__/
 *.pyc
 *.pyo
 .venv/
+.env*.local
+.vercel-token.txt

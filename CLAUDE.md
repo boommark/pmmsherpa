@@ -139,7 +139,12 @@ PERPLEXITY_API_KEY=pplx-...
 
 # App
 NEXT_PUBLIC_APP_URL=https://pmmsherpa.com
+
+# Vercel (for CLI deployments)
+VERCEL_TOKEN=rQeCMwL63rT10pN5NpA2iBov
 ```
+
+**Note**: Vercel token is stored locally in `.vercel-token.txt` (gitignored) for CLI deployments.
 
 ---
 
@@ -286,17 +291,32 @@ python ingest_documents.py
 - Tables: profiles, conversations, messages, documents, chunks
 
 ### Deploy to production
+
+**Option 1: Using Vercel CLI** (Recommended)
 ```bash
-git add -A && git commit -m "message" && git push origin main && ./deploy.sh
+# Quick deploy with token
+npx vercel --token rQeCMwL63rT10pN5NpA2iBov --prod --yes
+
+# Or set environment variable first
+export VERCEL_TOKEN="rQeCMwL63rT10pN5NpA2iBov"
+npx vercel --prod --yes
 ```
 
-**IMPORTANT**: Always run `./deploy.sh` after pushing to GitHub to ensure Vercel deployment completes. The deploy script:
-1. Pushes to GitHub (if not already pushed)
-2. Triggers Vercel production deployment
-3. Waits for deployment to complete
-4. Shows the live URL
+**Option 2: Git push (auto-deploy)**
+```bash
+git add -A && git commit -m "message" && git push origin main
+# Vercel auto-deploys via GitHub integration (~2-5 minutes)
+```
 
-Never leave a push without running the deployment script.
+**Option 3: Deploy script** (requires local path fix)
+```bash
+./deploy.sh "commit message"
+# Note: Script has hardcoded path, use Vercel CLI instead
+```
+
+**Vercel Token**: Stored in `.vercel-token.txt` (gitignored)
+**Live URL**: https://pmmsherpa.com
+**Dashboard**: https://vercel.com/dashboard
 
 ---
 
