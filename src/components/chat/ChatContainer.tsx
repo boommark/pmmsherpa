@@ -232,6 +232,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           attachments: chatAttachments,
           webSearchEnabled: searchDetection.shouldEnable,
           hasUrls: searchDetection.urls.length > 0,
+          searchReason: searchDetection.reason,
         }),
         signal: abortController.signal,
       })

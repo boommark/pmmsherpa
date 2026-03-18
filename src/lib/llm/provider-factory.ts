@@ -2,7 +2,7 @@ import { createAnthropic } from '@ai-sdk/anthropic'
 import { anthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { google } from '@ai-sdk/google'
-import { createXai, xai } from '@ai-sdk/xai'
+import { createXai } from '@ai-sdk/xai'
 import { getSystemPromptWithContext } from './system-prompt'
 
 // All available model providers
@@ -74,36 +74,25 @@ export function getModel(provider: ModelProvider) {
   }
 }
 
-// Returns provider-native web search + URL reading tools
-// hasUrls: whether the user message contains URLs (affects tool selection for Gemini)
-export function getProviderTools(provider: ModelProvider, hasUrls: boolean = false) {
+// Returns provider-native URL reading tools ONLY (no search tools)
+// Web search is handled by Perplexity; these tools are for reading URLs in user messages
+export function getUrlReadingTools(provider: ModelProvider) {
   const config = MODEL_CONFIG[provider]
 
   if (config.provider === 'anthropic') {
-    // Claude: webSearch is server-side (searches web), webFetch reads specific URLs
-    // Both are server-side tools that execute within a single turn (no maxSteps needed)
+    // Claude: webFetch reads specific URLs and PDFs
     return {
-      web_search: anthropic.tools.webSearch_20250305({ maxUses: 3 }),
       web_fetch: anthropic.tools.webFetch_20250910({ maxUses: 5 }),
     }
   } else if (config.provider === 'google') {
-    // Gemini: googleSearch and urlContext are grounding tools
+    // Gemini: urlContext reads URLs (grounding tool)
     // Per Google docs: urlContext CANNOT be combined with function calling
-    // googleSearch and urlContext should not be used together (causes hanging)
-    // Choose based on whether URLs are present in the message
-    if (hasUrls) {
-      return {
-        urlContext: google.tools.urlContext({}),
-      }
-    }
     return {
-      googleSearch: google.tools.googleSearch({}),
+      urlContext: google.tools.urlContext({}),
     }
   } else {
-    // xAI/Grok: webSearch is a server-side tool
-    return {
-      webSearch: xai.tools.webSearch(),
-    }
+    // xAI/Grok: no dedicated URL reading tool; Perplexity handles research
+    return null
   }
 }
 

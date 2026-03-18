@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server'
 import { streamText } from 'ai'
 import { createClient } from '@/lib/supabase/server'
-import { getModel, getProviderTools, buildMessages, getModelDisplayName, getDbModelValue, MODEL_CONFIG, type ModelProvider } from '@/lib/llm/provider-factory'
+import { getModel, getUrlReadingTools, buildMessages, getModelDisplayName, getDbModelValue, MODEL_CONFIG, type ModelProvider } from '@/lib/llm/provider-factory'
+import { perplexitySearch } from '@/lib/llm/perplexity-client'
 import { retrieveContext, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
 import type { ChatAttachment } from '@/types/chat'
 
@@ -20,13 +21,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { message, conversationId, model, attachments, webSearchEnabled, hasUrls } = body as {
+    const { message, conversationId, model, attachments, webSearchEnabled, hasUrls, searchReason } = body as {
       message: string
       conversationId?: string
       model: ModelProvider
       attachments?: ChatAttachment[]
       webSearchEnabled?: boolean
       hasUrls?: boolean
+      searchReason?: 'url' | 'research_trigger' | 'question' | null
     }
 
     if (!model) {
@@ -98,31 +100,62 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // Status: Searching knowledge base
+          // Status: Searching knowledge base (and optionally web)
           const searchQuery = message || (attachments ? attachments.map(a => a.fileName).join(' ') : '')
 
-          sendStatus('Searching PMM knowledge base...')
+          // Determine if we need Perplexity web research
+          // Perplexity runs for research_trigger and question reasons (NOT for URL-only)
+          const needsPerplexity = webSearchEnabled && searchReason && searchReason !== 'url'
+
+          if (needsPerplexity) {
+            sendStatus('Searching PMM knowledge base & web...')
+          } else {
+            sendStatus('Searching PMM knowledge base...')
+          }
 
           const startRetrieval = Date.now()
 
-          const ragResult = await retrieveContext({ query: searchQuery })
+          // Run RAG and Perplexity in parallel
+          const ragPromise = retrieveContext({ query: searchQuery })
+          const perplexityPromise = needsPerplexity
+            ? perplexitySearch(searchQuery, { recencyFilter: 'month' }).catch(err => {
+                console.error('Perplexity search failed:', err)
+                return null
+              })
+            : Promise.resolve(null)
+
+          const [ragResult, perplexityResult] = await Promise.all([ragPromise, perplexityPromise])
 
           const retrievalTime = Date.now() - startRetrieval
           const { chunks } = ragResult
           console.log(`RAG retrieval took ${retrievalTime}ms, found ${chunks.length} chunks`)
+          if (perplexityResult) {
+            console.log(`Perplexity returned ${perplexityResult.citations.length} citations`)
+          }
 
           const retrievedContext = formatContextForPrompt(chunks)
           const citations = extractCitations(chunks)
 
           // Status: Found sources
-          if (chunks.length > 0) {
+          if (chunks.length > 0 && perplexityResult) {
+            sendStatus(`Found ${chunks.length} sources + web research`)
+          } else if (chunks.length > 0) {
             sendStatus(`Found ${chunks.length} relevant sources`)
+          } else if (perplexityResult) {
+            sendStatus('Found web research results')
           } else {
             sendStatus('No specific sources found, using general knowledge')
           }
 
-          // Build messages with system prompt and context (including attachments)
+          // Build messages with system prompt and context (including attachments and web research)
           let fullContext = retrievedContext
+          if (perplexityResult) {
+            fullContext += '\n\n--- Web Research (via Perplexity) ---\n' + perplexityResult.content
+            if (perplexityResult.citations.length > 0) {
+              fullContext += '\n\nWeb Sources:\n' + perplexityResult.citations.map((url, i) => `[${i + 1}] ${url}`).join('\n')
+            }
+            fullContext += '\n--- End Web Research ---'
+          }
           if (attachmentContext) {
             fullContext += '\n\n--- User Attached Files ---' + attachmentContext
           }
@@ -157,8 +190,10 @@ export async function POST(request: NextRequest) {
 
           // Status: Generating response
           const modelName = getModelDisplayName(model)
-          if (webSearchEnabled) {
-            sendStatus(`Searching the web and generating response with ${modelName}...`)
+          if (hasUrls) {
+            sendStatus(`Reading URLs and generating response with ${modelName}...`)
+          } else if (perplexityResult) {
+            sendStatus(`Generating response with ${modelName} (with web research)...`)
           } else {
             sendStatus(`Generating response with ${modelName}...`)
           }
@@ -169,7 +204,7 @@ export async function POST(request: NextRequest) {
           // Get the database model value for storage
           const dbModel = getDbModelValue(model)
 
-          // Build streamText options with provider-specific web search tools
+          // Build streamText options
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const streamOptions: any = {
             model: llmModel,
@@ -179,13 +214,13 @@ export async function POST(request: NextRequest) {
             temperature: 0.7,
           }
 
-          // When webSearchEnabled, add provider-native tools
-          // These are server-side/grounding tools (not regular function-calling tools)
-          // so they do NOT need maxSteps — they execute within a single turn
-          if (webSearchEnabled) {
-            const tools = getProviderTools(model, hasUrls || false)
-            if (tools) {
-              streamOptions.tools = tools
+          // When URLs are detected, add provider-native URL reading tools
+          // These let the LLM fetch and read page content directly
+          // Web search is handled by Perplexity (injected into context above)
+          if (hasUrls) {
+            const urlTools = getUrlReadingTools(model)
+            if (urlTools) {
+              streamOptions.tools = urlTools
             }
           }
 
