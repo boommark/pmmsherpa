@@ -2,9 +2,9 @@ import { NextRequest } from 'next/server'
 import { streamText } from 'ai'
 import { createClient } from '@/lib/supabase/server'
 import { getModel, getUrlReadingTools, buildMessages, getModelDisplayName, getDbModelValue, MODEL_CONFIG, type ModelProvider } from '@/lib/llm/provider-factory'
-import { perplexitySearch } from '@/lib/llm/perplexity-client'
+import { conductResearch } from '@/lib/llm/perplexity-client'
 import { retrieveContext, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
-import type { ChatAttachment } from '@/types/chat'
+import type { ChatAttachment, WebCitation } from '@/types/chat'
 
 export const runtime = 'nodejs'
 export const maxDuration = 120 // 2 minutes to handle complex RAG queries
@@ -118,8 +118,8 @@ export async function POST(request: NextRequest) {
           // Run RAG and Perplexity in parallel
           const ragPromise = retrieveContext({ query: searchQuery })
           const perplexityPromise = needsPerplexity
-            ? perplexitySearch(searchQuery, { recencyFilter: 'month' }).catch(err => {
-                console.error('Perplexity search failed:', err)
+            ? conductResearch(searchQuery).catch(err => {
+                console.error('Perplexity research error:', err)
                 return null
               })
             : Promise.resolve(null)
@@ -129,32 +129,41 @@ export async function POST(request: NextRequest) {
           const retrievalTime = Date.now() - startRetrieval
           const { chunks } = ragResult
           console.log(`RAG retrieval took ${retrievalTime}ms, found ${chunks.length} chunks`)
+
+          // Format Perplexity research for context injection
+          let webResearchContext = ''
+          let webCitations: WebCitation[] = []
+          let relatedQuestions: string[] = []
+
           if (perplexityResult) {
-            console.log(`Perplexity returned ${perplexityResult.citations.length} citations`)
+            webCitations = perplexityResult.searchResults as WebCitation[]
+            relatedQuestions = perplexityResult.relatedQuestions || []
+            console.log(`Perplexity research completed: ${webCitations.length} web citations`)
+            webResearchContext = `
+
+--- Current Web Research (from Perplexity) ---
+${perplexityResult.content}
+
+Web Sources:
+${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
+--- End Web Research ---`
           }
 
           const retrievedContext = formatContextForPrompt(chunks)
           const citations = extractCitations(chunks)
 
           // Status: Found sources
-          if (chunks.length > 0 && perplexityResult) {
-            sendStatus(`Found ${chunks.length} sources + web research`)
-          } else if (chunks.length > 0) {
-            sendStatus(`Found ${chunks.length} relevant sources`)
-          } else if (perplexityResult) {
-            sendStatus('Found web research results')
+          if (chunks.length > 0 || webCitations.length > 0) {
+            const sourceCount = chunks.length + webCitations.length
+            sendStatus(`Found ${sourceCount} relevant sources`)
           } else {
             sendStatus('No specific sources found, using general knowledge')
           }
 
-          // Build messages with system prompt and context (including attachments and web research)
+          // Build messages with system prompt and context (including web research and attachments)
           let fullContext = retrievedContext
-          if (perplexityResult) {
-            fullContext += '\n\n--- Web Research (via Perplexity) ---\n' + perplexityResult.content
-            if (perplexityResult.citations.length > 0) {
-              fullContext += '\n\nWeb Sources:\n' + perplexityResult.citations.map((url, i) => `[${i + 1}] ${url}`).join('\n')
-            }
-            fullContext += '\n--- End Web Research ---'
+          if (webResearchContext) {
+            fullContext += webResearchContext
           }
           if (attachmentContext) {
             fullContext += '\n\n--- User Attached Files ---' + attachmentContext
@@ -192,7 +201,7 @@ export async function POST(request: NextRequest) {
           const modelName = getModelDisplayName(model)
           if (hasUrls) {
             sendStatus(`Reading URLs and generating response with ${modelName}...`)
-          } else if (perplexityResult) {
+          } else if (webCitations.length > 0) {
             sendStatus(`Generating response with ${modelName} (with web research)...`)
           } else {
             sendStatus(`Generating response with ${modelName}...`)
@@ -228,10 +237,29 @@ export async function POST(request: NextRequest) {
             ...streamOptions,
           })
 
-          // Send citations
+          // Send citations (RAG sources)
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ type: 'citations', citations })}\n\n`)
           )
+
+          // Send web research data if available (from parallel Perplexity call)
+          const expandedResearchForDb = perplexityResult && webCitations.length > 0
+            ? {
+                content: perplexityResult.content,
+                webCitations,
+                relatedQuestions,
+                researchType: 'quick'
+              }
+            : null
+
+          if (expandedResearchForDb) {
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({
+                type: 'expandedResearch',
+                expandedResearch: expandedResearchForDb
+              })}\n\n`)
+            )
+          }
 
           // Collect full response text while streaming
           let fullResponseText = ''
@@ -254,7 +282,7 @@ export async function POST(request: NextRequest) {
           if (conversationId) {
             console.log(`Saving assistant message to conversation ${conversationId}`)
 
-            // Save assistant message with citations (user message already saved before streaming)
+            // Save assistant message with citations and expanded research
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { data: assistantMsgData, error: assistantMsgError } = await (supabase.from('messages') as any).insert({
               conversation_id: conversationId,
@@ -264,6 +292,7 @@ export async function POST(request: NextRequest) {
               token_count: (usage?.inputTokens || 0) + (usage?.outputTokens || 0) || null,
               latency_ms: latencyMs,
               citations,
+              expanded_research: expandedResearchForDb,
             }).select('id').single()
 
             if (assistantMsgError) {

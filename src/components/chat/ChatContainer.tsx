@@ -45,6 +45,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     statusMessage,
     setStatusMessage,
     setMessageResearching,
+    setExpandedResearch,
     setAbortController,
     abortStreaming,
   } = useChatStore()
@@ -300,6 +301,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                     appendToStream(assistantMessageId, data.content)
                   } else if (data.type === 'citations') {
                     setCitations(assistantMessageId, data.citations)
+                  } else if (data.type === 'expandedResearch') {
+                    setExpandedResearch(assistantMessageId, data.expandedResearch)
                   } else if (data.type === 'done') {
                     receivedDone = true
                     setStatusMessage(null)

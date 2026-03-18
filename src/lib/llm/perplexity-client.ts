@@ -1,48 +1,94 @@
+/**
+ * Perplexity API Client for web research enrichment
+ * Uses OpenAI SDK with Perplexity's API endpoint
+ */
+
 import OpenAI from 'openai'
 
+// Initialize Perplexity client using OpenAI SDK
 const perplexity = new OpenAI({
-  apiKey: process.env.PERPLEXITY_API_KEY!,
-  baseURL: 'https://api.perplexity.ai',
+  apiKey: process.env.PERPLEXITY_API_KEY || '',
+  baseURL: 'https://api.perplexity.ai'
 })
 
-export interface PerplexityResult {
+export interface WebCitation {
+  title: string
+  url: string
+  date?: string
+  snippet?: string
+}
+
+export interface ResearchResult {
   content: string
-  citations: string[]
+  searchResults: WebCitation[]
+  relatedQuestions: string[]
+  usage?: {
+    promptTokens: number
+    completionTokens: number
+    totalTokens: number
+  }
 }
 
 /**
- * Quick web search via Perplexity sonar-pro.
- * Returns synthesized research content + source URLs.
+ * Conduct web research using Perplexity API (quick search with sonar-pro)
+ * Auto-triggered when search-detection.ts detects research triggers or questions
  */
-export async function perplexitySearch(
+export async function conductResearch(
   query: string,
-  options?: { recencyFilter?: 'month' | 'week' | 'day' | 'year' }
-): Promise<PerplexityResult | null> {
-  try {
-    const response = await perplexity.chat.completions.create({
-      model: 'sonar-pro',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a research assistant. Provide factual, well-sourced information. Focus on the most relevant and recent data. Be concise but thorough.',
-        },
-        {
-          role: 'user',
-          content: query,
-        },
-      ],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ...(options?.recencyFilter ? { search_recency_filter: options.recencyFilter } as any : {}),
-    })
+  context?: string,
+): Promise<ResearchResult> {
+  const systemMessage = context
+    ? `You are a research assistant enriching a product marketing response with current web data.
 
-    const content = response.choices[0]?.message?.content || ''
-    // Perplexity returns citations in the response object
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const citations: string[] = (response as any).citations || []
+Original response based on expert PMM knowledge:
+${context}
 
-    return { content, citations }
-  } catch (error) {
-    console.error('Perplexity search error:', error)
-    return null
+Your task: Add fresh statistics, recent examples, current trends, and web citations that complement and enrich this response. Focus on:
+- Recent industry data and statistics (within the last year)
+- Current market trends and developments
+- Real-world examples and case studies
+- Relevant news or announcements
+
+Format your response as additional insights that enhance the original. Do NOT repeat the original content. Only add NEW information with clear source attribution.`
+    : `You are a research assistant providing comprehensive, well-sourced information on product marketing topics. Provide current data, statistics, and examples with clear citations.`
+
+  const response = await perplexity.chat.completions.create({
+    model: 'sonar-pro',
+    messages: [
+      { role: 'system', content: systemMessage },
+      { role: 'user', content: query }
+    ],
+    // @ts-expect-error - Perplexity-specific params not in OpenAI types
+    search_recency_filter: 'month',
+    return_related_questions: true,
+  })
+
+  // Extract search results from response
+  // @ts-expect-error - Perplexity adds search_results to response
+  const searchResults: WebCitation[] = (response.search_results || []).map((result: {
+    title?: string
+    url?: string
+    date?: string
+    snippet?: string
+  }) => ({
+    title: result.title || 'Untitled',
+    url: result.url || '',
+    date: result.date,
+    snippet: result.snippet
+  }))
+
+  // Extract related questions
+  // @ts-expect-error - Perplexity adds related_questions to response
+  const relatedQuestions: string[] = response.related_questions || []
+
+  return {
+    content: response.choices[0]?.message?.content || '',
+    searchResults,
+    relatedQuestions,
+    usage: response.usage ? {
+      promptTokens: response.usage.prompt_tokens,
+      completionTokens: response.usage.completion_tokens,
+      totalTokens: response.usage.total_tokens
+    } : undefined
   }
 }
