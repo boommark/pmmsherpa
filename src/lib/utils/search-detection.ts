@@ -13,7 +13,7 @@ const RESEARCH_TRIGGERS = [
 
   // Current/recent information
   'latest', 'recent', 'current', 'today', 'this week', 'this month',
-  'this year', '2024', '2025', 'now', 'right now', 'currently',
+  'this year', '2024', '2025', '2026', 'now', 'right now', 'currently',
   'up to date', 'up-to-date', 'newest', 'most recent',
 
   // News and events

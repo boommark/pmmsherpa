@@ -1,15 +1,12 @@
 import { NextRequest } from 'next/server'
 import { streamText } from 'ai'
-import { anthropic } from '@ai-sdk/anthropic'
-import { google } from '@ai-sdk/google'
 import { createClient } from '@/lib/supabase/server'
-import { getModel, buildMessages, getModelDisplayName, getDbModelValue, MODEL_CONFIG, type ModelProvider } from '@/lib/llm/provider-factory'
+import { getModel, getProviderTools, buildMessages, getModelDisplayName, getDbModelValue, MODEL_CONFIG, type ModelProvider } from '@/lib/llm/provider-factory'
 import { retrieveContext, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
-import { conductResearch } from '@/lib/llm/perplexity-client'
-import type { ChatAttachment, WebCitation } from '@/types/chat'
+import type { ChatAttachment } from '@/types/chat'
 
 export const runtime = 'nodejs'
-export const maxDuration = 120 // 2 minutes to handle deep research + complex RAG queries
+export const maxDuration = 120 // 2 minutes to handle complex RAG queries
 
 export async function POST(request: NextRequest) {
   const encoder = new TextEncoder()
@@ -23,14 +20,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { message, conversationId, model, attachments, webSearchEnabled, perplexityEnabled, deepResearchEnabled } = body as {
+    const { message, conversationId, model, attachments, webSearchEnabled } = body as {
       message: string
       conversationId?: string
       model: ModelProvider
       attachments?: ChatAttachment[]
       webSearchEnabled?: boolean
-      perplexityEnabled?: boolean
-      deepResearchEnabled?: boolean
     }
 
     if (!model) {
@@ -102,80 +97,31 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // Status: Searching knowledge base (and web if enabled)
+          // Status: Searching knowledge base
           const searchQuery = message || (attachments ? attachments.map(a => a.fileName).join(' ') : '')
 
-          // Run RAG and Perplexity in parallel if Perplexity is enabled
-          if (perplexityEnabled) {
-            sendStatus(deepResearchEnabled
-              ? 'Searching knowledge base and conducting deep research...'
-              : 'Searching knowledge base and web...')
-          } else {
-            sendStatus('Searching PMM knowledge base...')
-          }
+          sendStatus('Searching PMM knowledge base...')
 
           const startRetrieval = Date.now()
 
-          // Build parallel promises
-          const ragPromise = retrieveContext({ query: searchQuery })
-          const perplexityPromise = perplexityEnabled
-            ? conductResearch(
-                searchQuery,
-                undefined, // No context yet - this is the parallel research
-                {
-                  model: deepResearchEnabled ? 'sonar-deep-research' : 'sonar-pro',
-                  recencyFilter: deepResearchEnabled ? 'year' : 'month'
-                }
-              ).catch(err => {
-                console.error('Perplexity parallel research error:', err)
-                return null
-              })
-            : Promise.resolve(null)
-
-          // Execute in parallel
-          const [ragResult, perplexityResult] = await Promise.all([ragPromise, perplexityPromise])
+          const ragResult = await retrieveContext({ query: searchQuery })
 
           const retrievalTime = Date.now() - startRetrieval
           const { chunks } = ragResult
           console.log(`RAG retrieval took ${retrievalTime}ms, found ${chunks.length} chunks`)
-          if (perplexityResult) {
-            console.log(`Perplexity parallel research completed: ${perplexityResult.searchResults.length} web citations`)
-          }
 
           const retrievedContext = formatContextForPrompt(chunks)
           const citations = extractCitations(chunks)
 
-          // Format Perplexity research for inclusion in context
-          let webResearchContext = ''
-          let webCitations: WebCitation[] = []
-          let relatedQuestions: string[] = []
-
-          if (perplexityResult) {
-            webCitations = perplexityResult.searchResults as WebCitation[]
-            relatedQuestions = perplexityResult.relatedQuestions || []
-            webResearchContext = `
-
---- Current Web Research (from Perplexity) ---
-${perplexityResult.content}
-
-Web Sources:
-${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
---- End Web Research ---`
-          }
-
           // Status: Found sources
-          if (chunks.length > 0 || webCitations.length > 0) {
-            const sourceCount = chunks.length + webCitations.length
-            sendStatus(`Found ${sourceCount} relevant sources`)
+          if (chunks.length > 0) {
+            sendStatus(`Found ${chunks.length} relevant sources`)
           } else {
             sendStatus('No specific sources found, using general knowledge')
           }
 
-          // Build messages with system prompt and context (including attachments and web research)
+          // Build messages with system prompt and context (including attachments)
           let fullContext = retrievedContext
-          if (webResearchContext) {
-            fullContext += webResearchContext
-          }
           if (attachmentContext) {
             fullContext += '\n\n--- User Attached Files ---' + attachmentContext
           }
@@ -191,7 +137,6 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
 
           // Get the appropriate model
           const llmModel = getModel(model)
-          const config = MODEL_CONFIG[model]
 
           // Status: Generating response
           const modelName = getModelDisplayName(model)
@@ -217,20 +162,11 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
             temperature: 0.7,
           }
 
-          // Add web search tools based on provider when enabled
+          // When webSearchEnabled, add provider-native tools from centralized config
           if (webSearchEnabled) {
-            if (config.provider === 'anthropic') {
-              // Anthropic Claude uses web_search tool
-              streamOptions.tools = {
-                web_search: anthropic.tools.webSearch_20250305({
-                  maxUses: 5,
-                }),
-              }
-            } else if (config.provider === 'google') {
-              // Google Gemini uses googleSearch tool for grounding
-              streamOptions.tools = {
-                googleSearch: google.tools.googleSearch({}),
-              }
+            const tools = getProviderTools(model)
+            if (tools) {
+              streamOptions.tools = tools
             }
           }
 
@@ -238,39 +174,13 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
             ...streamOptions,
           })
 
-          // Send citations (both RAG and web citations)
+          // Send citations
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ type: 'citations', citations })}\n\n`)
           )
 
-          // Send web research data if available (from parallel Perplexity call)
-          if (perplexityResult && webCitations.length > 0) {
-            const expandedResearch = {
-              content: perplexityResult.content,
-              webCitations,
-              relatedQuestions,
-              researchType: deepResearchEnabled ? 'deep' : 'quick'
-            }
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({
-                type: 'expandedResearch',
-                expandedResearch
-              })}\n\n`)
-            )
-          }
-
           // Collect full response text while streaming
           let fullResponseText = ''
-
-          // Build expanded research object for database storage
-          const expandedResearchForDb = perplexityResult && webCitations.length > 0
-            ? {
-                content: perplexityResult.content,
-                webCitations,
-                relatedQuestions,
-                researchType: deepResearchEnabled ? 'deep' : 'quick'
-              }
-            : null
 
           // Stream text chunks
           for await (const chunk of result.textStream) {
@@ -306,7 +216,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
               console.log('User message saved:', userMessageData?.id)
             }
 
-            // Save assistant message with citations and expanded research
+            // Save assistant message with citations
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { data: assistantMsgData, error: assistantMsgError } = await (supabase.from('messages') as any).insert({
               conversation_id: conversationId,
@@ -316,7 +226,6 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
               token_count: (usage?.inputTokens || 0) + (usage?.outputTokens || 0) || null,
               latency_ms: latencyMs,
               citations,
-              expanded_research: expandedResearchForDb,
             }).select('id').single()
 
             if (assistantMsgError) {

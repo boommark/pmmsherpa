@@ -44,11 +44,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     finishStreaming,
     statusMessage,
     setStatusMessage,
-    webSearchEnabled,
-    perplexityEnabled,
-    deepResearchEnabled,
     setMessageResearching,
-    setExpandedResearch,
     setAbortController,
     abortStreaming,
   } = useChatStore()
@@ -116,26 +112,31 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
     if (conversationId && dbMessages.length > 0) {
       // Sync from DB when we have DB messages
-      const chatMessages: ChatMessage[] = dbMessages.map((m) => ({
-        id: m.id,
-        role: m.role,
-        content: m.content,
-        citations: m.citations,
-        expandedResearch: m.expanded_research || undefined,
-        model: m.model || undefined,
-        createdAt: new Date(m.created_at),
-      }))
+      try {
+        const chatMessages: ChatMessage[] = dbMessages.map((m) => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          citations: m.citations,
+          expandedResearch: m.expanded_research || undefined,
+          model: m.model || undefined,
+          createdAt: new Date(m.created_at),
+        }))
 
-      // Only update if we don't have local messages or DB has more/different messages
-      const currentIds = messages.map(m => m.id).join(',')
-      const newIds = chatMessages.map(m => m.id).join(',')
+        // Only update if we don't have local messages or DB has more/different messages
+        const currentIds = messages.map(m => m.id).join(',')
+        const newIds = chatMessages.map(m => m.id).join(',')
 
-      if (messages.length === 0 || (currentIds !== newIds && dbMessages.length >= messages.length)) {
-        console.log('Setting messages from DB:', chatMessages.length)
-        setMessages(chatMessages)
-        setConversationId(conversationId)
-        setHasInitialized(true)
-      } else if (!hasInitialized) {
+        if (messages.length === 0 || (currentIds !== newIds && dbMessages.length >= messages.length)) {
+          console.log('Setting messages from DB:', chatMessages.length)
+          setMessages(chatMessages)
+          setConversationId(conversationId)
+          setHasInitialized(true)
+        } else if (!hasInitialized) {
+          setHasInitialized(true)
+        }
+      } catch (err) {
+        console.error('Error parsing messages:', err)
         setHasInitialized(true)
       }
     } else if (!conversationId && !hasInitialized) {
@@ -163,10 +164,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     isStreamingRef.current = true
 
     // Intelligently auto-enable web search if URLs or research triggers detected
-    // Only auto-enable if not already manually enabled
     const searchDetection = shouldAutoEnableWebSearch(content)
-    const autoWebSearch = searchDetection.shouldEnable && !webSearchEnabled
-    if (autoWebSearch) {
+    if (searchDetection.shouldEnable) {
       console.log(`Auto-enabling web search (reason: ${searchDetection.reason})`)
     }
 
@@ -223,8 +222,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       setAbortController(abortController)
 
       // Send to API with attachments
-      // Use auto-detected web search OR manually enabled web search
-      const effectiveWebSearch = webSearchEnabled || autoWebSearch
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -233,9 +230,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           conversationId: activeConversationId,
           model: currentModel,
           attachments: chatAttachments,
-          webSearchEnabled: effectiveWebSearch,
-          perplexityEnabled,
-          deepResearchEnabled,
+          webSearchEnabled: searchDetection.shouldEnable,
         }),
         signal: abortController.signal,
       })
@@ -303,9 +298,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                     appendToStream(assistantMessageId, data.content)
                   } else if (data.type === 'citations') {
                     setCitations(assistantMessageId, data.citations)
-                  } else if (data.type === 'expandedResearch') {
-                    // Handle Perplexity expanded research
-                    setExpandedResearch(assistantMessageId, data.expandedResearch)
                   } else if (data.type === 'done') {
                     receivedDone = true
                     setStatusMessage(null)
@@ -378,10 +370,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setConversationId,
     createConversation,
     router,
-    webSearchEnabled,
-    perplexityEnabled,
-    deepResearchEnabled,
-    setExpandedResearch,
     setAbortController,
   ])
 
@@ -391,39 +379,24 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     chatInputRef.current?.setInput(content)
   }, [])
 
-  // Handle expanding a message with web research
-  const handleExpandWithResearch = useCallback(async (messageId: string, content: string, deepResearch: boolean) => {
-    setMessageResearching(messageId, true)
-    try {
-      const response = await fetch('/api/research', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messageId,
-          originalContent: content,
-          query: content,
-          deepResearch
-        })
-      })
-
-      const data = await response.json()
-
-      if (data.success && data.expandedResearch) {
-        setExpandedResearch(messageId, data.expandedResearch)
-      } else {
-        console.error('Research failed:', data.error)
-      }
-    } catch (error) {
-      console.error('Research request failed:', error)
-    } finally {
-      setMessageResearching(messageId, false)
-    }
-  }, [setMessageResearching, setExpandedResearch])
-
   // Show loading state when:
   // 1. We have a conversationId and messages are loading, OR
   // 2. We have a conversationId but haven't initialized yet (waiting for DB sync)
   const showLoadingState = conversationId && (messagesLoading || !hasInitialized) && messages.length === 0
+
+  // Loading timeout - show error state if loading takes too long
+  const [loadingTimedOut, setLoadingTimedOut] = useState(false)
+
+  useEffect(() => {
+    if (showLoadingState) {
+      const timeout = setTimeout(() => {
+        setLoadingTimedOut(true)
+      }, 10000) // 10 seconds
+      return () => clearTimeout(timeout)
+    } else {
+      setLoadingTimedOut(false)
+    }
+  }, [showLoadingState])
 
   return (
     <div className="flex flex-col h-full overflow-hidden relative">
@@ -431,13 +404,31 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       {messages.length === 0 && !conversationId && <BlobBackground />}
 
       {showLoadingState ? (
-        // Loading state for existing conversations
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-muted-foreground text-sm">Loading conversation...</p>
+        loadingTimedOut ? (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-3 text-center px-6">
+              <p className="text-muted-foreground text-sm">This conversation is taking too long to load.</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => { setLoadingTimedOut(false); setHasInitialized(false) }}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Try again
+                </button>
+                <a href="/chat" className="text-sm text-primary hover:underline">
+                  New chat
+                </a>
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-muted-foreground text-sm">Loading conversation...</p>
+            </div>
+          </div>
+        )
       ) : messages.length === 0 && !conversationId ? (
         <div className="flex-1 flex flex-col">
           {/* Top section with orb and greeting - smaller on mobile, centered on desktop */}
@@ -519,7 +510,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
               messages={messages}
               statusMessage={statusMessage}
               onEditPrompt={handleEditPrompt}
-              onExpandWithResearch={handleExpandWithResearch}
             />
           </div>
           <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />

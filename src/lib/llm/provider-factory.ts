@@ -1,51 +1,42 @@
 import { createAnthropic } from '@ai-sdk/anthropic'
+import { anthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
+import { google } from '@ai-sdk/google'
+import { createXai, xai } from '@ai-sdk/xai'
 import { getSystemPromptWithContext } from './system-prompt'
 
-// All available model providers (Anthropic and Google only)
+// All available model providers
 export type ModelProvider =
-  | 'claude-opus'
   | 'claude-sonnet'
-  | 'gemini-3-pro'
-  | 'gemini-2.5-thinking'
+  | 'gemini-2.5-pro'
+  | 'grok-4.1-fast'
 
 export const MODEL_CONFIG = {
-  'claude-opus': {
-    id: 'claude-opus-4-5-20251101',
-    name: 'Claude Opus 4.5',
-    provider: 'anthropic',
-    maxTokens: 64000,
-    isThinking: false,
-    color: 'bg-orange-500',
-    // Claude uses web_search tool type
-    webSearchSupported: true,
-  },
   'claude-sonnet': {
-    id: 'claude-sonnet-4-5-20250929',
-    name: 'Claude Sonnet 4.5',
+    id: 'claude-sonnet-4-6-20250929',
+    name: 'Claude Sonnet 4.6',
     provider: 'anthropic',
     maxTokens: 64000,
     isThinking: false,
     color: 'bg-orange-400',
     webSearchSupported: true,
   },
-  'gemini-3-pro': {
-    id: 'gemini-3-pro-preview',
-    name: 'Gemini 3 Pro',
+  'gemini-2.5-pro': {
+    id: 'gemini-2.5-pro-preview-05-06',
+    name: 'Gemini 2.5 Pro',
     provider: 'google',
     maxTokens: 64000,
     isThinking: false,
     color: 'bg-blue-500',
-    // Gemini uses google_search grounding
     webSearchSupported: true,
   },
-  'gemini-2.5-thinking': {
-    id: 'gemini-2.5-pro',
-    name: 'Gemini 2.5 Pro (Thinking)',
-    provider: 'google',
+  'grok-4.1-fast': {
+    id: 'grok-4.1-fast',
+    name: 'Grok 4.1 Fast',
+    provider: 'xai',
     maxTokens: 64000,
-    isThinking: true,
-    color: 'bg-blue-600',
+    isThinking: false,
+    color: 'bg-gray-700',
     webSearchSupported: true,
   },
 } as const
@@ -62,15 +53,46 @@ export function getGoogleClient() {
   })
 }
 
+export function getXaiClient() {
+  return createXai({
+    apiKey: process.env.XAI_API_KEY!,
+  })
+}
+
 export function getModel(provider: ModelProvider) {
   const config = MODEL_CONFIG[provider]
 
   if (config.provider === 'anthropic') {
-    const anthropic = getAnthropicClient()
-    return anthropic(config.id)
+    const client = getAnthropicClient()
+    return client(config.id)
+  } else if (config.provider === 'google') {
+    const client = getGoogleClient()
+    return client(config.id)
   } else {
-    const google = getGoogleClient()
-    return google(config.id)
+    const client = getXaiClient()
+    return client(config.id)
+  }
+}
+
+// Returns provider-native web search + URL reading tools
+export function getProviderTools(provider: ModelProvider) {
+  const config = MODEL_CONFIG[provider]
+
+  if (config.provider === 'anthropic') {
+    return {
+      web_search: anthropic.tools.webSearch_20250305({ maxUses: 3 }),
+      web_fetch: anthropic.tools.webFetch_20250910({ maxUses: 5 }),
+    }
+  } else if (config.provider === 'google') {
+    return {
+      googleSearch: google.tools.googleSearch({}),
+      urlContext: google.tools.urlContext({}),
+    }
+  } else {
+    // xAI provider - uses webSearch tool for web grounding
+    return {
+      webSearch: xai.tools.webSearch(),
+    }
   }
 }
 
@@ -127,11 +149,12 @@ export function isThinkingModel(provider: ModelProvider): boolean {
 }
 
 // Database model type for storage
-export type DbModelValue = 'claude' | 'gemini'
+export type DbModelValue = 'claude' | 'gemini' | 'grok'
 
 // For database storage - maps new provider keys to simplified db values
 export function getDbModelValue(provider: ModelProvider): DbModelValue {
   const config = MODEL_CONFIG[provider]
   if (config.provider === 'anthropic') return 'claude'
+  if (config.provider === 'xai') return 'grok'
   return 'gemini'
 }

@@ -22,11 +22,15 @@ interface ModelSelectorProps {
 const modelGroups = {
   anthropic: {
     label: 'Anthropic',
-    models: ['claude-opus', 'claude-sonnet'] as ModelProvider[],
+    models: ['claude-sonnet'] as ModelProvider[],
   },
   google: {
     label: 'Google',
-    models: ['gemini-3-pro', 'gemini-2.5-thinking'] as ModelProvider[],
+    models: ['gemini-2.5-pro'] as ModelProvider[],
+  },
+  xai: {
+    label: 'xAI',
+    models: ['grok-4.1-fast'] as ModelProvider[],
   },
 }
 
