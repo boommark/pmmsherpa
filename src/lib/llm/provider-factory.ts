@@ -84,10 +84,10 @@ export function getProviderTools(provider: ModelProvider) {
       web_fetch: anthropic.tools.webFetch_20250910({ maxUses: 5 }),
     }
   } else if (config.provider === 'google') {
-    return {
-      googleSearch: google.tools.googleSearch({}),
-      urlContext: google.tools.urlContext({}),
-    }
+    // Google grounding tools (googleSearch, urlContext) cause the Gemini API to hang
+    // indefinitely with gemini-2.5-pro-preview. Disabled until stable model release.
+    // Gemini still has strong general knowledge for research queries via RAG context.
+    return null
   } else {
     // xAI provider - uses webSearch tool for web grounding
     return {
