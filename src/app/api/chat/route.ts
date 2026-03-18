@@ -135,6 +135,22 @@ export async function POST(request: NextRequest) {
           )
           console.log(`Total messages being sent to LLM: ${allMessages.length} (${conversationHistory.length} history + 1 new)`)
 
+          // Save user message to DB immediately (before streaming)
+          // This prevents orphaned conversations when streaming fails
+          if (conversationId) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: userMsgError } = await (supabase.from('messages') as any).insert({
+              conversation_id: conversationId,
+              role: 'user',
+              content: message || '[Attachments only]',
+              model: null,
+              citations: [],
+            })
+            if (userMsgError) {
+              console.error('Error saving user message:', userMsgError)
+            }
+          }
+
           // Get the appropriate model
           const llmModel = getModel(model)
 
@@ -167,6 +183,9 @@ export async function POST(request: NextRequest) {
             const tools = getProviderTools(model)
             if (tools) {
               streamOptions.tools = tools
+              // maxSteps allows the model to make tool calls and then generate text
+              // Without this, streamText stops after the first tool call
+              streamOptions.maxSteps = 5
             }
           }
 
@@ -198,25 +217,9 @@ export async function POST(request: NextRequest) {
           const latencyMs = Date.now() - startLLM
 
           if (conversationId) {
-            console.log(`Saving messages to conversation ${conversationId}`)
+            console.log(`Saving assistant message to conversation ${conversationId}`)
 
-            // Save user message
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { data: userMessageData, error: userMsgError } = await (supabase.from('messages') as any).insert({
-              conversation_id: conversationId,
-              role: 'user',
-              content: message || '[Attachments only]',
-              model: null,
-              citations: [],
-            }).select('id').single()
-
-            if (userMsgError) {
-              console.error('Error saving user message:', userMsgError)
-            } else {
-              console.log('User message saved:', userMessageData?.id)
-            }
-
-            // Save assistant message with citations
+            // Save assistant message with citations (user message already saved before streaming)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { data: assistantMsgData, error: assistantMsgError } = await (supabase.from('messages') as any).insert({
               conversation_id: conversationId,
@@ -265,8 +268,9 @@ export async function POST(request: NextRequest) {
           controller.close()
         } catch (error) {
           console.error('Chat API streaming error:', error)
+          const errorMsg = error instanceof Error ? error.message : 'An error occurred while generating the response'
           controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ type: 'error', message: 'An error occurred while generating the response' })}\n\n`)
+            encoder.encode(`data: ${JSON.stringify({ type: 'error', message: errorMsg })}\n\n`)
           )
           controller.close()
         }
