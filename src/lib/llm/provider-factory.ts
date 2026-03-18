@@ -22,7 +22,7 @@ export const MODEL_CONFIG = {
     webSearchSupported: true,
   },
   'gemini-2.5-pro': {
-    id: 'gemini-2.5-pro-preview-05-06',
+    id: 'gemini-2.5-pro',
     name: 'Gemini 2.5 Pro',
     provider: 'google',
     maxTokens: 64000,
@@ -75,21 +75,32 @@ export function getModel(provider: ModelProvider) {
 }
 
 // Returns provider-native web search + URL reading tools
-export function getProviderTools(provider: ModelProvider) {
+// hasUrls: whether the user message contains URLs (affects tool selection for Gemini)
+export function getProviderTools(provider: ModelProvider, hasUrls: boolean = false) {
   const config = MODEL_CONFIG[provider]
 
   if (config.provider === 'anthropic') {
+    // Claude: webSearch is server-side (searches web), webFetch reads specific URLs
+    // Both are server-side tools that execute within a single turn (no maxSteps needed)
     return {
       web_search: anthropic.tools.webSearch_20250305({ maxUses: 3 }),
       web_fetch: anthropic.tools.webFetch_20250910({ maxUses: 5 }),
     }
   } else if (config.provider === 'google') {
-    // Google grounding tools (googleSearch, urlContext) cause the Gemini API to hang
-    // indefinitely with gemini-2.5-pro-preview. Disabled until stable model release.
-    // Gemini still has strong general knowledge for research queries via RAG context.
-    return null
+    // Gemini: googleSearch and urlContext are grounding tools
+    // Per Google docs: urlContext CANNOT be combined with function calling
+    // googleSearch and urlContext should not be used together (causes hanging)
+    // Choose based on whether URLs are present in the message
+    if (hasUrls) {
+      return {
+        urlContext: google.tools.urlContext({}),
+      }
+    }
+    return {
+      googleSearch: google.tools.googleSearch({}),
+    }
   } else {
-    // xAI provider - uses webSearch tool for web grounding
+    // xAI/Grok: webSearch is a server-side tool
     return {
       webSearch: xai.tools.webSearch(),
     }

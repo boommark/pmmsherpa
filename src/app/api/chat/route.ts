@@ -20,12 +20,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { message, conversationId, model, attachments, webSearchEnabled } = body as {
+    const { message, conversationId, model, attachments, webSearchEnabled, hasUrls } = body as {
       message: string
       conversationId?: string
       model: ModelProvider
       attachments?: ChatAttachment[]
       webSearchEnabled?: boolean
+      hasUrls?: boolean
     }
 
     if (!model) {
@@ -178,14 +179,13 @@ export async function POST(request: NextRequest) {
             temperature: 0.7,
           }
 
-          // When webSearchEnabled, add provider-native tools from centralized config
+          // When webSearchEnabled, add provider-native tools
+          // These are server-side/grounding tools (not regular function-calling tools)
+          // so they do NOT need maxSteps — they execute within a single turn
           if (webSearchEnabled) {
-            const tools = getProviderTools(model)
+            const tools = getProviderTools(model, hasUrls || false)
             if (tools) {
               streamOptions.tools = tools
-              // maxSteps allows the model to make tool calls and then generate text
-              // Without this, streamText stops after the first tool call
-              streamOptions.maxSteps = 5
             }
           }
 
