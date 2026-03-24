@@ -47,4 +47,3 @@ __pycache__/
 .venv/
 .env*.local
 .vercel-token.txt
-.gstack/

@@ -2,19 +2,6 @@
 
 > **Read this file at the start of every session to understand the project.**
 
-## gstack Development Workflow
-
-Available slash commands for end-to-end development:
-
-| Phase | Commands |
-|-------|----------|
-| Plan | `/plan-ceo-review`, `/plan-eng-review`, `/plan-design-review`, `/design-consultation` |
-| Review | `/review` (code review) |
-| Test | `/browse` (headless browser), `/qa` (test+fix), `/qa-only` (report only), `/qa-design-review` |
-| Ship | `/ship` (release pipeline), `/document-release` (post-ship docs) |
-| Reflect | `/retro` (weekly retrospective) |
-| Setup | `/setup-browser-cookies` (import auth sessions for `/browse`) |
-
 ## Quick Start
 
 ```bash
@@ -28,8 +15,8 @@ npx vercel --prod  # Deploy to production
 
 **PMMSherpa** is an AI-powered Product Marketing assistant that combines:
 - **RAG Knowledge Base**: 15,985 chunks from 17 PMM books, 781 PMA blogs, 485 Sharebird AMAs
-- **Multi-Model Support**: Claude Sonnet 4.6, Gemini 2.5 Pro, Grok 4.1 Fast
-- **Web Search**: Auto-detected provider-native web search + URL reading
+- **Multi-Model Support**: Claude Opus 4.5, Claude Sonnet 4.5, Gemini 3 Pro, Gemini 2.5 Pro (Thinking)
+- **Web Search**: Provider-native web search (Anthropic web_search, Google googleSearch)
 - **Streaming Responses**: Real-time SSE with status updates and citations
 
 **Live URL**: https://pmmsherpa.com (custom domain)
@@ -45,10 +32,8 @@ npx vercel --prod  # Deploy to production
 | Framework | Next.js 16 (App Router) | TypeScript, Turbopack |
 | Database | Supabase PostgreSQL + pgvector | Project: Flytr |
 | Auth | Supabase Auth | Email/password |
-| LLM (Anthropic) | Claude Sonnet 4.6 | `claude-sonnet-4-6-20250929` |
-| LLM (Google) | Gemini 2.5 Pro | `gemini-2.5-pro-preview-05-06` |
-| LLM (xAI) | Grok 4.1 Fast | `grok-4.1-fast` |
-| Web Research | Provider-native | Auto-detected web search + URL reading |
+| LLM (Anthropic) | Claude Opus 4.5, Claude Sonnet 4.5 | `claude-opus-4-5-20251101`, `claude-sonnet-4-5-20250929` |
+| LLM (Google) | Gemini 3 Pro, Gemini 2.5 Pro (Thinking) | `gemini-3-pro-preview`, `gemini-2.5-pro` |
 | Embeddings | OpenAI | `text-embedding-3-small` (512 dim) |
 | UI | Tailwind CSS + shadcn/ui | Dark mode supported |
 | State | Zustand | `src/stores/chatStore.ts` |
@@ -71,8 +56,6 @@ npx vercel --prod  # Deploy to production
 - `src/components/chat/SourceCitations.tsx` - Collapsible citation display
 - `src/components/chat/StatusIndicator.tsx` - Loading status messages
 - `src/components/chat/ModelSelector.tsx` - Claude/Gemini toggle
-- `src/app/(dashboard)/chat/error.tsx` - Error boundary
-- `src/app/(dashboard)/chat/[conversationId]/error.tsx` - Error boundary
 
 ### RAG System
 - `src/lib/rag/retrieval.ts` - Hybrid search (70% semantic + 30% keyword)
@@ -81,7 +64,6 @@ npx vercel --prod  # Deploy to production
 ### LLM Integration
 - `src/lib/llm/provider-factory.ts` - LLM provider abstraction
 - `src/lib/llm/system-prompt.ts` - PMM expert system prompt
-- `src/lib/utils/search-detection.ts` - Smart web search auto-detection
 
 ### Database
 - `src/lib/supabase/server.ts` - Server-side Supabase client
@@ -107,9 +89,6 @@ npx vercel --prod  # Deploy to production
 ### Types
 - `src/types/database.ts` - Database types (Citation, Message, etc.)
 - `src/types/chat.ts` - Chat types (ChatMessage, RetrievedChunk, etc.)
-
-### Testing
-- `vitest.config.ts` - Test configuration
 
 ---
 
@@ -148,13 +127,15 @@ SUPABASE_SERVICE_ROLE_KEY=...
 # LLM Providers
 ANTHROPIC_API_KEY=sk-ant-...
 GOOGLE_API_KEY=AIza...
-XAI_API_KEY=xai-...
 
 # Embeddings
 OPENAI_API_KEY=sk-...
 
 # Email (Resend - for transactional emails)
 RESEND_API_KEY=re_...
+
+# Web Research (Perplexity)
+PERPLEXITY_API_KEY=pplx-...
 
 # App
 NEXT_PUBLIC_APP_URL=https://pmmsherpa.com
@@ -172,16 +153,19 @@ VERCEL_TOKEN=rQeCMwL63rT10pN5NpA2iBov
 ```
 User Message → POST /api/chat
     ↓
-1. Auto-detect web search need (URLs, research triggers)
+1. Generate query embedding (OpenAI)
     ↓
-2. Generate query embedding → Hybrid search RAG
+2. Hybrid search RAG (Supabase pgvector)
     ↓
-3. Build prompt with system instructions + RAG context
+3. Build prompt with system instructions + context
     ↓
-4. Stream response with provider-native tools
-   (web search + URL reading if auto-detected)
+4. Stream response (Claude/Gemini)
     ↓
-5. SSE Events: status → citations → text → done
+5. SSE Events:
+   - { type: "status", message: "Searching..." }
+   - { type: "citations", citations: [...] }
+   - { type: "text", content: "..." }
+   - { type: "done" }
 ```
 
 ---
@@ -381,41 +365,6 @@ git add -A && git commit -m "message" && git push origin main
 ---
 
 ## Change Log
-
-### March 17, 2026 — Model Refresh, Auto Web Search, Perplexity Removal
-
-**Model Lineup Refresh:**
-- Replaced 4 models with 3: Claude Sonnet 4.6, Gemini 2.5 Pro, Grok 4.1 Fast
-- Removed: Claude Opus 4.5 (expensive), Gemini 3 Pro (deprecated), Gemini 2.5 Pro Thinking
-- Added xAI/Grok support via @ai-sdk/xai
-
-**Auto Web Search + URL Reading:**
-- Web search is now auto-detected based on user message content (URLs, research triggers, questions)
-- Removed manual Globe toggle and Perplexity dropdown from ChatInput
-- Native provider tools handle web search and URL reading:
-  - Claude: webSearch + webFetch (reads URLs and PDFs)
-  - Gemini: googleSearch + urlContext (reads URLs)
-  - Grok: webSearch (built-in web grounding)
-
-**Perplexity Removed:**
-- Removed Perplexity parallel research (was $5/1K searches)
-- Native provider tools are free (token cost only) and more reliable
-- Deleted: perplexity-client.ts, /api/research, ExpandedResearch.tsx, PerplexityIcon.tsx
-
-**Error Handling:**
-- Added error.tsx error boundaries for chat routes
-- Loading timeout: shows error after 10s instead of infinite spinner
-- Defensive parsing for historical message data
-
-**Testing:**
-- Added Vitest with 48 unit tests for search-detection.ts
-- Created vitest.config.ts
-
-**Files Created:** error.tsx (x2), search-detection.test.ts, vitest.config.ts
-**Files Deleted:** perplexity-client.ts, research/route.ts, ExpandedResearch.tsx, PerplexityIcon.tsx
-**Files Modified:** provider-factory.ts, route.ts, ChatContainer.tsx, ChatInput.tsx, chatStore.ts, MessageBubble.tsx, MessageList.tsx, ModelSelector.tsx, preferences/page.tsx, database.ts
-
----
 
 ### December 13, 2025 - Perplexity Research Integration v2 (Parallel + Dropdown)
 

@@ -54,21 +54,17 @@ function applyTheme(theme: 'light' | 'dark' | 'system') {
 const modelGroups = {
   anthropic: {
     label: 'Anthropic',
-    models: ['claude-sonnet'] as ModelProvider[],
+    models: ['claude-opus', 'claude-sonnet'] as ModelProvider[],
   },
   google: {
     label: 'Google',
-    models: ['gemini-2.5-pro'] as ModelProvider[],
-  },
-  xai: {
-    label: 'xAI',
-    models: ['grok-4.1-fast'] as ModelProvider[],
+    models: ['gemini-3-pro', 'gemini-2.5-thinking'] as ModelProvider[],
   },
 }
 
 export default function PreferencesPage() {
   const { profile, loading, updateProfile } = useProfile()
-  const [preferredModel, setPreferredModel] = useState<ModelProvider>('gemini-2.5-pro')
+  const [preferredModel, setPreferredModel] = useState<ModelProvider>('claude-opus')
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system')
   const [voicePreference, setVoicePreference] = useState<TTSVoice>('nova')
   const [saving, setSaving] = useState(false)
@@ -82,9 +78,8 @@ export default function PreferencesPage() {
     if (profile) {
       // Map old db values to new model keys for backward compatibility
       const dbModel = profile.preferred_model
-      if (dbModel === 'claude') setPreferredModel('claude-sonnet')
-      else if (dbModel === 'gemini') setPreferredModel('gemini-2.5-pro')
-      else if (dbModel === 'grok') setPreferredModel('grok-4.1-fast')
+      if (dbModel === 'claude') setPreferredModel('claude-opus')
+      else if (dbModel === 'gemini') setPreferredModel('gemini-3-pro')
       else setPreferredModel(dbModel as ModelProvider)
       setTheme(profile.theme)
       applyTheme(profile.theme)

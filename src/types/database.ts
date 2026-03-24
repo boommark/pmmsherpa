@@ -6,7 +6,7 @@ export interface Profile {
   email: string;
   full_name: string | null;
   avatar_url: string | null;
-  preferred_model: 'claude' | 'gemini' | 'grok' | 'openai';
+  preferred_model: 'claude' | 'gemini' | 'openai';
   theme: 'light' | 'dark' | 'system';
   voice_preference: TTSVoice;
   created_at: string;
@@ -17,7 +17,7 @@ export interface Conversation {
   id: string;
   user_id: string;
   title: string;
-  model_used: 'claude' | 'gemini' | 'grok' | 'openai';
+  model_used: 'claude' | 'gemini' | 'openai';
   message_count: number;
   is_archived: boolean;
   created_at: string;

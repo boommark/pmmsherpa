@@ -6,6 +6,11 @@ import type { ModelProvider } from '@/lib/llm/provider-factory'
 interface ChatStore extends ChatState {
   // Status message for inline updates
   statusMessage: string | null
+  // Web search toggle
+  webSearchEnabled: boolean
+  // Perplexity research toggles
+  perplexityEnabled: boolean
+  deepResearchEnabled: boolean
   // Abort controller for canceling streaming
   abortController: AbortController | null
   // Actions
@@ -19,6 +24,9 @@ interface ChatStore extends ChatState {
   setCurrentModel: (model: ModelProvider) => void
   setConversationId: (id: string | null) => void
   setStatusMessage: (message: string | null) => void
+  setWebSearchEnabled: (enabled: boolean) => void
+  setPerplexityEnabled: (enabled: boolean) => void
+  setDeepResearchEnabled: (enabled: boolean) => void
   // Streaming helpers
   startStreaming: (messageId: string) => void
   appendToStream: (messageId: string, content: string) => void
@@ -37,9 +45,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
   isLoading: false,
   error: null,
-  currentModel: 'gemini-2.5-pro',
+  currentModel: 'claude-opus',
   conversationId: null,
   statusMessage: null,
+  webSearchEnabled: false,
+  perplexityEnabled: false,
+  deepResearchEnabled: false,
   abortController: null,
 
   // Actions
@@ -73,6 +84,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   setConversationId: (conversationId) => set({ conversationId }),
 
   setStatusMessage: (statusMessage) => set({ statusMessage }),
+
+  setWebSearchEnabled: (webSearchEnabled) => set({ webSearchEnabled }),
+
+  setPerplexityEnabled: (perplexityEnabled) => set({ perplexityEnabled }),
+
+  setDeepResearchEnabled: (deepResearchEnabled) => set({ deepResearchEnabled }),
 
   // Abort controller
   setAbortController: (abortController) => set({ abortController }),

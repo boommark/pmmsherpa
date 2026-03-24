@@ -11,11 +11,20 @@ const perplexity = new OpenAI({
   baseURL: 'https://api.perplexity.ai'
 })
 
+export type PerplexityModel = 'sonar-pro' | 'sonar-deep-research'
+
 export interface WebCitation {
   title: string
   url: string
   date?: string
   snippet?: string
+}
+
+export interface ResearchOptions {
+  model?: PerplexityModel
+  recencyFilter?: 'day' | 'week' | 'month' | 'year'
+  domainFilter?: string[]
+  returnImages?: boolean
 }
 
 export interface ResearchResult {
@@ -30,13 +39,19 @@ export interface ResearchResult {
 }
 
 /**
- * Conduct web research using Perplexity API (quick search with sonar-pro)
- * Auto-triggered when search-detection.ts detects research triggers or questions
+ * Conduct web research using Perplexity API
+ * @param query - The research query/question
+ * @param context - Optional context from previous response to enrich
+ * @param options - Research options (model, filters, etc.)
  */
 export async function conductResearch(
   query: string,
   context?: string,
+  options: ResearchOptions = {}
 ): Promise<ResearchResult> {
+  const model = options.model || 'sonar-pro'
+
+  // Build system message for enrichment context
   const systemMessage = context
     ? `You are a research assistant enriching a product marketing response with current web data.
 
@@ -53,13 +68,16 @@ Format your response as additional insights that enhance the original. Do NOT re
     : `You are a research assistant providing comprehensive, well-sourced information on product marketing topics. Provide current data, statistics, and examples with clear citations.`
 
   const response = await perplexity.chat.completions.create({
-    model: 'sonar-pro',
+    model,
     messages: [
       { role: 'system', content: systemMessage },
       { role: 'user', content: query }
     ],
-    // @ts-expect-error - Perplexity-specific params not in OpenAI types
-    search_recency_filter: 'month',
+    // Perplexity-specific parameters (not in OpenAI types)
+    // @ts-expect-error - Perplexity-specific params
+    search_recency_filter: options.recencyFilter || 'month',
+    search_domain_filter: options.domainFilter,
+    return_images: options.returnImages || false,
     return_related_questions: true,
   })
 
@@ -91,4 +109,24 @@ Format your response as additional insights that enhance the original. Do NOT re
       totalTokens: response.usage.total_tokens
     } : undefined
   }
+}
+
+/**
+ * Quick research - fast, focused results
+ */
+export async function quickResearch(query: string, context?: string): Promise<ResearchResult> {
+  return conductResearch(query, context, {
+    model: 'sonar-pro',
+    recencyFilter: 'month'
+  })
+}
+
+/**
+ * Deep research - comprehensive, thorough analysis
+ */
+export async function deepResearch(query: string, context?: string): Promise<ResearchResult> {
+  return conductResearch(query, context, {
+    model: 'sonar-deep-research',
+    recencyFilter: 'year'
+  })
 }
