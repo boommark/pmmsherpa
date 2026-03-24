@@ -12,7 +12,7 @@ _Last updated: 2026-03-24_
 
 ## Up Next
 
-- [ ] **URL scraping** — When user pastes a URL, fetch content via Jina Reader (`r.jina.ai/URL`), inject as context. Firecrawl as fallback. Remove broken native LLM URL reading.
+- [x] **URL scraping** — When user pastes a URL, fetch content via Jina Reader (`r.jina.ai/URL`), inject as context. Firecrawl as fallback. Remove broken native LLM URL reading.
 - [ ] **Telemetry dashboard** — `/admin/analytics` page: conversations per user, tokens by model, DAU/WAU. Audit whether `usage_logs` is being written on every chat call first.
 
 ---
