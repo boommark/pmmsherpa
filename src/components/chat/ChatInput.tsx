@@ -235,9 +235,9 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                     ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-800/40'
                     : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50'
                 }`}
-                title={perplexityEnabled ? 'Research enabled' : 'Enable research'}
+                title={perplexityEnabled ? 'Research with Perplexity (on)' : 'Research with Perplexity'}
               >
-                <PerplexityIcon size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <PerplexityIcon size={18} className="sm:w-[20px] sm:h-[20px]" />
               </Button>
 
               <textarea
