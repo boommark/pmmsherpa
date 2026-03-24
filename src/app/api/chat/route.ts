@@ -321,11 +321,12 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error: usageError } = await (supabase.from('usage_logs') as any).insert({
             user_id: user.id,
+            conversation_id: conversationId || null,
             model: dbModel,
             input_tokens: usage?.inputTokens || 0,
             output_tokens: usage?.outputTokens || 0,
+            total_tokens: (usage?.inputTokens || 0) + (usage?.outputTokens || 0),
             latency_ms: latencyMs,
-            endpoint: '/api/chat',
           })
 
           if (usageError) {
