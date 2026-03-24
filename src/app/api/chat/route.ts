@@ -1,15 +1,13 @@
 import { NextRequest } from 'next/server'
 import { streamText } from 'ai'
-import { anthropic } from '@ai-sdk/anthropic'
-import { google } from '@ai-sdk/google'
 import { createClient } from '@/lib/supabase/server'
-import { getModel, buildMessages, getModelDisplayName, getDbModelValue, MODEL_CONFIG, type ModelProvider } from '@/lib/llm/provider-factory'
+import { getModel, buildMessages, getModelDisplayName, getDbModelValue, type ModelProvider } from '@/lib/llm/provider-factory'
 import { retrieveContext, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
 import { conductResearch } from '@/lib/llm/perplexity-client'
 import type { ChatAttachment, WebCitation } from '@/types/chat'
 
 export const runtime = 'nodejs'
-export const maxDuration = 120 // 2 minutes to handle deep research + complex RAG queries
+export const maxDuration = 60
 
 export async function POST(request: NextRequest) {
   const encoder = new TextEncoder()
@@ -23,14 +21,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { message, conversationId, model, attachments, webSearchEnabled, perplexityEnabled, deepResearchEnabled } = body as {
+    const { message, conversationId, model, attachments, perplexityEnabled } = body as {
       message: string
       conversationId?: string
       model: ModelProvider
       attachments?: ChatAttachment[]
-      webSearchEnabled?: boolean
       perplexityEnabled?: boolean
-      deepResearchEnabled?: boolean
     }
 
     if (!model) {
@@ -105,11 +101,9 @@ export async function POST(request: NextRequest) {
           // Status: Searching knowledge base (and web if enabled)
           const searchQuery = message || (attachments ? attachments.map(a => a.fileName).join(' ') : '')
 
-          // Run RAG and Perplexity in parallel if Perplexity is enabled
+          // Run RAG and Perplexity in parallel if research is enabled
           if (perplexityEnabled) {
-            sendStatus(deepResearchEnabled
-              ? 'Searching knowledge base and conducting deep research...'
-              : 'Searching knowledge base and web...')
+            sendStatus('Searching knowledge base and web...')
           } else {
             sendStatus('Searching PMM knowledge base...')
           }
@@ -123,8 +117,8 @@ export async function POST(request: NextRequest) {
                 searchQuery,
                 undefined, // No context yet - this is the parallel research
                 {
-                  model: deepResearchEnabled ? 'sonar-deep-research' : 'sonar-pro',
-                  recencyFilter: deepResearchEnabled ? 'year' : 'month'
+                  model: 'sonar-pro',
+                  recencyFilter: 'month'
                 }
               ).catch(err => {
                 console.error('Perplexity parallel research error:', err)
@@ -191,15 +185,10 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
 
           // Get the appropriate model
           const llmModel = getModel(model)
-          const config = MODEL_CONFIG[model]
 
           // Status: Generating response
           const modelName = getModelDisplayName(model)
-          if (webSearchEnabled) {
-            sendStatus(`Searching the web and generating response with ${modelName}...`)
-          } else {
-            sendStatus(`Generating response with ${modelName}...`)
-          }
+          sendStatus(`Generating response with ${modelName}...`)
 
           // Start streaming
           const startLLM = Date.now()
@@ -207,35 +196,12 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
           // Get the database model value for storage
           const dbModel = getDbModelValue(model)
 
-          // Build streamText options with provider-specific web search tools
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const streamOptions: any = {
+          const result = streamText({
             model: llmModel,
             system,
             messages: allMessages,
             maxOutputTokens: 8192,
             temperature: 0.7,
-          }
-
-          // Add web search tools based on provider when enabled
-          if (webSearchEnabled) {
-            if (config.provider === 'anthropic') {
-              // Anthropic Claude uses web_search tool
-              streamOptions.tools = {
-                web_search: anthropic.tools.webSearch_20250305({
-                  maxUses: 5,
-                }),
-              }
-            } else if (config.provider === 'google') {
-              // Google Gemini uses googleSearch tool for grounding
-              streamOptions.tools = {
-                googleSearch: google.tools.googleSearch({}),
-              }
-            }
-          }
-
-          const result = streamText({
-            ...streamOptions,
           })
 
           // Send citations (both RAG and web citations)
@@ -249,7 +215,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
               content: perplexityResult.content,
               webCitations,
               relatedQuestions,
-              researchType: deepResearchEnabled ? 'deep' : 'quick'
+              researchType: 'quick'
             }
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({
@@ -268,7 +234,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
                 content: perplexityResult.content,
                 webCitations,
                 relatedQuestions,
-                researchType: deepResearchEnabled ? 'deep' : 'quick'
+                researchType: 'quick'
               }
             : null
 

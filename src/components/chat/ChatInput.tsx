@@ -2,14 +2,7 @@
 
 import { useState, useRef, useEffect, useImperativeHandle, forwardRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
-import { Send, Loader2, Globe, ChevronDown, Search, Microscope, Mic, MicOff, Square } from 'lucide-react'
+import { Send, Loader2, Mic, MicOff, Square } from 'lucide-react'
 import { FileUpload, type UploadedFile, getFileCategory } from './FileUpload'
 import { AttachmentPreview } from './AttachmentPreview'
 import { useChatStore } from '@/stores/chatStore'
@@ -36,12 +29,8 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const [partialTranscript, setPartialTranscript] = useState('')
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const {
-      webSearchEnabled,
-      setWebSearchEnabled,
       perplexityEnabled,
       setPerplexityEnabled,
-      deepResearchEnabled,
-      setDeepResearchEnabled,
       isLoading,
       abortStreaming
     } = useChatStore()
@@ -234,84 +223,22 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 maxFiles={5}
               />
 
-              {/* Web search toggle */}
+              {/* Research toggle */}
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => setWebSearchEnabled(!webSearchEnabled)}
+                onClick={() => setPerplexityEnabled(!perplexityEnabled)}
                 disabled={disabled}
                 className={`h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 transition-all ${
-                  webSearchEnabled
-                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800/40'
+                  perplexityEnabled
+                    ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-800/40'
                     : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50'
                 }`}
-                title={webSearchEnabled ? 'Web search enabled' : 'Enable web search'}
+                title={perplexityEnabled ? 'Research enabled' : 'Enable research'}
               >
-                <Globe className="h-4 w-4" />
+                <PerplexityIcon size={16} className="sm:w-[18px] sm:h-[18px]" />
               </Button>
-
-              {/* Perplexity research dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    disabled={disabled}
-                    className={`h-8 sm:h-9 md:h-10 px-1.5 sm:px-2 md:px-3 rounded-lg md:rounded-xl shrink-0 transition-all gap-0.5 sm:gap-1 ${
-                      perplexityEnabled
-                        ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-800/40'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50'
-                    }`}
-                    title="Research options"
-                  >
-                    <PerplexityIcon size={16} className="sm:w-[18px] sm:h-[18px]" />
-                    <ChevronDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setPerplexityEnabled(false)
-                      setDeepResearchEnabled(false)
-                    }}
-                    className="gap-2"
-                  >
-                    <div className={`w-2 h-2 rounded-full ${!perplexityEnabled ? 'bg-indigo-500' : 'bg-transparent border border-muted-foreground/30'}`} />
-                    <span>Knowledge Base Only</span>
-                    <span className="ml-auto text-xs text-muted-foreground">Default</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setPerplexityEnabled(true)
-                      setDeepResearchEnabled(false)
-                    }}
-                    className="gap-2"
-                  >
-                    <div className={`w-2 h-2 rounded-full ${perplexityEnabled && !deepResearchEnabled ? 'bg-indigo-500' : 'bg-transparent border border-muted-foreground/30'}`} />
-                    <Search className="h-4 w-4" />
-                    <div className="flex flex-col">
-                      <span>Quick Research</span>
-                      <span className="text-xs text-muted-foreground">Add current web data</span>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setPerplexityEnabled(true)
-                      setDeepResearchEnabled(true)
-                    }}
-                    className="gap-2"
-                  >
-                    <div className={`w-2 h-2 rounded-full ${perplexityEnabled && deepResearchEnabled ? 'bg-indigo-500' : 'bg-transparent border border-muted-foreground/30'}`} />
-                    <Microscope className="h-4 w-4" />
-                    <div className="flex flex-col">
-                      <span>Deep Research</span>
-                      <span className="text-xs text-muted-foreground">Comprehensive analysis</span>
-                    </div>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
 
               <textarea
                 ref={textareaRef}
