@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getModel, buildMessages, getModelDisplayName, getDbModelValue, type ModelProvider } from '@/lib/llm/provider-factory'
 import { retrieveContext, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
 import { conductResearch } from '@/lib/llm/perplexity-client'
+import { extractUrls, scrapeUrls } from '@/lib/url-scraper'
 import type { ChatAttachment, WebCitation } from '@/types/chat'
 
 export const runtime = 'nodejs'
@@ -101,8 +102,16 @@ export async function POST(request: NextRequest) {
           // Status: Searching knowledge base (and web if enabled)
           const searchQuery = message || (attachments ? attachments.map(a => a.fileName).join(' ') : '')
 
-          // Run RAG and Perplexity in parallel if research is enabled
-          if (perplexityEnabled) {
+          // Detect URLs in the message
+          const detectedUrls = message ? extractUrls(message) : []
+          const hasUrls = detectedUrls.length > 0
+
+          // Build status message
+          if (hasUrls && perplexityEnabled) {
+            sendStatus('Reading URLs and searching knowledge base and web...')
+          } else if (hasUrls) {
+            sendStatus('Reading URL content and searching knowledge base...')
+          } else if (perplexityEnabled) {
             sendStatus('Searching knowledge base and web...')
           } else {
             sendStatus('Searching PMM knowledge base...')
@@ -110,24 +119,31 @@ export async function POST(request: NextRequest) {
 
           const startRetrieval = Date.now()
 
-          // Build parallel promises
+          // Build parallel promises — RAG, Perplexity, and URL scraping all at once
           const ragPromise = retrieveContext({ query: searchQuery })
           const perplexityPromise = perplexityEnabled
             ? conductResearch(
                 searchQuery,
-                undefined, // No context yet - this is the parallel research
-                {
-                  model: 'sonar-pro',
-                  recencyFilter: 'month'
-                }
+                undefined,
+                { model: 'sonar-pro', recencyFilter: 'month' }
               ).catch(err => {
                 console.error('Perplexity parallel research error:', err)
                 return null
               })
             : Promise.resolve(null)
+          const urlScrapePromise = hasUrls
+            ? scrapeUrls(detectedUrls).catch(err => {
+                console.error('URL scraping error:', err)
+                return ''
+              })
+            : Promise.resolve('')
 
           // Execute in parallel
-          const [ragResult, perplexityResult] = await Promise.all([ragPromise, perplexityPromise])
+          const [ragResult, perplexityResult, scrapedUrlContent] = await Promise.all([
+            ragPromise,
+            perplexityPromise,
+            urlScrapePromise,
+          ])
 
           const retrievalTime = Date.now() - startRetrieval
           const { chunks } = ragResult
@@ -158,15 +174,18 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
           }
 
           // Status: Found sources
-          if (chunks.length > 0 || webCitations.length > 0) {
-            const sourceCount = chunks.length + webCitations.length
+          if (chunks.length > 0 || webCitations.length > 0 || scrapedUrlContent) {
+            const sourceCount = chunks.length + webCitations.length + (scrapedUrlContent ? detectedUrls.length : 0)
             sendStatus(`Found ${sourceCount} relevant sources`)
           } else {
             sendStatus('No specific sources found, using general knowledge')
           }
 
-          // Build messages with system prompt and context (including attachments and web research)
+          // Build messages with system prompt and context (including attachments, web research, and scraped URLs)
           let fullContext = retrievedContext
+          if (scrapedUrlContent) {
+            fullContext += '\n\n--- URL Content (fetched via Jina Reader) ---\n' + scrapedUrlContent + '\n--- End URL Content ---'
+          }
           if (webResearchContext) {
             fullContext += webResearchContext
           }
