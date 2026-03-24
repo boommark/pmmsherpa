@@ -162,6 +162,13 @@ npx vercel --token rQeCMwL63rT10pN5NpA2iBov --prod --yes
 | `staging` | staging.pmmsherpa.com | Staging — verify before prod |
 | `feature/*` | Vercel preview URL | Dev — local + preview testing |
 
+### After every ship to production
+Update the Obsidian shipped features log:
+```
+~/Documents/AbhishekR/PMM Sherpa/Shipped Features.md
+```
+Add a row to the relevant table with: feature name, one-line description, and month/year. Keep it concise and human-readable.
+
 ---
 
 ## Common Tasks
