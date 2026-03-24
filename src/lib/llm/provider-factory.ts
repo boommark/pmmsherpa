@@ -83,9 +83,10 @@ export function buildMessages(
   userMessage: string,
   retrievedContext: string,
   provider: ModelProvider,
-  conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
+  conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [],
+  scrapedUrlContent?: string
 ) {
-  const systemPrompt = getSystemPromptWithContext(retrievedContext, provider)
+  const systemPrompt = getSystemPromptWithContext(retrievedContext, provider, scrapedUrlContent)
 
   // Log conversation history for debugging
   if (conversationHistory.length > 0) {

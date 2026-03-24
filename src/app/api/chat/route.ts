@@ -181,11 +181,8 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
             sendStatus('No specific sources found, using general knowledge')
           }
 
-          // Build messages with system prompt and context (including attachments, web research, and scraped URLs)
+          // Build messages with system prompt and context (including attachments and web research)
           let fullContext = retrievedContext
-          if (scrapedUrlContent) {
-            fullContext += '\n\n--- URL Content (fetched via Jina Reader) ---\n' + scrapedUrlContent + '\n--- End URL Content ---'
-          }
           if (webResearchContext) {
             fullContext += webResearchContext
           }
@@ -198,7 +195,8 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
             message || '[User sent attachments without a message]',
             fullContext,
             model,
-            conversationHistory
+            conversationHistory,
+            scrapedUrlContent || undefined
           )
           console.log(`Total messages being sent to LLM: ${allMessages.length} (${conversationHistory.length} history + 1 new)`)
 

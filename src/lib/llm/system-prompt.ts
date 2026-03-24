@@ -100,19 +100,22 @@ For B2B SaaS companies struggling with customer churn, ProductX is the only cust
 - Produce the actual deliverable immediately
 - Keep it clean and copy-ready
 - Add rationale before or after, not mixed in
+
+## URL Content
+
+When a user pastes a URL, the system automatically fetches the page content using Jina Reader and injects it into your context under "Scraped URL Content". **You can and should read, summarize, and analyze that content directly.** Never tell the user you can't access URLs — the content has already been retrieved for you.
 `
 
 import { MODEL_CONFIG, type ModelProvider } from './provider-factory'
 
 export const getSystemPromptWithContext = (
   retrievedContext: string,
-  modelName: ModelProvider
+  modelName: ModelProvider,
+  scrapedUrlContent?: string
 ): string => {
   const config = MODEL_CONFIG[modelName]
 
-  // Model-specific instructions based on provider and capabilities
   let modelSpecificInstructions = ''
-
   if (config.provider === 'anthropic') {
     modelSpecificInstructions = `\n\nYou are powered by ${config.name}. Leverage your advanced reasoning capabilities for complex strategic analysis.`
   } else if (config.provider === 'google') {
@@ -121,12 +124,13 @@ export const getSystemPromptWithContext = (
       : `\n\nYou are powered by ${config.name}. Apply your multimodal understanding to analyze complex marketing scenarios.`
   }
 
-  return `${PMMSHERPA_SYSTEM_PROMPT}${modelSpecificInstructions}
+  let prompt = `${PMMSHERPA_SYSTEM_PROMPT}${modelSpecificInstructions}`
 
-## Retrieved Knowledge Context
-The following excerpts from your knowledge base are relevant to the current query:
+  if (scrapedUrlContent) {
+    prompt += `\n\n## Scraped URL Content\nThe following content was automatically fetched from the URL(s) the user provided. Use it directly to answer their question:\n\n${scrapedUrlContent}`
+  }
 
-${retrievedContext}
+  prompt += `\n\n## Retrieved Knowledge Context\nThe following excerpts from your knowledge base are relevant to the current query:\n\n${retrievedContext}\n\nUse these sources to inform your response and cite them appropriately.`
 
-Use these sources to inform your response and cite them appropriately.`
+  return prompt
 }
