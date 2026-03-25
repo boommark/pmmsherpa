@@ -11,6 +11,41 @@ import type { ChatAttachment, WebCitation } from '@/types/chat'
 export const runtime = 'nodejs'
 export const maxDuration = 60
 
+// Token budget per context section (rough estimate: 1 token ≈ 4 chars)
+// Total budget ~40K tokens leaves plenty of room for system prompt + output
+const TOKEN_BUDGETS = {
+  conversationHistory: 12000, // ~48K chars — keeps last N messages that fit
+  ragContext: 8000,           // ~32K chars — 10 chunks is usually well within this
+  urlContent: 8000,           // ~32K chars — truncate long articles
+  perplexityContent: 4000,    // ~16K chars — web research summary
+  attachments: 6000,          // ~24K chars — attachment text
+}
+
+function truncateToTokenBudget(text: string, tokenBudget: number): string {
+  const charBudget = tokenBudget * 4
+  if (text.length <= charBudget) return text
+  return text.slice(0, charBudget) + '\n\n[Content truncated to fit context window]'
+}
+
+function truncateHistory(
+  history: Array<{ role: 'user' | 'assistant'; content: string }>,
+  tokenBudget: number
+): Array<{ role: 'user' | 'assistant'; content: string }> {
+  const charBudget = tokenBudget * 4
+  let totalChars = 0
+  const result: Array<{ role: 'user' | 'assistant'; content: string }> = []
+
+  // Walk backwards (most recent first), keep messages that fit
+  for (let i = history.length - 1; i >= 0; i--) {
+    const msgChars = history[i].content.length
+    if (totalChars + msgChars > charBudget) break
+    totalChars += msgChars
+    result.unshift(history[i])
+  }
+
+  return result
+}
+
 export async function POST(request: NextRequest) {
   const encoder = new TextEncoder()
 
@@ -82,21 +117,27 @@ export async function POST(request: NextRequest) {
             urlScrapePromise,
           ])
 
-          // Process conversation history
+          // Process conversation history (truncate to budget — keeps most recent messages that fit)
           let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
           if (historyResult.data && Array.isArray(historyResult.data)) {
             const chronologicalMessages = historyResult.data.reverse()
-            conversationHistory = chronologicalMessages.map((m: { role: string; content: string }) => ({
+            const fullHistory = chronologicalMessages.map((m: { role: string; content: string }) => ({
               role: m.role as 'user' | 'assistant',
               content: m.content,
             }))
-            console.log(`Loaded ${conversationHistory.length} messages from conversation history for ${conversationId}`)
+            conversationHistory = truncateHistory(fullHistory, TOKEN_BUDGETS.conversationHistory)
+            console.log(`Loaded ${fullHistory.length} messages, kept ${conversationHistory.length} within token budget for ${conversationId}`)
           }
           if (historyResult.error) {
             console.error('Error fetching conversation history:', historyResult.error)
           }
 
-          // Process attachments
+          // Truncate URL content to budget
+          const truncatedUrlContent = scrapedUrlContent
+            ? truncateToTokenBudget(scrapedUrlContent, TOKEN_BUDGETS.urlContent)
+            : ''
+
+          // Process attachments (truncate to budget)
           let attachmentContext = ''
           if (hasAttachments && attachments) {
             for (const attachment of attachments) {
@@ -106,6 +147,7 @@ export async function POST(request: NextRequest) {
                 attachmentContext += `\n\n[Attached file: ${attachment.fileName} (${attachment.fileType})]`
               }
             }
+            attachmentContext = truncateToTokenBudget(attachmentContext, TOKEN_BUDGETS.attachments)
           }
 
           // ========================================
@@ -116,7 +158,7 @@ export async function POST(request: NextRequest) {
           const queryPlan = await planQueries({
             message: message || (attachments ? attachments.map(a => a.fileName).join(' ') : ''),
             conversationHistory,
-            scrapedUrlContent: scrapedUrlContent || undefined,
+            scrapedUrlContent: truncatedUrlContent || undefined,
             attachmentContext: attachmentContext || undefined,
           })
 
@@ -172,10 +214,14 @@ export async function POST(request: NextRequest) {
           if (perplexityResult) {
             webCitations = perplexityResult.searchResults as WebCitation[]
             relatedQuestions = perplexityResult.relatedQuestions || []
+            const truncatedWebContent = truncateToTokenBudget(
+              perplexityResult.content,
+              TOKEN_BUDGETS.perplexityContent
+            )
             webResearchContext = `
 
 ### Current Web Research (via Perplexity)
-${perplexityResult.content}
+${truncatedWebContent}
 
 Web Sources:
 ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
@@ -204,7 +250,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             fullContext,
             model,
             conversationHistory,
-            scrapedUrlContent || undefined
+            truncatedUrlContent || undefined
           )
           console.log(`Total messages being sent to LLM: ${allMessages.length} (${conversationHistory.length} history + 1 new)`)
 
