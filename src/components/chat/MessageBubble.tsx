@@ -95,27 +95,27 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
         className="w-full max-w-none px-1 sm:px-0"
         style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
       >
-        <div className="prose prose-base dark:prose-invert max-w-none prose-p:leading-[1.75] prose-li:leading-[1.65]">
+        <div className="prose prose-base dark:prose-invert max-w-none prose-p:leading-[1.85] prose-li:leading-[1.75] text-[15px] sm:text-base">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
               h1: ({ children }) => (
-                <h1 className="text-xl font-semibold mt-7 mb-3 tracking-tight">{children}</h1>
+                <h1 className="text-xl sm:text-2xl font-semibold mt-10 mb-4 tracking-tight">{children}</h1>
               ),
               h2: ({ children }) => (
-                <h2 className="text-lg font-semibold mt-6 mb-2.5 tracking-tight">{children}</h2>
+                <h2 className="text-lg sm:text-xl font-semibold mt-9 mb-3.5 tracking-tight">{children}</h2>
               ),
               h3: ({ children }) => (
-                <h3 className="text-base font-semibold mt-5 mb-2">{children}</h3>
+                <h3 className="text-base sm:text-lg font-semibold mt-7 mb-3">{children}</h3>
               ),
               ul: ({ children }) => (
-                <ul className="list-disc pl-5 my-3.5 space-y-2">{children}</ul>
+                <ul className="list-disc pl-6 my-5 space-y-3">{children}</ul>
               ),
               ol: ({ children }) => (
-                <ol className="list-decimal pl-5 my-3.5 space-y-2">{children}</ol>
+                <ol className="list-decimal pl-6 my-5 space-y-3">{children}</ol>
               ),
-              li: ({ children }) => <li className="my-1 break-words pl-1">{children}</li>,
-              p: ({ children }) => <p className="my-3.5 break-words">{children}</p>,
+              li: ({ children }) => <li className="my-1.5 break-words pl-1">{children}</li>,
+              p: ({ children }) => <p className="my-5 break-words">{children}</p>,
               a: ({ children, href }) => (
                 <a href={href} className="text-primary underline underline-offset-2 break-all" target="_blank" rel="noopener noreferrer">
                   {children}
@@ -132,32 +132,32 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
                 )
               },
               pre: ({ children }) => (
-                <pre className="bg-black/5 dark:bg-white/8 p-4 sm:p-5 rounded-lg overflow-x-auto my-5 text-sm leading-relaxed">
+                <pre className="bg-black/5 dark:bg-white/8 p-4 sm:p-5 rounded-xl overflow-x-auto my-6 text-sm leading-relaxed">
                   {children}
                 </pre>
               ),
               table: ({ children }) => (
-                <div className="overflow-x-auto my-5 max-w-full rounded-lg border border-border">
+                <div className="overflow-x-auto my-6 max-w-full rounded-lg border border-border">
                   <table className="w-full border-collapse text-sm min-w-full">
                     {children}
                   </table>
                 </div>
               ),
               th: ({ children }) => (
-                <th className="border border-border px-3 py-2 bg-muted/50 font-medium text-left text-sm break-words">
+                <th className="border border-border px-3.5 py-2.5 bg-muted/50 font-medium text-left text-sm break-words">
                   {children}
                 </th>
               ),
               td: ({ children }) => (
-                <td className="border border-border px-3 py-2 text-sm break-words">{children}</td>
+                <td className="border border-border px-3.5 py-2.5 text-sm break-words">{children}</td>
               ),
               blockquote: ({ children }) => (
-                <blockquote className="border-l-3 border-primary/30 pl-5 my-5 text-muted-foreground italic">
+                <blockquote className="border-l-3 border-primary/30 pl-6 my-6 text-muted-foreground italic">
                   {children}
                 </blockquote>
               ),
               hr: () => (
-                <hr className="my-6 border-border/40" />
+                <hr className="my-8 border-border/40" />
               ),
               strong: ({ children }) => (
                 <strong className="font-semibold">{children}</strong>
