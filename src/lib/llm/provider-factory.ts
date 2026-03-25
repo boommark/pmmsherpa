@@ -4,21 +4,10 @@ import { getSystemPromptWithContext } from './system-prompt'
 
 // All available model providers (Anthropic and Google only)
 export type ModelProvider =
-  | 'claude-opus'
   | 'claude-sonnet'
   | 'gemini-3-pro'
-  | 'gemini-2.5-thinking'
 
 export const MODEL_CONFIG = {
-  'claude-opus': {
-    id: 'claude-opus-4-6',
-    name: 'Claude Opus 4.6',
-    provider: 'anthropic',
-    maxTokens: 64000,
-    isThinking: false,
-    color: 'bg-orange-500',
-    webSearchSupported: true,
-  },
   'claude-sonnet': {
     id: 'claude-sonnet-4-6',
     name: 'Claude Sonnet 4.6',
@@ -32,18 +21,9 @@ export const MODEL_CONFIG = {
     id: 'gemini-3.1-pro-preview',
     name: 'Gemini 3.1 Pro',
     provider: 'google',
-    maxTokens: 64000,
+    maxTokens: 65536,
     isThinking: false,
     color: 'bg-blue-500',
-    webSearchSupported: true,
-  },
-  'gemini-2.5-thinking': {
-    id: 'gemini-2.5-pro',
-    name: 'Gemini 2.5 Pro (Thinking)',
-    provider: 'google',
-    maxTokens: 64000,
-    isThinking: true,
-    color: 'bg-blue-600',
     webSearchSupported: true,
   },
 } as const

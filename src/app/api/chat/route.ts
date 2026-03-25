@@ -219,6 +219,13 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
             messages: allMessages,
             maxOutputTokens: 8192,
             temperature: 0.7,
+            // Sonnet 4.6 defaults to effort: "high" which increases latency.
+            // Set to "low" for chat use case to maintain fast response times.
+            providerOptions: {
+              anthropic: {
+                output_config: { effort: 'low' },
+              },
+            },
           })
 
           // Send citations (both RAG and web citations)

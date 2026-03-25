@@ -40,7 +40,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
   isLoading: false,
   error: null,
-  currentModel: 'claude-opus',
+  currentModel: 'claude-sonnet',
   conversationId: null,
   statusMessage: null,
   perplexityEnabled: false,
