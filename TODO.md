@@ -1,47 +1,35 @@
 # PMM Sherpa — To-Do
 
-_Last updated: 2026-03-24_
+_Last updated: 2026-03-25_
 
 ---
 
-## In Progress
+## Recently Shipped (Mar 2026)
 
-- [x] **Action bar simplification** — Kill Perplexity dropdown + globe toggle. Replace with single Research toggle (Perplexity icon, quick research only). Remove deep research + native web search tools entirely.
-- [x] **URL scraping** — When user pastes a URL, fetch content via Jina Reader (`r.jina.ai/URL`), inject as context. Remove broken native LLM URL reading.
-- [x] **Admin analytics dashboard** — `/admin/analytics` gated by `is_admin` flag. Shows users, conversations, DAU/WAU, model breakdown, latency.
-- [x] **System prompt tone overhaul** — Replaced "April Dunford no-BS" persona with senior CMO advisor tone: no filler closers, no emoji, one recommendation not a menu, proportionate structure.
-- [x] **Model updates** — Claude Sonnet 4.6 (`claude-sonnet-4-6`) + Gemini 3.1 Pro (`gemini-3.1-pro-preview`). Removed Opus and Gemini 2.5 Thinking. Added `effort: "low"` for Sonnet 4.6 (avoids default high-latency mode).
-- [ ] **Intelligent RAG query generation** ← **CURRENT FOCUS**
-  - Problem: RAG uses raw user message as query — e.g. "Summarize this article: https://..." is a useless RAG query
-  - Fix needed: Read URL content FIRST, extract key concepts/themes, then generate 2-3 targeted queries that will actually surface relevant chunks from the knowledge base
-  - Also: duplicate conversation bug (double-submission race condition) needs `isSubmittingRef` guard fix
-  - Context: knowledge base is at `~/.gemini/antigravity/knowledge` — need to understand breadth of sources before designing query strategy
-  - Test approach: fetch both articles, reason about what knowledge is relevant, try query variants against live RAG, compare chunk quality
+- [x] **Intelligent RAG query engine** — Gemini 2.5 Flash Lite query planner analyzes full context (message, history, URLs, attachments), generates 2-3 targeted RAG queries across knowledge dimensions, auto-invokes Perplexity when external data needed. Multi-query parallel retrieval with dedup.
+- [x] **Voice and writing style overhaul** — System prompt rewrite modeled on Dunford, Stratton, Jassy. Anti-AI-slop rules. Explicit formatting: mandatory headings, bold, section breaks. Example response in prompt. Effort bumped to medium.
+- [x] **Welcome screen redesign** — "What are you working on?" + 4 pillar tiles (Frame, Consult, Validate, Grow) with clickable example prompts.
+- [x] **Homepage redesign** — Full marketing page with product screenshots, "How It Works" walkthrough, audience cards (PMMs, PMs, Founders), differentiators section.
+- [x] **Editorial response layout** — No bubble on assistant messages, DM Sans font, generous spacing (1.85 line height), heading hierarchy.
+- [x] **Single-click copy** — Replaced 3-option dropdown with single copy button (HTML + plain text clipboard).
+- [x] **UI cleanup** — Removed avatars, model name, Expand with Research, Perplexity toggle, source citations from UI. Citations still tracked in DB.
+- [x] **Token budgets** — Context overflow protection for long conversations (12K history, 8K RAG, 8K URL, 4K Perplexity, 6K attachments).
+- [x] **Auto-Perplexity** — Flash Lite decides when web research is needed. Toggle removed from UI entirely.
 
 ---
 
 ## Up Next
 
-- [ ] **Output tone & voice refinement** — Final output should sound like a professional PM or senior marketer: clear, warm, relatable, and technically precise. Will provide example outputs to calibrate. Involves system prompt tuning + possibly post-processing guardrails.
-- [ ] **Telemetry dashboard** — `/admin/analytics` page: conversations per user, tokens by model, DAU/WAU. Audit whether `usage_logs` is being written on every chat call first.
-
----
-
-## Onboarding & Marketing
-
-- [ ] **Welcome screen tiles** — 4 clickable use case tiles (Frame / Consult / Validate / Career) with example starter prompts on empty state.
-- [ ] **Homepage copy update** — Lead with outcomes, not modes. New section: "Frame it. Get advice. Validate it. Grow." with real example prompts per pillar.
-- [ ] **YouTube tutorials** — 4 videos (one per mode) using real past chats as demos. Thumbnails already in Canva.
+- [ ] **YouTube tutorials** — 4 videos (one per pillar: Frame, Consult, Validate, Grow) using real past chats as demos.
+- [ ] **Ongoing scrape + ingest pipeline** — PMA, Sharebird daily sync. Auto-update chunk counts.
+- [ ] **Evals** — Generic Claude vs PMM Sherpa quality comparison on standard PMM questions.
 
 ---
 
 ## Backlog
 
-- [ ] Ongoing scrape + ingest pipeline (PMA, Sharebird daily sync, chunk count on UI)
 - [ ] API product / MCP server
 - [ ] Ungate access / sandbox trial for new users
 - [ ] Knowledge expansion (theproductmarketer.com, Robert Kaminski, Anthony Pieri content)
-- [ ] Tone & style refinement (system prompt polish)
-- [ ] Evals — generic Claude vs PMM Sherpa quality comparison
 - [ ] Pricing & monetization (free/paid tiers, token limits)
 - [ ] Voice & phone access (ElevenLabs, Deepgram)
