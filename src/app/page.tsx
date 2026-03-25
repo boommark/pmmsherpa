@@ -201,14 +201,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-16 md:py-24 relative bg-white/30 dark:bg-zinc-900/30">
+      {/* How It Works Section — dark background so product screenshots blend */}
+      <section className="py-16 md:py-24 relative bg-zinc-950 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4 text-white">
               How it works
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
               Ask a question. Get expert-level depth. Ship faster.
             </p>
           </div>
@@ -217,14 +217,14 @@ export default function LandingPage() {
           <div className="max-w-5xl mx-auto mb-20 md:mb-28">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               <div>
-                <div className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-4">
-                  <span className="w-6 h-6 rounded-full bg-indigo-500/10 flex items-center justify-center text-xs font-bold">1</span>
+                <div className="inline-flex items-center gap-2 text-sm font-medium text-indigo-400 mb-4">
+                  <span className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-xs font-bold text-indigo-300">1</span>
                   You ask. PMMSherpa thinks.
                 </div>
-                <h3 className="text-2xl font-semibold tracking-tight mb-4">
+                <h3 className="text-2xl font-semibold tracking-tight mb-4 text-white">
                   Intelligent retrieval, not keyword matching
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-zinc-400 leading-relaxed">
                   Your question is analyzed alongside your conversation history, any URLs
                   or documents you&apos;ve shared, and the full context of what you&apos;re working
                   on. The system generates targeted queries across frameworks, practitioner
@@ -232,7 +232,7 @@ export default function LandingPage() {
                   data, it automatically pulls in live research via Perplexity.
                 </p>
               </div>
-              <div className="rounded-xl overflow-hidden shadow-xl shadow-black/15 border border-white/10 dark:border-zinc-700/30">
+              <div className="rounded-xl overflow-hidden shadow-2xl border border-zinc-700/50">
                 <Image
                   src="/homepage/intelligent-retrieval.png"
                   alt="PMMSherpa intelligently searching knowledge base and web"
@@ -247,7 +247,7 @@ export default function LandingPage() {
           {/* Step 2 */}
           <div className="max-w-5xl mx-auto mb-20 md:mb-28">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-              <div className="order-2 md:order-1 rounded-xl overflow-hidden shadow-xl shadow-black/15 border border-white/10 dark:border-zinc-700/30">
+              <div className="order-2 md:order-1 rounded-xl overflow-hidden shadow-2xl border border-zinc-700/50">
                 <Image
                   src="/homepage/rich-response.png"
                   alt="PMMSherpa providing structured expert response"
@@ -257,14 +257,14 @@ export default function LandingPage() {
                 />
               </div>
               <div className="order-1 md:order-2">
-                <div className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-4">
-                  <span className="w-6 h-6 rounded-full bg-indigo-500/10 flex items-center justify-center text-xs font-bold">2</span>
+                <div className="inline-flex items-center gap-2 text-sm font-medium text-indigo-400 mb-4">
+                  <span className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-xs font-bold text-indigo-300">2</span>
                   Deep expertise, not generic answers.
                 </div>
-                <h3 className="text-2xl font-semibold tracking-tight mb-4">
+                <h3 className="text-2xl font-semibold tracking-tight mb-4 text-white">
                   The depth of a senior PMM advisor in every response
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-zinc-400 leading-relaxed">
                   Every response draws from curated PMM knowledge: the same books, AMAs,
                   and playbooks that shaped the best product marketers in tech. Structured
                   for readability, grounded in specifics, with the depth of an advisor
@@ -278,21 +278,21 @@ export default function LandingPage() {
           <div className="max-w-5xl mx-auto mb-20 md:mb-28">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               <div>
-                <div className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-4">
-                  <span className="w-6 h-6 rounded-full bg-indigo-500/10 flex items-center justify-center text-xs font-bold">3</span>
+                <div className="inline-flex items-center gap-2 text-sm font-medium text-indigo-400 mb-4">
+                  <span className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-xs font-bold text-indigo-300">3</span>
                   Production-ready deliverables.
                 </div>
-                <h3 className="text-2xl font-semibold tracking-tight mb-4">
+                <h3 className="text-2xl font-semibold tracking-tight mb-4 text-white">
                   Battlecards, positioning statements, and launch plans you can use today
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-zinc-400 leading-relaxed">
                   Positioning statements, competitive battlecards, messaging frameworks,
                   launch plans. Share your context and PMMSherpa produces the artifact,
                   not a template with blanks. Ready to present, ready to share with sales,
                   ready to ship.
                 </p>
               </div>
-              <div className="rounded-xl overflow-hidden shadow-xl shadow-black/15 border border-white/10 dark:border-zinc-700/30">
+              <div className="rounded-xl overflow-hidden shadow-2xl border border-zinc-700/50">
                 <Image
                   src="/homepage/deliverable.png"
                   alt="PMMSherpa generating a competitive battlecard"
@@ -307,7 +307,7 @@ export default function LandingPage() {
           {/* Step 4 - URL Analysis */}
           <div className="max-w-5xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-              <div className="order-2 md:order-1 rounded-xl overflow-hidden shadow-xl shadow-black/15 border border-white/10 dark:border-zinc-700/30">
+              <div className="order-2 md:order-1 rounded-xl overflow-hidden shadow-2xl border border-zinc-700/50">
                 <Image
                   src="/homepage/url-analysis.png"
                   alt="PMMSherpa analyzing URLs and applying frameworks"
@@ -317,14 +317,14 @@ export default function LandingPage() {
                 />
               </div>
               <div className="order-1 md:order-2">
-                <div className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 mb-4">
-                  <span className="w-6 h-6 rounded-full bg-indigo-500/10 flex items-center justify-center text-xs font-bold">4</span>
+                <div className="inline-flex items-center gap-2 text-sm font-medium text-indigo-400 mb-4">
+                  <span className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-xs font-bold text-indigo-300">4</span>
                   Paste a URL. Get expert analysis.
                 </div>
-                <h3 className="text-2xl font-semibold tracking-tight mb-4">
+                <h3 className="text-2xl font-semibold tracking-tight mb-4 text-white">
                   Reads articles, analyzes competitors, and applies the right frameworks
                 </h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-zinc-400 leading-relaxed">
                   Drop a competitor&apos;s homepage, a blog post, or a product announcement.
                   PMMSherpa reads the content, identifies the relevant PMM concepts,
                   and gives you analysis grounded in frameworks and practitioner experience.
