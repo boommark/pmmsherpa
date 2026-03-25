@@ -4,18 +4,11 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { ExpandedResearch } from './ExpandedResearch'
-import { User, Bot, Loader2, Copy, ChevronDown, FileText, Type, Pencil, Check, Sparkles, Search, Volume2, VolumeX } from 'lucide-react'
+import { Loader2, Copy, Pencil, Check, Volume2, VolumeX } from 'lucide-react'
 import { toast } from 'sonner'
-import { copyAsMarkdown, copyAsPlainText, copyForGoogleDocs, type CopyOptions } from '@/lib/utils/clipboard'
+import { copyForGoogleDocs, type CopyOptions } from '@/lib/utils/clipboard'
 import type { ChatMessage } from '@/types/chat'
 import type { Citation } from '@/types/database'
 import { useVoiceOutput } from '@/hooks/useVoiceOutput'
@@ -27,10 +20,9 @@ interface MessageBubbleProps {
   onExpandWithResearch?: (messageId: string, content: string, deepResearch: boolean) => void
 }
 
-export function MessageBubble({ message, messageIndex, onEditPrompt, onExpandWithResearch }: MessageBubbleProps) {
+export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBubbleProps) {
   const isUser = message.role === 'user'
   const isStreaming = message.isStreaming
-  const isResearching = message.isResearching
   const [copied, setCopied] = useState(false)
 
   // Voice output hook
@@ -54,23 +46,12 @@ export function MessageBubble({ message, messageIndex, onEditPrompt, onExpandWit
     expandedResearch: message.expandedResearch,
   } : undefined
 
-  const handleCopy = async (format: 'markdown' | 'plain' | 'gdocs') => {
+  // Single-click copy: writes both HTML (for Google Docs) and plain text to clipboard
+  const handleCopy = async () => {
     try {
-      switch (format) {
-        case 'markdown':
-          await copyAsMarkdown(message.content, copyOptions)
-          toast.success('Copied as Markdown')
-          break
-        case 'plain':
-          await copyAsPlainText(message.content, copyOptions)
-          toast.success('Copied as plain text')
-          break
-        case 'gdocs':
-          await copyForGoogleDocs(message.content, copyOptions)
-          toast.success('Copied for Google Docs')
-          break
-      }
+      await copyForGoogleDocs(message.content, copyOptions)
       setCopied(true)
+      toast.success('Copied')
       setTimeout(() => setCopied(false), 2000)
     } catch {
       toast.error('Failed to copy')
@@ -83,26 +64,25 @@ export function MessageBubble({ message, messageIndex, onEditPrompt, onExpandWit
     }
   }
 
+  // Model display names (mapped from DB values)
+  const getModelName = (model: string) => {
+    switch (model) {
+      case 'claude': return 'Claude Sonnet 4.6'
+      case 'gemini': return 'Gemini 3.1 Pro'
+      default: return model
+    }
+  }
+
   return (
     <div
       className={cn(
         'flex gap-2 sm:gap-2.5 md:gap-3 group w-full overflow-hidden',
-        isUser ? 'flex-row-reverse' : 'flex-row'
+        isUser ? 'justify-end' : 'justify-start'
       )}
     >
-      <Avatar className={cn('h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 shrink-0', isUser ? 'bg-gradient-to-br from-indigo-500 to-purple-500' : 'bg-secondary')}>
-        <AvatarFallback>
-          {isUser ? (
-            <User className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
-          ) : (
-            <Bot className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
-          )}
-        </AvatarFallback>
-      </Avatar>
-
       <div
         className={cn(
-          'flex flex-col min-w-0 max-w-[calc(100%-2.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[85%] space-y-1 sm:space-y-1.5 md:space-y-2',
+          'flex flex-col min-w-0 max-w-[90%] sm:max-w-[85%] md:max-w-[80%] space-y-1 sm:space-y-1.5 md:space-y-2',
           isUser ? 'items-end' : 'items-start'
         )}
       >
@@ -122,7 +102,6 @@ export function MessageBubble({ message, messageIndex, onEditPrompt, onExpandWit
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
-                  // Style markdown elements
                   h1: ({ children }) => (
                     <h1 className="text-lg font-bold mt-4 mb-2">{children}</h1>
                   ),
@@ -200,37 +179,20 @@ export function MessageBubble({ message, messageIndex, onEditPrompt, onExpandWit
             isUser ? 'flex-row-reverse' : 'flex-row',
             'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
           )}>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs text-muted-foreground hover:text-foreground gap-0.5 sm:gap-1"
-                >
-                  {copied ? (
-                    <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                  ) : (
-                    <Copy className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                  )}
-                  <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
-                  <ChevronDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem onClick={() => handleCopy('markdown')}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Copy as Markdown
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleCopy('plain')}>
-                  <Type className="h-4 w-4 mr-2" />
-                  Copy as Plain Text
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleCopy('gdocs')}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Copy for Google Docs
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Single copy button - writes HTML + plain text to clipboard */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopy}
+              className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs text-muted-foreground hover:text-foreground gap-0.5 sm:gap-1"
+            >
+              {copied ? (
+                <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              ) : (
+                <Copy className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              )}
+              <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
+            </Button>
             {/* Voice playback button - only for assistant messages */}
             {!isUser && (
               <Button
@@ -264,64 +226,15 @@ export function MessageBubble({ message, messageIndex, onEditPrompt, onExpandWit
           </div>
         )}
 
-        {/* Citations stored in DB for internal tracing but not displayed to users */}
-
         {/* Expanded Research - only show after streaming completes */}
         {!isUser && !isStreaming && message.expandedResearch && (
           <ExpandedResearch research={message.expandedResearch} />
         )}
 
-        {/* Expand with Research button */}
-        {!isUser && !isStreaming && !message.expandedResearch && onExpandWithResearch && (
-          <div className="flex items-center gap-1 sm:gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={isResearching}
-                  className="h-6 sm:h-7 px-1.5 sm:px-2.5 text-[10px] sm:text-xs gap-1 sm:gap-1.5 border-dashed"
-                >
-                  {isResearching ? (
-                    <>
-                      <Loader2 className="h-2.5 w-2.5 sm:h-3 sm:w-3 animate-spin" />
-                      <span className="hidden sm:inline">Researching...</span>
-                      <span className="sm:hidden">...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Search className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                      <span className="hidden sm:inline">Expand with Research</span>
-                      <span className="sm:hidden">Research</span>
-                      <ChevronDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                    </>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem
-                  onClick={() => onExpandWithResearch(message.id, message.content, false)}
-                >
-                  <Search className="h-4 w-4 mr-2" />
-                  Quick Search
-                  <span className="ml-auto text-xs text-muted-foreground">~5s</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => onExpandWithResearch(message.id, message.content, true)}
-                >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Deep Research
-                  <span className="ml-auto text-xs text-muted-foreground">~30s</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
-
         {/* Model indicator */}
         {!isUser && message.model && !isStreaming && (
           <span className="text-xs text-muted-foreground">
-            {message.model === 'claude' ? 'Claude Opus 4.5' : 'Gemini 2.5 Pro'}
+            {getModelName(message.model)}
           </span>
         )}
       </div>
