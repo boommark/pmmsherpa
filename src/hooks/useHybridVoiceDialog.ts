@@ -216,8 +216,7 @@ export function useHybridVoiceDialog({
               message: transcribedText.trim(),
               conversationId,
               model,
-              webSearchEnabled: false,
-              perplexityEnabled: false
+              webSearchEnabled: false
             }),
             signal: abortControllerRef.current.signal
           })

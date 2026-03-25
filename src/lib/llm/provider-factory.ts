@@ -28,6 +28,15 @@ export const MODEL_CONFIG = {
   },
 } as const
 
+// Internal-only model for lightweight tasks (query planning, intent classification)
+// Not exposed to users — used by the RAG query planner
+export const FLASH_LITE_MODEL_ID = 'gemini-2.5-flash-lite'
+
+export function getFlashLiteModel() {
+  const google = getGoogleClient()
+  return google(FLASH_LITE_MODEL_ID)
+}
+
 export function getAnthropicClient() {
   return createAnthropic({
     apiKey: process.env.ANTHROPIC_API_KEY!,

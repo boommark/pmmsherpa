@@ -75,17 +75,97 @@ export async function retrieveContext({
   return { chunks, totalTokens: Math.round(totalTokens) }
 }
 
+/**
+ * Multi-query retrieval: runs N parallel hybrid searches, deduplicates by chunk ID,
+ * and returns the top chunks sorted by highest score.
+ */
+export async function multiQueryRetrieve(
+  queries: string[],
+  topK: number = 10
+): Promise<RetrievalResult> {
+  const startTime = Date.now()
+
+  // Run all queries in parallel
+  const results = await Promise.all(
+    queries.map((query) =>
+      retrieveContext({ query, topK: 6 }).catch((err) => {
+        console.error(`[MultiQuery] Error for query "${query}":`, err)
+        return { chunks: [], totalTokens: 0 } as RetrievalResult
+      })
+    )
+  )
+
+  // Deduplicate by chunk ID, keeping highest score
+  const chunkMap = new Map<string, RetrievedChunk>()
+  for (const result of results) {
+    for (const chunk of result.chunks) {
+      const existing = chunkMap.get(chunk.id)
+      if (!existing || chunk.similarity > existing.similarity) {
+        chunkMap.set(chunk.id, chunk)
+      }
+    }
+  }
+
+  // Sort by score descending and take top K
+  const chunks = Array.from(chunkMap.values())
+    .sort((a, b) => b.similarity - a.similarity)
+    .slice(0, topK)
+
+  const totalTokens = chunks.reduce((sum, c) => sum + (c.content.split(' ').length * 1.3), 0)
+  const elapsed = Date.now() - startTime
+
+  console.log(`[MultiQuery] ${queries.length} queries → ${chunkMap.size} unique chunks → top ${chunks.length} returned (${elapsed}ms)`)
+
+  return { chunks, totalTokens: Math.round(totalTokens) }
+}
+
+/**
+ * Format chunks grouped by knowledge layer for structured context.
+ */
 export function formatContextForPrompt(chunks: RetrievedChunk[]): string {
   if (chunks.length === 0) {
     return 'No relevant knowledge base content found for this query.'
   }
 
-  return chunks
-    .map((chunk, idx) => {
-      const sourceInfo = formatSourceInfo(chunk)
-      return `[Source ${idx + 1}] ${sourceInfo}\n${chunk.content}`
-    })
-    .join('\n\n---\n\n')
+  // Group by source type
+  const books = chunks.filter((c) => c.sourceType === 'book')
+  const amas = chunks.filter((c) => c.sourceType === 'ama')
+  const blogs = chunks.filter((c) => c.sourceType === 'blog')
+
+  const sections: string[] = []
+  let sourceIdx = 1
+
+  if (books.length > 0) {
+    const formatted = books
+      .map((chunk) => {
+        const info = formatSourceInfo(chunk)
+        return `[Source ${sourceIdx++}] ${info}\n${chunk.content}`
+      })
+      .join('\n\n---\n\n')
+    sections.push(`### Frameworks & Theory\n${formatted}`)
+  }
+
+  if (amas.length > 0) {
+    const formatted = amas
+      .map((chunk) => {
+        const info = formatSourceInfo(chunk)
+        return `[Source ${sourceIdx++}] ${info}\n${chunk.content}`
+      })
+      .join('\n\n---\n\n')
+    sections.push(`### Practitioner Experience\n${formatted}`)
+  }
+
+  if (blogs.length > 0) {
+    const formatted = blogs
+      .map((chunk) => {
+        const info = formatSourceInfo(chunk)
+        return `[Source ${sourceIdx++}] ${info}\n${chunk.content}`
+      })
+      .join('\n\n---\n\n')
+    sections.push(`### Tactical Guides & Case Studies\n${formatted}`)
+  }
+
+  return sections.join('\n\n')
 }
 
 function formatSourceInfo(chunk: RetrievedChunk): string {

@@ -25,6 +25,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   const lastConversationIdRef = useRef<string | undefined>(undefined)
   const isNavigatingToNewConversation = useRef(false)
   const isStreamingRef = useRef(false)
+  const isSubmittingRef = useRef(false)
   const editingMessageIndexRef = useRef<number | null>(null)
 
   const {
@@ -43,7 +44,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     finishStreaming,
     statusMessage,
     setStatusMessage,
-    perplexityEnabled,
     setMessageResearching,
     setExpandedResearch,
     setAbortController,
@@ -152,8 +152,10 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     const hasContent = content.trim()
     const hasAttachments = attachments && attachments.length > 0
 
-    if ((!hasContent && !hasAttachments) || isLoading) return
+    if ((!hasContent && !hasAttachments) || isLoading || isSubmittingRef.current) return
 
+    // Synchronous guard to prevent double-submission before React re-renders
+    isSubmittingRef.current = true
     setIsLoading(true)
     setError(null)
     setStatusMessage('Preparing your request...')
@@ -219,7 +221,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           conversationId: activeConversationId,
           model: currentModel,
           attachments: chatAttachments,
-          perplexityEnabled,
         }),
         signal: abortController.signal,
       })
@@ -344,6 +345,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       setIsLoading(false)
       setStatusMessage(null)
       isStreamingRef.current = false
+      isSubmittingRef.current = false
       setAbortController(null)
     }
   }, [
@@ -362,7 +364,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setConversationId,
     createConversation,
     router,
-    perplexityEnabled,
     setExpandedResearch,
     setAbortController,
   ])

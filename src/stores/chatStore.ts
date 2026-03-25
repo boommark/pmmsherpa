@@ -6,8 +6,6 @@ import type { ModelProvider } from '@/lib/llm/provider-factory'
 interface ChatStore extends ChatState {
   // Status message for inline updates
   statusMessage: string | null
-  // Research toggle (Perplexity quick research)
-  perplexityEnabled: boolean
   // Abort controller for canceling streaming
   abortController: AbortController | null
   // Actions
@@ -21,7 +19,6 @@ interface ChatStore extends ChatState {
   setCurrentModel: (model: ModelProvider) => void
   setConversationId: (id: string | null) => void
   setStatusMessage: (message: string | null) => void
-  setPerplexityEnabled: (enabled: boolean) => void
   // Streaming helpers
   startStreaming: (messageId: string) => void
   appendToStream: (messageId: string, content: string) => void
@@ -43,7 +40,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   currentModel: 'claude-sonnet',
   conversationId: null,
   statusMessage: null,
-  perplexityEnabled: false,
   abortController: null,
 
   // Actions
@@ -77,8 +73,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   setConversationId: (conversationId) => set({ conversationId }),
 
   setStatusMessage: (statusMessage) => set({ statusMessage }),
-
-  setPerplexityEnabled: (perplexityEnabled) => set({ perplexityEnabled }),
 
   // Abort controller
   setAbortController: (abortController) => set({ abortController }),

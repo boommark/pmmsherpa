@@ -2,7 +2,8 @@ import { NextRequest } from 'next/server'
 import { streamText } from 'ai'
 import { createClient } from '@/lib/supabase/server'
 import { getModel, buildMessages, getModelDisplayName, getDbModelValue, type ModelProvider } from '@/lib/llm/provider-factory'
-import { retrieveContext, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
+import { multiQueryRetrieve, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
+import { planQueries } from '@/lib/rag/query-planner'
 import { conductResearch } from '@/lib/llm/perplexity-client'
 import { extractUrls, scrapeUrls } from '@/lib/url-scraper'
 import type { ChatAttachment, WebCitation } from '@/types/chat'
@@ -22,12 +23,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { message, conversationId, model, attachments, perplexityEnabled } = body as {
+    const { message, conversationId, model, attachments } = body as {
       message: string
       conversationId?: string
       model: ModelProvider
       attachments?: ChatAttachment[]
-      perplexityEnabled?: boolean
     }
 
     if (!model) {
@@ -51,86 +51,25 @@ export async function POST(request: NextRequest) {
         }
 
         try {
-          // Status: Loading context
+          // ========================================
+          // PHASE 1: Gather all inputs (parallel)
+          // ========================================
           sendStatus('Loading conversation context...')
-
-          // Get conversation history (last 10 messages for context window efficiency)
-          let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
-          if (conversationId) {
-            // Fetch last 10 messages, ordered DESC to get most recent, then reverse for chronological
-            const { data: messages, error: historyError } = await supabase
-              .from('messages')
-              .select('role, content, created_at')
-              .eq('conversation_id', conversationId)
-              .order('created_at', { ascending: false })
-              .limit(10)
-
-            if (historyError) {
-              console.error('Error fetching conversation history:', historyError)
-            }
-
-            if (messages && Array.isArray(messages)) {
-              // Reverse to get chronological order (oldest to newest)
-              const chronologicalMessages = messages.reverse()
-              conversationHistory = chronologicalMessages.map((m: { role: string; content: string }) => ({
-                role: m.role as 'user' | 'assistant',
-                content: m.content,
-              }))
-              console.log(`Loaded ${conversationHistory.length} messages from conversation history for ${conversationId}`)
-            }
-          } else {
-            console.log('No conversationId provided - starting fresh conversation')
-          }
-
-          // Status: Processing attachments if any
-          let attachmentContext = ''
-          const attachmentIds: string[] = []
-          if (hasAttachments && attachments) {
-            sendStatus('Processing attached files...')
-            for (const attachment of attachments) {
-              attachmentIds.push(attachment.id)
-              // Include extracted text from documents
-              if (attachment.extractedText) {
-                attachmentContext += `\n\n--- Attached File: ${attachment.fileName} ---\n${attachment.extractedText}\n--- End of ${attachment.fileName} ---`
-              } else {
-                // For files without extracted text (images, etc.), just note they're attached
-                attachmentContext += `\n\n[Attached file: ${attachment.fileName} (${attachment.fileType})]`
-              }
-            }
-          }
-
-          // Status: Searching knowledge base (and web if enabled)
-          const searchQuery = message || (attachments ? attachments.map(a => a.fileName).join(' ') : '')
 
           // Detect URLs in the message
           const detectedUrls = message ? extractUrls(message) : []
           const hasUrls = detectedUrls.length > 0
 
-          // Build status message
-          if (hasUrls && perplexityEnabled) {
-            sendStatus('Reading URLs and searching knowledge base and web...')
-          } else if (hasUrls) {
-            sendStatus('Reading URL content and searching knowledge base...')
-          } else if (perplexityEnabled) {
-            sendStatus('Searching knowledge base and web...')
-          } else {
-            sendStatus('Searching PMM knowledge base...')
-          }
+          // Gather inputs in parallel: conversation history, URL scraping, attachment processing
+          const historyPromise = conversationId
+            ? supabase
+                .from('messages')
+                .select('role, content, created_at')
+                .eq('conversation_id', conversationId)
+                .order('created_at', { ascending: false })
+                .limit(10)
+            : Promise.resolve({ data: null, error: null })
 
-          const startRetrieval = Date.now()
-
-          // Build parallel promises — RAG, Perplexity, and URL scraping all at once
-          const ragPromise = retrieveContext({ query: searchQuery })
-          const perplexityPromise = perplexityEnabled
-            ? conductResearch(
-                searchQuery,
-                undefined,
-                { model: 'sonar-pro', recencyFilter: 'month' }
-              ).catch(err => {
-                console.error('Perplexity parallel research error:', err)
-                return null
-              })
-            : Promise.resolve(null)
           const urlScrapePromise = hasUrls
             ? scrapeUrls(detectedUrls).catch(err => {
                 console.error('URL scraping error:', err)
@@ -138,20 +77,90 @@ export async function POST(request: NextRequest) {
               })
             : Promise.resolve('')
 
-          // Execute in parallel
-          const [ragResult, perplexityResult, scrapedUrlContent] = await Promise.all([
+          const [historyResult, scrapedUrlContent] = await Promise.all([
+            historyPromise,
+            urlScrapePromise,
+          ])
+
+          // Process conversation history
+          let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
+          if (historyResult.data && Array.isArray(historyResult.data)) {
+            const chronologicalMessages = historyResult.data.reverse()
+            conversationHistory = chronologicalMessages.map((m: { role: string; content: string }) => ({
+              role: m.role as 'user' | 'assistant',
+              content: m.content,
+            }))
+            console.log(`Loaded ${conversationHistory.length} messages from conversation history for ${conversationId}`)
+          }
+          if (historyResult.error) {
+            console.error('Error fetching conversation history:', historyResult.error)
+          }
+
+          // Process attachments
+          let attachmentContext = ''
+          if (hasAttachments && attachments) {
+            for (const attachment of attachments) {
+              if (attachment.extractedText) {
+                attachmentContext += `\n\n--- Attached File: ${attachment.fileName} ---\n${attachment.extractedText}\n--- End of ${attachment.fileName} ---`
+              } else {
+                attachmentContext += `\n\n[Attached file: ${attachment.fileName} (${attachment.fileType})]`
+              }
+            }
+          }
+
+          // ========================================
+          // PHASE 2: Plan queries + Retrieve (parallel)
+          // ========================================
+          sendStatus('Analyzing your question...')
+
+          const queryPlan = await planQueries({
+            message: message || (attachments ? attachments.map(a => a.fileName).join(' ') : ''),
+            conversationHistory,
+            scrapedUrlContent: scrapedUrlContent || undefined,
+            attachmentContext: attachmentContext || undefined,
+          })
+
+          // Show status based on what the planner decided
+          if (queryPlan.webResearch.needed && hasUrls) {
+            sendStatus('Searching knowledge base and fetching current market data via Perplexity...')
+          } else if (queryPlan.webResearch.needed) {
+            sendStatus('Searching knowledge base and researching the web via Perplexity...')
+          } else if (hasUrls) {
+            sendStatus('Reading URL content and searching PMM knowledge base...')
+          } else {
+            sendStatus('Searching PMM knowledge base...')
+          }
+
+          const startRetrieval = Date.now()
+
+          // Run RAG and Perplexity in parallel
+          const ragPromise = multiQueryRetrieve(queryPlan.ragQueries)
+          const perplexityPromise = queryPlan.webResearch.needed && queryPlan.webResearch.query
+            ? conductResearch(
+                queryPlan.webResearch.query,
+                undefined,
+                { model: 'sonar-pro', recencyFilter: 'month' }
+              ).catch(err => {
+                console.error('Perplexity research error:', err)
+                return null
+              })
+            : Promise.resolve(null)
+
+          const [ragResult, perplexityResult] = await Promise.all([
             ragPromise,
             perplexityPromise,
-            urlScrapePromise,
           ])
 
           const retrievalTime = Date.now() - startRetrieval
           const { chunks } = ragResult
-          console.log(`RAG retrieval took ${retrievalTime}ms, found ${chunks.length} chunks`)
+          console.log(`Retrieval took ${retrievalTime}ms, found ${chunks.length} chunks`)
           if (perplexityResult) {
-            console.log(`Perplexity parallel research completed: ${perplexityResult.searchResults.length} web citations`)
+            console.log(`Perplexity research completed: ${perplexityResult.searchResults.length} web citations`)
           }
 
+          // ========================================
+          // PHASE 3: Assemble context + Generate
+          // ========================================
           const retrievedContext = formatContextForPrompt(chunks)
           const citations = extractCitations(chunks)
 
@@ -165,12 +174,11 @@ export async function POST(request: NextRequest) {
             relatedQuestions = perplexityResult.relatedQuestions || []
             webResearchContext = `
 
---- Current Web Research (from Perplexity) ---
+### Current Web Research (via Perplexity)
 ${perplexityResult.content}
 
 Web Sources:
-${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
---- End Web Research ---`
+${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           }
 
           // Status: Found sources
@@ -181,10 +189,10 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
             sendStatus('No specific sources found, using general knowledge')
           }
 
-          // Build messages with system prompt and context (including attachments and web research)
+          // Build structured context
           let fullContext = retrievedContext
           if (webResearchContext) {
-            fullContext += webResearchContext
+            fullContext += '\n\n' + webResearchContext
           }
           if (attachmentContext) {
             fullContext += '\n\n--- User Attached Files ---' + attachmentContext
@@ -233,7 +241,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}
             encoder.encode(`data: ${JSON.stringify({ type: 'citations', citations })}\n\n`)
           )
 
-          // Send web research data if available (from parallel Perplexity call)
+          // Send web research data if available
           if (perplexityResult && webCitations.length > 0) {
             const expandedResearch = {
               content: perplexityResult.content,

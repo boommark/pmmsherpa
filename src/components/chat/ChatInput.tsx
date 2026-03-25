@@ -6,7 +6,6 @@ import { Send, Loader2, Mic, MicOff, Square } from 'lucide-react'
 import { FileUpload, type UploadedFile, getFileCategory } from './FileUpload'
 import { AttachmentPreview } from './AttachmentPreview'
 import { useChatStore } from '@/stores/chatStore'
-import { PerplexityIcon } from '@/components/icons/PerplexityIcon'
 import { useVoiceInput } from '@/hooks/useVoiceInput'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -29,8 +28,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const [partialTranscript, setPartialTranscript] = useState('')
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const {
-      perplexityEnabled,
-      setPerplexityEnabled,
       isLoading,
       abortStreaming
     } = useChatStore()
@@ -222,23 +219,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 disabled={disabled || isUploading}
                 maxFiles={5}
               />
-
-              {/* Research toggle */}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => setPerplexityEnabled(!perplexityEnabled)}
-                disabled={disabled}
-                className={`h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 transition-all ${
-                  perplexityEnabled
-                    ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-800/40'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50'
-                }`}
-                title={perplexityEnabled ? 'Research with Perplexity (on)' : 'Research with Perplexity'}
-              >
-                <PerplexityIcon size={22} className="sm:w-[24px] sm:h-[24px]" />
-              </Button>
 
               <textarea
                 ref={textareaRef}
