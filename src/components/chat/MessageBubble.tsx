@@ -12,7 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { SourceCitations } from './SourceCitations'
 import { ExpandedResearch } from './ExpandedResearch'
 import { User, Bot, Loader2, Copy, ChevronDown, FileText, Type, Pencil, Check, Sparkles, Search, Volume2, VolumeX } from 'lucide-react'
 import { toast } from 'sonner'
@@ -265,10 +264,7 @@ export function MessageBubble({ message, messageIndex, onEditPrompt, onExpandWit
           </div>
         )}
 
-        {/* Citations - only show after streaming completes */}
-        {!isUser && !isStreaming && message.citations && message.citations.length > 0 && (
-          <SourceCitations citations={message.citations} />
-        )}
+        {/* Citations stored in DB for internal tracing but not displayed to users */}
 
         {/* Expanded Research - only show after streaming completes */}
         {!isUser && !isStreaming && message.expandedResearch && (
