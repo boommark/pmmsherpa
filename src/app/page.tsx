@@ -35,7 +35,7 @@ function MountainIcon({ className }: { className?: string }) {
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 relative overflow-hidden">
+    <div className="landing-light min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 relative overflow-hidden" style={{ colorScheme: 'light' }}>
       <BlobBackground />
 
       {/* Navigation */}
