@@ -11,18 +11,17 @@ export type ModelProvider =
 
 export const MODEL_CONFIG = {
   'claude-opus': {
-    id: 'claude-opus-4-5-20251101',
-    name: 'Claude Opus 4.5',
+    id: 'claude-opus-4-6',
+    name: 'Claude Opus 4.6',
     provider: 'anthropic',
     maxTokens: 64000,
     isThinking: false,
     color: 'bg-orange-500',
-    // Claude uses web_search tool type
     webSearchSupported: true,
   },
   'claude-sonnet': {
-    id: 'claude-sonnet-4-5-20250929',
-    name: 'Claude Sonnet 4.5',
+    id: 'claude-sonnet-4-6',
+    name: 'Claude Sonnet 4.6',
     provider: 'anthropic',
     maxTokens: 64000,
     isThinking: false,
@@ -30,13 +29,12 @@ export const MODEL_CONFIG = {
     webSearchSupported: true,
   },
   'gemini-3-pro': {
-    id: 'gemini-3-pro-preview',
-    name: 'Gemini 3 Pro',
+    id: 'gemini-3.1-pro-preview',
+    name: 'Gemini 3.1 Pro',
     provider: 'google',
     maxTokens: 64000,
     isThinking: false,
     color: 'bg-blue-500',
-    // Gemini uses google_search grounding
     webSearchSupported: true,
   },
   'gemini-2.5-thinking': {
