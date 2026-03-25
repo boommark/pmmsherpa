@@ -8,7 +8,7 @@ import { MessageList } from './MessageList'
 import { ChatInput, type ChatInputRef } from './ChatInput'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
-import { Loader2, Target, Users, Sparkles } from 'lucide-react'
+import { Loader2, Target, MessageCircle, CheckCircle, TrendingUp } from 'lucide-react'
 import type { ChatMessage, ChatAttachment } from '@/types/chat'
 import type { UploadedFile } from './FileUpload'
 
@@ -423,76 +423,86 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         </div>
       ) : messages.length === 0 && !conversationId ? (
         <div className="flex-1 flex flex-col">
-          {/* Top section with orb and greeting - smaller on mobile, centered on desktop */}
-          <div className="flex flex-col justify-center items-center px-3 md:px-4 py-4 md:py-8 md:flex-1">
-            {/* Animated AI Orb - smaller on mobile */}
-            <div className="flex justify-center mb-2 md:mb-6">
-              <div className="md:block">
-                <AnimatedOrb size="lg" />
-              </div>
+          {/* Top section with orb and headline */}
+          <div className="flex flex-col justify-center items-center px-3 md:px-4 pt-6 md:pt-10 md:flex-1">
+            <div className="flex justify-center mb-3 md:mb-5">
+              <AnimatedOrb size="md" />
             </div>
 
-            {/* Greeting - more compact on mobile */}
             <div className="text-center space-y-2 md:space-y-3 max-w-2xl mx-auto">
               <h2 className="text-xl md:text-3xl font-semibold tracking-tight">
-                Welcome to PMMSherpa
+                What are you working on?
               </h2>
-              <p className="text-sm md:text-lg text-muted-foreground/80">
-                Your second brain for product marketing
+              <p className="text-sm md:text-base text-muted-foreground/70 max-w-lg mx-auto">
+                Grounded in the frameworks, war stories, and playbooks of thousands of real-world PMM leaders.
               </p>
-              <div className="flex flex-wrap gap-2 justify-center pt-2">
-                <span className="px-3 py-1 rounded-full bg-teal-500/10 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 text-xs font-medium">
-                  Expert Knowledge
-                </span>
-                <span className="px-3 py-1 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-medium">
-                  Real-time Research
-                </span>
-                <span className="px-3 py-1 rounded-full bg-purple-500/10 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs font-medium">
-                  Voice & Text
-                </span>
-              </div>
             </div>
           </div>
 
-          {/* Bottom section: Chat input first, then suggestions below */}
-          <div className="w-full">
-            {/* Chat input */}
-            <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />
+          {/* Pillar tiles - 2x2 grid on desktop, stacked on mobile */}
+          <div className="w-full max-w-2xl mx-auto px-4 md:px-6 py-4 md:py-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 md:gap-3">
+              <button
+                className="group text-left px-4 py-3.5 md:px-5 md:py-4 rounded-xl bg-white/60 dark:bg-zinc-800/50 backdrop-blur-sm border border-white/30 dark:border-zinc-700/40 hover:bg-white/90 dark:hover:bg-zinc-700/70 transition-all shadow-sm hover:shadow-md"
+                onClick={() => handleSendMessage("Help me build a positioning statement for my B2B developer tools product")}
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Target className="h-4 w-4 text-teal-600 dark:text-teal-400 shrink-0" />
+                  <span className="text-xs font-semibold uppercase tracking-wide text-teal-700 dark:text-teal-400">Frame</span>
+                </div>
+                <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
+                  Help me build a positioning statement for my B2B dev tools product
+                </p>
+                <p className="text-xs text-muted-foreground/60 mt-1.5">Positioning, messaging, GTM planning</p>
+              </button>
 
-            {/* Quick action suggestions - below the chat input */}
-            <div className="w-full max-w-3xl mx-auto px-3 md:px-6 pb-3 md:pb-6">
-              <p className="text-xs text-muted-foreground/70 mb-2 md:mb-3 text-center md:text-left">
-                Try asking about:
-              </p>
-              <div className="flex flex-col gap-1.5 md:gap-2">
-                <button
-                  className="group px-3 py-2.5 md:px-4 md:py-3 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left flex items-center gap-2"
-                  onClick={() => handleSendMessage("What is April Dunford's positioning framework?")}
-                >
-                  <Target className="h-4 w-4 text-teal-600 dark:text-teal-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                  <span>What is April Dunford&apos;s positioning framework?</span>
-                </button>
-                <button
-                  className="group px-3 py-2.5 md:px-4 md:py-3 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left flex items-center gap-2"
-                  onClick={() => handleSendMessage('How can PMMs earn respect from PMs?')}
-                >
-                  <Users className="h-4 w-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                  <span>How can PMMs earn respect from PMs?</span>
-                </button>
-                <button
-                  className="group px-3 py-2.5 md:px-4 md:py-3 rounded-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-sm border border-white/20 dark:border-zinc-700/50 text-xs md:text-sm hover:bg-white/80 dark:hover:bg-zinc-700/80 transition-all shadow-sm hover:shadow-md text-left flex items-center gap-2"
-                  onClick={() => handleSendMessage('What messaging strategies deliver success?')}
-                >
-                  <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                  <span>What messaging strategies deliver success?</span>
-                </button>
-              </div>
+              <button
+                className="group text-left px-4 py-3.5 md:px-5 md:py-4 rounded-xl bg-white/60 dark:bg-zinc-800/50 backdrop-blur-sm border border-white/30 dark:border-zinc-700/40 hover:bg-white/90 dark:hover:bg-zinc-700/70 transition-all shadow-sm hover:shadow-md"
+                onClick={() => handleSendMessage("We're losing deals to a competitor who's 40% cheaper. How should I respond?")}
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <MessageCircle className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  <span className="text-xs font-semibold uppercase tracking-wide text-indigo-700 dark:text-indigo-400">Consult</span>
+                </div>
+                <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
+                  We&apos;re losing deals to a competitor who&apos;s 40% cheaper. How should I respond?
+                </p>
+                <p className="text-xs text-muted-foreground/60 mt-1.5">Strategy, competitive, pricing questions</p>
+              </button>
 
-              {/* Subtle hint */}
-              <p className="text-xs text-muted-foreground/60 pt-3 text-center">
-                Powered by 1,280+ expert sources
-              </p>
+              <button
+                className="group text-left px-4 py-3.5 md:px-5 md:py-4 rounded-xl bg-white/60 dark:bg-zinc-800/50 backdrop-blur-sm border border-white/30 dark:border-zinc-700/40 hover:bg-white/90 dark:hover:bg-zinc-700/70 transition-all shadow-sm hover:shadow-md"
+                onClick={() => handleSendMessage("Review this messaging and tell me where it's weak")}
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">Validate</span>
+                </div>
+                <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
+                  Review this messaging and tell me where it&apos;s weak
+                </p>
+                <p className="text-xs text-muted-foreground/60 mt-1.5">Stress-test work against expert standards</p>
+              </button>
+
+              <button
+                className="group text-left px-4 py-3.5 md:px-5 md:py-4 rounded-xl bg-white/60 dark:bg-zinc-800/50 backdrop-blur-sm border border-white/30 dark:border-zinc-700/40 hover:bg-white/90 dark:hover:bg-zinc-700/70 transition-all shadow-sm hover:shadow-md"
+                onClick={() => handleSendMessage("I'm transitioning from IC to PMM manager. What should I focus on first?")}
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400 shrink-0" />
+                  <span className="text-xs font-semibold uppercase tracking-wide text-purple-700 dark:text-purple-400">Grow</span>
+                </div>
+                <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
+                  I&apos;m transitioning from IC to PMM manager. What should I focus on first?
+                </p>
+                <p className="text-xs text-muted-foreground/60 mt-1.5">Career guidance, skill gaps, leadership</p>
+              </button>
             </div>
+          </div>
+
+          {/* Chat input */}
+          <div className="w-full mt-auto">
+            <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />
           </div>
         </div>
       ) : (

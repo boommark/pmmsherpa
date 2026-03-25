@@ -287,7 +287,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
             </div>
           </div>
           <p className="text-xs text-muted-foreground/70 mt-2 md:mt-3 text-center hidden sm:block">
-            PMMSherpa draws from 1,280+ expert sources. Attach PDFs, images, or documents for context.
+            Attach files for context. Paste URLs for analysis. Ask anything about product marketing.
           </p>
         </div>
       </div>
