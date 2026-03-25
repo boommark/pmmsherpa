@@ -502,7 +502,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
               messages={messages}
               statusMessage={statusMessage}
               onEditPrompt={handleEditPrompt}
-              onExpandWithResearch={handleExpandWithResearch}
             />
           </div>
           <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />

@@ -5,7 +5,6 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { ExpandedResearch } from './ExpandedResearch'
 import { Loader2, Copy, Pencil, Check, Volume2, VolumeX } from 'lucide-react'
 import { toast } from 'sonner'
 import { copyForGoogleDocs, type CopyOptions } from '@/lib/utils/clipboard'
@@ -17,7 +16,6 @@ interface MessageBubbleProps {
   message: ChatMessage
   messageIndex?: number
   onEditPrompt?: (content: string, messageIndex: number) => void
-  onExpandWithResearch?: (messageId: string, content: string, deepResearch: boolean) => void
 }
 
 export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBubbleProps) {
@@ -40,13 +38,11 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
     }
   }
 
-  // Build copy options to include citations and research when copying assistant messages
   const copyOptions: CopyOptions | undefined = !isUser ? {
     citations: message.citations as Citation[] | undefined,
     expandedResearch: message.expandedResearch,
   } : undefined
 
-  // Single-click copy: writes both HTML (for Google Docs) and plain text to clipboard
   const handleCopy = async () => {
     try {
       await copyForGoogleDocs(message.content, copyOptions)
@@ -64,7 +60,6 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
     }
   }
 
-  // Model display names (mapped from DB values)
   const getModelName = (model: string) => {
     switch (model) {
       case 'claude': return 'Claude Sonnet 4.6'
@@ -88,7 +83,7 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
       >
         <div
           className={cn(
-            'rounded-lg px-2 py-1.5 sm:px-2.5 sm:py-2 md:px-4 md:py-2.5 w-full relative',
+            'rounded-lg px-3 py-2 sm:px-3.5 sm:py-2.5 md:px-5 md:py-3.5 w-full relative',
             isUser
               ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white'
               : 'bg-muted text-foreground'
@@ -98,27 +93,30 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
           {isUser ? (
             <p className="whitespace-pre-wrap text-sm sm:text-base break-words overflow-wrap-anywhere">{message.content}</p>
           ) : (
-            <div className="prose prose-sm dark:prose-invert max-w-none" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+            <div
+              className="prose prose-base dark:prose-invert max-w-none prose-p:leading-relaxed prose-li:leading-relaxed"
+              style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+            >
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
                   h1: ({ children }) => (
-                    <h1 className="text-lg font-bold mt-4 mb-2">{children}</h1>
+                    <h1 className="text-lg font-semibold mt-6 mb-3">{children}</h1>
                   ),
                   h2: ({ children }) => (
-                    <h2 className="text-base font-bold mt-3 mb-2">{children}</h2>
+                    <h2 className="text-base font-semibold mt-5 mb-2.5">{children}</h2>
                   ),
                   h3: ({ children }) => (
-                    <h3 className="text-sm font-bold mt-2 mb-1">{children}</h3>
+                    <h3 className="text-sm font-semibold mt-4 mb-2">{children}</h3>
                   ),
                   ul: ({ children }) => (
-                    <ul className="list-disc pl-4 my-2 space-y-1">{children}</ul>
+                    <ul className="list-disc pl-5 my-3 space-y-1.5">{children}</ul>
                   ),
                   ol: ({ children }) => (
-                    <ol className="list-decimal pl-4 my-2 space-y-1">{children}</ol>
+                    <ol className="list-decimal pl-5 my-3 space-y-1.5">{children}</ol>
                   ),
-                  li: ({ children }) => <li className="my-0.5 break-words">{children}</li>,
-                  p: ({ children }) => <p className="my-2 break-words">{children}</p>,
+                  li: ({ children }) => <li className="my-1 break-words">{children}</li>,
+                  p: ({ children }) => <p className="my-3 break-words">{children}</p>,
                   a: ({ children, href }) => (
                     <a href={href} className="text-primary underline break-all" target="_blank" rel="noopener noreferrer">
                       {children}
@@ -135,29 +133,32 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
                     )
                   },
                   pre: ({ children }) => (
-                    <pre className="bg-black/10 dark:bg-white/10 p-2 sm:p-3 rounded-lg overflow-x-auto my-2 text-xs sm:text-sm">
+                    <pre className="bg-black/10 dark:bg-white/10 p-3 sm:p-4 rounded-lg overflow-x-auto my-4 text-xs sm:text-sm">
                       {children}
                     </pre>
                   ),
                   table: ({ children }) => (
-                    <div className="overflow-x-auto my-2 -mx-2 sm:mx-0 max-w-[calc(100vw-5rem)] sm:max-w-full rounded-md border border-border">
+                    <div className="overflow-x-auto my-4 -mx-2 sm:mx-0 max-w-[calc(100vw-5rem)] sm:max-w-full rounded-md border border-border">
                       <table className="w-full border-collapse text-xs sm:text-sm min-w-full">
                         {children}
                       </table>
                     </div>
                   ),
                   th: ({ children }) => (
-                    <th className="border border-border px-1.5 py-1 sm:px-3 sm:py-2 bg-muted font-medium text-left text-xs sm:text-sm break-words">
+                    <th className="border border-border px-2 py-1.5 sm:px-3 sm:py-2 bg-muted font-medium text-left text-xs sm:text-sm break-words">
                       {children}
                     </th>
                   ),
                   td: ({ children }) => (
-                    <td className="border border-border px-1.5 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm break-words">{children}</td>
+                    <td className="border border-border px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm break-words">{children}</td>
                   ),
                   blockquote: ({ children }) => (
-                    <blockquote className="border-l-4 border-primary pl-4 my-2 italic">
+                    <blockquote className="border-l-4 border-primary/40 pl-4 my-4 italic text-muted-foreground">
                       {children}
                     </blockquote>
+                  ),
+                  hr: () => (
+                    <hr className="my-5 border-border/50" />
                   ),
                 }}
               >
@@ -172,14 +173,13 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
           )}
         </div>
 
-        {/* Action buttons - always visible on mobile, hover on desktop */}
+        {/* Action buttons */}
         {!isStreaming && (
           <div className={cn(
             'flex items-center gap-0.5 sm:gap-1 transition-opacity',
             isUser ? 'flex-row-reverse' : 'flex-row',
             'opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
           )}>
-            {/* Single copy button - writes HTML + plain text to clipboard */}
             <Button
               variant="ghost"
               size="sm"
@@ -193,7 +193,6 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
               )}
               <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
             </Button>
-            {/* Voice playback button - only for assistant messages */}
             {!isUser && (
               <Button
                 variant="ghost"
@@ -224,11 +223,6 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
               </Button>
             )}
           </div>
-        )}
-
-        {/* Expanded Research - only show after streaming completes */}
-        {!isUser && !isStreaming && message.expandedResearch && (
-          <ExpandedResearch research={message.expandedResearch} />
         )}
 
         {/* Model indicator */}
