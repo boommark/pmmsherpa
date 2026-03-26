@@ -20,7 +20,6 @@ function MountainIcon({ className }: { className?: string }) {
   );
 }
 
-
 function CustomIcon({ src, alt, size = 40 }: { src: string; alt: string; size?: number }) {
   return (
     <Image
@@ -49,10 +48,9 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-[#5f6368]">
-            <a href="#use-cases" className="hover:text-[#191c1e] transition-colors">Use Cases</a>
+            <a href="#what-it-does" className="hover:text-[#191c1e] transition-colors">What It Does</a>
             <a href="#how-it-works" className="hover:text-[#191c1e] transition-colors">How It Works</a>
             <a href="#who-its-for" className="hover:text-[#191c1e] transition-colors">Who It&apos;s For</a>
-            <a href="#why-different" className="hover:text-[#191c1e] transition-colors">Why PMMSherpa</a>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login">
@@ -71,7 +69,7 @@ export default function LandingPage() {
 
       {/* Hero with header background */}
       <section className="relative overflow-hidden">
-        {/* Header background illustration — contained, not stretched */}
+        {/* Header background illustration */}
         <div className="absolute inset-x-0 top-0 h-[500px] md:h-[600px] pointer-events-none">
           <Image
             src="/homepage/hero-background.png"
@@ -139,13 +137,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Four Pillars with custom icons */}
-      <section id="use-cases" className="py-20 md:py-28 scroll-mt-20" style={{
+      {/* What It Does */}
+      <section id="what-it-does" className="py-20 md:py-28 scroll-mt-20" style={{
         background: 'linear-gradient(180deg, #f8f9fd 0%, #f0f3fa 50%, #f8f9fd 100%)',
       }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <div className="text-center mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">Use Cases</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">What It Does</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e] mb-4">
               Four ways to work smarter
             </h2>
@@ -159,7 +157,7 @@ export default function LandingPage() {
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
                 Build positioning, messaging, and GTM plans on solid ground.
-                Proven frameworks from Dunford, Moore, and hundreds of practitioner playbooks.
+                Proven frameworks and hundreds of practitioner playbooks.
               </p>
               <p className="text-xs text-[#a0a4ab]">Positioning, messaging, GTM planning</p>
             </div>
@@ -183,7 +181,7 @@ export default function LandingPage() {
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
                 Stress-test before you ship. Paste your messaging or launch plan
-                and get a senior PMM red-team review, on demand.
+                and get expert PMM critique, on demand.
               </p>
               <p className="text-xs text-[#a0a4ab]">Review work against expert standards</p>
             </div>
@@ -195,7 +193,7 @@ export default function LandingPage() {
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
                 Level up without waiting for a mentor.
-                Career advice from 540+ PMM leaders at companies from Series A to Fortune 500.
+                Career advice from hundreds of PMM leaders at companies from Series A to Fortune 500.
               </p>
               <p className="text-xs text-[#a0a4ab]">Career guidance, skill gaps, leadership</p>
             </div>
@@ -203,7 +201,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works with custom icons in placeholders */}
+      {/* How It Works */}
       <section id="how-it-works" className="py-20 md:py-28 scroll-mt-20" style={{
         background: 'linear-gradient(180deg, #0a1628 0%, #0f1d35 50%, #0a1628 100%)',
       }}>
@@ -315,7 +313,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Who It's For with custom icons */}
+      {/* Who It's For */}
       <section id="who-its-for" className="py-20 md:py-28 scroll-mt-20" style={{
         background: 'linear-gradient(180deg, #ffffff 0%, #f8f9fd 50%, #ffffff 100%)',
       }}>
@@ -364,56 +362,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Why Different with custom icons */}
-      <section id="why-different" className="py-20 md:py-28 scroll-mt-20" style={{
-        background: 'linear-gradient(180deg, #f8f9fd 0%, #f0f3fa 50%, #f8f9fd 100%)',
-      }}>
-        <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="text-center mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">Why PMMSherpa</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e]">
-              Not another chatbot with a marketing prompt
-            </h2>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            <div className="rounded-2xl bg-white/80 backdrop-blur-sm border border-[#e8ecf4]/60 p-10 md:p-14">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
-                <div className="text-center">
-                  <div className="mx-auto mb-4 w-16 h-16">
-                    <CustomIcon src="/icons/curated-knowledge.png" alt="Curated Knowledge" size={64} />
-                  </div>
-                  <h3 className="font-semibold text-base text-[#191c1e] mb-2">Curated expertise</h3>
-                  <p className="text-sm text-[#5f6368] leading-relaxed">
-                    540+ practitioner AMAs, foundational PMM books, and hundreds of tactical guides.
-                  </p>
-                </div>
-
-                <div className="text-center">
-                  <div className="mx-auto mb-4 w-16 h-16">
-                    <CustomIcon src="/icons/intelligent-retrieval-2.png" alt="Intelligent Retrieval" size={64} />
-                  </div>
-                  <h3 className="font-semibold text-base text-[#191c1e] mb-2">Context-aware retrieval</h3>
-                  <p className="text-sm text-[#5f6368] leading-relaxed">
-                    Understands your question, reads your history, and pulls the right frameworks.
-                  </p>
-                </div>
-
-                <div className="text-center">
-                  <div className="mx-auto mb-4 w-16 h-16">
-                    <CustomIcon src="/icons/live-market-insights.png" alt="Live Market Insights" size={64} />
-                  </div>
-                  <h3 className="font-semibold text-base text-[#191c1e] mb-2">Live market intel</h3>
-                  <p className="text-sm text-[#5f6368] leading-relaxed">
-                    Automatically pulls in web research when your question needs current data.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
       <section className="py-20 md:py-28" style={{
         background: 'linear-gradient(180deg, #ffffff 0%, #f8f9fd 100%)',
@@ -442,16 +390,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 bg-white border-t border-[#f0f2f5]">
-        <div className="max-w-6xl mx-auto flex flex-col items-center justify-between gap-4 px-5 md:px-8 text-sm text-[#a0a4ab] sm:flex-row">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#0058be] to-[#2170e4] flex items-center justify-center">
-              <MountainIcon className="h-3 w-3 text-white" />
+      {/* Footer with nav links */}
+      <footer className="py-10 bg-white border-t border-[#f0f2f5]">
+        <div className="max-w-6xl mx-auto px-5 md:px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#0058be] to-[#2170e4] flex items-center justify-center">
+                <MountainIcon className="h-3 w-3 text-white" />
+              </div>
+              <span className="font-medium text-[#191c1e]">PMMSherpa</span>
             </div>
-            <span className="font-medium text-[#5f6368]">PMMSherpa</span>
+            <div className="flex items-center gap-8 text-sm text-[#5f6368]">
+              <a href="#what-it-does" className="hover:text-[#191c1e] transition-colors">What It Does</a>
+              <a href="#how-it-works" className="hover:text-[#191c1e] transition-colors">How It Works</a>
+              <a href="#who-its-for" className="hover:text-[#191c1e] transition-colors">Who It&apos;s For</a>
+              <Link href="/login" className="hover:text-[#191c1e] transition-colors">Log in</Link>
+            </div>
           </div>
-          <p>Built for product marketing professionals.</p>
         </div>
       </footer>
     </div>
