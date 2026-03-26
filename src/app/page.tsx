@@ -141,14 +141,20 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Hero Screenshot Placeholder */}
+        {/* Hero Demo Video */}
         <div className="max-w-5xl mx-auto px-5 md:px-8 pb-20 md:pb-28 relative">
           <div className="max-w-4xl mx-auto">
-            <ScreenshotPlaceholder
-              label="PMMSherpa Chat Interface"
-              icon={Sparkles}
-              description="Product screenshot coming soon — AI-powered conversations with deep PMM expertise"
-            />
+            <div className="rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,88,190,0.10)] ring-1 ring-[#e8ecf4]/60">
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-auto"
+              >
+                <source src="/homepage/hero-demo.mp4" type="video/mp4" />
+              </video>
+            </div>
           </div>
         </div>
       </section>
