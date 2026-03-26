@@ -44,7 +44,7 @@ export function ModelSelector({ value, onChange, disabled }: ModelSelectorProps)
           <div className="flex items-center gap-1.5 sm:gap-2">
             <span className={`w-2 h-2 rounded-full shrink-0 ${currentConfig.color}`} />
             <span className="truncate text-xs sm:text-sm">{currentConfig.name}</span>
-            {currentConfig.isThinking && <Brain className="h-3 w-3 text-purple-500 shrink-0 hidden sm:block" />}
+            {currentConfig.isThinking && <Brain className="h-3 w-3 text-[#0058be] shrink-0 hidden sm:block" />}
           </div>
         </SelectValue>
       </SelectTrigger>
@@ -60,7 +60,7 @@ export function ModelSelector({ value, onChange, disabled }: ModelSelectorProps)
                     <span className={`w-2 h-2 rounded-full ${config.color}`} />
                     <span>{config.name}</span>
                     {config.isThinking ? (
-                      <Brain className="h-3 w-3 text-purple-500" />
+                      <Brain className="h-3 w-3 text-[#0058be]" />
                     ) : (
                       <Zap className="h-3 w-3 text-yellow-500" />
                     )}

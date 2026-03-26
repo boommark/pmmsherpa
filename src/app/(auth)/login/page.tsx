@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
-import { Loader2, Sparkles } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -45,13 +45,13 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 px-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-[#f7f9fc] dark:bg-[#111418] px-4 relative overflow-hidden">
       {/* Background blobs */}
       <BlobBackground />
 
-      {/* Glassmorphism card */}
+      {/* Glassmorphism card — no hard border */}
       <div className="w-full max-w-md relative z-10">
-        <div className="rounded-3xl bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-white/20 dark:border-zinc-700/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-8">
+        <div className="rounded-2xl bg-white/80 dark:bg-[#1e2125]/80 backdrop-blur-xl shadow-[0_10px_40px_rgba(25,28,30,0.06)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)] p-8">
           {/* Header */}
           <div className="text-center space-y-4 mb-8">
             {/* Animated Orb */}
@@ -60,15 +60,17 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center justify-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                <Sparkles className="h-4 w-4 text-white" />
+              <div className="w-8 h-8 rounded-lg bg-[#0058be] flex items-center justify-center">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 20L7 10l5 6 4-10 6 14" />
+                </svg>
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold text-[#0058be] dark:text-[#a8c0f0]">
                 PMMSherpa
               </span>
             </div>
 
-            <h1 className="text-2xl font-bold">Welcome back</h1>
+            <h1 className="text-2xl font-bold text-[#191c1e] dark:text-[#e2e4e8]">Welcome back</h1>
             <p className="text-muted-foreground text-sm">
               Sign in to your AI-powered product marketing assistant
             </p>
@@ -77,7 +79,7 @@ export default function LoginPage() {
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-5">
             {error && (
-              <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 text-sm">
+              <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm">
                 {error}
               </div>
             )}
@@ -94,7 +96,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isLoading}
-                className="h-11 rounded-xl bg-white/50 dark:bg-zinc-800/50 border-white/20 dark:border-zinc-700/50 focus:border-indigo-500 focus:ring-indigo-500/20"
+                className="h-11 rounded-xl bg-[#f2f4f7] dark:bg-[#282b30] border-none focus:bg-[#d8e2ff] dark:focus:bg-[#33363b] focus:ring-0 transition-colors"
               />
             </div>
 
@@ -105,7 +107,7 @@ export default function LoginPage() {
                 </Label>
                 <Link
                   href="/forgot-password"
-                  className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                  className="text-sm text-[#0058be] dark:text-[#a8c0f0] hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -118,13 +120,13 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                className="h-11 rounded-xl bg-white/50 dark:bg-zinc-800/50 border-white/20 dark:border-zinc-700/50 focus:border-indigo-500 focus:ring-indigo-500/20"
+                className="h-11 rounded-xl bg-[#f2f4f7] dark:bg-[#282b30] border-none focus:bg-[#d8e2ff] dark:focus:bg-[#33363b] focus:ring-0 transition-colors"
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full h-11 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 shadow-lg shadow-indigo-500/25 font-medium"
+              className="w-full h-11 rounded-xl bg-[#0058be] hover:bg-[#004a9e] shadow-none font-medium text-white"
               disabled={isLoading}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -132,13 +134,13 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {/* Footer */}
-          <div className="mt-6 pt-6 border-t border-white/10 dark:border-zinc-700/30 text-center">
+          {/* Footer — spacing divider instead of border */}
+          <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
               Don&apos;t have an account?{' '}
               <Link
                 href="/request-access"
-                className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+                className="text-[#0058be] dark:text-[#a8c0f0] hover:underline font-medium"
               >
                 Request Access
               </Link>

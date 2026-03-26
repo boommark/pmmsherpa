@@ -22,27 +22,27 @@ export function AnimatedOrb({ size = 'md', className }: AnimatedOrbProps) {
 
   return (
     <div className={cn('relative', sizeClasses[size], className)}>
-      {/* Outer glow - indigo/purple */}
+      {/* Outer glow — Precision Blue */}
       <div
-        className="absolute inset-0 rounded-full animate-pulse opacity-60 blur-xl"
+        className="absolute inset-0 rounded-full animate-pulse opacity-50 blur-xl"
         style={{
-          background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)',
+          background: 'linear-gradient(135deg, #0058be 0%, #2170e4 50%, #5a9cf5 100%)',
         }}
       />
 
       {/* Secondary glow ring */}
       <div
-        className="absolute -inset-2 rounded-full opacity-30 blur-lg animate-[glow_4s_ease-in-out_infinite]"
+        className="absolute -inset-2 rounded-full opacity-25 blur-lg animate-[glow_4s_ease-in-out_infinite]"
         style={{
-          background: 'radial-gradient(circle, #8b5cf6 0%, transparent 70%)',
+          background: 'radial-gradient(circle, #2170e4 0%, transparent 70%)',
         }}
       />
 
-      {/* Main orb container with gradient and float animation */}
+      {/* Main orb — sapphire gradient */}
       <div
         className="absolute inset-0 rounded-full shadow-lg animate-[float_6s_ease-in-out_infinite] flex items-center justify-center"
         style={{
-          background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)',
+          background: 'linear-gradient(135deg, #0058be 0%, #2170e4 50%, #5a9cf5 100%)',
         }}
       >
         {/* Mountain peak icon */}
@@ -59,22 +59,20 @@ export function AnimatedOrb({ size = 'md', className }: AnimatedOrbProps) {
         </svg>
       </div>
 
-      {/* Animated shine sweep effect */}
-      <div
-        className="absolute inset-0 rounded-full overflow-hidden pointer-events-none"
-      >
+      {/* Animated shine sweep */}
+      <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%)',
+            background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%)',
             animation: 'shine 3s ease-in-out infinite',
           }}
         />
       </div>
 
-      {/* Sparkle dots - purple/indigo theme */}
-      <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-violet-300 animate-[sparkle_2s_ease-in-out_infinite]" />
-      <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 rounded-full bg-indigo-300 animate-[sparkle_2s_ease-in-out_infinite_0.5s]" />
+      {/* Sparkle dots — blue tones */}
+      <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-blue-300 animate-[sparkle_2s_ease-in-out_infinite]" />
+      <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 rounded-full bg-sky-300 animate-[sparkle_2s_ease-in-out_infinite_0.5s]" />
       <div className="absolute top-1/4 -right-2 w-1 h-1 rounded-full bg-white animate-[sparkle_2s_ease-in-out_infinite_1s]" />
 
       <style jsx>{`
@@ -96,11 +94,11 @@ export function AnimatedOrb({ size = 'md', className }: AnimatedOrbProps) {
         }
         @keyframes glow {
           0%, 100% {
-            opacity: 0.3;
+            opacity: 0.25;
             transform: scale(1);
           }
           50% {
-            opacity: 0.5;
+            opacity: 0.45;
             transform: scale(1.1);
           }
         }

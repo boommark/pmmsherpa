@@ -34,13 +34,13 @@ export function ExpandedResearch({ research }: ExpandedResearchProps) {
               <div className={cn(
                 "p-1 sm:p-1.5 rounded-md shrink-0",
                 research.researchType === 'deep'
-                  ? "bg-purple-100 dark:bg-purple-900/30"
+                  ? "bg-[#d8e2ff] dark:bg-[#0058be]/20"
                   : "bg-blue-100 dark:bg-blue-900/30"
               )}>
                 {research.researchType === 'deep' ? (
                   <Sparkles className={cn(
                     "h-3 w-3 sm:h-3.5 sm:w-3.5",
-                    "text-purple-600 dark:text-purple-400"
+                    "text-[#0058be] dark:text-[#a8c0f0]"
                   )} />
                 ) : (
                   <Search className={cn(
@@ -70,7 +70,7 @@ export function ExpandedResearch({ research }: ExpandedResearchProps) {
           <div className={cn(
             "rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm overflow-hidden",
             research.researchType === 'deep'
-              ? "bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200/50 dark:border-purple-800/30"
+              ? "bg-[#d8e2ff]/30 dark:bg-[#0058be]/10"
               : "bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30"
           )}>
             <div className="prose prose-sm dark:prose-invert max-w-none break-words overflow-hidden [&_*]:break-words">
@@ -102,7 +102,7 @@ export function ExpandedResearch({ research }: ExpandedResearchProps) {
                       className={cn(
                         "underline decoration-dotted hover:decoration-solid",
                         research.researchType === 'deep'
-                          ? "text-purple-600 dark:text-purple-400"
+                          ? "text-[#0058be] dark:text-[#a8c0f0]"
                           : "text-blue-600 dark:text-blue-400"
                       )}
                     >

@@ -36,14 +36,12 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const { isRecording, isProcessing, startRecording, stopRecording } = useVoiceInput({
       onTranscript: (text, isFinal) => {
         if (isFinal) {
-          // Append final transcript to input
           setInput(prev => {
             const separator = prev.trim() ? ' ' : ''
             return prev.trim() + separator + text
           })
           setPartialTranscript('')
         } else {
-          // Show partial transcript
           setPartialTranscript(text)
         }
       },
@@ -64,7 +62,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     useImperativeHandle(ref, () => ({
       setInput: (value: string) => {
         setInput(value)
-        // Focus the textarea after setting the input
         setTimeout(() => textareaRef.current?.focus(), 0)
       },
       focus: () => {
@@ -82,7 +79,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
 
     // Handle file selection
     const handleFilesSelected = useCallback(async (files: File[]) => {
-      // Create pending file entries
       const newAttachments: UploadedFile[] = files.map((file) => ({
         id: crypto.randomUUID(),
         file,
@@ -93,10 +89,8 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
 
       setAttachments((prev) => [...prev, ...newAttachments])
 
-      // Upload each file
       for (const attachment of newAttachments) {
         try {
-          // Update status to uploading
           setAttachments((prev) =>
             prev.map((a) =>
               a.id === attachment.id ? { ...a, status: 'uploading' as const, progress: 10 } : a
@@ -121,7 +115,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
 
           const data = await response.json()
 
-          // Update with success
           setAttachments((prev) =>
             prev.map((a) =>
               a.id === attachment.id
@@ -137,7 +130,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
           )
         } catch (error) {
           console.error('File upload error:', error)
-          // Update with error
           setAttachments((prev) =>
             prev.map((a) =>
               a.id === attachment.id
@@ -157,12 +149,10 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const handleRemoveAttachment = useCallback(async (id: string) => {
       const attachment = attachments.find((a) => a.id === id)
 
-      // Revoke preview URL if it exists
       if (attachment?.preview) {
         URL.revokeObjectURL(attachment.preview)
       }
 
-      // If the file was uploaded, delete it from storage
       if (attachment?.storagePath && attachment.status === 'completed') {
         try {
           await fetch(`/api/upload?id=${id}`, {
@@ -181,7 +171,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       const hasCompletedAttachments = attachments.some((a) => a.status === 'completed')
 
       if ((hasText || hasCompletedAttachments) && !disabled) {
-        // Filter to only completed attachments
         const completedAttachments = attachments.filter((a) => a.status === 'completed')
         onSend(input.trim(), completedAttachments.length > 0 ? completedAttachments : undefined)
         setInput('')
@@ -196,15 +185,14 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       }
     }
 
-    // Check if any attachments are still uploading
     const isUploading = attachments.some((a) => a.status === 'uploading')
     const canSubmit = (input.trim() || attachments.some((a) => a.status === 'completed')) && !isUploading
 
     return (
       <div className="p-2 sm:p-3 md:p-4 lg:p-6 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-3 md:pb-4 lg:pb-6">
         <div className="w-full max-w-3xl mx-auto">
-          {/* Glassmorphism container */}
-          <div className="relative rounded-xl md:rounded-2xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl shadow-[0_4px_16px_rgba(0,0,0,0.08)] md:shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.3)] md:dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/20 dark:border-zinc-700/50">
+          {/* Glassmorphism container — no hard borders */}
+          <div className="relative rounded-xl md:rounded-2xl bg-surface-container-lowest/80 dark:bg-surface-container/80 backdrop-blur-xl shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
             {/* Attachment previews */}
             <AttachmentPreview
               files={attachments}
@@ -212,7 +200,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               disabled={disabled}
             />
 
-            <div className="relative flex items-end gap-1 sm:gap-1.5 md:gap-2 p-1.5 sm:p-2 md:p-3">
+            <div className="relative flex items-end gap-1.5 sm:gap-2 md:gap-2.5 p-1.5 sm:p-2 md:p-3">
               {/* File upload button */}
               <FileUpload
                 onFilesSelected={handleFilesSelected}
@@ -235,10 +223,10 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                     : "Ask about product marketing..."
                 }
                 disabled={disabled || isRecording}
-                className="flex-1 min-h-[36px] sm:min-h-[40px] md:min-h-[44px] max-h-[120px] sm:max-h-[150px] md:max-h-[200px] resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-sm md:text-base placeholder:text-muted-foreground/60 disabled:opacity-50 py-2"
+                className="flex-1 min-h-[36px] sm:min-h-[40px] md:min-h-[44px] max-h-[120px] sm:max-h-[150px] md:max-h-[200px] resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-sm md:text-base placeholder:text-muted-foreground/50 disabled:opacity-50 py-2"
                 rows={1}
               />
-              {/* Voice input button - purple styling */}
+              {/* Voice input button — Precision Blue tint */}
               <Button
                 type="button"
                 variant="ghost"
@@ -249,7 +237,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                   'h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 transition-all',
                   isRecording
                     ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/40 animate-pulse'
-                    : 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-800/40'
+                    : 'bg-primary-fixed/40 dark:bg-primary-fixed/10 text-[#0058be] dark:text-[#a8c0f0] hover:bg-primary-fixed/60 dark:hover:bg-primary-fixed/20'
                 )}
                 title={isRecording ? 'Stop recording' : 'Voice input'}
               >
@@ -265,7 +253,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 <Button
                   onClick={abortStreaming}
                   size="icon"
-                  className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 bg-gradient-to-br from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 shadow-md md:shadow-lg text-white"
+                  className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 bg-destructive hover:bg-destructive/90 shadow-none text-white"
                   title="Stop generating"
                 >
                   <Square className="h-4 w-4 fill-current" />
@@ -275,7 +263,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                   onClick={handleSubmit}
                   disabled={!canSubmit || disabled}
                   size="icon"
-                  className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 bg-gradient-to-br from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 shadow-md md:shadow-lg text-white"
+                  className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 bg-[#0058be] hover:bg-[#004a9e] shadow-none text-white"
                 >
                   {disabled || isUploading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -286,7 +274,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               )}
             </div>
           </div>
-          <p className="text-xs text-muted-foreground/70 mt-2 md:mt-3 text-center hidden sm:block">
+          <p className="text-xs text-muted-foreground/60 mt-2.5 md:mt-3 text-center hidden sm:block">
             Attach files for context. Paste URLs for analysis. Ask anything about product marketing.
           </p>
         </div>

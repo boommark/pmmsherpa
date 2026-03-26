@@ -49,7 +49,7 @@ function AttachmentItem({ file, onRemove, disabled }: AttachmentItemProps) {
   const getStatusStyles = () => {
     switch (file.status) {
       case 'uploading':
-        return 'border-indigo-300 dark:border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30'
+        return 'border-[#0058be]/30 dark:border-[#a8c0f0]/30 bg-[#d8e2ff]/30 dark:bg-[#0058be]/10'
       case 'completed':
         return 'border-green-300 dark:border-green-600 bg-green-50/50 dark:bg-green-950/30'
       case 'error':
@@ -98,7 +98,7 @@ function AttachmentItem({ file, onRemove, disabled }: AttachmentItemProps) {
       {/* Loading indicator or remove button */}
       {file.status === 'uploading' ? (
         <div className="absolute right-2 top-1/2 -translate-y-1/2">
-          <Loader2 className="h-4 w-4 animate-spin text-indigo-500" />
+          <Loader2 className="h-4 w-4 animate-spin text-[#0058be]" />
         </div>
       ) : (
         <Button
@@ -134,7 +134,7 @@ function getIconBgColor(category: 'document' | 'image' | 'video' | 'unknown') {
     case 'document':
       return 'bg-blue-100 dark:bg-blue-900/30'
     case 'image':
-      return 'bg-purple-100 dark:bg-purple-900/30'
+      return 'bg-[#d8e2ff] dark:bg-[#0058be]/20'
     case 'video':
       return 'bg-pink-100 dark:bg-pink-900/30'
     default:
@@ -147,7 +147,7 @@ function getIconColor(category: 'document' | 'image' | 'video' | 'unknown') {
     case 'document':
       return 'text-blue-600 dark:text-blue-400'
     case 'image':
-      return 'text-purple-600 dark:text-purple-400'
+      return 'text-[#0058be] dark:text-[#a8c0f0]'
     case 'video':
       return 'text-pink-600 dark:text-pink-400'
     default:

@@ -118,12 +118,9 @@ function SidebarContent({
   // Handle new chat click - clear state and navigate
   const handleNewChat = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
-    // Clear the chat store state
     clearMessages()
     setConversationId(null)
-    // Navigate to /chat
     router.push('/chat')
-    // Call onNavigate callback (for closing mobile sidebar)
     onNavigate?.()
   }, [clearMessages, setConversationId, router, onNavigate])
 
@@ -156,11 +153,11 @@ function SidebarContent({
 
   return (
     <>
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      {/* Header — no border, tonal shift */}
+      <div className="flex items-center justify-between p-4">
         {!collapsed && (
           <a href="/chat" className="flex items-center gap-2 cursor-pointer" onClick={handleNewChat}>
-            <div className="w-7 h-7 rounded-md bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-sm">
+            <div className="w-7 h-7 rounded-md bg-[#0058be] flex items-center justify-center">
               <svg
                 viewBox="0 0 24 24"
                 className="w-4 h-4 text-white"
@@ -173,7 +170,7 @@ function SidebarContent({
                 <path d="M2 20L7 10l5 6 4-10 6 14" />
               </svg>
             </div>
-            <span className="font-semibold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">PMMSherpa</span>
+            <span className="font-semibold text-lg text-[#0058be] dark:text-[#a8c0f0]">PMMSherpa</span>
           </a>
         )}
         {showCollapseButton && (
@@ -181,7 +178,7 @@ function SidebarContent({
             variant="ghost"
             size="icon"
             onClick={() => setCollapsed(!collapsed)}
-            className={cn(collapsed && 'mx-auto')}
+            className={cn('hover:bg-sidebar-accent', collapsed && 'mx-auto')}
           >
             {collapsed ? (
               <PanelLeft className="h-5 w-5" />
@@ -192,13 +189,13 @@ function SidebarContent({
         )}
       </div>
 
-      {/* New Chat Button */}
-      <div className="p-3">
+      {/* New Chat Button — Precision Blue */}
+      <div className="px-3 pb-3">
         <Button
           onClick={handleNewChat}
           className={cn(
             "w-full",
-            !collapsed && "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-md hover:shadow-lg transition-all"
+            !collapsed && "bg-[#0058be] hover:bg-[#004a9e] text-white shadow-none transition-all"
           )}
           variant={collapsed ? 'ghost' : 'default'}
         >
@@ -225,7 +222,7 @@ function SidebarContent({
                       <div
                         key={conv.id}
                         className={cn(
-                          'group flex items-center justify-between rounded-lg px-2 py-2 text-sm hover:bg-sidebar-accent/50 transition-colors',
+                          'group flex items-center justify-between rounded-lg px-2 py-2 text-sm hover:bg-sidebar-accent transition-colors',
                           pathname === `/chat/${conv.id}` && 'bg-sidebar-accent'
                         )}
                       >
@@ -303,8 +300,8 @@ function SidebarContent({
         </ScrollArea>
       )}
 
-      {/* Navigation */}
-      <nav className="mt-auto border-t p-3">
+      {/* Navigation — no top border, uses spacing as divider */}
+      <nav className="mt-auto p-3 pt-4">
         <ul className="space-y-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href
@@ -315,7 +312,7 @@ function SidebarContent({
                   onClick={onNavigate}
                   className={cn(
                     'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                    'hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground',
+                    'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
                     isActive
                       ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                       : 'text-sidebar-foreground',
@@ -330,20 +327,20 @@ function SidebarContent({
           })}
         </ul>
 
-        {/* User Profile Section */}
+        {/* User Profile Section — spacing divider instead of border */}
         {!collapsed && profile && (
-          <div className="mt-3 pt-3 border-t">
+          <div className="mt-4 pt-4">
             <Link
               href="/settings"
               onClick={onNavigate}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-sidebar-accent/50 transition-colors"
+              className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-sidebar-accent transition-colors"
             >
               <Avatar className="h-8 w-8">
                 <AvatarImage
                   src={profile.avatar_url || undefined}
                   alt={profile.full_name || ''}
                 />
-                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                <AvatarFallback className="text-xs bg-[#d8e2ff] text-[#0058be]">{initials}</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">
@@ -357,14 +354,14 @@ function SidebarContent({
           </div>
         )}
         {collapsed && profile && (
-          <div className="mt-3 pt-3 border-t flex justify-center">
+          <div className="mt-4 pt-4 flex justify-center">
             <Link href="/settings" onClick={onNavigate}>
               <Avatar className="h-8 w-8">
                 <AvatarImage
                   src={profile.avatar_url || undefined}
                   alt={profile.full_name || ''}
                 />
-                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                <AvatarFallback className="text-xs bg-[#d8e2ff] text-[#0058be]">{initials}</AvatarFallback>
               </Avatar>
             </Link>
           </div>
@@ -400,10 +397,10 @@ export function Sidebar() {
         </SheetContent>
       </Sheet>
 
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar — no border-r, uses background tonal shift */}
       <aside
         className={cn(
-          'hidden md:flex flex-col border-r bg-sidebar transition-all duration-300',
+          'hidden md:flex flex-col bg-sidebar transition-all duration-300',
           collapsed ? 'w-16' : 'w-64'
         )}
       >

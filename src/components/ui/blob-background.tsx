@@ -3,35 +3,35 @@
 export function BlobBackground() {
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-      {/* Soft peach/cream blob - top right */}
+      {/* Soft blue mist — top right */}
       <div
-        className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full opacity-40 dark:opacity-20 blur-3xl"
+        className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full opacity-30 dark:opacity-15 blur-3xl"
         style={{
-          background: 'radial-gradient(circle, rgba(255,237,213,1) 0%, rgba(255,237,213,0) 70%)',
+          background: 'radial-gradient(circle, rgba(216,226,255,1) 0%, rgba(216,226,255,0) 70%)',
         }}
       />
 
-      {/* Soft mint/green blob - bottom left */}
+      {/* Cool slate wash — bottom left */}
       <div
-        className="absolute -bottom-48 -left-32 w-[600px] h-[600px] rounded-full opacity-30 dark:opacity-15 blur-3xl"
+        className="absolute -bottom-48 -left-32 w-[600px] h-[600px] rounded-full opacity-25 dark:opacity-10 blur-3xl"
         style={{
-          background: 'radial-gradient(circle, rgba(209,250,229,1) 0%, rgba(209,250,229,0) 70%)',
+          background: 'radial-gradient(circle, rgba(226,232,240,1) 0%, rgba(226,232,240,0) 70%)',
         }}
       />
 
-      {/* Soft lavender blob - center */}
+      {/* Faint sapphire glow — center */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full opacity-20 dark:opacity-10 blur-3xl"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full opacity-15 dark:opacity-8 blur-3xl"
         style={{
-          background: 'radial-gradient(circle, rgba(233,213,255,1) 0%, rgba(233,213,255,0) 70%)',
+          background: 'radial-gradient(circle, rgba(168,192,240,1) 0%, rgba(168,192,240,0) 70%)',
         }}
       />
 
-      {/* Additional subtle blue accent blob */}
+      {/* Subtle warm neutral accent — upper area */}
       <div
-        className="absolute top-1/4 right-1/4 w-[300px] h-[300px] rounded-full opacity-20 dark:opacity-10 blur-3xl"
+        className="absolute top-1/4 right-1/4 w-[300px] h-[300px] rounded-full opacity-15 dark:opacity-8 blur-3xl"
         style={{
-          background: 'radial-gradient(circle, rgba(191,219,254,1) 0%, rgba(191,219,254,0) 70%)',
+          background: 'radial-gradient(circle, rgba(242,244,247,1) 0%, rgba(242,244,247,0) 70%)',
         }}
       />
     </div>

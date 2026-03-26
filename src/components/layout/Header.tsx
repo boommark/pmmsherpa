@@ -32,10 +32,8 @@ export function Header() {
   // Handle clicking the logo to start a new chat
   const handleNewChat = (e: React.MouseEvent) => {
     e.preventDefault()
-    // Clear the chat store state
     clearMessages()
     setConversationId(null)
-    // Navigate to /chat
     router.push('/chat')
   }
 
@@ -48,19 +46,19 @@ export function Header() {
     : profile?.email?.[0]?.toUpperCase() || 'U'
 
   return (
-    <header className="flex items-center justify-between px-2 md:px-6 py-2 md:py-3 border-b bg-background">
-      <div className="flex items-center gap-1.5 md:gap-4">
+    <header className="flex items-center justify-between px-3 md:px-6 py-2.5 md:py-3 bg-background">
+      <div className="flex items-center gap-2 md:gap-4">
         {/* Mobile menu button */}
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden shrink-0 h-8 w-8"
+          className="md:hidden shrink-0 h-8 w-8 hover:bg-accent"
           onClick={toggleMobileSidebar}
         >
           <Menu className="h-4 w-4" />
         </Button>
         <a href="/chat" onClick={handleNewChat} className="hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
-          <div className="w-7 h-7 rounded-md bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-sm">
+          <div className="w-7 h-7 rounded-md bg-[#0058be] flex items-center justify-center">
             <svg
               viewBox="0 0 24 24"
               className="w-4 h-4 text-white"
@@ -73,7 +71,7 @@ export function Header() {
               <path d="M2 20L7 10l5 6 4-10 6 14" />
             </svg>
           </div>
-          <h1 className="text-base md:text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">PMMSherpa</h1>
+          <h1 className="text-base md:text-lg font-semibold text-[#0058be] dark:text-[#a8c0f0]">PMMSherpa</h1>
         </a>
         <ModelSelector
           value={currentModel}
@@ -86,7 +84,7 @@ export function Header() {
           <Button variant="ghost" className="relative h-8 w-8 rounded-full shrink-0">
             <Avatar className="h-8 w-8">
               <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || ''} />
-              <AvatarFallback>{initials}</AvatarFallback>
+              <AvatarFallback className="bg-[#d8e2ff] text-[#0058be] text-xs">{initials}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>

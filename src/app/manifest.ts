@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Your AI-powered Product Marketing Assistant',
     start_url: '/',
     display: 'standalone',
-    background_color: '#ffffff',
-    theme_color: '#6366f1',
+    background_color: '#f7f9fc',
+    theme_color: '#0058be',
     icons: [
       {
         src: '/icon',

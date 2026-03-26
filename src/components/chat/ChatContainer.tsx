@@ -55,15 +55,11 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     if (conversationId !== lastConversationIdRef.current) {
       console.log('Conversation changed from', lastConversationIdRef.current, 'to', conversationId)
 
-      // Don't clear messages if we're navigating to a new conversation we just created
-      // (messages are already in state from the current session)
       if (isNavigatingToNewConversation.current) {
         console.log('Navigating to new conversation - keeping messages')
         isNavigatingToNewConversation.current = false
-        setHasInitialized(true) // Mark as initialized so we don't overwrite
+        setHasInitialized(true)
       } else {
-        // Clear messages when switching to a different conversation
-        // This includes going from /chat/[id] to /chat (no conversationId)
         console.log('Clearing messages for new/different conversation')
         setMessages([])
         setConversationId(null)
@@ -75,22 +71,16 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
   // Sync messages from DB when loaded
   useEffect(() => {
-    // Don't sync while actively chatting, loading, or streaming
     if (isLoading) return
     if (isStreamingRef.current) return
-
-    // Wait for messages to load from DB
     if (messagesLoading) return
 
-    // Check if any message is currently streaming
     const hasStreamingMessage = messages.some(m => m.isStreaming)
     if (hasStreamingMessage) {
       console.log('Skipping sync - message is streaming')
       return
     }
 
-    // If we have local messages that haven't been saved to DB yet, don't overwrite them
-    // This handles the case where we just sent messages and they're not in DB yet
     if (messages.length > 0 && dbMessages.length === 0) {
       console.log('Skipping sync - have local messages, DB is empty (messages being saved)')
       if (!hasInitialized) {
@@ -99,8 +89,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       return
     }
 
-    // If we have more local messages than DB messages, we likely have unsaved messages
-    // Don't overwrite local state with stale DB state
     if (messages.length > dbMessages.length && dbMessages.length > 0) {
       console.log('Skipping sync - local messages ahead of DB (unsaved messages)')
       if (!hasInitialized) {
@@ -112,7 +100,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     console.log('Syncing messages - conversationId:', conversationId, 'dbMessages:', dbMessages.length, 'hasInitialized:', hasInitialized, 'storeMessages:', messages.length)
 
     if (conversationId && dbMessages.length > 0) {
-      // Sync from DB when we have DB messages
       const chatMessages: ChatMessage[] = dbMessages.map((m) => ({
         id: m.id,
         role: m.role,
@@ -123,7 +110,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         createdAt: new Date(m.created_at),
       }))
 
-      // Only update if we don't have local messages or DB has more/different messages
       const currentIds = messages.map(m => m.id).join(',')
       const newIds = chatMessages.map(m => m.id).join(',')
 
@@ -141,7 +127,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       setConversationId(null)
       setHasInitialized(true)
     } else if (conversationId && dbMessages.length === 0 && !messagesLoading && !hasInitialized) {
-      // Conversation exists but has no messages yet (new conversation)
       console.log('New conversation with no messages yet')
       setConversationId(conversationId)
       setHasInitialized(true)
@@ -154,20 +139,17 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
     if ((!hasContent && !hasAttachments) || isLoading || isSubmittingRef.current) return
 
-    // Synchronous guard to prevent double-submission before React re-renders
     isSubmittingRef.current = true
     setIsLoading(true)
     setError(null)
     setStatusMessage('Preparing your request...')
     isStreamingRef.current = true
 
-    // If editing a previous message, remove all messages from that index onwards
     if (editingMessageIndexRef.current !== null) {
       removeMessagesFromIndex(editingMessageIndexRef.current)
       editingMessageIndexRef.current = null
     }
 
-    // Convert uploaded files to chat attachments
     const chatAttachments: ChatAttachment[] | undefined = attachments?.map((a) => ({
       id: a.id,
       fileName: a.file.name,
@@ -177,7 +159,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       extractedText: a.extractedText || null,
     }))
 
-    // Create user message
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
@@ -187,17 +168,14 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     }
     addMessage(userMessage)
 
-    // Create assistant message placeholder
     const assistantMessageId = `assistant-${Date.now()}`
     startStreaming(assistantMessageId)
 
     try {
-      // Get or create conversation
       let activeConversationId = conversationId
       let isNewConversation = false
 
       if (!activeConversationId) {
-        // Create new conversation with first message as title
         const title = content.slice(0, 50) + (content.length > 50 ? '...' : '')
         const newConv = await createConversation(title, currentModel)
         if (newConv) {
@@ -209,7 +187,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         }
       }
 
-      // Create abort controller for this request
       const abortController = new AbortController()
       setAbortController(abortController)
 
@@ -229,19 +206,18 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         throw new Error('Failed to send message')
       }
 
-      // Handle streaming response with timeout protection
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
 
       if (reader) {
         let receivedDone = false
         let lastActivityTime = Date.now()
-        const STREAM_TIMEOUT_MS = 90000 // 90 seconds total timeout
-        const INACTIVITY_TIMEOUT_MS = 30000 // 30 seconds without any data
+        const STREAM_TIMEOUT_MS = 90000
+        const INACTIVITY_TIMEOUT_MS = 30000
 
         const checkTimeout = () => {
           const now = Date.now()
-          const totalElapsed = now - (lastActivityTime - INACTIVITY_TIMEOUT_MS) // Rough start time
+          const totalElapsed = now - (lastActivityTime - INACTIVITY_TIMEOUT_MS)
           if (now - lastActivityTime > INACTIVITY_TIMEOUT_MS) {
             throw new Error('Stream timed out - no data received for 30 seconds')
           }
@@ -252,7 +228,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
         try {
           while (true) {
-            // Race between reading and timeout check
             const readPromise = reader.read()
             const timeoutPromise = new Promise<never>((_, reject) => {
               const timeoutId = setTimeout(() => {
@@ -266,7 +241,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             lastActivityTime = Date.now()
 
             if (done) {
-              // Stream ended - check if we got a proper 'done' event
               if (!receivedDone) {
                 console.warn('Stream ended without done event - server may have disconnected')
               }
@@ -283,21 +257,17 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                   if (data.type === 'status') {
                     setStatusMessage(data.message)
                   } else if (data.type === 'text') {
-                    // Clear status when text starts streaming
                     setStatusMessage(null)
                     appendToStream(assistantMessageId, data.content)
                   } else if (data.type === 'citations') {
                     setCitations(assistantMessageId, data.citations)
                   } else if (data.type === 'expandedResearch') {
-                    // Handle Perplexity expanded research
                     setExpandedResearch(assistantMessageId, data.expandedResearch)
                   } else if (data.type === 'done') {
                     receivedDone = true
                     setStatusMessage(null)
                     finishStreaming(assistantMessageId)
-                    // Navigate to new conversation after streaming completes
                     if (isNewConversation && activeConversationId) {
-                      // Set flag before navigation to prevent message clearing
                       isNavigatingToNewConversation.current = true
                       router.replace(`/chat/${activeConversationId}`)
                     }
@@ -312,7 +282,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             }
           }
         } finally {
-          // Always cancel the reader when done to clean up resources
           try {
             reader.cancel()
           } catch {
@@ -321,12 +290,9 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         }
       }
     } catch (error) {
-      // Don't show error for user-initiated abort
       if (error instanceof Error && error.name === 'AbortError') {
-        // User stopped the generation - just finish streaming without error
         finishStreaming(assistantMessageId)
       } else {
-        // Provide user-friendly error messages
         let errorMessage = 'An error occurred'
         if (error instanceof Error) {
           if (error.message.includes('timed out') || error.message.includes('timeout')) {
@@ -368,13 +334,11 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setAbortController,
   ])
 
-  // Handle editing a prompt - puts the content back in the input for editing
   const handleEditPrompt = useCallback((content: string, messageIndex: number) => {
     editingMessageIndexRef.current = messageIndex
     chatInputRef.current?.setInput(content)
   }, [])
 
-  // Handle expanding a message with web research
   const handleExpandWithResearch = useCallback(async (messageId: string, content: string, deepResearch: boolean) => {
     setMessageResearching(messageId, true)
     try {
@@ -403,9 +367,6 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     }
   }, [setMessageResearching, setExpandedResearch])
 
-  // Show loading state when:
-  // 1. We have a conversationId and messages are loading, OR
-  // 2. We have a conversationId but haven't initialized yet (waiting for DB sync)
   const showLoadingState = conversationId && (messagesLoading || !hasInitialized) && messages.length === 0
 
   return (
@@ -414,41 +375,40 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       {messages.length === 0 && !conversationId && <BlobBackground />}
 
       {showLoadingState ? (
-        // Loading state for existing conversations
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Loader2 className="h-8 w-8 animate-spin text-[#0058be]" />
             <p className="text-muted-foreground text-sm">Loading conversation...</p>
           </div>
         </div>
       ) : messages.length === 0 && !conversationId ? (
         <div className="flex-1 flex flex-col">
           {/* Top section with orb and headline */}
-          <div className="flex flex-col justify-center items-center px-3 md:px-4 pt-6 md:pt-10 md:flex-1">
-            <div className="flex justify-center mb-3 md:mb-5">
+          <div className="flex flex-col justify-center items-center px-4 md:px-6 pt-8 md:pt-14 md:flex-1">
+            <div className="flex justify-center mb-4 md:mb-6">
               <AnimatedOrb size="md" />
             </div>
 
-            <div className="text-center space-y-2 md:space-y-3 max-w-2xl mx-auto">
-              <h2 className="text-xl md:text-3xl font-semibold tracking-tight">
+            <div className="text-center space-y-2.5 md:space-y-3 max-w-2xl mx-auto">
+              <h2 className="text-xl md:text-3xl font-extrabold tracking-tight" style={{ letterSpacing: '-0.02em' }}>
                 What are you working on?
               </h2>
-              <p className="text-sm md:text-base text-muted-foreground/70 max-w-lg mx-auto">
+              <p className="text-sm md:text-base text-muted-foreground/70 max-w-lg mx-auto" style={{ letterSpacing: '0.01em' }}>
                 Grounded in the frameworks, war stories, and playbooks of thousands of real-world PMM leaders.
               </p>
             </div>
           </div>
 
-          {/* Pillar tiles - 2x2 grid on desktop, stacked on mobile */}
-          <div className="w-full max-w-2xl mx-auto px-4 md:px-6 py-4 md:py-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 md:gap-3">
+          {/* Pillar tiles — white cards on surface, no borders */}
+          <div className="w-full max-w-2xl mx-auto px-4 md:px-6 py-5 md:py-7">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-3.5">
               <button
-                className="group text-left px-4 py-3.5 md:px-5 md:py-4 rounded-xl bg-white/60 dark:bg-zinc-800/50 backdrop-blur-sm border border-white/30 dark:border-zinc-700/40 hover:bg-white/90 dark:hover:bg-zinc-700/70 transition-all shadow-sm hover:shadow-md"
+                className="group text-left px-5 py-4 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
                 onClick={() => handleSendMessage("Help me build a positioning statement for my B2B developer tools product")}
               >
                 <div className="flex items-center gap-2 mb-1.5">
-                  <Target className="h-4 w-4 text-teal-600 dark:text-teal-400 shrink-0" />
-                  <span className="text-xs font-semibold uppercase tracking-wide text-teal-700 dark:text-teal-400">Frame</span>
+                  <Target className="h-4 w-4 text-[#0058be] shrink-0" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Frame</span>
                 </div>
                 <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
                   Help me build a positioning statement for my B2B dev tools product
@@ -457,12 +417,12 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
               </button>
 
               <button
-                className="group text-left px-4 py-3.5 md:px-5 md:py-4 rounded-xl bg-white/60 dark:bg-zinc-800/50 backdrop-blur-sm border border-white/30 dark:border-zinc-700/40 hover:bg-white/90 dark:hover:bg-zinc-700/70 transition-all shadow-sm hover:shadow-md"
+                className="group text-left px-5 py-4 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
                 onClick={() => handleSendMessage("We're losing deals to a competitor who's 40% cheaper. How should I respond?")}
               >
                 <div className="flex items-center gap-2 mb-1.5">
-                  <MessageCircle className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                  <span className="text-xs font-semibold uppercase tracking-wide text-indigo-700 dark:text-indigo-400">Consult</span>
+                  <MessageCircle className="h-4 w-4 text-[#0058be] shrink-0" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Consult</span>
                 </div>
                 <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
                   We&apos;re losing deals to a competitor who&apos;s 40% cheaper. How should I respond?
@@ -471,12 +431,12 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
               </button>
 
               <button
-                className="group text-left px-4 py-3.5 md:px-5 md:py-4 rounded-xl bg-white/60 dark:bg-zinc-800/50 backdrop-blur-sm border border-white/30 dark:border-zinc-700/40 hover:bg-white/90 dark:hover:bg-zinc-700/70 transition-all shadow-sm hover:shadow-md"
+                className="group text-left px-5 py-4 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
                 onClick={() => handleSendMessage("Review this messaging and tell me where it's weak")}
               >
                 <div className="flex items-center gap-2 mb-1.5">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">Validate</span>
+                  <CheckCircle className="h-4 w-4 text-[#0058be] shrink-0" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Validate</span>
                 </div>
                 <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
                   Review this messaging and tell me where it&apos;s weak
@@ -485,12 +445,12 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
               </button>
 
               <button
-                className="group text-left px-4 py-3.5 md:px-5 md:py-4 rounded-xl bg-white/60 dark:bg-zinc-800/50 backdrop-blur-sm border border-white/30 dark:border-zinc-700/40 hover:bg-white/90 dark:hover:bg-zinc-700/70 transition-all shadow-sm hover:shadow-md"
+                className="group text-left px-5 py-4 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
                 onClick={() => handleSendMessage("I'm transitioning from IC to PMM manager. What should I focus on first?")}
               >
                 <div className="flex items-center gap-2 mb-1.5">
-                  <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400 shrink-0" />
-                  <span className="text-xs font-semibold uppercase tracking-wide text-purple-700 dark:text-purple-400">Grow</span>
+                  <TrendingUp className="h-4 w-4 text-[#0058be] shrink-0" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Grow</span>
                 </div>
                 <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
                   I&apos;m transitioning from IC to PMM manager. What should I focus on first?

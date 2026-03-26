@@ -59,13 +59,13 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
     }
   }
 
-  // User messages: compact bubble, right-aligned
+  // User messages: Precision Blue bubble, right-aligned
   if (isUser) {
     return (
       <div className="flex justify-end group w-full overflow-hidden">
         <div className="flex flex-col items-end min-w-0 max-w-[85%] sm:max-w-[75%] md:max-w-[65%] space-y-1">
           <div
-            className="rounded-2xl px-4 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-br from-indigo-500 to-purple-500 text-white"
+            className="rounded-2xl px-4 py-2.5 sm:px-5 sm:py-3 bg-[#0058be] text-white"
             style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
           >
             <p className="whitespace-pre-wrap text-sm sm:text-base break-words">{message.content}</p>
@@ -88,7 +88,7 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
     )
   }
 
-  // Assistant messages: full-width, no bubble, clean editorial layout
+  // Assistant messages: full-width, editorial layout
   return (
     <div className="group w-full overflow-hidden">
       <div
@@ -117,14 +117,14 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
               li: ({ children }) => <li className="my-1.5 break-words pl-1">{children}</li>,
               p: ({ children }) => <p className="my-5 break-words">{children}</p>,
               a: ({ children, href }) => (
-                <a href={href} className="text-primary underline underline-offset-2 break-all" target="_blank" rel="noopener noreferrer">
+                <a href={href} className="text-[#0058be] dark:text-[#a8c0f0] underline underline-offset-2 break-all" target="_blank" rel="noopener noreferrer">
                   {children}
                 </a>
               ),
               code: ({ className, children }) => {
                 const isInline = !className
                 return isInline ? (
-                  <code className="bg-black/8 dark:bg-white/10 px-1.5 py-0.5 rounded text-[0.9em] break-all">
+                  <code className="bg-surface-container-low dark:bg-surface-container-high px-1.5 py-0.5 rounded text-[0.9em] break-all">
                     {children}
                   </code>
                 ) : (
@@ -132,32 +132,32 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
                 )
               },
               pre: ({ children }) => (
-                <pre className="bg-black/5 dark:bg-white/8 p-4 sm:p-5 rounded-xl overflow-x-auto my-6 text-sm leading-relaxed">
+                <pre className="bg-surface-container-low dark:bg-surface-container p-4 sm:p-5 rounded-xl overflow-x-auto my-6 text-sm leading-relaxed">
                   {children}
                 </pre>
               ),
               table: ({ children }) => (
-                <div className="overflow-x-auto my-6 max-w-full rounded-lg border border-border">
+                <div className="overflow-x-auto my-6 max-w-full rounded-lg">
                   <table className="w-full border-collapse text-sm min-w-full">
                     {children}
                   </table>
                 </div>
               ),
               th: ({ children }) => (
-                <th className="border border-border px-3.5 py-2.5 bg-muted/50 font-medium text-left text-sm break-words">
+                <th className="px-3.5 py-2.5 bg-surface-container-low dark:bg-surface-container font-medium text-left text-sm break-words">
                   {children}
                 </th>
               ),
               td: ({ children }) => (
-                <td className="border border-border px-3.5 py-2.5 text-sm break-words">{children}</td>
+                <td className="px-3.5 py-2.5 text-sm break-words border-t border-outline-variant/15">{children}</td>
               ),
               blockquote: ({ children }) => (
-                <blockquote className="border-l-3 border-primary/30 pl-6 my-6 text-muted-foreground italic">
+                <blockquote className="border-l-3 border-[#0058be]/30 dark:border-[#a8c0f0]/30 pl-6 my-6 text-muted-foreground italic">
                   {children}
                 </blockquote>
               ),
               hr: () => (
-                <hr className="my-8 border-border/40" />
+                <hr className="my-8 border-outline-variant/15" />
               ),
               strong: ({ children }) => (
                 <strong className="font-semibold">{children}</strong>
@@ -174,7 +174,7 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
         </div>
       </div>
 
-      {/* Action buttons - below the response */}
+      {/* Action buttons */}
       {!isStreaming && (
         <div className="flex items-center gap-1 mt-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-1 sm:px-0">
           <Button
