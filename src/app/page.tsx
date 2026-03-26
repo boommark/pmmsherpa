@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { AnimatedOrb } from "@/components/ui/animated-orb";
-import { ArrowRight, Sparkles, Search, BarChart3, Link2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 function MountainIcon({ className }: { className?: string }) {
   return (
@@ -20,26 +20,6 @@ function MountainIcon({ className }: { className?: string }) {
   );
 }
 
-function ScreenshotPlaceholder({ label, icon: Icon, description, className }: {
-  label: string
-  icon: React.ElementType
-  description: string
-  className?: string
-}) {
-  return (
-    <div className={`rounded-2xl overflow-hidden aspect-[16/10] flex flex-col items-center justify-center text-center p-8 ${className}`}
-      style={{
-        background: 'linear-gradient(135deg, #f0f4ff 0%, #e8edf8 30%, #f5f7fc 70%, #eef2fb 100%)',
-      }}
-    >
-      <div className="w-14 h-14 rounded-2xl bg-white/80 backdrop-blur-sm flex items-center justify-center mb-4 shadow-sm">
-        <Icon className="h-7 w-7 text-[#0058be]" />
-      </div>
-      <p className="text-sm font-semibold text-[#191c1e] mb-1">{label}</p>
-      <p className="text-xs text-[#8e9199] max-w-xs">{description}</p>
-    </div>
-  );
-}
 
 function CustomIcon({ src, alt, size = 40 }: { src: string; alt: string; size?: number }) {
   return (
@@ -252,25 +232,21 @@ export default function LandingPage() {
                   automatically when needed.
                 </p>
               </div>
-              <ScreenshotPlaceholder
-                label="Intelligent Retrieval"
-                icon={Search}
-                description="Shows how PMMSherpa searches knowledge base and web in parallel"
-                className="shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
-              />
+              <div className="rounded-2xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
+                <video autoPlay loop muted playsInline className="w-full h-auto">
+                  <source src="/homepage/intelligent-retrieval.mp4" type="video/mp4" />
+                </video>
+              </div>
             </div>
           </div>
 
           {/* Step 2 */}
           <div className="max-w-5xl mx-auto mb-24 md:mb-32">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-center">
-              <div className="order-2 md:order-1">
-                <ScreenshotPlaceholder
-                  label="Expert Response"
-                  icon={Sparkles}
-                  description="Structured expert response with citations from PMM knowledge base"
-                  className="shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
-                />
+              <div className="order-2 md:order-1 rounded-2xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
+                <video autoPlay loop muted playsInline className="w-full h-auto">
+                  <source src="/homepage/expert-response.mp4" type="video/mp4" />
+                </video>
               </div>
               <div className="order-1 md:order-2">
                 <div className="inline-flex items-center gap-2 text-sm font-medium text-[#5a9cf5] mb-4">
@@ -305,25 +281,21 @@ export default function LandingPage() {
                   Share your context, get the artifact. Ready to present, ready to share with sales.
                 </p>
               </div>
-              <ScreenshotPlaceholder
-                label="Deliverable Output"
-                icon={BarChart3}
-                description="Complete battlecard or positioning doc generated from your context"
-                className="shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
-              />
+              <div className="rounded-2xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
+                <video autoPlay loop muted playsInline className="w-full h-auto">
+                  <source src="/homepage/deliverable.mp4" type="video/mp4" />
+                </video>
+              </div>
             </div>
           </div>
 
           {/* Step 4 */}
           <div className="max-w-5xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-center">
-              <div className="order-2 md:order-1">
-                <ScreenshotPlaceholder
-                  label="URL Analysis"
-                  icon={Link2}
-                  description="Competitor page analysis with framework application"
-                  className="shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
-                />
+              <div className="order-2 md:order-1 rounded-2xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
+                <video autoPlay loop muted playsInline className="w-full h-auto">
+                  <source src="/homepage/url-analysis.mp4" type="video/mp4" />
+                </video>
               </div>
               <div className="order-1 md:order-2">
                 <div className="inline-flex items-center gap-2 text-sm font-medium text-[#5a9cf5] mb-4">
