@@ -91,16 +91,16 @@ export default function LandingPage() {
 
       {/* Hero with header background */}
       <section className="relative overflow-hidden">
-        {/* Header background illustration */}
-        <div className="absolute inset-0 pointer-events-none">
+        {/* Header background illustration — contained, not stretched */}
+        <div className="absolute inset-x-0 top-0 h-[500px] md:h-[600px] pointer-events-none">
           <Image
             src="/homepage/hero-background.png"
             alt=""
             fill
-            className="object-cover object-center opacity-[0.35]"
+            className="object-contain object-top opacity-[0.30]"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/70 to-white" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white" />
         </div>
 
         <div className="max-w-6xl mx-auto px-5 md:px-8 pt-20 md:pt-28 pb-10 md:pb-14 text-center relative">
