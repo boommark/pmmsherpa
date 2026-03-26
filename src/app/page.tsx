@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { AnimatedOrb } from "@/components/ui/animated-orb";
 import {
@@ -14,6 +13,10 @@ import {
   FileText,
   Users,
   Rocket,
+  Search,
+  Sparkles,
+  BarChart3,
+  Link2,
 } from "lucide-react";
 
 function MountainIcon({ className }: { className?: string }) {
@@ -32,18 +35,39 @@ function MountainIcon({ className }: { className?: string }) {
   );
 }
 
+function ScreenshotPlaceholder({ label, icon: Icon, description, className }: {
+  label: string
+  icon: React.ElementType
+  description: string
+  className?: string
+}) {
+  return (
+    <div className={`rounded-2xl overflow-hidden aspect-[16/10] flex flex-col items-center justify-center text-center p-8 ${className}`}
+      style={{
+        background: 'linear-gradient(135deg, #f0f4ff 0%, #e8edf8 30%, #f5f7fc 70%, #eef2fb 100%)',
+      }}
+    >
+      <div className="w-14 h-14 rounded-2xl bg-white/80 backdrop-blur-sm flex items-center justify-center mb-4 shadow-sm">
+        <Icon className="h-7 w-7 text-[#0058be]" />
+      </div>
+      <p className="text-sm font-semibold text-[#191c1e] mb-1">{label}</p>
+      <p className="text-xs text-[#8e9199] max-w-xs">{description}</p>
+    </div>
+  );
+}
+
 export default function LandingPage() {
   return (
-    <div className="landing-light min-h-screen bg-[#f7f9fc] relative overflow-hidden" style={{ colorScheme: 'light' }}>
+    <div className="landing-light min-h-screen bg-white relative overflow-hidden" style={{ colorScheme: 'light' }}>
 
       {/* Navigation */}
-      <header className="sticky top-0 z-50 bg-[#f7f9fc]/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl">
         <nav className="max-w-6xl mx-auto flex h-16 items-center justify-between px-5 md:px-8">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0058be] to-[#2170e4] flex items-center justify-center">
               <MountainIcon className="h-4 w-4 text-white" />
             </div>
-            <span className="text-xl font-bold text-[#0058be]">
+            <span className="text-xl font-bold text-[#191c1e]">
               PMMSherpa
             </span>
           </div>
@@ -55,30 +79,34 @@ export default function LandingPage() {
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login">
-              <Button variant="ghost" className="rounded-lg text-[#5f6368] hover:text-[#191c1e] hover:bg-[#eceef1]">
+              <Button variant="ghost" className="rounded-full text-[#5f6368] hover:text-[#191c1e] hover:bg-[#f2f4f7]">
                 Log in
               </Button>
             </Link>
             <Link href="/request-access">
-              <Button className="rounded-lg bg-[#0058be] hover:bg-[#004a9e] text-white shadow-none font-medium">
-                Request Access
+              <Button className="rounded-full bg-[#0058be] hover:bg-[#004a9e] text-white shadow-none font-medium px-5">
+                Get Started
               </Button>
             </Link>
           </div>
         </nav>
       </header>
 
-      {/* Hero */}
+      {/* Hero — white background, clean */}
       <section className="relative overflow-hidden">
-        <div className="max-w-6xl mx-auto px-5 md:px-8 pt-20 md:pt-32 pb-10 md:pb-16 text-center relative">
+        {/* Gentle gradient wash behind hero */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,88,190,0.04) 0%, transparent 70%)',
+        }} />
+        <div className="max-w-6xl mx-auto px-5 md:px-8 pt-20 md:pt-28 pb-10 md:pb-14 text-center relative">
           <div className="mx-auto max-w-3xl">
             <div className="flex justify-center mb-8">
               <AnimatedOrb size="md" />
             </div>
 
-            <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-[#191c1e] sm:text-5xl md:text-6xl" style={{ letterSpacing: '-0.02em' }}>
+            <h1 className="mb-6 text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e] sm:text-5xl md:text-[3.5rem] leading-[1.1]">
               Your Second Brain for{" "}
-              <span className="text-[#0058be]">
+              <span className="bg-gradient-to-r from-[#0058be] to-[#2170e4] bg-clip-text text-transparent">
                 Product Marketing
               </span>
             </h1>
@@ -90,7 +118,7 @@ export default function LandingPage() {
               <Link href="/request-access">
                 <Button
                   size="lg"
-                  className="gap-2 rounded-lg bg-[#0058be] hover:bg-[#004a9e] text-white font-medium px-8 shadow-none"
+                  className="gap-2 rounded-full bg-[#0058be] hover:bg-[#004a9e] text-white font-medium px-8 shadow-none h-12 text-base"
                 >
                   Request Access <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -99,7 +127,7 @@ export default function LandingPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="rounded-lg bg-white text-[#191c1e] hover:bg-[#f2f4f7] px-8 border-none shadow-[0_0_0_1px_rgba(196,199,204,0.15)]"
+                  className="rounded-full bg-white text-[#191c1e] hover:bg-[#f8f9fb] px-8 border border-[#e2e5ea] h-12 text-base"
                 >
                   Sign In
                 </Button>
@@ -108,37 +136,34 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Hero Screenshot */}
-        <div className="max-w-5xl mx-auto px-5 md:px-8 pb-20 md:pb-32 relative">
+        {/* Hero Screenshot Placeholder */}
+        <div className="max-w-5xl mx-auto px-5 md:px-8 pb-20 md:pb-28 relative">
           <div className="max-w-4xl mx-auto">
-            <div className="rounded-2xl overflow-hidden shadow-[0_10px_40px_rgba(25,28,30,0.06)] ring-1 ring-[rgba(196,199,204,0.15)]">
-              <Image
-                src="/homepage/welcome-screen.png"
-                alt="PMMSherpa — intelligent product marketing assistant"
-                width={1440}
-                height={900}
-                className="w-full h-auto"
-                priority
-              />
-            </div>
+            <ScreenshotPlaceholder
+              label="PMMSherpa Chat Interface"
+              icon={Sparkles}
+              description="Product screenshot coming soon — AI-powered conversations with deep PMM expertise"
+            />
           </div>
         </div>
       </section>
 
-      {/* Four Pillars */}
-      <section id="use-cases" className="py-20 md:py-28 bg-[#f2f4f7] scroll-mt-20">
+      {/* Four Pillars — gentle gradient background */}
+      <section id="use-cases" className="py-20 md:py-28 scroll-mt-20" style={{
+        background: 'linear-gradient(180deg, #f8f9fd 0%, #f0f3fa 50%, #f8f9fd 100%)',
+      }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">Use Cases</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-[#191c1e] mb-4" style={{ letterSpacing: '-0.02em' }}>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e] mb-4">
               Four ways to work smarter
             </h2>
           </div>
 
           <div className="mx-auto max-w-5xl grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
-            <div className="rounded-2xl bg-white p-7 md:p-8 transition-all hover:shadow-[0_10px_40px_rgba(25,28,30,0.06)] hover:-translate-y-1">
+            <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
               <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-[#d8e2ff] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
                   <Target className="h-5 w-5 text-[#0058be]" />
                 </div>
                 <h3 className="text-lg font-semibold text-[#191c1e]">Frame</h3>
@@ -147,12 +172,12 @@ export default function LandingPage() {
                 Build positioning, messaging, and GTM plans on solid ground.
                 Proven frameworks from Dunford, Moore, and hundreds of practitioner playbooks.
               </p>
-              <p className="text-xs text-[#8e9199]">Positioning, messaging, GTM planning</p>
+              <p className="text-xs text-[#a0a4ab]">Positioning, messaging, GTM planning</p>
             </div>
 
-            <div className="rounded-2xl bg-white p-7 md:p-8 transition-all hover:shadow-[0_10px_40px_rgba(25,28,30,0.06)] hover:-translate-y-1">
+            <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
               <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-[#d8e2ff] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
                   <MessageCircle className="h-5 w-5 text-[#0058be]" />
                 </div>
                 <h3 className="text-lg font-semibold text-[#191c1e]">Consult</h3>
@@ -161,12 +186,12 @@ export default function LandingPage() {
                 Get a second opinion that&apos;s actually informed.
                 Direct recommendations grounded in how the best PMMs have handled it.
               </p>
-              <p className="text-xs text-[#8e9199]">Strategy, competitive, pricing questions</p>
+              <p className="text-xs text-[#a0a4ab]">Strategy, competitive, pricing questions</p>
             </div>
 
-            <div className="rounded-2xl bg-white p-7 md:p-8 transition-all hover:shadow-[0_10px_40px_rgba(25,28,30,0.06)] hover:-translate-y-1">
+            <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
               <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-[#d8e2ff] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
                   <CheckCircle className="h-5 w-5 text-[#0058be]" />
                 </div>
                 <h3 className="text-lg font-semibold text-[#191c1e]">Validate</h3>
@@ -175,12 +200,12 @@ export default function LandingPage() {
                 Stress-test before you ship. Paste your messaging or launch plan
                 and get a senior PMM red-team review, on demand.
               </p>
-              <p className="text-xs text-[#8e9199]">Review work against expert standards</p>
+              <p className="text-xs text-[#a0a4ab]">Review work against expert standards</p>
             </div>
 
-            <div className="rounded-2xl bg-white p-7 md:p-8 transition-all hover:shadow-[0_10px_40px_rgba(25,28,30,0.06)] hover:-translate-y-1">
+            <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
               <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-[#d8e2ff] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
                   <TrendingUp className="h-5 w-5 text-[#0058be]" />
                 </div>
                 <h3 className="text-lg font-semibold text-[#191c1e]">Grow</h3>
@@ -189,18 +214,20 @@ export default function LandingPage() {
                 Level up without waiting for a mentor.
                 Career advice from 540+ PMM leaders at companies from Series A to Fortune 500.
               </p>
-              <p className="text-xs text-[#8e9199]">Career guidance, skill gaps, leadership</p>
+              <p className="text-xs text-[#a0a4ab]">Career guidance, skill gaps, leadership</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="py-20 md:py-28 bg-[#111418] text-white scroll-mt-20">
+      {/* How It Works — gentle gradient instead of harsh dark */}
+      <section id="how-it-works" className="py-20 md:py-28 scroll-mt-20" style={{
+        background: 'linear-gradient(180deg, #0a1628 0%, #0f1d35 50%, #0a1628 100%)',
+      }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <div className="text-center mb-20">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#5a9cf5] mb-3">How It Works</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4 text-white" style={{ letterSpacing: '-0.02em' }}>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] mb-4 text-white">
               Ask. Get depth. Ship.
             </h2>
           </div>
@@ -218,32 +245,28 @@ export default function LandingPage() {
                 </h3>
                 <p className="text-[#8e9199] leading-relaxed">
                   Your question is analyzed with full conversation context. Targeted queries pull
-                  the right frameworks and practitioner experience. Current market data is added
+                  the right frameworks and practitioner experience. Current market data added
                   automatically when needed.
                 </p>
               </div>
-              <div className="rounded-xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
-                <Image
-                  src="/homepage/intelligent-retrieval.png"
-                  alt="Intelligent retrieval"
-                  width={900}
-                  height={300}
-                  className="w-full h-auto"
-                />
-              </div>
+              <ScreenshotPlaceholder
+                label="Intelligent Retrieval"
+                icon={Search}
+                description="Shows how PMMSherpa searches knowledge base and web in parallel"
+                className="shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
+              />
             </div>
           </div>
 
           {/* Step 2 */}
           <div className="max-w-5xl mx-auto mb-24 md:mb-32">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-center">
-              <div className="order-2 md:order-1 rounded-xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
-                <Image
-                  src="/homepage/rich-response.png"
-                  alt="Expert-depth responses"
-                  width={900}
-                  height={700}
-                  className="w-full h-auto"
+              <div className="order-2 md:order-1">
+                <ScreenshotPlaceholder
+                  label="Expert Response"
+                  icon={Sparkles}
+                  description="Structured expert response with citations from PMM knowledge base"
+                  className="shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
                 />
               </div>
               <div className="order-1 md:order-2">
@@ -279,28 +302,24 @@ export default function LandingPage() {
                   Share your context, get the artifact. Ready to present, ready to share with sales.
                 </p>
               </div>
-              <div className="rounded-xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
-                <Image
-                  src="/homepage/deliverable.png"
-                  alt="Production-ready deliverables"
-                  width={900}
-                  height={700}
-                  className="w-full h-auto"
-                />
-              </div>
+              <ScreenshotPlaceholder
+                label="Deliverable Output"
+                icon={BarChart3}
+                description="Complete battlecard or positioning doc generated from your context"
+                className="shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
+              />
             </div>
           </div>
 
           {/* Step 4 */}
           <div className="max-w-5xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-center">
-              <div className="order-2 md:order-1 rounded-xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
-                <Image
-                  src="/homepage/url-analysis.png"
-                  alt="URL analysis"
-                  width={900}
-                  height={700}
-                  className="w-full h-auto"
+              <div className="order-2 md:order-1">
+                <ScreenshotPlaceholder
+                  label="URL Analysis"
+                  icon={Link2}
+                  description="Competitor page analysis with framework application"
+                  className="shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
                 />
               </div>
               <div className="order-1 md:order-2">
@@ -321,19 +340,21 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Who It's For */}
-      <section id="who-its-for" className="py-20 md:py-28 bg-[#f7f9fc] scroll-mt-20">
+      {/* Who It's For — gentle gradient */}
+      <section id="who-its-for" className="py-20 md:py-28 scroll-mt-20" style={{
+        background: 'linear-gradient(180deg, #ffffff 0%, #f8f9fd 50%, #ffffff 100%)',
+      }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">Who It&apos;s For</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-[#191c1e]" style={{ letterSpacing: '-0.02em' }}>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e]">
               Built for go-to-market professionals
             </h2>
           </div>
 
           <div className="mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="rounded-2xl bg-white p-7 md:p-8">
-              <div className="w-12 h-12 rounded-xl bg-[#d8e2ff] flex items-center justify-center mb-5">
+            <div className="rounded-2xl bg-white p-7 md:p-8 border border-[#e8ecf4]/60 hover:shadow-[0_8px_30px_rgba(0,88,190,0.06)] transition-all">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center mb-5">
                 <FileText className="h-6 w-6 text-[#0058be]" />
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Product Marketers</h3>
@@ -343,8 +364,8 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl bg-white p-7 md:p-8">
-              <div className="w-12 h-12 rounded-xl bg-[#d8e2ff] flex items-center justify-center mb-5">
+            <div className="rounded-2xl bg-white p-7 md:p-8 border border-[#e8ecf4]/60 hover:shadow-[0_8px_30px_rgba(0,88,190,0.06)] transition-all">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center mb-5">
                 <Users className="h-6 w-6 text-[#0058be]" />
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Product Managers</h3>
@@ -354,8 +375,8 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl bg-white p-7 md:p-8">
-              <div className="w-12 h-12 rounded-xl bg-[#d8e2ff] flex items-center justify-center mb-5">
+            <div className="rounded-2xl bg-white p-7 md:p-8 border border-[#e8ecf4]/60 hover:shadow-[0_8px_30px_rgba(0,88,190,0.06)] transition-all">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center mb-5">
                 <Rocket className="h-6 w-6 text-[#0058be]" />
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Founders</h3>
@@ -368,21 +389,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Why Different */}
-      <section id="why-different" className="py-20 md:py-28 bg-[#f2f4f7] scroll-mt-20">
+      {/* Why Different — gentle gradient */}
+      <section id="why-different" className="py-20 md:py-28 scroll-mt-20" style={{
+        background: 'linear-gradient(180deg, #f8f9fd 0%, #f0f3fa 50%, #f8f9fd 100%)',
+      }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">Why PMMSherpa</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-[#191c1e]" style={{ letterSpacing: '-0.02em' }}>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e]">
               Not another chatbot with a marketing prompt
             </h2>
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="rounded-2xl bg-white p-10 md:p-14">
+            <div className="rounded-2xl bg-white/80 backdrop-blur-sm border border-[#e8ecf4]/60 p-10 md:p-14">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
                 <div className="text-center">
-                  <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-[#d8e2ff] flex items-center justify-center">
+                  <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
                     <BookOpen className="h-7 w-7 text-[#0058be]" />
                   </div>
                   <h3 className="font-semibold text-base text-[#191c1e] mb-2">Curated expertise</h3>
@@ -392,7 +415,7 @@ export default function LandingPage() {
                 </div>
 
                 <div className="text-center">
-                  <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-[#d8e2ff] flex items-center justify-center">
+                  <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
                     <Brain className="h-7 w-7 text-[#0058be]" />
                   </div>
                   <h3 className="font-semibold text-base text-[#191c1e] mb-2">Context-aware retrieval</h3>
@@ -402,7 +425,7 @@ export default function LandingPage() {
                 </div>
 
                 <div className="text-center">
-                  <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-[#d8e2ff] flex items-center justify-center">
+                  <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
                     <Globe className="h-7 w-7 text-[#0058be]" />
                   </div>
                   <h3 className="font-semibold text-base text-[#191c1e] mb-2">Live market intel</h3>
@@ -416,21 +439,25 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 md:py-28 bg-[#f7f9fc]">
+      {/* CTA — gradient background */}
+      <section className="py-20 md:py-28" style={{
+        background: 'linear-gradient(180deg, #ffffff 0%, #f8f9fd 100%)',
+      }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <div className="max-w-3xl mx-auto">
-            <div className="rounded-2xl bg-[#0058be] p-10 md:p-14 text-center">
-              <h2 className="mb-4 text-3xl md:text-4xl font-extrabold tracking-tight text-white" style={{ letterSpacing: '-0.02em' }}>
+            <div className="rounded-2xl p-10 md:p-14 text-center" style={{
+              background: 'linear-gradient(135deg, #0058be 0%, #1a6dd6 50%, #2170e4 100%)',
+            }}>
+              <h2 className="mb-4 text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-white">
                 Stop starting from blank pages.
               </h2>
-              <p className="mb-8 text-lg text-[#a8c0f0] max-w-xl mx-auto">
+              <p className="mb-8 text-lg text-blue-200 max-w-xl mx-auto">
                 The expertise is already here.
               </p>
               <Link href="/request-access">
                 <Button
                   size="lg"
-                  className="gap-2 rounded-lg bg-white text-[#0058be] hover:bg-[#f2f4f7] font-semibold px-8 shadow-none"
+                  className="gap-2 rounded-full bg-white text-[#0058be] hover:bg-blue-50 font-semibold px-8 shadow-none h-12 text-base"
                 >
                   Request Access <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -441,8 +468,8 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 bg-[#f2f4f7]">
-        <div className="max-w-6xl mx-auto flex flex-col items-center justify-between gap-4 px-5 md:px-8 text-sm text-[#8e9199] sm:flex-row">
+      <footer className="py-8 bg-white border-t border-[#f0f2f5]">
+        <div className="max-w-6xl mx-auto flex flex-col items-center justify-between gap-4 px-5 md:px-8 text-sm text-[#a0a4ab] sm:flex-row">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#0058be] to-[#2170e4] flex items-center justify-center">
               <MountainIcon className="h-3 w-3 text-white" />
