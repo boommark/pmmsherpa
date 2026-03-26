@@ -385,78 +385,78 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       ) : messages.length === 0 && !conversationId ? (
         <div className="flex-1 overflow-y-auto">
           {/* Top section with orb and headline */}
-          <div className="flex flex-col justify-center items-center px-4 md:px-6 pt-8 md:pt-14">
-            <div className="flex justify-center mb-4 md:mb-6">
+          <div className="flex flex-col justify-center items-center px-4 md:px-6 pt-4 md:pt-14">
+            <div className="flex justify-center mb-2 md:mb-6">
               <AnimatedOrb size="md" />
             </div>
 
-            <div className="text-center space-y-2.5 md:space-y-3 max-w-2xl mx-auto">
-              <h2 className="text-xl md:text-3xl font-extrabold tracking-tight" style={{ letterSpacing: '-0.02em' }}>
+            <div className="text-center space-y-1.5 md:space-y-3 max-w-2xl mx-auto">
+              <h2 className="text-lg md:text-3xl font-extrabold tracking-tight" style={{ letterSpacing: '-0.02em' }}>
                 What are you working on?
               </h2>
-              <p className="text-sm md:text-base text-muted-foreground/70 max-w-lg mx-auto" style={{ letterSpacing: '0.01em' }}>
+              <p className="text-xs md:text-base text-muted-foreground/70 max-w-lg mx-auto" style={{ letterSpacing: '0.01em' }}>
                 Grounded in the frameworks, war stories, and playbooks of thousands of real-world PMM leaders.
               </p>
             </div>
           </div>
 
           {/* Pillar tiles */}
-          <div className="w-full max-w-2xl mx-auto px-4 md:px-6 py-5 md:py-7">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-3.5">
+          <div className="w-full max-w-2xl mx-auto px-4 md:px-6 py-3 md:py-7">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3.5">
               <button
-                className="group text-left px-5 py-4 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
+                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
                 onClick={() => handleSendMessage("Help me build a positioning statement for my B2B developer tools product")}
               >
-                <div className="flex items-center gap-2.5 mb-1.5">
-                  <Image src="/icons/frame.png" alt="" width={28} height={28} className="shrink-0" />
+                <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
+                  <Image src="/icons/frame.png" alt="" width={28} height={28} className="shrink-0 w-5 h-5 md:w-7 md:h-7" />
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Frame</span>
                 </div>
-                <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
+                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug">
                   Help me build a positioning statement for my B2B dev tools product
                 </p>
-                <p className="text-xs text-muted-foreground/60 mt-1.5">Positioning, messaging, GTM planning</p>
+                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Positioning, messaging, GTM planning</p>
               </button>
 
               <button
-                className="group text-left px-5 py-4 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
+                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
                 onClick={() => handleSendMessage("We're losing deals to a competitor who's 40% cheaper. How should I respond?")}
               >
-                <div className="flex items-center gap-2.5 mb-1.5">
-                  <Image src="/icons/consult.png" alt="" width={28} height={28} className="shrink-0" />
+                <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
+                  <Image src="/icons/consult.png" alt="" width={28} height={28} className="shrink-0 w-5 h-5 md:w-7 md:h-7" />
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Consult</span>
                 </div>
-                <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
+                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug">
                   We&apos;re losing deals to a competitor who&apos;s 40% cheaper. How should I respond?
                 </p>
-                <p className="text-xs text-muted-foreground/60 mt-1.5">Strategy, competitive, pricing questions</p>
+                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Strategy, competitive, pricing questions</p>
               </button>
 
               <button
-                className="group text-left px-5 py-4 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
+                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
                 onClick={() => handleSendMessage("Review this messaging and tell me where it's weak")}
               >
-                <div className="flex items-center gap-2.5 mb-1.5">
-                  <Image src="/icons/validate.png" alt="" width={28} height={28} className="shrink-0" />
+                <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
+                  <Image src="/icons/validate.png" alt="" width={28} height={28} className="shrink-0 w-5 h-5 md:w-7 md:h-7" />
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Validate</span>
                 </div>
-                <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
+                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug">
                   Review this messaging and tell me where it&apos;s weak
                 </p>
-                <p className="text-xs text-muted-foreground/60 mt-1.5">Stress-test work against expert standards</p>
+                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Stress-test work against expert standards</p>
               </button>
 
               <button
-                className="group text-left px-5 py-4 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
+                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
                 onClick={() => handleSendMessage("I'm transitioning from IC to PMM manager. What should I focus on first?")}
               >
-                <div className="flex items-center gap-2.5 mb-1.5">
-                  <Image src="/icons/grow.png" alt="" width={28} height={28} className="shrink-0" />
+                <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
+                  <Image src="/icons/grow.png" alt="" width={28} height={28} className="shrink-0 w-5 h-5 md:w-7 md:h-7" />
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Grow</span>
                 </div>
-                <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
+                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug">
                   I&apos;m transitioning from IC to PMM manager. What should I focus on first?
                 </p>
-                <p className="text-xs text-muted-foreground/60 mt-1.5">Career guidance, skill gaps, leadership</p>
+                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Career guidance, skill gaps, leadership</p>
               </button>
             </div>
           </div>
