@@ -8,7 +8,8 @@ import { MessageList } from './MessageList'
 import { ChatInput, type ChatInputRef } from './ChatInput'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
-import { Loader2, Target, MessageCircle, CheckCircle, TrendingUp } from 'lucide-react'
+import Image from 'next/image'
+import { Loader2 } from 'lucide-react'
 import type { ChatMessage, ChatAttachment } from '@/types/chat'
 import type { UploadedFile } from './FileUpload'
 
@@ -406,8 +407,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                 className="group text-left px-5 py-4 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
                 onClick={() => handleSendMessage("Help me build a positioning statement for my B2B developer tools product")}
               >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <Target className="h-4 w-4 text-[#0058be] shrink-0" />
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <Image src="/icons/frame.png" alt="" width={28} height={28} className="shrink-0" />
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Frame</span>
                 </div>
                 <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
@@ -420,8 +421,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                 className="group text-left px-5 py-4 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
                 onClick={() => handleSendMessage("We're losing deals to a competitor who's 40% cheaper. How should I respond?")}
               >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <MessageCircle className="h-4 w-4 text-[#0058be] shrink-0" />
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <Image src="/icons/consult.png" alt="" width={28} height={28} className="shrink-0" />
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Consult</span>
                 </div>
                 <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
@@ -434,8 +435,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                 className="group text-left px-5 py-4 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
                 onClick={() => handleSendMessage("Review this messaging and tell me where it's weak")}
               >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <CheckCircle className="h-4 w-4 text-[#0058be] shrink-0" />
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <Image src="/icons/validate.png" alt="" width={28} height={28} className="shrink-0" />
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Validate</span>
                 </div>
                 <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">
@@ -448,8 +449,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                 className="group text-left px-5 py-4 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
                 onClick={() => handleSendMessage("I'm transitioning from IC to PMM manager. What should I focus on first?")}
               >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <TrendingUp className="h-4 w-4 text-[#0058be] shrink-0" />
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <Image src="/icons/grow.png" alt="" width={28} height={28} className="shrink-0" />
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Grow</span>
                 </div>
                 <p className="text-sm md:text-[15px] text-foreground/90 leading-snug">

@@ -1,23 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { AnimatedOrb } from "@/components/ui/animated-orb";
-import {
-  Target,
-  MessageCircle,
-  CheckCircle,
-  TrendingUp,
-  BookOpen,
-  Brain,
-  Globe,
-  ArrowRight,
-  FileText,
-  Users,
-  Rocket,
-  Search,
-  Sparkles,
-  BarChart3,
-  Link2,
-} from "lucide-react";
+import { ArrowRight, Sparkles, Search, BarChart3, Link2 } from "lucide-react";
 
 function MountainIcon({ className }: { className?: string }) {
   return (
@@ -53,6 +38,18 @@ function ScreenshotPlaceholder({ label, icon: Icon, description, className }: {
       <p className="text-sm font-semibold text-[#191c1e] mb-1">{label}</p>
       <p className="text-xs text-[#8e9199] max-w-xs">{description}</p>
     </div>
+  );
+}
+
+function CustomIcon({ src, alt, size = 40 }: { src: string; alt: string; size?: number }) {
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      width={size}
+      height={size}
+      className="object-contain"
+    />
   );
 }
 
@@ -92,12 +89,20 @@ export default function LandingPage() {
         </nav>
       </header>
 
-      {/* Hero — white background, clean */}
+      {/* Hero with header background */}
       <section className="relative overflow-hidden">
-        {/* Gentle gradient wash behind hero */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,88,190,0.04) 0%, transparent 70%)',
-        }} />
+        {/* Header background illustration */}
+        <div className="absolute inset-0 pointer-events-none">
+          <Image
+            src="/homepage/hero-background.png"
+            alt=""
+            fill
+            className="object-cover object-center opacity-[0.35]"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/70 to-white" />
+        </div>
+
         <div className="max-w-6xl mx-auto px-5 md:px-8 pt-20 md:pt-28 pb-10 md:pb-14 text-center relative">
           <div className="mx-auto max-w-3xl">
             <div className="flex justify-center mb-8">
@@ -148,7 +153,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Four Pillars — gentle gradient background */}
+      {/* Four Pillars with custom icons */}
       <section id="use-cases" className="py-20 md:py-28 scroll-mt-20" style={{
         background: 'linear-gradient(180deg, #f8f9fd 0%, #f0f3fa 50%, #f8f9fd 100%)',
       }}>
@@ -162,10 +167,8 @@ export default function LandingPage() {
 
           <div className="mx-auto max-w-5xl grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
             <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
-                  <Target className="h-5 w-5 text-[#0058be]" />
-                </div>
+              <div className="flex items-center gap-3 mb-4">
+                <CustomIcon src="/icons/frame.png" alt="Frame" size={48} />
                 <h3 className="text-lg font-semibold text-[#191c1e]">Frame</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
@@ -176,10 +179,8 @@ export default function LandingPage() {
             </div>
 
             <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5 text-[#0058be]" />
-                </div>
+              <div className="flex items-center gap-3 mb-4">
+                <CustomIcon src="/icons/consult.png" alt="Consult" size={48} />
                 <h3 className="text-lg font-semibold text-[#191c1e]">Consult</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
@@ -190,10 +191,8 @@ export default function LandingPage() {
             </div>
 
             <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
-                  <CheckCircle className="h-5 w-5 text-[#0058be]" />
-                </div>
+              <div className="flex items-center gap-3 mb-4">
+                <CustomIcon src="/icons/validate.png" alt="Validate" size={48} />
                 <h3 className="text-lg font-semibold text-[#191c1e]">Validate</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
@@ -204,10 +203,8 @@ export default function LandingPage() {
             </div>
 
             <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-[#0058be]" />
-                </div>
+              <div className="flex items-center gap-3 mb-4">
+                <CustomIcon src="/icons/grow.png" alt="Grow" size={48} />
                 <h3 className="text-lg font-semibold text-[#191c1e]">Grow</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
@@ -220,7 +217,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works — gentle gradient instead of harsh dark */}
+      {/* How It Works with custom icons in placeholders */}
       <section id="how-it-works" className="py-20 md:py-28 scroll-mt-20" style={{
         background: 'linear-gradient(180deg, #0a1628 0%, #0f1d35 50%, #0a1628 100%)',
       }}>
@@ -340,7 +337,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Who It's For — gentle gradient */}
+      {/* Who It's For with custom icons */}
       <section id="who-its-for" className="py-20 md:py-28 scroll-mt-20" style={{
         background: 'linear-gradient(180deg, #ffffff 0%, #f8f9fd 50%, #ffffff 100%)',
       }}>
@@ -354,8 +351,8 @@ export default function LandingPage() {
 
           <div className="mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="rounded-2xl bg-white p-7 md:p-8 border border-[#e8ecf4]/60 hover:shadow-[0_8px_30px_rgba(0,88,190,0.06)] transition-all">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center mb-5">
-                <FileText className="h-6 w-6 text-[#0058be]" />
+              <div className="w-16 h-16 mb-5">
+                <CustomIcon src="/icons/product-marketer.png" alt="Product Marketers" size={64} />
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Product Marketers</h3>
               <p className="text-sm text-[#5f6368] leading-relaxed">
@@ -365,8 +362,8 @@ export default function LandingPage() {
             </div>
 
             <div className="rounded-2xl bg-white p-7 md:p-8 border border-[#e8ecf4]/60 hover:shadow-[0_8px_30px_rgba(0,88,190,0.06)] transition-all">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center mb-5">
-                <Users className="h-6 w-6 text-[#0058be]" />
+              <div className="w-16 h-16 mb-5">
+                <CustomIcon src="/icons/product-manager.png" alt="Product Managers" size={64} />
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Product Managers</h3>
               <p className="text-sm text-[#5f6368] leading-relaxed">
@@ -376,8 +373,8 @@ export default function LandingPage() {
             </div>
 
             <div className="rounded-2xl bg-white p-7 md:p-8 border border-[#e8ecf4]/60 hover:shadow-[0_8px_30px_rgba(0,88,190,0.06)] transition-all">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center mb-5">
-                <Rocket className="h-6 w-6 text-[#0058be]" />
+              <div className="w-16 h-16 mb-5">
+                <CustomIcon src="/icons/technical-founder.png" alt="Founders" size={64} />
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Founders</h3>
               <p className="text-sm text-[#5f6368] leading-relaxed">
@@ -389,7 +386,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Why Different — gentle gradient */}
+      {/* Why Different with custom icons */}
       <section id="why-different" className="py-20 md:py-28 scroll-mt-20" style={{
         background: 'linear-gradient(180deg, #f8f9fd 0%, #f0f3fa 50%, #f8f9fd 100%)',
       }}>
@@ -405,8 +402,8 @@ export default function LandingPage() {
             <div className="rounded-2xl bg-white/80 backdrop-blur-sm border border-[#e8ecf4]/60 p-10 md:p-14">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
                 <div className="text-center">
-                  <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
-                    <BookOpen className="h-7 w-7 text-[#0058be]" />
+                  <div className="mx-auto mb-4 w-16 h-16">
+                    <CustomIcon src="/icons/curated-knowledge.png" alt="Curated Knowledge" size={64} />
                   </div>
                   <h3 className="font-semibold text-base text-[#191c1e] mb-2">Curated expertise</h3>
                   <p className="text-sm text-[#5f6368] leading-relaxed">
@@ -415,8 +412,8 @@ export default function LandingPage() {
                 </div>
 
                 <div className="text-center">
-                  <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
-                    <Brain className="h-7 w-7 text-[#0058be]" />
+                  <div className="mx-auto mb-4 w-16 h-16">
+                    <CustomIcon src="/icons/intelligent-retrieval-2.png" alt="Intelligent Retrieval" size={64} />
                   </div>
                   <h3 className="font-semibold text-base text-[#191c1e] mb-2">Context-aware retrieval</h3>
                   <p className="text-sm text-[#5f6368] leading-relaxed">
@@ -425,8 +422,8 @@ export default function LandingPage() {
                 </div>
 
                 <div className="text-center">
-                  <div className="mx-auto mb-4 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#e8f0ff] to-[#d8e2ff] flex items-center justify-center">
-                    <Globe className="h-7 w-7 text-[#0058be]" />
+                  <div className="mx-auto mb-4 w-16 h-16">
+                    <CustomIcon src="/icons/live-market-insights.png" alt="Live Market Insights" size={64} />
                   </div>
                   <h3 className="font-semibold text-base text-[#191c1e] mb-2">Live market intel</h3>
                   <p className="text-sm text-[#5f6368] leading-relaxed">
@@ -439,7 +436,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA — gradient background */}
+      {/* CTA */}
       <section className="py-20 md:py-28" style={{
         background: 'linear-gradient(180deg, #ffffff 0%, #f8f9fd 100%)',
       }}>

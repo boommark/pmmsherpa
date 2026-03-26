@@ -116,10 +116,10 @@ export default function RequestAccessPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f7f9fc] dark:bg-[#111418] p-4 relative overflow-hidden">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#111418] p-4 relative overflow-hidden">
         <BlobBackground />
         <div className="w-full max-w-md relative z-10">
-          <div className="rounded-2xl bg-white/80 dark:bg-[#1e2125]/80 backdrop-blur-xl shadow-[0_10px_40px_rgba(25,28,30,0.06)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)] p-8 text-center">
+          <div className="rounded-2xl bg-white/80 dark:bg-[#1e2125]/80 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,88,190,0.06)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-[#e8ecf4]/60 dark:border-transparent p-8 text-center">
             <div className="mx-auto mb-6 w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center">
               <CheckCircle2 className="h-8 w-8 text-white" />
             </div>
@@ -146,11 +146,11 @@ export default function RequestAccessPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f7f9fc] dark:bg-[#111418] p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#111418] p-4 relative overflow-hidden">
       <BlobBackground />
 
       <div className="w-full max-w-lg relative z-10 my-8">
-        <div className="rounded-2xl bg-white/80 dark:bg-[#1e2125]/80 backdrop-blur-xl shadow-[0_10px_40px_rgba(25,28,30,0.06)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)] p-8">
+        <div className="rounded-2xl bg-white/80 dark:bg-[#1e2125]/80 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,88,190,0.06)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-[#e8ecf4]/60 dark:border-transparent p-8">
           {/* Header */}
           <div className="text-center space-y-4 mb-8">
             <div className="flex justify-center mb-4">
