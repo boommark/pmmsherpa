@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useProfile, useSignOut } from '@/hooks/useSupabase'
 import { useChatStore } from '@/stores/chatStore'
 import { useUIStore } from '@/stores/uiStore'
@@ -21,6 +21,7 @@ export function Header() {
   const { profile } = useProfile()
   const signOut = useSignOut()
   const router = useRouter()
+  const pathname = usePathname()
   const { currentModel, setCurrentModel, clearMessages, setConversationId } = useChatStore()
   const { toggleMobileSidebar } = useUIStore()
 
@@ -34,7 +35,11 @@ export function Header() {
     e.preventDefault()
     clearMessages()
     setConversationId(null)
-    router.push('/chat')
+    if (pathname === '/chat') {
+      router.refresh()
+    } else {
+      router.push('/chat')
+    }
   }
 
   const initials = profile?.full_name

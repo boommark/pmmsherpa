@@ -120,9 +120,14 @@ function SidebarContent({
     e.preventDefault()
     clearMessages()
     setConversationId(null)
-    router.push('/chat')
+    // If already on /chat, force refresh; otherwise navigate
+    if (pathname === '/chat') {
+      router.refresh()
+    } else {
+      router.push('/chat')
+    }
     onNavigate?.()
-  }, [clearMessages, setConversationId, router, onNavigate])
+  }, [clearMessages, setConversationId, router, pathname, onNavigate])
 
   // Group conversations by date
   const groupedConversations = useMemo(() => {
@@ -153,26 +158,8 @@ function SidebarContent({
 
   return (
     <>
-      {/* Header — no border, tonal shift */}
-      <div className="flex items-center justify-between p-4">
-        {!collapsed && (
-          <a href="/chat" className="flex items-center gap-2 cursor-pointer" onClick={handleNewChat}>
-            <div className="w-7 h-7 rounded-md bg-[#0058be] flex items-center justify-center">
-              <svg
-                viewBox="0 0 24 24"
-                className="w-4 h-4 text-white"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M2 20L7 10l5 6 4-10 6 14" />
-              </svg>
-            </div>
-            <span className="font-semibold text-lg text-[#0058be] dark:text-[#a8c0f0]">PMMSherpa</span>
-          </a>
-        )}
+      {/* Header — collapse toggle only, no logo (logo is in the Header component) */}
+      <div className="flex items-center justify-end p-4">
         {showCollapseButton && (
           <Button
             variant="ghost"
