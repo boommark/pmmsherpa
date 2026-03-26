@@ -115,19 +115,14 @@ function SidebarContent({
         .toUpperCase()
     : profile?.email?.[0]?.toUpperCase() || 'U'
 
-  // Handle new chat click - clear state and navigate
+  // Handle new chat click - single click, no scroll flash
   const handleNewChat = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
-    clearMessages()
     setConversationId(null)
-    // If already on /chat, force refresh; otherwise navigate
-    if (pathname === '/chat') {
-      router.refresh()
-    } else {
-      router.push('/chat')
-    }
+    clearMessages()
+    router.replace(`/chat?t=${Date.now()}`)
     onNavigate?.()
-  }, [clearMessages, setConversationId, router, pathname, onNavigate])
+  }, [clearMessages, setConversationId, router, onNavigate])
 
   // Group conversations by date
   const groupedConversations = useMemo(() => {
@@ -158,21 +153,27 @@ function SidebarContent({
 
   return (
     <>
-      {/* Header — collapse toggle only, no logo (logo is in the Header component) */}
-      <div className="flex items-center justify-end p-4">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4">
+        {!showCollapseButton && (
+          <span className="font-semibold text-base text-foreground">PMMSherpa</span>
+        )}
         {showCollapseButton && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCollapsed(!collapsed)}
-            className={cn('hover:bg-sidebar-accent', collapsed && 'mx-auto')}
-          >
-            {collapsed ? (
-              <PanelLeft className="h-5 w-5" />
-            ) : (
-              <PanelLeftClose className="h-5 w-5" />
-            )}
-          </Button>
+          <>
+            <div />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCollapsed(!collapsed)}
+              className={cn('hover:bg-sidebar-accent', collapsed && 'mx-auto')}
+            >
+              {collapsed ? (
+                <PanelLeft className="h-5 w-5" />
+              ) : (
+                <PanelLeftClose className="h-5 w-5" />
+              )}
+            </Button>
+          </>
         )}
       </div>
 

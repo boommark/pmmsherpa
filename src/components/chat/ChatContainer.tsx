@@ -371,7 +371,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   const showLoadingState = conversationId && (messagesLoading || !hasInitialized) && messages.length === 0
 
   return (
-    <div className="flex flex-col h-full overflow-hidden relative">
+    <div className="flex flex-col h-full overflow-hidden relative" style={{ height: '100%', minHeight: 0 }}>
       {/* Background blobs - only show on welcome screen */}
       {messages.length === 0 && !conversationId && <BlobBackground />}
 
@@ -468,14 +468,16 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         </div>
       ) : (
         <>
-          <div className="flex-1 overflow-hidden min-h-0">
+          <div className="flex-1 overflow-auto min-h-0">
             <MessageList
               messages={messages}
               statusMessage={statusMessage}
               onEditPrompt={handleEditPrompt}
             />
           </div>
-          <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />
+          <div className="shrink-0">
+            <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />
+          </div>
         </>
       )}
     </div>

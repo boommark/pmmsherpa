@@ -30,16 +30,14 @@ export function Header() {
     router.push('/login')
   }
 
-  // Handle clicking the logo to start a new chat
+  // Handle clicking the logo to start a new chat — single click, no scroll flash
   const handleNewChat = (e: React.MouseEvent) => {
     e.preventDefault()
-    clearMessages()
     setConversationId(null)
-    if (pathname === '/chat') {
-      router.refresh()
-    } else {
-      router.push('/chat')
-    }
+    clearMessages()
+    // Always use replace to /chat to force a clean navigation
+    // Adding a timestamp param busts the router cache when already on /chat
+    router.replace(`/chat?t=${Date.now()}`)
   }
 
   const initials = profile?.full_name
