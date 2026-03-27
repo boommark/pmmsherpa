@@ -11,15 +11,16 @@ interface AccessRequestData {
   approvalToken: string
 }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://pmmsherpa.vercel.app'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://pmmsherpa.com'
+const LOGO_URL = 'https://pmmsherpa.com/email/logo-blue.png'
 
-// Common email styles for consistent branding
+// Common email styles for consistent branding (blue #0058be)
 const emailStyles = `
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
     color: #1f2937;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%);
+    background-color: #f9fafb;
     margin: 0;
     padding: 20px;
   }
@@ -28,65 +29,44 @@ const emailStyles = `
     margin: 0 auto;
   }
   .container {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 24px;
+    background: #ffffff;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   }
   .header {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-    color: white;
-    padding: 40px 30px;
+    color: #1f2937;
+    padding: 32px 30px 24px;
     text-align: center;
   }
-  .logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .logo-icon {
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .logo-text {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-  }
   .header h1 {
-    margin: 0;
-    font-size: 28px;
+    margin: 16px 0 0 0;
+    font-size: 24px;
     font-weight: 700;
-    letter-spacing: -0.5px;
+    color: #1f2937;
   }
   .header p {
-    margin: 12px 0 0 0;
-    opacity: 0.9;
-    font-size: 16px;
+    margin: 8px 0 0 0;
+    color: #6b7280;
+    font-size: 15px;
   }
   .content {
-    padding: 32px;
+    padding: 0 32px 32px;
   }
   .field {
-    margin-bottom: 20px;
-    padding: 16px;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
-    border-radius: 12px;
-    border: 1px solid rgba(99, 102, 241, 0.1);
+    margin-bottom: 16px;
+    padding: 14px 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
   }
   .field-label {
     font-weight: 600;
-    color: #6366f1;
+    color: #0058be;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
   .field-value {
     color: #1f2937;
@@ -94,120 +74,41 @@ const emailStyles = `
     font-weight: 500;
   }
   .field-value a {
-    color: #6366f1;
+    color: #0058be;
     text-decoration: none;
-  }
-  .field-value a:hover {
-    text-decoration: underline;
   }
   .use-cases {
     display: grid;
-    gap: 8px;
+    gap: 6px;
     margin-top: 8px;
   }
   .use-case-item {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 12px;
+    padding: 6px 10px;
     background: white;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: 14px;
     color: #374151;
   }
   .use-case-dot {
     width: 6px;
     height: 6px;
-    background: linear-gradient(135deg, #6366f1, #a855f7);
+    background: #0058be;
     border-radius: 50%;
     flex-shrink: 0;
   }
-  .button {
-    display: inline-block;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    color: white !important;
-    text-decoration: none;
-    padding: 16px 32px;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 15px;
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
-  }
-  .button-success {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
-  }
-  .button-outline {
-    background: white;
-    color: #6366f1 !important;
-    border: 2px solid #e5e7eb;
-    box-shadow: none;
-  }
-  .buttons {
-    text-align: center;
-    margin-top: 28px;
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .note {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    padding: 16px;
-    border-radius: 12px;
-    margin-top: 24px;
-    font-size: 14px;
-    color: #92400e;
-  }
-  .note strong {
-    color: #78350f;
-  }
-  .features {
-    margin: 24px 0;
-  }
-  .feature-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  .feature-item:last-child {
-    border-bottom: none;
-  }
-  .feature-icon {
-    width: 24px;
-    height: 24px;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    color: #6366f1;
-    font-size: 12px;
-  }
-  .feature-text {
-    font-size: 14px;
-    color: #374151;
-  }
   .footer {
-    padding: 24px 32px;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+    padding: 20px 32px;
     text-align: center;
     font-size: 13px;
-    color: #6b7280;
-    border-top: 1px solid rgba(99, 102, 241, 0.1);
+    color: #9ca3af;
+    border-top: 1px solid #e5e7eb;
   }
   .footer a {
-    color: #6366f1;
+    color: #9ca3af;
     text-decoration: none;
-  }
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.2), transparent);
-    margin: 24px 0;
   }
 `
 
@@ -230,12 +131,9 @@ export function getAdminNotificationEmail(data: AccessRequestData) {
           <div class="wrapper">
             <div class="container">
               <div class="header">
-                <div class="logo">
-                  <div class="logo-icon">✨</div>
-                  <span class="logo-text">PMMSherpa</span>
-                </div>
+                <img src="${LOGO_URL}" alt="PMM Sherpa" width="48" height="48" style="border-radius: 10px;" />
                 <h1>New Access Request</h1>
-                <p>Someone wants to join PMMSherpa</p>
+                <p>Someone wants to join PMM Sherpa</p>
               </div>
               <div class="content">
                 <div class="field">
@@ -291,7 +189,7 @@ export function getAdminNotificationEmail(data: AccessRequestData) {
                 </div>
               </div>
               <div class="footer">
-                <p>This notification was sent from <a href="${APP_URL}">PMMSherpa</a></p>
+                <p><a href="${APP_URL}">pmmsherpa.com</a></p>
               </div>
             </div>
           </div>
