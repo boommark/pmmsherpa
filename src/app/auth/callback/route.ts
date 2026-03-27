@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type')
   const next = searchParams.get('redirect_to') ?? searchParams.get('next') ?? '/chat'
+  const isRecovery = next === '/set-password' || type === 'recovery'
 
   // Handle PKCE code exchange (standard login flow)
   if (code) {
@@ -16,6 +17,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${origin}${next}`)
     }
     console.error('Code exchange error:', error)
+    // If this was a recovery flow and PKCE failed (e.g. different browser/tab),
+    // redirect to forgot-password so user can try again, not the login page
+    if (isRecovery) {
+      return NextResponse.redirect(`${origin}/forgot-password?error=expired`)
+    }
     return NextResponse.redirect(`${origin}/login?error=auth_error`)
   }
 

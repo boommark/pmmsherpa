@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -9,6 +10,16 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, CheckCircle2, ArrowLeft, Mail } from 'lucide-react'
+
+function ForgotPasswordError({ onError }: { onError: (msg: string) => void }) {
+  const searchParams = useSearchParams()
+  useEffect(() => {
+    if (searchParams.get('error') === 'expired') {
+      onError('Your reset link has expired. Please request a new one.')
+    }
+  }, [searchParams, onError])
+  return null
+}
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -112,6 +123,7 @@ export default function ForgotPasswordPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <Suspense><ForgotPasswordError onError={setError} /></Suspense>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <Alert variant="destructive">
@@ -132,15 +144,13 @@ export default function ForgotPasswordPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                'Send Reset Link'
-              )}
+            <Button
+              type="submit"
+              className="w-full h-11 rounded-xl bg-[#0058be] hover:bg-[#004a9e] shadow-none font-medium text-white"
+              disabled={isLoading}
+            >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading ? 'Sending...' : 'Send Reset Link'}
             </Button>
 
             <Link href="/login" className="block">
