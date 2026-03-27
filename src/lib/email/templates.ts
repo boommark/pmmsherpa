@@ -492,7 +492,7 @@ export function getCelebratoryWelcomeEmail(data: { fullName: string; email: stri
                   <!-- Logo -->
                   <tr>
                     <td align="center" style="padding: 32px 0 16px 0;">
-                      <img src="https://pmmsherpa.com/pmmsherpa-logo.png" alt="PMM Sherpa" width="56" height="56" style="border-radius: 12px;" />
+                      <img src="https://pmmsherpa.com/email/logo-blue.png" alt="PMM Sherpa" width="56" height="56" style="border-radius: 12px;" />
                     </td>
                   </tr>
                   <!-- Body -->
