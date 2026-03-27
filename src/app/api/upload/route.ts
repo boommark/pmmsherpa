@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60
+export const maxDuration = 120 // LlamaParse can take time for large docs
 
 // Supported file types and their max sizes
 const SUPPORTED_FILE_TYPES: Record<string, { maxSize: number; category: string }> = {
@@ -16,6 +16,79 @@ const SUPPORTED_FILE_TYPES: Record<string, { maxSize: number; category: string }
   'image/webp': { maxSize: 5 * 1024 * 1024, category: 'image' },
   'video/mp4': { maxSize: 50 * 1024 * 1024, category: 'video' },
   'video/webm': { maxSize: 50 * 1024 * 1024, category: 'video' },
+}
+
+const LLAMA_PARSE_BASE = 'https://api.cloud.llamaindex.ai'
+
+async function parseWithLlamaParse(file: File): Promise<string | null> {
+  const apiKey = process.env.LLAMA_CLOUD_API_KEY
+  if (!apiKey) {
+    console.warn('LLAMA_CLOUD_API_KEY not set, skipping document parsing')
+    return null
+  }
+
+  // Step 1: Upload file and start parse job
+  const uploadForm = new FormData()
+  uploadForm.append('file', file)
+  uploadForm.append('configuration', JSON.stringify({
+    tier: 'cost_effective',
+    version: 'latest',
+    output_options: {
+      markdown: {
+        annotate_links: true,
+        tables: { output_tables_as_markdown: true },
+      },
+    },
+  }))
+
+  const uploadRes = await fetch(`${LLAMA_PARSE_BASE}/api/v2/parse/upload`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}` },
+    body: uploadForm,
+  })
+
+  if (!uploadRes.ok) {
+    const err = await uploadRes.text()
+    console.error('LlamaParse upload failed:', err)
+    return null
+  }
+
+  const { job } = await uploadRes.json()
+  const jobId: string = job.id
+
+  // Step 2: Poll for completion (max 90 seconds)
+  const maxAttempts = 45
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(r => setTimeout(r, 2000))
+
+    const pollRes = await fetch(`${LLAMA_PARSE_BASE}/api/v2/parse/${jobId}`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    })
+    const pollData = await pollRes.json()
+    const status = pollData.job?.status
+
+    if (status === 'COMPLETED') {
+      // Step 3: Fetch markdown result
+      const resultRes = await fetch(
+        `${LLAMA_PARSE_BASE}/api/v2/parse/${jobId}?expand=markdown`,
+        { headers: { Authorization: `Bearer ${apiKey}` } }
+      )
+      const result = await resultRes.json()
+      const pages = result.markdown?.pages
+      if (pages && pages.length > 0) {
+        return pages.map((p: { markdown: string }) => p.markdown).join('\n\n')
+      }
+      return null
+    }
+
+    if (status === 'FAILED' || status === 'CANCELLED') {
+      console.error('LlamaParse job failed:', pollData.job?.error_message)
+      return null
+    }
+  }
+
+  console.error('LlamaParse timed out for job:', jobId)
+  return null
 }
 
 export async function POST(request: NextRequest) {
@@ -86,13 +159,25 @@ export async function POST(request: NextRequest) {
       .from('conversation-files')
       .getPublicUrl(storagePath)
 
-    // Extract text for documents (basic text extraction for .txt files)
+    // Extract text from documents
     let extractedText: string | null = null
+    const PARSEABLE_TYPES = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ]
+
     if (file.type === 'text/plain') {
       try {
         extractedText = await file.text()
       } catch {
-        console.warn('Failed to extract text from file')
+        console.warn('Failed to extract text from .txt file')
+      }
+    } else if (PARSEABLE_TYPES.includes(file.type)) {
+      try {
+        extractedText = await parseWithLlamaParse(file)
+      } catch (err) {
+        console.error('LlamaParse extraction failed:', err)
       }
     }
 
