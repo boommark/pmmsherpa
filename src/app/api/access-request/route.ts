@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
 
     try {
       await getResend().emails.send({
-        from: 'PMMSherpa <noreply@pmmsherpa.com>',
+        from: 'PMM Sherpa <support@pmmsherpa.com>',
         to: emailTemplate.to,
         subject: emailTemplate.subject,
         html: emailTemplate.html,

@@ -276,21 +276,18 @@ export function getAdminNotificationEmail(data: AccessRequestData) {
                     ${data.useCases.map(u => `<div class="use-case-item"><span class="use-case-dot"></span>${u}</div>`).join('')}
                   </div>
                 </div>
-                <div class="note" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%); border: 1px solid rgba(16, 185, 129, 0.3); color: #065f46;">
-                  <strong>How to approve this user:</strong>
-                  <ol style="margin: 12px 0 0 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
-                    <li>Click the green "Approve in Supabase" button below</li>
-                    <li>You'll see the user <strong>${data.email}</strong> in the list (already filtered)</li>
-                    <li>Click on the user row to open their details panel on the right</li>
-                    <li>Scroll down in the panel and look for <strong>"User banned until..."</strong></li>
-                    <li>Click the <strong>"Remove ban"</strong> button to activate their account</li>
-                    <li>The user can now log in with the password they set during signup!</li>
-                  </ol>
-                  <p style="margin-top: 12px; font-size: 13px; color: #047857;"><strong>Note:</strong> The user already set their password when requesting access. Once you remove the ban, they can immediately log in at <a href="${APP_URL}/login" style="color: #047857;">${APP_URL}/login</a></p>
-                </div>
-                <div class="buttons">
-                  <a href="https://supabase.com/dashboard/project/nhwcpjfjsjsslxuqpuoy/auth/users?search=${encodeURIComponent(data.email)}" class="button button-success">✓ Approve in Supabase</a>
-                  <a href="${APP_URL}/admin/requests" class="button button-outline">View All Requests</a>
+                <div style="text-align: center; margin-top: 28px;">
+                  <p style="font-size: 14px; color: #6b7280; margin: 0 0 16px 0;">Click to approve or reject this user. They'll be unbanned and receive a welcome email automatically.</p>
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+                    <tr>
+                      <td style="padding-right: 12px;">
+                        <a href="${APP_URL}/api/approve-user?token=${data.approvalToken}&action=approve" class="button button-success" style="display: inline-block; background: #0058be; color: white !important; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 15px;">✓ Approve</a>
+                      </td>
+                      <td>
+                        <a href="${APP_URL}/api/approve-user?token=${data.approvalToken}&action=reject" class="button button-outline" style="display: inline-block; background: white; color: #dc2626 !important; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 15px; border: 2px solid #e5e7eb;">✗ Reject</a>
+                      </td>
+                    </tr>
+                  </table>
                 </div>
               </div>
               <div class="footer">
@@ -310,14 +307,9 @@ ${data.phone ? `Phone: ${data.phone}\n` : ''}${data.profession ? `Profession: ${
 Use Cases:
 ${useCasesFormatted}
 
-HOW TO APPROVE:
-1. Click the Supabase link below
-2. Search for ${data.email}
-3. Click on the user row
-4. Click "Remove ban" to activate their account
-
-Approve in Supabase: https://supabase.com/dashboard/project/nhwcpjfjsjsslxuqpuoy/auth/users?search=${encodeURIComponent(data.email)}
-View All Requests: ${APP_URL}/admin/requests
+APPROVE OR REJECT:
+Approve: ${APP_URL}/api/approve-user?token=${data.approvalToken}&action=approve
+Reject: ${APP_URL}/api/approve-user?token=${data.approvalToken}&action=reject
     `.trim()
   }
 }
