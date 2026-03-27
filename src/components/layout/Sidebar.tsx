@@ -152,9 +152,9 @@ function SidebarContent({
   ]
 
   return (
-    <>
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center justify-between p-4 flex-shrink-0">
         {!showCollapseButton && (
           <span className="font-semibold text-base text-foreground">PMMSherpa</span>
         )}
@@ -355,7 +355,7 @@ function SidebarContent({
           </div>
         )}
       </nav>
-    </>
+    </div>
   )
 }
 

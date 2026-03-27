@@ -164,13 +164,13 @@ export async function POST(request: NextRequest) {
 
           // Show status based on what the planner decided
           if (queryPlan.webResearch.needed && hasUrls) {
-            sendStatus('Searching knowledge base and fetching current market data via Perplexity...')
+            sendStatus('Reading URL and searching knowledge base + web...')
           } else if (queryPlan.webResearch.needed) {
-            sendStatus('Searching knowledge base and researching the web via Perplexity...')
+            sendStatus('Searching knowledge base and the web...')
           } else if (hasUrls) {
-            sendStatus('Reading URL content and searching PMM knowledge base...')
+            sendStatus('Reading URL and searching knowledge base...')
           } else {
-            sendStatus('Searching PMM knowledge base...')
+            sendStatus('Searching knowledge base...')
           }
 
           const startRetrieval = Date.now()

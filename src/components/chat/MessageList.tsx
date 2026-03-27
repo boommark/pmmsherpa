@@ -129,10 +129,7 @@ export function MessageList({ messages, statusMessage, onEditPrompt }: MessageLi
           </div>
         ))}
         {statusMessage && (
-          <div className="space-y-3">
-            <SkeletonMessage />
-            <StatusIndicator message={statusMessage} />
-          </div>
+          <StatusIndicator message={statusMessage} />
         )}
         <div ref={messagesEndRef} />
       </div>
