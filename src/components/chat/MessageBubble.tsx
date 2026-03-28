@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Loader2, Copy, Pencil, Check, Volume2, VolumeX } from 'lucide-react'
+import { Loader2, Copy, Pencil, Check, Volume2, VolumeX, FileText, Image as ImageIcon, Film, File, ExternalLink } from 'lucide-react'
 import { toast } from 'sonner'
 import { copyForGoogleDocs, type CopyOptions } from '@/lib/utils/clipboard'
 import type { ChatMessage } from '@/types/chat'
@@ -16,6 +16,19 @@ interface MessageBubbleProps {
   message: ChatMessage
   messageIndex?: number
   onEditPrompt?: (content: string, messageIndex: number) => void
+}
+
+function getFileIcon(fileType: string) {
+  if (fileType.startsWith('image/')) return ImageIcon
+  if (fileType.startsWith('video/')) return Film
+  if (fileType === 'application/pdf' || fileType.includes('word') || fileType === 'text/plain') return FileText
+  return File
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBubbleProps) {
@@ -64,6 +77,33 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
     return (
       <div className="flex justify-end group w-full overflow-hidden">
         <div className="flex flex-col items-end min-w-0 max-w-[85%] sm:max-w-[75%] md:max-w-[65%] space-y-1">
+          {message.attachments && message.attachments.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-1.5">
+              {message.attachments.map((att) => {
+                const Icon = getFileIcon(att.fileType)
+                const isImage = att.fileType.startsWith('image/')
+                return (
+                  <a
+                    key={att.id}
+                    href={att.storagePath}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 transition-colors text-white text-xs group/att cursor-pointer"
+                    title={`Open ${att.fileName}`}
+                  >
+                    {isImage && att.storagePath ? (
+                      <img src={att.storagePath} alt={att.fileName} className="h-8 w-8 rounded object-cover" />
+                    ) : (
+                      <Icon className="h-3.5 w-3.5 shrink-0 opacity-80" />
+                    )}
+                    <span className="truncate max-w-[140px]">{att.fileName}</span>
+                    <span className="opacity-60 shrink-0">{formatFileSize(att.fileSize)}</span>
+                    <ExternalLink className="h-2.5 w-2.5 opacity-0 group-hover/att:opacity-60 shrink-0 transition-opacity" />
+                  </a>
+                )
+              })}
+            </div>
+          )}
           <div
             className="rounded-2xl px-4 py-2.5 sm:px-5 sm:py-3 bg-[#0058be] text-white"
             style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
