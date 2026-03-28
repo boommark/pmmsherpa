@@ -9,7 +9,7 @@ import { extractUrls, scrapeUrls } from '@/lib/url-scraper'
 import type { ChatAttachment, WebCitation } from '@/types/chat'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60
+export const maxDuration = 120
 
 // Token budget per context section (rough estimate: 1 token ≈ 4 chars)
 // Total budget ~40K tokens leaves plenty of room for system prompt + output

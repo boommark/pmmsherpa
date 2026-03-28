@@ -20,7 +20,7 @@ const SUPPORTED_FILE_TYPES: Record<string, { maxSize: number; category: string }
 
 const LLAMA_PARSE_BASE = 'https://api.cloud.llamaindex.ai'
 
-async function parseWithLlamaParse(file: File): Promise<string | null> {
+async function parseWithLlamaParse(fileBuffer: Buffer, fileName: string, mimeType: string): Promise<string | null> {
   const apiKey = process.env.LLAMA_CLOUD_API_KEY
   if (!apiKey) {
     console.warn('LLAMA_CLOUD_API_KEY not set, skipping document parsing')
@@ -29,7 +29,8 @@ async function parseWithLlamaParse(file: File): Promise<string | null> {
 
   // Step 1: Upload file and start parse job
   const uploadForm = new FormData()
-  uploadForm.append('file', file)
+  const blob = new Blob([new Uint8Array(fileBuffer)], { type: mimeType })
+  uploadForm.append('file', blob, fileName)
   uploadForm.append('configuration', JSON.stringify({
     tier: 'cost_effective',
     version: 'latest',
@@ -53,8 +54,13 @@ async function parseWithLlamaParse(file: File): Promise<string | null> {
     return null
   }
 
-  const { job } = await uploadRes.json()
-  const jobId: string = job.id
+  const uploadJson = await uploadRes.json()
+  // LlamaParse returns job fields at top level, not nested under "job"
+  const jobId: string = uploadJson.id
+  if (!jobId) {
+    console.error('LlamaParse upload returned no job ID:', uploadJson)
+    return null
+  }
 
   // Step 2: Poll for completion (max 90 seconds)
   const maxAttempts = 45
@@ -134,8 +140,9 @@ export async function POST(request: NextRequest) {
       ? `${user.id}/${conversationId}/${sanitizedFileName}`
       : `${user.id}/temp/${sanitizedFileName}`
 
-    // Convert File to ArrayBuffer for upload
+    // Buffer the file once — used for both Supabase upload and LlamaParse
     const arrayBuffer = await file.arrayBuffer()
+    const fileBuffer = Buffer.from(arrayBuffer)
     const uint8Array = new Uint8Array(arrayBuffer)
 
     // Upload to Supabase Storage
@@ -175,7 +182,7 @@ export async function POST(request: NextRequest) {
       }
     } else if (PARSEABLE_TYPES.includes(file.type)) {
       try {
-        extractedText = await parseWithLlamaParse(file)
+        extractedText = await parseWithLlamaParse(fileBuffer, file.name, file.type)
       } catch (err) {
         console.error('LlamaParse extraction failed:', err)
       }

@@ -58,7 +58,9 @@ export async function scrapeUrls(urls: string[]): Promise<string> {
   const results = await Promise.all(
     limited.map(async (url) => {
       const content = await scrapeWithFirecrawl(url)
-      if (!content) return null
+      if (!content) {
+        return `--- Scraped content from ${url} ---\n[Failed to fetch content from this URL. The page may be behind a login, blocking scrapers, or temporarily unavailable.]\n--- End of ${url} ---`
+      }
       return `--- Scraped content from ${url} ---\n${content}\n--- End of ${url} ---`
     })
   )
