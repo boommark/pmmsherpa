@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import Image from "next/image";
 
 type OrbState = "idle" | "listening" | "processing" | "speaking";
 
@@ -11,7 +12,7 @@ interface VoiceOrbProps {
 }
 
 const STATE_LABELS: Record<OrbState, string> = {
-  idle: "Tap to start",
+  idle: "Click to start",
   listening: "Listening...",
   processing: "Thinking...",
   speaking: "Speaking...",
@@ -188,6 +189,18 @@ export function VoiceOrb({ state, amplitude = 0, frequencyData }: VoiceOrbProps)
               filter: "blur(6px)",
             }}
           />
+
+          {/* PMMSherpa logo */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Image
+              src="/pmmsherpa-logo.png"
+              alt="PMMSherpa"
+              width={72}
+              height={72}
+              className="w-[52px] h-[52px] md:w-[72px] md:h-[72px] opacity-90 drop-shadow-lg"
+              style={{ filter: "brightness(1.3)" }}
+            />
+          </div>
         </div>
       </div>
 

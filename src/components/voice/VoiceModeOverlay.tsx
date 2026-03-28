@@ -7,6 +7,15 @@ import { VoiceWaveform } from "./VoiceWaveform";
 
 type VoiceState = "idle" | "listening" | "processing" | "speaking";
 
+const VOICES = [
+  { id: "VsQmyFHffusQDewmHB5v", name: "Eddie", desc: "British, clear" },
+  { id: "wWWn96OtTHu1sn8SRGEr", name: "Hale", desc: "Deep, emotive" },
+  { id: "AXdMgz6evoL7OPd7eU12", name: "Elizabeth", desc: "British, precise" },
+  { id: "gJx1vCzNCD1EQHT212Ls", name: "Ava", desc: "Warm, helpful" },
+  { id: "sB7vwSCyX0tQmU24cW2C", name: "Jon", desc: "Natural authority" },
+  { id: "jqcCZkN6Knx8BJ5TBdYR", name: "Zara", desc: "Conversational" },
+];
+
 interface VoiceModeOverlayProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,6 +28,8 @@ interface VoiceModeOverlayProps {
   onStartListening: () => void;
   onStopListening: () => void;
   onCancel: () => void;
+  voiceId?: string;
+  onVoiceChange?: (voiceId: string) => void;
 }
 
 export function VoiceModeOverlay({
@@ -33,9 +44,14 @@ export function VoiceModeOverlay({
   onStartListening,
   onStopListening,
   onCancel,
+  voiceId = "VsQmyFHffusQDewmHB5v",
+  onVoiceChange,
 }: VoiceModeOverlayProps) {
   const [visible, setVisible] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
+  const [showVoicePicker, setShowVoicePicker] = useState(false);
+
+  const currentVoice = VOICES.find((v) => v.id === voiceId) || VOICES[0];
 
   // Handle mount/unmount animation
   useEffect(() => {
@@ -104,9 +120,26 @@ export function VoiceModeOverlay({
 
       {/* Top bar */}
       <div className="relative flex items-center justify-between px-5 pt-4 pb-2" style={{ paddingTop: "max(env(safe-area-inset-top, 16px), 16px)" }}>
-        <span className="text-xs font-medium tracking-widest uppercase" style={{ color: "rgba(148, 180, 230, 0.4)" }}>
-          Voice Mode
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-medium tracking-widest uppercase" style={{ color: "rgba(148, 180, 230, 0.4)" }}>
+            Voice Mode
+          </span>
+          {/* Voice selector */}
+          <button
+            onClick={() => setShowVoicePicker(!showVoicePicker)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors"
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.06)",
+              color: "rgba(200, 210, 230, 0.7)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
+            }}
+          >
+            <span>{currentVoice.name}</span>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ opacity: 0.5 }}>
+              <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
         <button
           onClick={onClose}
           className="flex items-center justify-center w-10 h-10 rounded-full transition-colors"
@@ -127,6 +160,43 @@ export function VoiceModeOverlay({
           <X size={20} />
         </button>
       </div>
+
+      {/* Voice picker dropdown */}
+      {showVoicePicker && (
+        <div
+          className="absolute left-5 top-16 z-10 rounded-xl overflow-hidden"
+          style={{
+            backgroundColor: "rgba(15, 20, 35, 0.95)",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            backdropFilter: "blur(20px)",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          {VOICES.map((voice) => (
+            <button
+              key={voice.id}
+              onClick={() => {
+                onVoiceChange?.(voice.id);
+                setShowVoicePicker(false);
+              }}
+              className="flex items-center gap-3 w-full px-4 py-2.5 text-left transition-colors"
+              style={{
+                backgroundColor: voice.id === voiceId ? "rgba(0, 88, 190, 0.2)" : "transparent",
+                color: voice.id === voiceId ? "rgba(168, 192, 240, 1)" : "rgba(200, 210, 230, 0.7)",
+              }}
+              onMouseEnter={(e) => {
+                if (voice.id !== voiceId) e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
+              }}
+              onMouseLeave={(e) => {
+                if (voice.id !== voiceId) e.currentTarget.style.backgroundColor = "transparent";
+              }}
+            >
+              <span className="text-sm font-medium">{voice.name}</span>
+              <span className="text-xs" style={{ color: "rgba(148, 180, 230, 0.5)" }}>{voice.desc}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Center: Orb */}
       <div className="flex-1 flex items-center justify-center min-h-0">

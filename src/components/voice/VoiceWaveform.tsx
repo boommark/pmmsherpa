@@ -131,7 +131,16 @@ export function VoiceWaveform({ audioLevel, isActive }: VoiceWaveformProps) {
   }, [draw]);
 
   return (
-    <div className="w-full flex justify-center px-4">
+    <div
+      className="w-full flex justify-center px-4"
+      style={{
+        background: "linear-gradient(180deg, transparent 0%, rgba(0, 88, 190, 0.04) 30%, rgba(0, 88, 190, 0.08) 100%)",
+        borderRadius: "16px",
+        padding: "8px 16px",
+        maxWidth: "400px",
+        margin: "0 auto",
+      }}
+    >
       <canvas
         ref={canvasRef}
         className="w-full max-w-[320px]"

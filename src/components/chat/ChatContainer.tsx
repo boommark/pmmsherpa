@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback, useState } from 'react'
+import { useEffect, useRef, useCallback, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useChatStore } from '@/stores/chatStore'
 import { useConversations, useConversationMessages } from '@/hooks/useConversations'
@@ -342,6 +342,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   // ========================================
   const [voiceModeOpen, setVoiceModeOpen] = useState(false)
   const [voiceResponseText, setVoiceResponseText] = useState('')
+  const [selectedVoiceId, setSelectedVoiceId] = useState('VsQmyFHffusQDewmHB5v')
   const voiceResponseRef = useRef('')
 
   const handleVoiceTranscript = useCallback(async (transcript: string) => {
@@ -414,7 +415,28 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   const voiceMode = useVoiceMode({
     onTranscript: handleVoiceTranscript,
     onError: (error) => console.error('Voice mode error:', error),
+    voiceId: selectedVoiceId,
   })
+
+  // Poll playback amplitude in a rAF loop for smooth orb animation
+  const [playbackAmplitude, setPlaybackAmplitude] = useState(0)
+  const [playbackFreqData, setPlaybackFreqData] = useState<Uint8Array | undefined>(undefined)
+  const rafRef = useRef<number>(0)
+
+  useEffect(() => {
+    if (!voiceModeOpen) return
+
+    const tick = () => {
+      setPlaybackAmplitude(voiceMode.getPlaybackAmplitude())
+      setPlaybackFreqData(voiceMode.getPlaybackFrequencyData())
+      rafRef.current = requestAnimationFrame(tick)
+    }
+    rafRef.current = requestAnimationFrame(tick)
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [voiceModeOpen, voiceMode])
 
   const handleOpenVoiceMode = useCallback(() => {
     setVoiceModeOpen(true)
@@ -470,13 +492,15 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         onClose={handleCloseVoiceMode}
         state={voiceMode.state}
         audioLevel={voiceMode.audioLevel}
-        playbackAmplitude={voiceMode.getPlaybackAmplitude()}
-        playbackFrequencyData={voiceMode.getPlaybackFrequencyData()}
+        playbackAmplitude={playbackAmplitude}
+        playbackFrequencyData={playbackFreqData}
         transcript={voiceMode.transcript}
         responseText={voiceResponseText}
         onStartListening={voiceMode.startListening}
         onStopListening={voiceMode.stopListening}
         onCancel={voiceMode.cancel}
+        voiceId={selectedVoiceId}
+        onVoiceChange={setSelectedVoiceId}
       />
       {/* Background blobs - only show on welcome screen */}
       {messages.length === 0 && !conversationId && <BlobBackground />}
