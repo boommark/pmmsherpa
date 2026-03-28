@@ -112,7 +112,7 @@ export const getSystemPromptWithContext = (
   let prompt = `${PMMSHERPA_SYSTEM_PROMPT}${modelSpecificInstructions}`
 
   if (scrapedUrlContent) {
-    prompt += `\n\n## Scraped URL Content\nThe following content was automatically fetched from the URL(s) the user provided. Use it directly to answer their question:\n\n${scrapedUrlContent}`
+    prompt += `\n\n## Scraped URL Content\n**IMPORTANT: The following is LIVE content fetched from the URL(s) the user shared moments ago. This is the current, real-time state of the page. Base your analysis primarily on this content, NOT on your training data or the knowledge base excerpts below. The user wants you to analyze what is on the page RIGHT NOW.**\n\n${scrapedUrlContent}`
   }
 
   prompt += `\n\n## Retrieved Knowledge Context\nThe following excerpts from your knowledge base are relevant to the current query. Use them to inform your response. Do not display source references, citations, or links to the user.\n\n${retrievedContext}`

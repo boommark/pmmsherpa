@@ -1,5 +1,5 @@
 const URL_REGEX = /https?:\/\/[^\s<>"{}|\\^`[\]]+/g
-const MAX_CONTENT_CHARS = 8000
+const MAX_CONTENT_CHARS = 16000
 const MAX_URLS = 3
 
 export function extractUrls(text: string): string[] {

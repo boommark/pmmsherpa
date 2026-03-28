@@ -16,7 +16,7 @@ export const maxDuration = 120
 const TOKEN_BUDGETS = {
   conversationHistory: 12000, // ~48K chars — keeps last N messages that fit
   ragContext: 8000,           // ~32K chars — 10 chunks is usually well within this
-  urlContent: 8000,           // ~32K chars — truncate long articles
+  urlContent: 16000,          // ~64K chars — full page content for accurate analysis
   perplexityContent: 4000,    // ~16K chars — web research summary
   attachments: 6000,          // ~24K chars — attachment text
 }
@@ -136,6 +136,14 @@ export async function POST(request: NextRequest) {
           const truncatedUrlContent = scrapedUrlContent
             ? truncateToTokenBudget(scrapedUrlContent, TOKEN_BUDGETS.urlContent)
             : ''
+
+          if (hasUrls) {
+            console.log(`[URL Scraping] Detected ${detectedUrls.length} URLs: ${detectedUrls.join(', ')}`)
+            console.log(`[URL Scraping] Scraped content length: ${scrapedUrlContent.length} chars, truncated to: ${truncatedUrlContent.length} chars`)
+            if (!scrapedUrlContent) {
+              console.warn('[URL Scraping] WARNING: URL scraping returned empty content!')
+            }
+          }
 
           // Process attachments (truncate to budget)
           let attachmentContext = ''
