@@ -433,16 +433,63 @@ def main():
 
     log.info(f"\nLog saved to: {log_file}")
 
-    # ── Alerts ──
+    # ── Daily Status Email ──
+    summary_lines = []
+    has_new_content = False
+    has_errors = False
+
+    if "pma" in results:
+        r = results["pma"]
+        status = "AUTH EXPIRED" if r["auth_expired"] else ("OK" if r["success"] else "FAILED")
+        summary_lines.append(f"PMA Scraper:       {status} | {r['new_files']} new files | {r['duration_sec']:.0f}s")
+        if r["new_files"] > 0:
+            has_new_content = True
+        if not r["success"]:
+            has_errors = True
+
+    if "sharebird" in results:
+        r = results["sharebird"]
+        status = "AUTH EXPIRED" if r["auth_expired"] else ("OK" if r["success"] else "FAILED")
+        summary_lines.append(f"Sharebird Scraper: {status} | {r['new_files']} new files | {r['duration_sec']:.0f}s")
+        if r["new_files"] > 0:
+            has_new_content = True
+        if not r["success"]:
+            has_errors = True
+
+    if "ingestion" in results:
+        r = results["ingestion"]
+        status = "OK" if r.get("success") else "ERRORS"
+        summary_lines.append(f"Ingestion:         {status} | {r['documents']} docs, {r['chunks']} chunks | {r['skipped']} skipped, {r['errors']} errors")
+        if r.get("errors", 0) > 0:
+            has_errors = True
+
+    # Build email
     if auth_failures:
-        alert_body = (
-            f"The following scrapers have expired sessions and need manual re-auth:\n\n"
-            f"{', '.join(auth_failures)}\n\n"
-            f"PMA: cd '{PMA_SCRAPER_DIR}' && python main.py login <magic_link>\n"
-            f"Sharebird: cd '{SHAREBIRD_SCRAPER_DIR}' && python main.py login\n\n"
-            f"Full log: {log_file}"
-        )
-        send_alert("PMM Sherpa Pipeline: Auth Expired", alert_body)
+        subject = f"PMM Sherpa Pipeline: AUTH EXPIRED ({', '.join(auth_failures)})"
+    elif has_errors:
+        subject = "PMM Sherpa Pipeline: Errors"
+    elif has_new_content:
+        total_new = sum(r.get("new_files", 0) for k, r in results.items() if k in ("pma", "sharebird"))
+        total_docs = results.get("ingestion", {}).get("documents", 0)
+        subject = f"PMM Sherpa Pipeline: {total_new} scraped, {total_docs} ingested"
+    else:
+        subject = "PMM Sherpa Pipeline: No new content"
+
+    email_body = f"Daily Pipeline Run — {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"
+    email_body += "=" * 50 + "\n\n"
+    email_body += "\n".join(summary_lines) + "\n"
+
+    if auth_failures:
+        email_body += f"\nACTION REQUIRED: Re-authenticate {', '.join(auth_failures)}\n"
+        email_body += f"\nPMA:  python main.py login <magic_link>\n"
+        email_body += f"Sharebird: python main.py login\n"
+        email_body += f"Then scp session files to VPS.\n"
+
+    email_body += f"\nLog: {log_file}"
+
+    send_alert(subject, email_body)
+
+    if auth_failures:
         log.warning(f"\nACTION REQUIRED: Re-authenticate {', '.join(auth_failures)}")
 
     # Exit code
