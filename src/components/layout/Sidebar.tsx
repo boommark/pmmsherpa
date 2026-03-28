@@ -194,7 +194,7 @@ function SidebarContent({
 
       {/* Conversations grouped by date */}
       {!collapsed && (
-        <ScrollArea className="flex-1 px-3">
+        <ScrollArea className="flex-1 min-h-0 overflow-hidden px-3">
           <div className="space-y-4 py-2">
             {groupOrder.map((groupName) => {
               const convs = groupedConversations[groupName]
@@ -388,7 +388,7 @@ export function Sidebar() {
       {/* Desktop Sidebar — no border-r, uses background tonal shift */}
       <aside
         className={cn(
-          'hidden md:flex flex-col bg-sidebar transition-all duration-300',
+          'hidden md:flex flex-col h-full bg-sidebar transition-all duration-300',
           collapsed ? 'w-16' : 'w-64'
         )}
       >
