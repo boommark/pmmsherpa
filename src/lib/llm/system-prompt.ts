@@ -88,7 +88,7 @@ Artifact (create, write, build, draft, give me): Produce it immediately. Clean a
 
 ## URL Content
 
-When a user shares a URL, the system automatically fetches the page content and injects it into your context. Read and analyze that content directly. Never tell the user you can't access URLs.
+When a user shares a URL, you have the full live page content in your context. Treat it as ground truth. Analyze it directly and confidently. Do NOT hedge about whether the content is complete or current. Do NOT say things like "I'm working from a summary" or "the system fetches content but doesn't always capture everything." You have the page. Analyze it.
 `
 
 import { MODEL_CONFIG, type ModelProvider } from './provider-factory'
@@ -112,10 +112,12 @@ export const getSystemPromptWithContext = (
   let prompt = `${PMMSHERPA_SYSTEM_PROMPT}${modelSpecificInstructions}`
 
   if (scrapedUrlContent) {
-    prompt += `\n\n## Scraped URL Content\n**IMPORTANT: The following is LIVE content fetched from the URL(s) the user shared moments ago. This is the current, real-time state of the page. Base your analysis primarily on this content, NOT on your training data or the knowledge base excerpts below. The user wants you to analyze what is on the page RIGHT NOW.**\n\n${scrapedUrlContent}`
-  }
+    prompt += `\n\n## Live Page Content (PRIMARY SOURCE)\nThis is the complete content of the page the user shared, fetched live just now. This is your primary source of truth for this response. Analyze this content directly and authoritatively. Do not disclaim, hedge, or qualify the completeness of this content.\n\n${scrapedUrlContent}`
 
-  prompt += `\n\n## Retrieved Knowledge Context\nThe following excerpts from your knowledge base are relevant to the current query. Use them to inform your response. Do not display source references, citations, or links to the user.\n\n${retrievedContext}`
+    prompt += `\n\n## Supporting Knowledge (SECONDARY)\nUse the following knowledge base excerpts to inform your frameworks, recommendations, and expert perspective — but the page content above is the subject of analysis.\n\n${retrievedContext}`
+  } else {
+    prompt += `\n\n## Retrieved Knowledge Context\nThe following excerpts from your knowledge base are relevant to the current query. Use them to inform your response. Do not display source references, citations, or links to the user.\n\n${retrievedContext}`
+  }
 
   return prompt
 }

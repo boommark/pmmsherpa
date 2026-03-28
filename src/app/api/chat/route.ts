@@ -252,9 +252,17 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             fullContext += '\n\n--- User Attached Files ---' + attachmentContext
           }
 
+          // When URLs were scraped, annotate the user message so the LLM knows content is available
+          let processedMessage = message || '[User sent attachments without a message]'
+          if (hasUrls && truncatedUrlContent) {
+            for (const url of detectedUrls) {
+              processedMessage = processedMessage.replace(url, `${url} [page content loaded above]`)
+            }
+          }
+
           console.log(`Building messages with ${conversationHistory.length} history messages for model: ${model}`)
           const { system, messages: allMessages } = buildMessages(
-            message || '[User sent attachments without a message]',
+            processedMessage,
             fullContext,
             model,
             conversationHistory,
