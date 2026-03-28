@@ -148,7 +148,7 @@ function SidebarContent({
     { href: '/chat', icon: MessageSquare, label: 'New Chat' },
     { href: '/history', icon: History, label: 'History' },
     { href: '/saved', icon: Bookmark, label: 'Saved' },
-    { href: '/settings', icon: Settings, label: 'Settings' },
+    { href: '/settings/preferences', icon: Settings, label: 'Settings' },
   ]
 
   return (

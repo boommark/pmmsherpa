@@ -17,21 +17,19 @@ import {
 } from '@/components/ui/select'
 import { Loader2, CheckCircle, Moon, Sun, Monitor, Brain, Zap, Volume2 } from 'lucide-react'
 import { MODEL_CONFIG, getDbModelValue, type ModelProvider } from '@/lib/llm/provider-factory'
-import type { TTSVoice } from '@/types/database'
+import type { ElevenLabsVoiceId } from '@/types/database'
 
-// Available TTS voices with descriptions
-const TTS_VOICES: { id: TTSVoice; name: string; description: string }[] = [
-  { id: 'nova', name: 'Nova', description: 'Warm and friendly' },
-  { id: 'alloy', name: 'Alloy', description: 'Balanced and versatile' },
-  { id: 'echo', name: 'Echo', description: 'Soft and conversational' },
-  { id: 'fable', name: 'Fable', description: 'Expressive and dynamic' },
-  { id: 'onyx', name: 'Onyx', description: 'Deep and authoritative' },
-  { id: 'shimmer', name: 'Shimmer', description: 'Clear and energetic' },
-  { id: 'ash', name: 'Ash', description: 'Calm and measured' },
-  { id: 'ballad', name: 'Ballad', description: 'Melodic and smooth' },
-  { id: 'coral', name: 'Coral', description: 'Bright and engaging' },
-  { id: 'sage', name: 'Sage', description: 'Thoughtful and wise' },
+// Available ElevenLabs TTS voices
+const ELEVENLABS_VOICES: { id: ElevenLabsVoiceId; name: string; description: string }[] = [
+  { id: 'VsQmyFHffusQDewmHB5v', name: 'Eddie Stirling', description: 'British corporate, clear & reliable' },
+  { id: 'wWWn96OtTHu1sn8SRGEr', name: 'Hale', description: 'Expressive, deep & emotive' },
+  { id: 'AXdMgz6evoL7OPd7eU12', name: 'Elizabeth', description: 'British, precise & natural' },
+  { id: 'gJx1vCzNCD1EQHT212Ls', name: 'Ava', description: 'Warm, helpful & understanding' },
+  { id: 'sB7vwSCyX0tQmU24cW2C', name: 'Jon', description: 'Natural authority, agent-like' },
+  { id: 'jqcCZkN6Knx8BJ5TBdYR', name: 'Zara', description: 'Warm, real-world conversationalist' },
 ]
+
+const DEFAULT_VOICE_ID: ElevenLabsVoiceId = 'VsQmyFHffusQDewmHB5v'
 
 // Apply theme to document
 function applyTheme(theme: 'light' | 'dark' | 'system') {
@@ -66,7 +64,7 @@ export default function PreferencesPage() {
   const { profile, loading, updateProfile } = useProfile()
   const [preferredModel, setPreferredModel] = useState<ModelProvider>('claude-sonnet')
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system')
-  const [voicePreference, setVoicePreference] = useState<TTSVoice>('nova')
+  const [voicePreference, setVoicePreference] = useState<ElevenLabsVoiceId>(DEFAULT_VOICE_ID)
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -83,8 +81,8 @@ export default function PreferencesPage() {
       else setPreferredModel(dbModel as ModelProvider)
       setTheme(profile.theme)
       applyTheme(profile.theme)
-      // Set voice preference with fallback
-      setVoicePreference(profile.voice_preference || 'nova')
+      // Set ElevenLabs voice preference with fallback
+      setVoicePreference((profile.elevenlabs_voice_id as ElevenLabsVoiceId) || DEFAULT_VOICE_ID)
     }
   }, [profile])
 
@@ -97,17 +95,18 @@ export default function PreferencesPage() {
   }
 
   // Preview voice
-  const handleVoicePreview = async (voiceId: TTSVoice) => {
+  const handleVoicePreview = async (voiceId: ElevenLabsVoiceId) => {
     if (isPlayingPreview) return
 
     setIsPlayingPreview(true)
     try {
+      const voiceName = ELEVENLABS_VOICES.find(v => v.id === voiceId)?.name || 'your assistant'
       const response = await fetch('/api/voice/speak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          text: `Hello! I'm ${TTS_VOICES.find(v => v.id === voiceId)?.name || voiceId}. This is how I sound as your voice assistant.`,
-          voice: voiceId
+          text: `Hello! I'm ${voiceName}. This is how I sound as your PMM Sherpa voice assistant.`,
+          voiceId: voiceId
         })
       })
 
@@ -143,7 +142,7 @@ export default function PreferencesPage() {
 
     const { error } = await updateProfile({
       preferred_model: dbModelValue,
-      voice_preference: voicePreference,
+      elevenlabs_voice_id: voicePreference,
     })
 
     if (error) {
@@ -295,13 +294,13 @@ export default function PreferencesPage() {
               <div className="flex gap-2">
                 <Select
                   value={voicePreference}
-                  onValueChange={(v) => setVoicePreference(v as TTSVoice)}
+                  onValueChange={(v) => setVoicePreference(v as ElevenLabsVoiceId)}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select voice" />
                   </SelectTrigger>
                   <SelectContent>
-                    {TTS_VOICES.map((voice) => (
+                    {ELEVENLABS_VOICES.map((voice) => (
                       <SelectItem key={voice.id} value={voice.id}>
                         <div className="flex flex-col">
                           <span className="font-medium">{voice.name}</span>
