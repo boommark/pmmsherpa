@@ -44,6 +44,7 @@ SHAREBIRD_SCRAPER_DIR = ANTIGRAVITY / "Sharebird Scraper"
 
 PMA_OUTPUT = PMA_SCRAPER_DIR / "output"
 SHAREBIRD_OUTPUT = SHAREBIRD_SCRAPER_DIR / "output"
+SUBSTACK_OUTPUT = PROJECT_ROOT / "data" / "substacks"
 
 LOG_DIR = PROJECT_ROOT / "logs" / "pipeline"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -163,6 +164,42 @@ def run_scraper(name: str, cwd: Path, args: list[str], timeout_minutes: int = 30
         return {"success": False, "exit_code": -1, "auth_expired": False, "new_files": 0, "duration_sec": 0}
 
 
+# ── Substack Scraper ─────────────────────────────────────────────────
+def run_substack_scraper(dry_run: bool = False) -> dict:
+    """Run the Substack scraper (RSS + Jina Reader, no browser needed)."""
+    log.info(f"{'='*50}")
+    log.info("Starting Substack scraper...")
+
+    start = datetime.now()
+
+    try:
+        sys.path.insert(0, str(SCRIPT_DIR))
+        from scrape_substacks import scrape_all
+
+        stats = scrape_all(dry_run=dry_run)
+        duration = (datetime.now() - start).total_seconds()
+
+        log.info(f"Substack: Completed. {stats['new_posts']} new posts from {stats['authors']} authors. ({duration:.0f}s)")
+
+        return {
+            "success": stats["errors"] == 0,
+            "new_files": stats["new_posts"],
+            "duration_sec": duration,
+            "auth_expired": False,
+            "exit_code": 0,
+        }
+    except Exception as e:
+        duration = (datetime.now() - start).total_seconds()
+        log.error(f"Substack: Exception: {e}")
+        return {
+            "success": False,
+            "new_files": 0,
+            "duration_sec": duration,
+            "auth_expired": False,
+            "exit_code": 1,
+        }
+
+
 # ── Ingestion ────────────────────────────────────────────────────────
 def run_ingestion(dry_run: bool = False) -> dict:
     """
@@ -185,11 +222,14 @@ def run_ingestion(dry_run: bool = False) -> dict:
 
     new_blogs = get_new_files(pma_dirs, checkpoint)
     new_amas = get_new_files([SHAREBIRD_OUTPUT], checkpoint)
+    substack_dirs = [d for d in SUBSTACK_OUTPUT.iterdir() if d.is_dir()] if SUBSTACK_OUTPUT.exists() else []
+    new_substacks = get_new_files(substack_dirs, checkpoint)
 
     log.info(f"  New PMA blogs to ingest: {len(new_blogs)}")
     log.info(f"  New Sharebird AMAs to ingest: {len(new_amas)}")
+    log.info(f"  New Substack posts to ingest: {len(new_substacks)}")
 
-    if not new_blogs and not new_amas:
+    if not new_blogs and not new_amas and not new_substacks:
         log.info("  Nothing new to ingest. All files already in checkpoint.")
         return {"success": True, "documents": 0, "chunks": 0, "skipped": 0, "errors": 0}
 
@@ -203,6 +243,10 @@ def run_ingestion(dry_run: bool = False) -> dict:
             log.info(f"    AMA: {f.name}")
         if len(new_amas) > 10:
             log.info(f"    ... and {len(new_amas) - 10} more")
+        for f in new_substacks[:10]:
+            log.info(f"    Substack: {f.name}")
+        if len(new_substacks) > 10:
+            log.info(f"    ... and {len(new_substacks) - 10} more")
         return {"success": True, "documents": 0, "chunks": 0, "skipped": 0, "errors": 0}
 
     # Initialize clients
@@ -333,6 +377,56 @@ def run_ingestion(dry_run: bool = False) -> dict:
                 log.error(f"  AMA error {ama_path.name}: {e}")
                 stats["errors"] += 1
 
+    # ── Ingest new Substack posts ──
+    if new_substacks:
+        from processors.substack_processor import SubstackProcessor
+        substack_processor = SubstackProcessor()
+        log.info(f"\n  Processing {len(new_substacks)} new Substack posts...")
+
+        for post_path in new_substacks:
+            try:
+                doc = substack_processor.process(post_path)
+                if not doc:
+                    mark_ingested(post_path)
+                    stats["skipped"] += 1
+                    continue
+
+                doc_id = insert_document(
+                    supabase,
+                    title=doc["title"],
+                    source_type="substack",
+                    source_file=str(post_path),
+                    raw_content=doc["raw_content"],
+                    author=doc.get("author"),
+                    url=doc.get("url"),
+                    tags=doc.get("tags", []),
+                )
+
+                if doc_id:
+                    existing = (
+                        supabase.table("chunks")
+                        .select("id", count="exact")
+                        .eq("document_id", doc_id)
+                        .execute()
+                    )
+                    if existing.count and existing.count > 0:
+                        mark_ingested(post_path)
+                        stats["skipped"] += 1
+                        continue
+
+                    n = insert_chunks(supabase, openai_client, doc_id, doc["chunks"])
+                    stats["documents"] += 1
+                    stats["chunks"] += n
+                    log.info(f"  + Substack: {doc['title'][:60]} ({n} chunks)")
+                else:
+                    stats["skipped"] += 1
+
+                mark_ingested(post_path)
+
+            except Exception as e:
+                log.error(f"  Substack error {post_path.name}: {e}")
+                stats["errors"] += 1
+
     stats["success"] = stats["errors"] == 0
     return stats
 
@@ -406,6 +500,10 @@ def main():
             if sb_result["auth_expired"]:
                 auth_failures.append("Sharebird")
 
+            # Substack scraper (no browser, no auth — RSS + Jina Reader)
+            substack_result = run_substack_scraper(dry_run=False)
+            results["substack"] = substack_result
+
     # ── Phase 2: Ingestion ──
     if not args.scrape_only:
         ingest_result = run_ingestion(dry_run=args.dry_run)
@@ -425,6 +523,11 @@ def main():
         r = results["sharebird"]
         status = "AUTH EXPIRED" if r["auth_expired"] else ("OK" if r["success"] else "FAILED")
         log.info(f"  Sharebird Scraper: {status} | {r['new_files']} new files | {r['duration_sec']:.0f}s")
+
+    if "substack" in results:
+        r = results["substack"]
+        status = "OK" if r["success"] else "FAILED"
+        log.info(f"  Substack Scraper:  {status} | {r['new_files']} new posts | {r['duration_sec']:.0f}s")
 
     if "ingestion" in results:
         r = results["ingestion"]
@@ -456,6 +559,15 @@ def main():
         if not r["success"]:
             has_errors = True
 
+    if "substack" in results:
+        r = results["substack"]
+        status = "OK" if r["success"] else "FAILED"
+        summary_lines.append(f"Substack Scraper:  {status} | {r['new_files']} new posts | {r['duration_sec']:.0f}s")
+        if r["new_files"] > 0:
+            has_new_content = True
+        if not r["success"]:
+            has_errors = True
+
     if "ingestion" in results:
         r = results["ingestion"]
         status = "OK" if r.get("success") else "ERRORS"
@@ -469,7 +581,7 @@ def main():
     elif has_errors:
         subject = "PMM Sherpa Pipeline: Errors"
     elif has_new_content:
-        total_new = sum(r.get("new_files", 0) for k, r in results.items() if k in ("pma", "sharebird"))
+        total_new = sum(r.get("new_files", 0) for k, r in results.items() if k in ("pma", "sharebird", "substack"))
         total_docs = results.get("ingestion", {}).get("documents", 0)
         subject = f"PMM Sherpa Pipeline: {total_new} scraped, {total_docs} ingested"
     else:
