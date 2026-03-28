@@ -48,3 +48,7 @@ __pycache__/
 .env*.local
 .vercel-token.txt
 .gstack/
+
+# Pipeline
+logs/pipeline/
+scripts/.ingestion_checkpoint.json
