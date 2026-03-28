@@ -1,5 +1,5 @@
 const URL_REGEX = /https?:\/\/[^\s<>"{}|\\^`[\]]+/g
-const MAX_CONTENT_CHARS = 16000
+const MAX_TOTAL_CHARS = 40000 // Total budget across all URLs
 const MAX_URLS = 3
 
 export function extractUrls(text: string): string[] {
@@ -42,10 +42,7 @@ async function scrapeWithFirecrawl(url: string): Promise<string | null> {
       return null
     }
 
-    const text = json.data.markdown
-    return text.length > MAX_CONTENT_CHARS
-      ? text.slice(0, MAX_CONTENT_CHARS) + '\n...[content truncated]'
-      : text
+    return json.data.markdown as string
   } catch (err) {
     console.error(`FireCrawl scrape failed for ${url}:`, err)
     return null
@@ -54,6 +51,7 @@ async function scrapeWithFirecrawl(url: string): Promise<string | null> {
 
 export async function scrapeUrls(urls: string[]): Promise<string> {
   const limited = urls.slice(0, MAX_URLS)
+  const perUrlBudget = Math.floor(MAX_TOTAL_CHARS / limited.length)
 
   const results = await Promise.all(
     limited.map(async (url) => {
@@ -61,7 +59,10 @@ export async function scrapeUrls(urls: string[]): Promise<string> {
       if (!content) {
         return `--- Scraped content from ${url} ---\n[Failed to fetch content from this URL. The page may be behind a login, blocking scrapers, or temporarily unavailable.]\n--- End of ${url} ---`
       }
-      return `--- Scraped content from ${url} ---\n${content}\n--- End of ${url} ---`
+      const trimmed = content.length > perUrlBudget
+        ? content.slice(0, perUrlBudget) + '\n...[content truncated]'
+        : content
+      return `--- Scraped content from ${url} ---\n${trimmed}\n--- End of ${url} ---`
     })
   )
 
