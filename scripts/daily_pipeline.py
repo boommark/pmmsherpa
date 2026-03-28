@@ -34,7 +34,10 @@ from typing import Optional
 # ── Paths ────────────────────────────────────────────────────────────
 SCRIPT_DIR = Path(__file__).parent.resolve()
 PROJECT_ROOT = SCRIPT_DIR.parent
-ANTIGRAVITY = Path("/Users/abhishekratna/Documents/Antigravity Projects")
+ANTIGRAVITY = Path(os.environ.get(
+    "PMM_PIPELINE_ANTIGRAVITY",
+    "/Users/abhishekratna/Documents/Antigravity Projects"
+))
 
 PMA_SCRAPER_DIR = ANTIGRAVITY / "PMA Scraper"
 SHAREBIRD_SCRAPER_DIR = ANTIGRAVITY / "Sharebird Scraper"
