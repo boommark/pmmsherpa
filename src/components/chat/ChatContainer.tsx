@@ -12,6 +12,8 @@ import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
 import type { ChatMessage, ChatAttachment } from '@/types/chat'
 import type { UploadedFile } from './FileUpload'
+import { VoiceModeOverlay } from '@/components/voice/VoiceModeOverlay'
+import { useVoiceMode } from '@/hooks/useVoiceMode'
 
 interface ChatContainerProps {
   conversationId?: string
@@ -335,6 +337,96 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setAbortController,
   ])
 
+  // ========================================
+  // Voice Mode
+  // ========================================
+  const [voiceModeOpen, setVoiceModeOpen] = useState(false)
+  const [voiceResponseText, setVoiceResponseText] = useState('')
+  const voiceResponseRef = useRef('')
+
+  const handleVoiceTranscript = useCallback(async (transcript: string) => {
+    // Send transcript through the same chat API flow
+    voiceResponseRef.current = ''
+    setVoiceResponseText('')
+
+    try {
+      let activeConversationId = conversationId
+
+      if (!activeConversationId) {
+        const title = transcript.slice(0, 50) + (transcript.length > 50 ? '...' : '')
+        const newConv = await createConversation(title, currentModel)
+        if (newConv) {
+          activeConversationId = newConv.id
+          setConversationId(newConv.id)
+        }
+      }
+
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: transcript,
+          conversationId: activeConversationId,
+          model: currentModel,
+        }),
+      })
+
+      if (!response.ok || !response.body) {
+        throw new Error('Failed to get response')
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const text = decoder.decode(value, { stream: true })
+          const lines = text.split('\n').filter(line => line.startsWith('data: '))
+
+          for (const line of lines) {
+            try {
+              const data = JSON.parse(line.slice(6))
+              if (data.type === 'text') {
+                voiceResponseRef.current += data.content
+                setVoiceResponseText(voiceResponseRef.current)
+              }
+            } catch {
+              // Ignore parse errors
+            }
+          }
+        }
+      } finally {
+        reader.cancel()
+      }
+
+      // Speak the full response
+      if (voiceResponseRef.current) {
+        voiceMode.speakResponse(voiceResponseRef.current)
+      }
+    } catch (error) {
+      console.error('Voice mode chat error:', error)
+    }
+  }, [conversationId, currentModel, createConversation, setConversationId])
+
+  const voiceMode = useVoiceMode({
+    onTranscript: handleVoiceTranscript,
+    onError: (error) => console.error('Voice mode error:', error),
+  })
+
+  const handleOpenVoiceMode = useCallback(() => {
+    setVoiceModeOpen(true)
+    setVoiceResponseText('')
+  }, [])
+
+  const handleCloseVoiceMode = useCallback(() => {
+    voiceMode.cancel()
+    setVoiceModeOpen(false)
+    setVoiceResponseText('')
+  }, [voiceMode])
+
   const handleEditPrompt = useCallback((content: string, messageIndex: number) => {
     editingMessageIndexRef.current = messageIndex
     chatInputRef.current?.setInput(content)
@@ -372,6 +464,20 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
   return (
     <div className="flex flex-col h-full overflow-hidden relative" style={{ height: '100%', minHeight: 0 }}>
+      {/* Voice Mode Overlay */}
+      <VoiceModeOverlay
+        isOpen={voiceModeOpen}
+        onClose={handleCloseVoiceMode}
+        state={voiceMode.state}
+        audioLevel={voiceMode.audioLevel}
+        playbackAmplitude={voiceMode.getPlaybackAmplitude()}
+        playbackFrequencyData={voiceMode.getPlaybackFrequencyData()}
+        transcript={voiceMode.transcript}
+        responseText={voiceResponseText}
+        onStartListening={voiceMode.startListening}
+        onStopListening={voiceMode.stopListening}
+        onCancel={voiceMode.cancel}
+      />
       {/* Background blobs - only show on welcome screen */}
       {messages.length === 0 && !conversationId && <BlobBackground />}
 
@@ -463,7 +569,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
           {/* Chat input — sticky at bottom of scroll container */}
           <div className="sticky bottom-0 w-full bg-background">
-            <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />
+            <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} onOpenVoiceMode={handleOpenVoiceMode} />
           </div>
         </div>
       ) : (
@@ -476,7 +582,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             />
           </div>
           <div className="shrink-0">
-            <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} />
+            <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} onOpenVoiceMode={handleOpenVoiceMode} />
           </div>
         </>
       )}

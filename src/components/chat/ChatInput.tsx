@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useImperativeHandle, forwardRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Send, Loader2, Mic, MicOff, Square } from 'lucide-react'
+import { Send, Loader2, Mic, MicOff, Square, AudioLines } from 'lucide-react'
 import { FileUpload, type UploadedFile, getFileCategory } from './FileUpload'
 import { AttachmentPreview } from './AttachmentPreview'
 import { useChatStore } from '@/stores/chatStore'
@@ -14,6 +14,7 @@ interface ChatInputProps {
   onSend: (message: string, attachments?: UploadedFile[]) => void
   disabled?: boolean
   conversationId?: string
+  onOpenVoiceMode?: () => void
 }
 
 export interface ChatInputRef {
@@ -22,7 +23,7 @@ export interface ChatInputRef {
 }
 
 export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
-  function ChatInput({ onSend, disabled, conversationId }, ref) {
+  function ChatInput({ onSend, disabled, conversationId, onOpenVoiceMode }, ref) {
     const [input, setInput] = useState('')
     const [attachments, setAttachments] = useState<UploadedFile[]>([])
     const [partialTranscript, setPartialTranscript] = useState('')
@@ -226,6 +227,20 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 className="flex-1 min-h-[36px] sm:min-h-[40px] md:min-h-[44px] max-h-[120px] sm:max-h-[150px] md:max-h-[200px] resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-sm md:text-base placeholder:text-muted-foreground/50 disabled:opacity-50 py-2"
                 rows={1}
               />
+              {/* Voice mode button — opens full voice conversation UI */}
+              {onOpenVoiceMode && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={onOpenVoiceMode}
+                  disabled={disabled}
+                  className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 text-muted-foreground hover:text-[#0058be] hover:bg-primary-fixed/40 dark:hover:bg-primary-fixed/10 transition-all"
+                  title="Voice conversation mode"
+                >
+                  <AudioLines className="h-4 w-4" />
+                </Button>
+              )}
               {/* Voice input button — Precision Blue tint */}
               <Button
                 type="button"

@@ -1,4 +1,13 @@
-// Available TTS voices from OpenAI
+// Available ElevenLabs TTS voices
+export type ElevenLabsVoiceId =
+  | 'VsQmyFHffusQDewmHB5v'  // Eddie Stirling
+  | 'wWWn96OtTHu1sn8SRGEr'  // Hale
+  | 'AXdMgz6evoL7OPd7eU12'  // Elizabeth
+  | 'gJx1vCzNCD1EQHT212Ls'  // Ava
+  | 'sB7vwSCyX0tQmU24cW2C'  // Jon
+  | 'jqcCZkN6Knx8BJ5TBdYR'; // Zara
+
+// Legacy OpenAI voice type (kept for backward compatibility with existing DB rows)
 export type TTSVoice = 'alloy' | 'ash' | 'ballad' | 'coral' | 'echo' | 'fable' | 'nova' | 'onyx' | 'sage' | 'shimmer';
 
 export interface Profile {
@@ -9,6 +18,7 @@ export interface Profile {
   preferred_model: 'claude' | 'gemini' | 'openai';
   theme: 'light' | 'dark' | 'system';
   voice_preference: TTSVoice;
+  elevenlabs_voice_id: ElevenLabsVoiceId | null;
   created_at: string;
   updated_at: string;
 }
