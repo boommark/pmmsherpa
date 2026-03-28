@@ -131,7 +131,7 @@ function SidebarContent({
       (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
     )
 
-    sortedConvs.slice(0, 15).forEach((conv) => {
+    sortedConvs.forEach((conv) => {
       const group = getDateGroup(new Date(conv.updated_at))
       if (!groups[group]) {
         groups[group] = []
