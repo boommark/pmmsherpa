@@ -95,7 +95,7 @@ export default function LandingPage() {
               </span>
             </h1>
             <p className="mb-12 text-lg text-[#5f6368] sm:text-xl max-w-xl mx-auto leading-relaxed">
-              PMMSherpa gives product marketers the strategic depth, practitioner experience, and ready-to-ship deliverables to move with confidence — not just speed.
+              PMMSherpa gives product marketers the strategic depth, practitioner experience, and ready-to-ship deliverables to move with confidence, not just speed.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link href="/request-access">
@@ -119,12 +119,6 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Section Bridge */}
-        <div className="max-w-2xl mx-auto px-5 md:px-8 pb-10 text-center relative">
-          <p className="text-base text-[#5f6368] leading-relaxed">
-            Most PMMs are making high-stakes calls — on positioning, pricing, launches — without a senior peer to pressure-test with. PMMSherpa closes that gap.
-          </p>
-        </div>
 
         {/* Hero Demo Video */}
         <div className="max-w-5xl mx-auto px-5 md:px-8 pb-20 md:pb-28 relative">
@@ -163,7 +157,7 @@ export default function LandingPage() {
                 <h3 className="text-lg font-semibold text-[#191c1e]">Frame</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
-                Start from a foundation, not a feeling. Proven positioning frameworks and hundreds of practitioner playbooks so your GTM strategy is built on something defensible — not just instinct.
+                Start from a foundation, not a feeling. Proven positioning frameworks and hundreds of practitioner playbooks so your GTM strategy is built on something defensible, not just instinct.
               </p>
               <p className="text-xs text-[#a0a4ab]">Positioning · Messaging · GTM Planning</p>
             </div>
@@ -174,7 +168,7 @@ export default function LandingPage() {
                 <h3 className="text-lg font-semibold text-[#191c1e]">Consult</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
-                The senior PMM who picks up every time. Direct recommendations grounded in how the best product marketers at Salesforce, Twilio, and Gong have handled the exact call you&apos;re facing.
+                The senior PMM who picks up every time. Direct recommendations grounded in how the best product marketers have handled the exact call you&apos;re facing.
               </p>
               <p className="text-xs text-[#a0a4ab]">Strategy · Competitive · Pricing</p>
             </div>
@@ -185,7 +179,7 @@ export default function LandingPage() {
                 <h3 className="text-lg font-semibold text-[#191c1e]">Validate</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
-                Don&apos;t find out your messaging is off after it&apos;s live. Paste your work and get a critique grounded in practitioner standards — before it goes to leadership, sales, or the market.
+                Don&apos;t find out your messaging is off after it&apos;s live. Paste your work and get a critique grounded in practitioner standards, before it goes to leadership, sales, or the market.
               </p>
               <p className="text-xs text-[#a0a4ab]">Review · Stress-test · Sharpen</p>
             </div>
@@ -228,7 +222,7 @@ export default function LandingPage() {
                   Context-aware, not keyword-dependent
                 </h3>
                 <p className="text-[#8e9199] leading-relaxed">
-                  Your question is read in full — with everything you&apos;ve shared in the conversation. The right frameworks and practitioner experience surface automatically. No prompt engineering required.
+                  Your question is read in full, with everything you&apos;ve shared in the conversation. The right frameworks and practitioner experience surface automatically. No prompt engineering required.
                 </p>
               </div>
               <div className="rounded-2xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
@@ -274,7 +268,7 @@ export default function LandingPage() {
                   Deliverables, not drafts
                 </h3>
                 <p className="text-[#8e9199] leading-relaxed">
-                  Positioning statements. Battlecards. Messaging frameworks. Launch plans. Share your context and get something you can actually hand to sales or present to leadership — not a template with blanks to fill.
+                  Positioning statements. Battlecards. Messaging frameworks. Launch plans. Share your context and get something you can actually hand to sales or present to leadership. Not a template with blanks to fill.
                 </p>
               </div>
               <div className="rounded-2xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
@@ -339,7 +333,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Product Managers</h3>
               <p className="text-sm text-[#5f6368] leading-relaxed">
-                You know the product cold. Translating that into messaging that makes buyers feel something — that&apos;s a different skill. PMMSherpa bridges the gap.
+                You know the product cold. Translating that into messaging that makes buyers feel something? That&apos;s a different skill. PMMSherpa bridges the gap.
               </p>
             </div>
 
@@ -349,7 +343,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Founders</h3>
               <p className="text-sm text-[#5f6368] leading-relaxed">
-                Your first PMM hire is $180K and three months to ramp. Before that investment, or instead of it, PMMSherpa gives you the strategic foundation to go to market with confidence.
+                Your first PMM hire is $180K and three months to ramp. PMMSherpa gives you strategic depth from day one, without the headcount.
               </p>
             </div>
           </div>
