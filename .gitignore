@@ -53,3 +53,5 @@ __pycache__/
 logs/pipeline/
 scripts/.ingestion_checkpoint.json
 scripts/.substack_checkpoint.json
+scripts/.linkedin_checkpoint.json
+scripts/.linkedin_session.json
