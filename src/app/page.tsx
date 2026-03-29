@@ -88,14 +88,13 @@ export default function LandingPage() {
             </div>
 
             <h1 className="mb-6 text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e] sm:text-5xl md:text-[3.5rem] leading-[1.1]">
-              Your Second Brain for{" "}
+              Stop guessing.{" "}
               <span className="bg-gradient-to-r from-[#0058be] to-[#2170e4] bg-clip-text text-transparent">
-                Product Marketing
+                Start knowing.
               </span>
             </h1>
             <p className="mb-12 text-lg text-[#5f6368] sm:text-xl max-w-xl mx-auto leading-relaxed">
-              Deep domain expertise meets live market intelligence.
-              Think clearly. Ship faster.
+              PMMSherpa gives product marketers the strategic depth, practitioner experience, and ready-to-ship deliverables to move with confidence — not just speed.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link href="/request-access">
@@ -117,6 +116,13 @@ export default function LandingPage() {
               </Link>
             </div>
           </div>
+        </div>
+
+        {/* Section Bridge */}
+        <div className="max-w-2xl mx-auto px-5 md:px-8 pb-10 text-center relative">
+          <p className="text-base text-[#5f6368] leading-relaxed">
+            Most PMMs are making high-stakes calls — on positioning, pricing, launches — without a senior peer to pressure-test with. PMMSherpa closes that gap.
+          </p>
         </div>
 
         {/* Hero Demo Video */}
@@ -145,7 +151,7 @@ export default function LandingPage() {
           <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">What It Does</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e] mb-4">
-              Four ways to work smarter
+              Four ways to work without second-guessing yourself
             </h2>
           </div>
 
@@ -156,10 +162,9 @@ export default function LandingPage() {
                 <h3 className="text-lg font-semibold text-[#191c1e]">Frame</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
-                Build positioning, messaging, and GTM plans on solid ground.
-                Proven frameworks and hundreds of practitioner playbooks.
+                Start from a foundation, not a feeling. Proven positioning frameworks and hundreds of practitioner playbooks so your GTM strategy is built on something defensible — not just instinct.
               </p>
-              <p className="text-xs text-[#a0a4ab]">Positioning, messaging, GTM planning</p>
+              <p className="text-xs text-[#a0a4ab]">Positioning · Messaging · GTM Planning</p>
             </div>
 
             <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
@@ -168,10 +173,9 @@ export default function LandingPage() {
                 <h3 className="text-lg font-semibold text-[#191c1e]">Consult</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
-                Get a second opinion that&apos;s actually informed.
-                Direct recommendations grounded in how the best PMMs have handled it.
+                The senior PMM who picks up every time. Direct recommendations grounded in how the best product marketers at Salesforce, Twilio, and Gong have handled the exact call you&apos;re facing.
               </p>
-              <p className="text-xs text-[#a0a4ab]">Strategy, competitive, pricing questions</p>
+              <p className="text-xs text-[#a0a4ab]">Strategy · Competitive · Pricing</p>
             </div>
 
             <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
@@ -180,10 +184,9 @@ export default function LandingPage() {
                 <h3 className="text-lg font-semibold text-[#191c1e]">Validate</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
-                Stress-test before you ship. Paste your messaging or launch plan
-                and get expert PMM critique, on demand.
+                Don&apos;t find out your messaging is off after it&apos;s live. Paste your work and get a critique grounded in practitioner standards — before it goes to leadership, sales, or the market.
               </p>
-              <p className="text-xs text-[#a0a4ab]">Review work against expert standards</p>
+              <p className="text-xs text-[#a0a4ab]">Review · Stress-test · Sharpen</p>
             </div>
 
             <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
@@ -192,10 +195,9 @@ export default function LandingPage() {
                 <h3 className="text-lg font-semibold text-[#191c1e]">Grow</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-2">
-                Level up without waiting for a mentor.
-                Career advice from hundreds of PMM leaders at companies from Series A to Fortune 500.
+                Most PMMs don&apos;t have a mentor who&apos;s done the job at the next level. Now you do. Career guidance drawn from hundreds of PMM leaders across every stage of company.
               </p>
-              <p className="text-xs text-[#a0a4ab]">Career guidance, skill gaps, leadership</p>
+              <p className="text-xs text-[#a0a4ab]">Career · Skill Gaps · Leadership</p>
             </div>
           </div>
         </div>
@@ -222,12 +224,10 @@ export default function LandingPage() {
                   Intelligent retrieval
                 </div>
                 <h3 className="text-2xl font-semibold tracking-tight mb-4 text-white">
-                  Not keyword matching
+                  Context-aware, not keyword-dependent
                 </h3>
                 <p className="text-[#8e9199] leading-relaxed">
-                  Your question is analyzed with full conversation context. Targeted queries pull
-                  the right frameworks and practitioner experience. Current market data added
-                  automatically when needed.
+                  Your question is read in full — with everything you&apos;ve shared in the conversation. The right frameworks and practitioner experience surface automatically. No prompt engineering required.
                 </p>
               </div>
               <div className="rounded-2xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
@@ -252,12 +252,10 @@ export default function LandingPage() {
                   Expert depth
                 </div>
                 <h3 className="text-2xl font-semibold tracking-tight mb-4 text-white">
-                  Not generic answers
+                  A point of view, not a list of options
                 </h3>
                 <p className="text-[#8e9199] leading-relaxed">
-                  Every response draws from curated PMM knowledge — the same books, AMAs,
-                  and playbooks that shaped the best product marketers in tech.
-                  Not a summary. A recommendation.
+                  Every response draws from the books, AMAs, and playbooks that shaped the best product marketers in tech. PMMSherpa commits to a recommendation. You decide what to do with it.
                 </p>
               </div>
             </div>
@@ -272,11 +270,10 @@ export default function LandingPage() {
                   Ready to ship
                 </div>
                 <h3 className="text-2xl font-semibold tracking-tight mb-4 text-white">
-                  Not templates with blanks
+                  Deliverables, not drafts
                 </h3>
                 <p className="text-[#8e9199] leading-relaxed">
-                  Positioning statements, battlecards, messaging frameworks, launch plans.
-                  Share your context, get the artifact. Ready to present, ready to share with sales.
+                  Positioning statements. Battlecards. Messaging frameworks. Launch plans. Share your context and get something you can actually hand to sales or present to leadership — not a template with blanks to fill.
                 </p>
               </div>
               <div className="rounded-2xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
@@ -301,11 +298,10 @@ export default function LandingPage() {
                   URL analysis
                 </div>
                 <h3 className="text-2xl font-semibold tracking-tight mb-4 text-white">
-                  Drop a link. Get expert analysis.
+                  Drop a URL. Get a strategic read.
                 </h3>
                 <p className="text-[#8e9199] leading-relaxed">
-                  Paste a competitor&apos;s homepage, a blog post, or a product announcement.
-                  PMMSherpa reads it, identifies the PMM concepts, and applies the right frameworks.
+                  Paste a competitor&apos;s homepage, a pricing page, an announcement. PMMSherpa reads it, identifies the positioning moves, and tells you what it means for your own strategy.
                 </p>
               </div>
             </div>
@@ -321,7 +317,7 @@ export default function LandingPage() {
           <div className="text-center mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">Who It&apos;s For</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e]">
-              Built for go-to-market professionals
+              For the people who own go-to-market and can&apos;t afford to get it wrong
             </h2>
           </div>
 
@@ -332,8 +328,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Product Marketers</h3>
               <p className="text-sm text-[#5f6368] leading-relaxed">
-                Speed, depth, and a thinking partner that doesn&apos;t need a meeting invite.
-                Production-ready deliverables validated against practitioner experience.
+                You&apos;re the only one in the room who knows what you know. PMMSherpa is the thinking partner who&apos;s already up to speed, has seen your problem before, and tells you what it actually thinks.
               </p>
             </div>
 
@@ -343,8 +338,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Product Managers</h3>
               <p className="text-sm text-[#5f6368] leading-relaxed">
-                You own the product. Now you need the go-to-market to match.
-                Positioning that differentiates. Messaging that resonates with buyers.
+                You know the product cold. Translating that into messaging that makes buyers feel something — that&apos;s a different skill. PMMSherpa bridges the gap.
               </p>
             </div>
 
@@ -354,8 +348,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Founders</h3>
               <p className="text-sm text-[#5f6368] leading-relaxed">
-                Professional product marketing without the six-figure hire.
-                Strategic depth, on demand.
+                Your first PMM hire is $180K and three months to ramp. Before that investment, or instead of it, PMMSherpa gives you the strategic foundation to go to market with confidence.
               </p>
             </div>
           </div>
@@ -372,10 +365,10 @@ export default function LandingPage() {
               background: 'linear-gradient(135deg, #0058be 0%, #1a6dd6 50%, #2170e4 100%)',
             }}>
               <h2 className="mb-4 text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-white">
-                Stop starting from blank pages.
+                The doubt doesn&apos;t go away on its own.
               </h2>
               <p className="mb-8 text-lg text-blue-200 max-w-xl mx-auto">
-                The expertise is already here.
+                PMMSherpa is what you check your thinking against before it matters.
               </p>
               <Link href="/request-access">
                 <Button
