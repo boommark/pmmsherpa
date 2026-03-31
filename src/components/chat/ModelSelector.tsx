@@ -24,10 +24,6 @@ const modelGroups = {
     label: 'Anthropic',
     models: ['claude-sonnet'] as ModelProvider[],
   },
-  google: {
-    label: 'Google',
-    models: ['gemini-3-pro'] as ModelProvider[],
-  },
 }
 
 export function ModelSelector({ value, onChange, disabled }: ModelSelectorProps) {

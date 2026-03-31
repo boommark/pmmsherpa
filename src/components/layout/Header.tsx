@@ -76,10 +76,7 @@ export function Header() {
           </div>
           <h1 className="text-base md:text-lg font-semibold text-[#0058be] dark:text-[#a8c0f0]">PMMSherpa</h1>
         </a>
-        <ModelSelector
-          value={currentModel}
-          onChange={setCurrentModel}
-        />
+        {/* Model selector hidden — defaulting to Claude Sonnet */}
       </div>
 
       <DropdownMenu>

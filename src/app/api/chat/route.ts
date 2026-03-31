@@ -7,6 +7,12 @@ import { planQueries } from '@/lib/rag/query-planner'
 import { conductResearch } from '@/lib/llm/perplexity-client'
 import { extractUrls, scrapeUrls } from '@/lib/url-scraper'
 import type { ChatAttachment, WebCitation } from '@/types/chat'
+import { initLogger } from 'braintrust'
+
+const btLogger = initLogger({
+  projectName: 'PMMSherpa',
+  apiKey: process.env.BRAINTRUST_API_KEY,
+})
 
 export const runtime = 'nodejs'
 export const maxDuration = 120
@@ -406,6 +412,35 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
 
           if (usageError) {
             console.error('Error logging usage:', usageError)
+          }
+
+          // Log to Braintrust for eval & observability
+          try {
+            btLogger.log({
+              input: {
+                message: message || '[Attachments only]',
+                model,
+                conversationId: conversationId || null,
+                hasAttachments: hasAttachments || false,
+                hasUrls,
+              },
+              output: fullResponseText,
+              metadata: {
+                userId: user.id,
+                ragChunksRetrieved: chunks.length,
+                ragQueries: queryPlan.ragQueries,
+                webResearchUsed: !!perplexityResult,
+                webCitationsCount: webCitations.length,
+                citationsCount: citations.length,
+                retrievalTimeMs: retrievalTime,
+                llmLatencyMs: latencyMs,
+                inputTokens: usage?.inputTokens || 0,
+                outputTokens: usage?.outputTokens || 0,
+                modelUsed: dbModel,
+              },
+            })
+          } catch (btError) {
+            console.error('Braintrust logging error:', btError)
           }
 
           // Signal completion
