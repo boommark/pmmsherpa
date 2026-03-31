@@ -50,10 +50,8 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
     }
   }
 
-  const copyOptions: CopyOptions | undefined = !isUser ? {
-    citations: message.citations as Citation[] | undefined,
-    expandedResearch: message.expandedResearch,
-  } : undefined
+  // Citations and research excluded from clipboard — clean copy for users
+  const copyOptions: CopyOptions | undefined = undefined
 
   const handleCopy = async () => {
     try {
