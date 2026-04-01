@@ -168,9 +168,10 @@ export async function planQueries(input: QueryPlannerInput): Promise<QueryPlan> 
     // Fallback: detect search intent from the message if planner missed it
     const msg = input.message.toLowerCase()
     const searchIntentPatterns = [
-      /\b(?:look for|find|search for|look up|research)\b.*\b(?:blog|article|post|page|website|site|doc|documentation)\b/,
-      /\b(?:look for|find|search for|look up|research)\b.*\b(?:company|product|competitor|pricing|feature)\b/,
-      /\b(?:go to|check out|pull up|read)\b.*\b(?:\.com|\.io|\.ai|\.org|\.net|http)/,
+      /\b(?:look for|find|search for|look up|research|find me)\b.*\b(?:blogs?|articles?|posts?|pages?|websites?|sites?|docs?|documentation)\b/,
+      /\b(?:look for|find|search for|look up|research|find me)\b.*\b(?:company|products?|competitors?|pricing|features?|content|info|information)\b/,
+      /\b(?:go to|check out|pull up|read|browse)\b.*(?:\.com|\.io|\.ai|\.org|\.net|http)/,
+      /\b(?:latest|recent|newest)\b.*\b(?:blogs?|articles?|posts?|content|news)\b.*\b(?:from|by|on|about)\b/,
     ]
     if (!plan.webSearch.needed && searchIntentPatterns.some(p => p.test(msg))) {
       plan.webSearch = {
