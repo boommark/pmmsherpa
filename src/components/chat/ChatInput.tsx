@@ -227,43 +227,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 className="flex-1 min-h-[36px] sm:min-h-[40px] md:min-h-[44px] max-h-[120px] sm:max-h-[150px] md:max-h-[200px] resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-sm md:text-base placeholder:text-muted-foreground/50 disabled:opacity-50 py-2"
                 rows={1}
               />
-              {/* Voice mode button — opens full voice conversation UI */}
-              {onOpenVoiceMode && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={onOpenVoiceMode}
-                  disabled={disabled}
-                  className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 text-muted-foreground hover:text-[#0058be] hover:bg-primary-fixed/40 dark:hover:bg-primary-fixed/10 transition-all"
-                  title="Voice conversation mode"
-                >
-                  <AudioLines className="h-4 w-4" />
-                </Button>
-              )}
-              {/* Voice input button — Precision Blue tint */}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={handleMicClick}
-                disabled={disabled || isProcessing}
-                className={cn(
-                  'h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 transition-all',
-                  isRecording
-                    ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/40 animate-pulse'
-                    : 'bg-primary-fixed/40 dark:bg-primary-fixed/10 text-[#0058be] dark:text-[#a8c0f0] hover:bg-primary-fixed/60 dark:hover:bg-primary-fixed/20'
-                )}
-                title={isRecording ? 'Stop recording' : 'Voice input'}
-              >
-                {isProcessing ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : isRecording ? (
-                  <MicOff className="h-4 w-4" />
-                ) : (
-                  <Mic className="h-4 w-4" />
-                )}
-              </Button>
+              {/* Voice mode and voice input hidden for now */}
               {isLoading ? (
                 <Button
                   onClick={abortStreaming}
