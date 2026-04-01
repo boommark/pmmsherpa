@@ -160,10 +160,34 @@ export async function planQueries(input: QueryPlannerInput): Promise<QueryPlan> 
     // Ensure 2-3 queries
     plan.ragQueries = plan.ragQueries.slice(0, 3)
 
-    console.log(`[QueryPlanner] Generated ${plan.ragQueries.length} RAG queries, web research: ${plan.webResearch?.needed ? 'YES' : 'NO'}`)
+    // Ensure webSearch field exists (Flash Lite may omit it)
+    if (!plan.webSearch) {
+      plan.webSearch = { needed: false, query: null, reason: null }
+    }
+
+    // Fallback: detect search intent from the message if planner missed it
+    const msg = input.message.toLowerCase()
+    const searchIntentPatterns = [
+      /\b(?:look for|find|search for|look up|research)\b.*\b(?:blog|article|post|page|website|site|doc|documentation)\b/,
+      /\b(?:look for|find|search for|look up|research)\b.*\b(?:company|product|competitor|pricing|feature)\b/,
+      /\b(?:go to|check out|pull up|read)\b.*\b(?:\.com|\.io|\.ai|\.org|\.net|http)/,
+    ]
+    if (!plan.webSearch.needed && searchIntentPatterns.some(p => p.test(msg))) {
+      plan.webSearch = {
+        needed: true,
+        query: input.message.replace(/["""]/g, '').slice(0, 200),
+        reason: 'Search intent detected from message',
+      }
+      console.log(`[QueryPlanner] Fallback: search intent detected from message`)
+    }
+
+    console.log(`[QueryPlanner] Generated ${plan.ragQueries.length} RAG queries, web research: ${plan.webResearch?.needed ? 'YES' : 'NO'}, web search: ${plan.webSearch?.needed ? 'YES' : 'NO'}`)
     console.log(`[QueryPlanner] Queries: ${JSON.stringify(plan.ragQueries)}`)
     if (plan.webResearch?.needed) {
-      console.log(`[QueryPlanner] Web query: "${plan.webResearch.query}" (${plan.webResearch.reason})`)
+      console.log(`[QueryPlanner] Perplexity query: "${plan.webResearch.query}"`)
+    }
+    if (plan.webSearch?.needed) {
+      console.log(`[QueryPlanner] Brave search query: "${plan.webSearch.query}"`)
     }
 
     return plan
