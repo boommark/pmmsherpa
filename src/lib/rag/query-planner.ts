@@ -15,6 +15,11 @@ export interface QueryPlan {
     query: string | null
     reason: string | null
   }
+  webSearch: {
+    needed: boolean
+    query: string | null
+    reason: string | null
+  }
   intent: 'guidance' | 'deliverable' | 'review' | 'career' | 'general'
   contextSummary: string
 }
@@ -71,12 +76,18 @@ Given the user's message and context, generate:
    - Strip away conversational fluff ("can you help me with", "I was wondering about")
    - Incorporate relevant context from conversation history, URLs, or attachments
 
-2. **Web research decision** — Should we invoke Perplexity web search?
-   - YES when: specific companies/competitors mentioned, current market data needed, recent events referenced, pricing/benchmarks requested, "latest"/"current"/"2026" trends asked about
+2. **Web research decision** — Should we invoke Perplexity for synthesized research?
+   - YES when: current market data needed, recent events referenced, pricing/benchmarks requested, "latest"/"current"/"2026" trends asked about, competitive landscape analysis
    - NO when: asking about frameworks/methodology, requesting deliverables/templates, career advice, reviewing their own work, conceptual questions the KB covers well
-   - If YES, generate a query optimized for web search that targets what the KB CANNOT provide
+   - If YES, generate a query optimized for Perplexity that targets what the KB CANNOT provide
 
-3. **Intent classification** — What type of response does the user need?
+3. **Web search decision** — Should we search the web and fetch specific pages?
+   - YES when: user asks to "look for," "find," "search for," or "research" specific content (blog posts, articles, company pages, documentation), mentions a specific company/product/person they want current info on, asks about a company's current positioning/pricing/features, wants to analyze a competitor's website or content
+   - NO when: the question is about frameworks, methodology, career advice, or is clearly answerable from the KB or from Perplexity synthesis alone
+   - If YES, generate a precise search query. Include company names, product names, and specific terms. "Protopia AI enterprise data security blog" not "data security best practices"
+   - Web search finds and reads actual web pages. Perplexity synthesizes across the web. Use web search when the user wants specific pages. Use Perplexity when they want a synthesized answer about market trends.
+
+4. **Intent classification** — What type of response does the user need?
    - "guidance": teaching, explaining, advising
    - "deliverable": create an artifact (positioning statement, battlecard, etc.)
    - "review": evaluating/critiquing user's work
@@ -87,7 +98,7 @@ Given the user's message and context, generate:
 
 ## Output Format
 Respond ONLY with valid JSON, no markdown fences:
-{"ragQueries":["query1","query2","query3"],"webResearch":{"needed":false,"query":null,"reason":null},"intent":"guidance","contextSummary":"summary"}`
+{"ragQueries":["query1","query2","query3"],"webResearch":{"needed":false,"query":null,"reason":null},"webSearch":{"needed":false,"query":null,"reason":null},"intent":"guidance","contextSummary":"summary"}`
 
 function buildPlannerInput(input: QueryPlannerInput): string {
   const parts: string[] = []
@@ -165,6 +176,7 @@ export async function planQueries(input: QueryPlannerInput): Promise<QueryPlan> 
     return {
       ragQueries: [input.message],
       webResearch: { needed: false, query: null, reason: null },
+      webSearch: { needed: false, query: null, reason: null },
       intent: 'general',
       contextSummary: input.message.substring(0, 100),
     }

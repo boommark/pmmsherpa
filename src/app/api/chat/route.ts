@@ -6,6 +6,7 @@ import { multiQueryRetrieve, formatContextForPrompt, extractCitations } from '@/
 import { planQueries } from '@/lib/rag/query-planner'
 import { conductResearch } from '@/lib/llm/perplexity-client'
 import { extractUrls, scrapeUrls } from '@/lib/url-scraper'
+import { searchAndFetch } from '@/lib/web/brave-search'
 import type { ChatAttachment, WebCitation } from '@/types/chat'
 import { initLogger } from 'braintrust'
 
@@ -190,7 +191,9 @@ export async function POST(request: NextRequest) {
           })
 
           // Show status based on what the planner decided
-          if (queryPlan.webResearch.needed && hasUrls) {
+          if (queryPlan.webSearch?.needed) {
+            sendStatus('Searching the web and reading pages...')
+          } else if (queryPlan.webResearch.needed && hasUrls) {
             sendStatus('Reading URL and searching knowledge base + web...')
           } else if (queryPlan.webResearch.needed) {
             sendStatus('Searching knowledge base and the web...')
@@ -202,7 +205,7 @@ export async function POST(request: NextRequest) {
 
           const startRetrieval = Date.now()
 
-          // Run RAG and Perplexity in parallel
+          // Run RAG, Perplexity, and Brave Search in parallel
           const ragPromise = multiQueryRetrieve(queryPlan.ragQueries)
           const perplexityPromise = queryPlan.webResearch.needed && queryPlan.webResearch.query
             ? conductResearch(
@@ -214,14 +217,24 @@ export async function POST(request: NextRequest) {
                 return null
               })
             : Promise.resolve(null)
+          const braveSearchPromise = queryPlan.webSearch?.needed && queryPlan.webSearch.query
+            ? searchAndFetch(queryPlan.webSearch.query, 3).catch(err => {
+                console.error('Brave Search error:', err)
+                return null
+              })
+            : Promise.resolve(null)
 
-          const [ragResult, perplexityResult] = await Promise.all([
+          const [ragResult, perplexityResult, braveSearchResult] = await Promise.all([
             ragPromise,
             perplexityPromise,
+            braveSearchPromise,
           ])
 
           const retrievalTime = Date.now() - startRetrieval
           const { chunks } = ragResult
+          if (braveSearchResult?.fetchedContent) {
+            console.log(`[BraveSearch] Fetched ${braveSearchResult.results.length} results, ${braveSearchResult.fetchedContent.length} chars of content`)
+          }
           console.log(`Retrieval took ${retrievalTime}ms, found ${chunks.length} chunks`)
           if (perplexityResult) {
             console.log(`Perplexity research completed: ${perplexityResult.searchResults.length} web citations`)
@@ -254,9 +267,16 @@ Web Sources:
 ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           }
 
+          // Build web search context if available
+          let webSearchContext = ''
+          if (braveSearchResult?.fetchedContent) {
+            webSearchContext = `\n\n### Web Search Results (fetched live)\nThe following pages were found and read based on the user's request:\n\n${braveSearchResult.fetchedContent}`
+          }
+
           // Status: Found sources
-          if (chunks.length > 0 || webCitations.length > 0 || scrapedUrlContent) {
-            const sourceCount = chunks.length + webCitations.length + (scrapedUrlContent ? detectedUrls.length : 0)
+          const braveResultCount = braveSearchResult?.results?.length || 0
+          if (chunks.length > 0 || webCitations.length > 0 || scrapedUrlContent || braveResultCount > 0) {
+            const sourceCount = chunks.length + webCitations.length + (scrapedUrlContent ? detectedUrls.length : 0) + braveResultCount
             sendStatus(`Found ${sourceCount} relevant sources`)
           } else {
             sendStatus('No specific sources found, using general knowledge')
@@ -266,6 +286,9 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           let fullContext = retrievedContext
           if (webResearchContext) {
             fullContext += '\n\n' + webResearchContext
+          }
+          if (webSearchContext) {
+            fullContext += '\n\n' + webSearchContext
           }
           if (attachmentContext) {
             fullContext += '\n\n--- User Attached Files ---' + attachmentContext
@@ -443,6 +466,8 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
                 ragChunksRetrieved: chunks.length,
                 ragQueries: queryPlan.ragQueries,
                 webResearchUsed: !!perplexityResult,
+                webSearchUsed: !!braveSearchResult?.fetchedContent,
+                webSearchResultCount: braveResultCount,
                 webCitationsCount: webCitations.length,
                 citationsCount: citations.length,
                 retrievalTimeMs: retrievalTime,
