@@ -152,11 +152,24 @@ export async function POST(request: NextRequest) {
           }
 
           // Process attachments (truncate to budget)
+          // If client didn't send extractedText, fetch from DB as fallback
           let attachmentContext = ''
           if (hasAttachments && attachments) {
             for (const attachment of attachments) {
-              if (attachment.extractedText) {
-                attachmentContext += `\n\n--- Attached File: ${attachment.fileName} ---\n${attachment.extractedText}\n--- End of ${attachment.fileName} ---`
+              let text = attachment.extractedText
+              if (!text && attachment.id) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { data: dbAttachment } = await (supabase.from('conversation_attachments') as any)
+                  .select('extracted_text')
+                  .eq('id', attachment.id)
+                  .maybeSingle()
+                if (dbAttachment?.extracted_text) {
+                  text = dbAttachment.extracted_text as string
+                  console.log(`[Attachments] Fetched extracted_text from DB for ${attachment.fileName}`)
+                }
+              }
+              if (text) {
+                attachmentContext += `\n\n--- Attached File: ${attachment.fileName} ---\n${text}\n--- End of ${attachment.fileName} ---`
               } else {
                 attachmentContext += `\n\n[Attached file: ${attachment.fileName} (${attachment.fileType})]`
               }
