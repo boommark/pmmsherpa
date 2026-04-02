@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { useConversations } from '@/hooks/useConversations'
 import { useProfile } from '@/hooks/useSupabase'
 import { useUIStore } from '@/stores/uiStore'
+import { useChatStore } from '@/stores/chatStore'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
@@ -61,6 +62,7 @@ function SidebarContent({
   const pathname = usePathname()
   const router = useRouter()
   const { conversations, deleteConversation, updateConversation } = useConversations()
+  const { setPendingNewChat } = useChatStore()
   const { profile } = useProfile()
 
   // Rename state
@@ -113,15 +115,15 @@ function SidebarContent({
         .toUpperCase()
     : profile?.email?.[0]?.toUpperCase() || 'U'
 
-  // Handle new chat click — only navigate; do NOT clear messages here.
-  // ChatContainer's conversation-change effect handles clearing after the
-  // new page mounts, which avoids the scroll-jump caused by emptying the
-  // MessageList while it's still on screen.
+  // Handle new chat click — set a store flag so ChatContainer immediately
+  // shows the welcome screen, even while the old page is still visible
+  // during Next.js soft navigation. This prevents the scroll-jump.
   const handleNewChat = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
+    setPendingNewChat(true)
     onNavigate?.()
     router.push(`/chat?t=${Date.now()}`)
-  }, [router, onNavigate])
+  }, [setPendingNewChat, router, onNavigate])
 
   // Group conversations by date
   const groupedConversations = useMemo(() => {

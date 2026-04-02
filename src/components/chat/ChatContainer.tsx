@@ -51,7 +51,20 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setExpandedResearch,
     setAbortController,
     abortStreaming,
+    pendingNewChat,
+    setPendingNewChat,
   } = useChatStore()
+
+  // Handle pendingNewChat flag (set by sidebar before navigation)
+  // Clear stale messages and reset the flag so the welcome screen renders cleanly.
+  useEffect(() => {
+    if (pendingNewChat) {
+      setMessages([])
+      setConversationId(null)
+      setPendingNewChat(false)
+      setHasInitialized(true)
+    }
+  }, [pendingNewChat, setMessages, setConversationId, setPendingNewChat])
 
   // Reset state when conversation changes
   useEffect(() => {
@@ -482,10 +495,10 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     }
   }, [setMessageResearching, setExpandedResearch])
 
-  const showLoadingState = conversationId && (messagesLoading || !hasInitialized) && messages.length === 0
-  // Show welcome screen when there's no conversationId, even if the store
-  // has stale messages that haven't been cleared yet (e.g. after clicking New Chat)
-  const isNewChatWelcome = !conversationId && !hasInitialized
+  const showLoadingState = conversationId && !pendingNewChat && (messagesLoading || !hasInitialized) && messages.length === 0
+  // Show welcome screen immediately when pendingNewChat is set (even before
+  // the effect clears messages), or when there's no conversation and no messages.
+  const isNewChatWelcome = pendingNewChat || (!conversationId && !hasInitialized)
 
   return (
     <div className="flex flex-col h-full overflow-hidden relative" style={{ height: '100%', minHeight: 0 }}>

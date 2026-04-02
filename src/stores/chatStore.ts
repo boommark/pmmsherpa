@@ -8,7 +8,11 @@ interface ChatStore extends ChatState {
   statusMessage: string | null
   // Abort controller for canceling streaming
   abortController: AbortController | null
+  // Flag: sidebar initiated new-chat navigation; ChatContainer should
+  // show the welcome screen immediately and clear stale messages on mount.
+  pendingNewChat: boolean
   // Actions
+  setPendingNewChat: (pending: boolean) => void
   setMessages: (messages: ChatMessage[]) => void
   addMessage: (message: ChatMessage) => void
   updateMessage: (id: string, updates: Partial<ChatMessage>) => void
@@ -41,8 +45,10 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   conversationId: null,
   statusMessage: null,
   abortController: null,
+  pendingNewChat: false,
 
   // Actions
+  setPendingNewChat: (pending) => set({ pendingNewChat: pending }),
   setMessages: (messages) => set({ messages }),
 
   addMessage: (message) =>
