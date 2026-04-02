@@ -50,17 +50,18 @@ async function parseWithLlamaParse(fileBuffer: Buffer, fileName: string, mimeTyp
 
   if (!uploadRes.ok) {
     const err = await uploadRes.text()
-    console.error('LlamaParse upload failed:', err)
+    console.error('LlamaParse upload failed:', uploadRes.status, err)
     return null
   }
 
   const uploadJson = await uploadRes.json()
-  // LlamaParse returns job fields at top level, not nested under "job"
+  // LlamaParse v2 returns job fields at top level (id, status), not nested under "job"
   const jobId: string = uploadJson.id
   if (!jobId) {
-    console.error('LlamaParse upload returned no job ID:', uploadJson)
+    console.error('LlamaParse upload returned no job ID:', JSON.stringify(uploadJson))
     return null
   }
+  console.log(`[LlamaParse] Job created: ${jobId} for ${fileName}`)
 
   // Step 2: Poll for completion (max 90 seconds)
   const maxAttempts = 45
@@ -71,29 +72,47 @@ async function parseWithLlamaParse(fileBuffer: Buffer, fileName: string, mimeTyp
       headers: { Authorization: `Bearer ${apiKey}` },
     })
     const pollData = await pollRes.json()
-    const status = pollData.job?.status
+    // v2 API: status is at top level OR under .job — check both
+    const status = pollData.status || pollData.job?.status
+    console.log(`[LlamaParse] Poll ${i + 1}/${maxAttempts} for ${jobId}: status=${status}`)
 
     if (status === 'COMPLETED') {
       // Step 3: Fetch markdown result
       const resultRes = await fetch(
-        `${LLAMA_PARSE_BASE}/api/v2/parse/${jobId}?expand=markdown`,
+        `${LLAMA_PARSE_BASE}/api/v2/parse/${jobId}/result/markdown`,
         { headers: { Authorization: `Bearer ${apiKey}` } }
       )
       const result = await resultRes.json()
-      const pages = result.markdown?.pages
-      if (pages && pages.length > 0) {
-        return pages.map((p: { markdown: string }) => p.markdown).join('\n\n')
+
+      // v2 API: result structure varies — check multiple paths
+      // Path 1: { markdown: string } (single doc)
+      // Path 2: { pages: [{ markdown: string }] }
+      // Path 3: { markdown: { pages: [{ markdown: string }] } }
+      let markdown: string | null = null
+      if (typeof result.markdown === 'string') {
+        markdown = result.markdown
+      } else if (result.pages && Array.isArray(result.pages)) {
+        markdown = result.pages.map((p: { markdown?: string; text?: string }) => p.markdown || p.text || '').join('\n\n')
+      } else if (result.markdown?.pages && Array.isArray(result.markdown.pages)) {
+        markdown = result.markdown.pages.map((p: { markdown: string }) => p.markdown).join('\n\n')
       }
+
+      if (markdown && markdown.trim()) {
+        console.log(`[LlamaParse] Successfully parsed ${fileName}: ${markdown.length} chars`)
+        return markdown
+      }
+      console.warn(`[LlamaParse] Completed but no markdown content for ${fileName}:`, JSON.stringify(result).slice(0, 500))
       return null
     }
 
     if (status === 'FAILED' || status === 'CANCELLED') {
-      console.error('LlamaParse job failed:', pollData.job?.error_message)
+      const errorMsg = pollData.error_message || pollData.job?.error_message || 'Unknown error'
+      console.error(`[LlamaParse] Job ${status} for ${fileName}:`, errorMsg)
       return null
     }
   }
 
-  console.error('LlamaParse timed out for job:', jobId)
+  console.error(`[LlamaParse] Timed out after 90s for job ${jobId} (${fileName})`)
   return null
 }
 

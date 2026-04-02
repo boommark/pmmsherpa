@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils'
 import { useConversations } from '@/hooks/useConversations'
 import { useProfile } from '@/hooks/useSupabase'
 import { useUIStore } from '@/stores/uiStore'
-import { useChatStore } from '@/stores/chatStore'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
@@ -62,7 +61,6 @@ function SidebarContent({
   const pathname = usePathname()
   const router = useRouter()
   const { conversations, deleteConversation, updateConversation } = useConversations()
-  const { clearMessages, setConversationId } = useChatStore()
   const { profile } = useProfile()
 
   // Rename state
@@ -115,14 +113,15 @@ function SidebarContent({
         .toUpperCase()
     : profile?.email?.[0]?.toUpperCase() || 'U'
 
-  // Handle new chat click - single click, no scroll flash
+  // Handle new chat click — only navigate; do NOT clear messages here.
+  // ChatContainer's conversation-change effect handles clearing after the
+  // new page mounts, which avoids the scroll-jump caused by emptying the
+  // MessageList while it's still on screen.
   const handleNewChat = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
-    setConversationId(null)
-    clearMessages()
-    router.replace(`/chat?t=${Date.now()}`)
     onNavigate?.()
-  }, [clearMessages, setConversationId, router, onNavigate])
+    router.push(`/chat?t=${Date.now()}`)
+  }, [router, onNavigate])
 
   // Group conversations by date
   const groupedConversations = useMemo(() => {

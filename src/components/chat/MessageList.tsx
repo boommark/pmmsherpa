@@ -75,13 +75,13 @@ export function MessageList({ messages, statusMessage, onEditPrompt }: MessageLi
     }
   }, [isStreaming])
 
-  // Scroll when new messages are added
+  // Scroll when new messages are added (not when messages are cleared)
   useEffect(() => {
     const currentCount = messages.length
     const prevCount = prevMessageCountRef.current
 
-    // When a new message is added (user sends a message or assistant starts responding)
-    if (currentCount > prevCount) {
+    // Only scroll when messages are ADDED, not when cleared (navigating away)
+    if (currentCount > prevCount && currentCount > 0) {
       // Reset auto-scroll when user sends a new message
       const lastMessage = messages[messages.length - 1]
       if (lastMessage?.role === 'user') {

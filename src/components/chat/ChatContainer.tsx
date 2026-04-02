@@ -483,6 +483,9 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   }, [setMessageResearching, setExpandedResearch])
 
   const showLoadingState = conversationId && (messagesLoading || !hasInitialized) && messages.length === 0
+  // Show welcome screen when there's no conversationId, even if the store
+  // has stale messages that haven't been cleared yet (e.g. after clicking New Chat)
+  const isNewChatWelcome = !conversationId && !hasInitialized
 
   return (
     <div className="flex flex-col h-full overflow-hidden relative" style={{ height: '100%', minHeight: 0 }}>
@@ -503,7 +506,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         onVoiceChange={setSelectedVoiceId}
       />
       {/* Background blobs - only show on welcome screen */}
-      {messages.length === 0 && !conversationId && <BlobBackground />}
+      {(isNewChatWelcome || (messages.length === 0 && !conversationId)) && <BlobBackground />}
 
       {showLoadingState ? (
         <div className="flex-1 flex items-center justify-center">
@@ -512,7 +515,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             <p className="text-muted-foreground text-sm">Loading conversation...</p>
           </div>
         </div>
-      ) : messages.length === 0 && !conversationId ? (
+      ) : isNewChatWelcome || (messages.length === 0 && !conversationId) ? (
         <div className="flex-1 overflow-y-auto">
           {/* Top section with orb and headline */}
           <div className="flex flex-col justify-center items-center px-4 md:px-6 pt-4 md:pt-14">
