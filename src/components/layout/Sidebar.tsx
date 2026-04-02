@@ -253,34 +253,29 @@ function SidebarContent({
                             >
                               {conv.title}
                             </Link>
-                            <div className={cn(
-                              "flex items-center gap-0.5 transition-opacity",
-                              pathname === `/chat/${conv.id}`
-                                ? "opacity-100"
-                                : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                            )}>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6"
+                            <div className="flex items-center gap-0.5 shrink-0 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                className="p-1 rounded hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
                                 onClick={(e) => {
                                   e.preventDefault()
+                                  e.stopPropagation()
                                   handleStartRename(conv.id, conv.title)
                                 }}
+                                title="Rename"
                               >
-                                <Pencil className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6"
+                                <Pencil className="h-3.5 w-3.5" />
+                              </button>
+                              <button
+                                className="p-1 rounded hover:bg-white/10 text-muted-foreground hover:text-red-400 transition-colors"
                                 onClick={(e) => {
                                   e.preventDefault()
+                                  e.stopPropagation()
                                   deleteConversation(conv.id)
                                 }}
+                                title="Delete"
                               >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
                             </div>
                           </>
                         )}
