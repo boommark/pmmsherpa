@@ -251,7 +251,12 @@ function SidebarContent({
                             >
                               {conv.title}
                             </Link>
-                            <div className="flex items-center gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                            <div className={cn(
+                              "flex items-center gap-0.5 transition-opacity",
+                              pathname === `/chat/${conv.id}`
+                                ? "opacity-100"
+                                : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                            )}>
                               <Button
                                 variant="ghost"
                                 size="icon"
