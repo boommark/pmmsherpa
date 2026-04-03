@@ -115,11 +115,14 @@ function SidebarContent({
         .toUpperCase()
     : profile?.email?.[0]?.toUpperCase() || 'U'
 
-  // Handle new chat click — set a store flag so ChatContainer immediately
-  // shows the welcome screen, even while the old page is still visible
-  // during Next.js soft navigation. This prevents the scroll-jump.
+  // Handle new chat click — hide chat content instantly via CSS (before React
+  // re-renders), set store flag, then navigate. The CSS hide prevents any
+  // scroll flash during Next.js soft navigation transition.
   const handleNewChat = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
+    // Instant CSS hide to prevent scroll flash — before any React re-render
+    const chatEl = document.querySelector('[data-chat-container]')
+    if (chatEl) (chatEl as HTMLElement).style.visibility = 'hidden'
     setPendingNewChat(true)
     onNavigate?.()
     router.push(`/chat?t=${Date.now()}`)
@@ -253,9 +256,9 @@ function SidebarContent({
                             >
                               {conv.title}
                             </Link>
-                            <div className="flex items-center gap-0.5 shrink-0 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center gap-0.5 shrink-0 ml-1">
                               <button
-                                className="p-1 rounded hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
+                                className="p-1 rounded text-muted-foreground/50 hover:text-foreground hover:bg-sidebar-accent transition-colors"
                                 onClick={(e) => {
                                   e.preventDefault()
                                   e.stopPropagation()
@@ -266,7 +269,7 @@ function SidebarContent({
                                 <Pencil className="h-3.5 w-3.5" />
                               </button>
                               <button
-                                className="p-1 rounded hover:bg-white/10 text-muted-foreground hover:text-red-400 transition-colors"
+                                className="p-1 rounded text-muted-foreground/50 hover:text-red-500 hover:bg-sidebar-accent transition-colors"
                                 onClick={(e) => {
                                   e.preventDefault()
                                   e.stopPropagation()
