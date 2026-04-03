@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useProfile, useUser } from '@/hooks/useSupabase'
-import { useTheme as useAppTheme } from '@/components/providers/ThemeProvider'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,11 +18,24 @@ import {
 } from '@/components/ui/select'
 import { Loader2, CheckCircle, Moon, Sun, Monitor, Upload, X, Mail, Shield } from 'lucide-react'
 
+// Apply theme to document and persist to localStorage
+function applyTheme(theme: 'light' | 'dark' | 'system') {
+  const resolvedTheme = theme === 'system'
+    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    : theme
+  if (resolvedTheme === 'dark') {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+  localStorage.setItem('theme', theme)
+}
+
 export default function SettingsPage() {
   const { profile, loading, updateProfile } = useProfile()
   const { user } = useUser()
-  const { theme, setTheme: setAppTheme } = useAppTheme()
   const [fullName, setFullName] = useState('')
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system')
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -43,12 +55,17 @@ export default function SettingsPage() {
     if (profile?.full_name) {
       setFullName(profile.full_name)
     }
+    if (profile?.theme) {
+      setTheme(profile.theme)
+      applyTheme(profile.theme)
+    }
   }, [profile])
 
-  // Handle theme change — ThemeProvider handles DOM + localStorage,
-  // then persist to DB for cross-device sync
+  // Handle theme change - apply immediately + persist to localStorage + save to DB
   const handleThemeChange = async (newTheme: 'light' | 'dark' | 'system') => {
-    setAppTheme(newTheme)
+    setTheme(newTheme)
+    applyTheme(newTheme)
+    localStorage.setItem('theme', newTheme)
     await updateProfile({ theme: newTheme })
   }
 

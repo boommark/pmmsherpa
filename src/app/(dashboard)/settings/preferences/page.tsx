@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useProfile } from '@/hooks/useSupabase'
-import { useTheme as useAppTheme } from '@/components/providers/ThemeProvider'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -32,8 +31,18 @@ const ELEVENLABS_VOICES: { id: ElevenLabsVoiceId; name: string; description: str
 
 const DEFAULT_VOICE_ID: ElevenLabsVoiceId = 'VsQmyFHffusQDewmHB5v'
 
-// applyTheme removed — use ThemeProvider's setTheme which handles
-// both DOM updates AND localStorage persistence
+// Apply theme to document and persist to localStorage
+function applyTheme(theme: 'light' | 'dark' | 'system') {
+  const resolvedTheme = theme === 'system'
+    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    : theme
+  if (resolvedTheme === 'dark') {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+  localStorage.setItem('theme', theme)
+}
 
 // Group models by provider for preferences
 const modelGroups = {
@@ -49,8 +58,8 @@ const modelGroups = {
 
 export default function PreferencesPage() {
   const { profile, loading, updateProfile } = useProfile()
-  const { theme, setTheme: setAppTheme } = useAppTheme()
   const [preferredModel, setPreferredModel] = useState<ModelProvider>('claude-sonnet')
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system')
   const [voicePreference, setVoicePreference] = useState<ElevenLabsVoiceId>(DEFAULT_VOICE_ID)
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -66,15 +75,17 @@ export default function PreferencesPage() {
       if (dbModel === 'claude') setPreferredModel('claude-sonnet')
       else if (dbModel === 'gemini') setPreferredModel('gemini-3-pro')
       else setPreferredModel(dbModel as ModelProvider)
+      setTheme(profile.theme)
+      applyTheme(profile.theme)
       // Set ElevenLabs voice preference with fallback
       setVoicePreference((profile.elevenlabs_voice_id as ElevenLabsVoiceId) || DEFAULT_VOICE_ID)
     }
   }, [profile])
 
-  // Handle theme change - apply immediately via ThemeProvider (handles DOM + localStorage)
-  // and save to DB in background for cross-device sync
+  // Handle theme change - apply immediately + persist to localStorage + save to DB
   const handleThemeChange = async (newTheme: 'light' | 'dark' | 'system') => {
-    setAppTheme(newTheme)
+    setTheme(newTheme)
+    applyTheme(newTheme)
     await updateProfile({ theme: newTheme })
   }
 
