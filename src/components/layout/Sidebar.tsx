@@ -115,14 +115,10 @@ function SidebarContent({
         .toUpperCase()
     : profile?.email?.[0]?.toUpperCase() || 'U'
 
-  // Handle new chat click — hide chat content instantly via CSS (before React
-  // re-renders), set store flag, then navigate. The CSS hide prevents any
-  // scroll flash during Next.js soft navigation transition.
+  // Handle new chat click — set store flag so ChatContainer immediately
+  // renders the welcome screen, then navigate.
   const handleNewChat = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
-    // Instant CSS hide to prevent scroll flash — before any React re-render
-    const chatEl = document.querySelector('[data-chat-container]')
-    if (chatEl) (chatEl as HTMLElement).style.visibility = 'hidden'
     setPendingNewChat(true)
     onNavigate?.()
     router.push(`/chat?t=${Date.now()}`)
@@ -256,9 +252,10 @@ function SidebarContent({
                             >
                               {conv.title}
                             </Link>
-                            <div className="flex items-center gap-0.5 shrink-0 ml-1">
+                            <div className="flex items-center gap-1 shrink-0 ml-2">
                               <button
-                                className="p-1 rounded text-muted-foreground/50 hover:text-foreground hover:bg-sidebar-accent transition-colors"
+                                type="button"
+                                className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                                 onClick={(e) => {
                                   e.preventDefault()
                                   e.stopPropagation()
@@ -266,10 +263,11 @@ function SidebarContent({
                                 }}
                                 title="Rename"
                               >
-                                <Pencil className="h-3.5 w-3.5" />
+                                <Pencil className="h-4 w-4" />
                               </button>
                               <button
-                                className="p-1 rounded text-muted-foreground/50 hover:text-red-500 hover:bg-sidebar-accent transition-colors"
+                                type="button"
+                                className="p-1.5 rounded-md text-muted-foreground hover:text-red-500 hover:bg-muted/50 transition-colors"
                                 onClick={(e) => {
                                   e.preventDefault()
                                   e.stopPropagation()
@@ -277,7 +275,7 @@ function SidebarContent({
                                 }}
                                 title="Delete"
                               >
-                                <Trash2 className="h-3.5 w-3.5" />
+                                <Trash2 className="h-4 w-4" />
                               </button>
                             </div>
                           </>

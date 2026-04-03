@@ -501,7 +501,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   const isNewChatWelcome = pendingNewChat || (!conversationId && !hasInitialized)
 
   return (
-    <div data-chat-container className="flex flex-col h-full overflow-hidden relative" style={{ height: '100%', minHeight: 0 }}>
+    <div className="flex flex-col h-full overflow-hidden relative" style={{ height: '100%', minHeight: 0 }}>
       {/* Voice Mode Overlay */}
       <VoiceModeOverlay
         isOpen={voiceModeOpen}
