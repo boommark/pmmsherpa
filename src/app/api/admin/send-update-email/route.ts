@@ -6,7 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 const LOGO_URL = 'https://pmmsherpa.com/email/logo-blue.png'
 const APP_URL = 'https://pmmsherpa.com'
 
-function getUpdateEmailHtml(firstName: string) {
+function getUpdateEmailHtml() {
   return `<!DOCTYPE html>
 <html>
   <head>
@@ -27,7 +27,7 @@ function getUpdateEmailHtml(firstName: string) {
             <!-- Body -->
             <tr>
               <td style="padding: 0 40px 32px 40px;">
-                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">Hey ${firstName},</p>
+                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">Hey \u{1F44B}</p>
 
                 <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">You've probably noticed something about AI writing. It's correct. It's structured. And the moment you read it, you know exactly what it is.</p>
 
@@ -168,14 +168,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'testEmail required' }, { status: 400 })
     }
 
-    const firstName = testEmail.split('@')[0].split('.')[0]
-    const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1)
-
     const { data, error } = await resend.emails.send({
       from: 'PMMSherpa <hello@pmmsherpa.com>',
       to: testEmail,
       subject: "Sherpa doesn't sound like AI anymore",
-      html: getUpdateEmailHtml(capitalizedName),
+      html: getUpdateEmailHtml(),
     })
 
     if (error) {
