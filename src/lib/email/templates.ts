@@ -361,7 +361,6 @@ P.S. Check out the "Try asking" suggestions on the chat page for inspiration!`
 
 // Celebratory welcome email sent when user is approved/unbanned
 export function getCelebratoryWelcomeEmail(data: { fullName: string; email: string }) {
-  const firstName = data.fullName.split(' ')[0]
   const YOUTUBE_URL = 'https://youtu.be/i0YHeFcxI4U'
 
   return {
@@ -388,7 +387,7 @@ export function getCelebratoryWelcomeEmail(data: { fullName: string; email: stri
                   <!-- Body -->
                   <tr>
                     <td style="padding: 0 40px 32px 40px;">
-                      <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">Hey ${firstName},</p>
+                      <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">Hey 👋</p>
 
                       <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">You signed up. That means more to me than you know. You're now approved to start using PMM Sherpa 🥳🚀</p>
 
@@ -454,7 +453,7 @@ export function getCelebratoryWelcomeEmail(data: { fullName: string; email: stri
         </body>
       </html>
     `,
-    text: `Hey ${firstName},
+    text: `Hey 👋
 
 You signed up. That means more to me than you know. You're now approved to start using PMM Sherpa 🥳🚀
 
