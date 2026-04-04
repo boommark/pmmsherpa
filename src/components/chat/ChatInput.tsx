@@ -179,6 +179,29 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       }
     }, [input, attachments, disabled, onSend])
 
+    // Handle pasting images from clipboard
+    const handlePaste = useCallback((e: React.ClipboardEvent) => {
+      const items = Array.from(e.clipboardData?.items || [])
+      const imageFiles: File[] = []
+
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          const file = item.getAsFile()
+          if (file) {
+            // Give pasted images a descriptive name with timestamp
+            const ext = file.type.split('/')[1] || 'png'
+            const named = new File([file], `screenshot-${Date.now()}.${ext}`, { type: file.type })
+            imageFiles.push(named)
+          }
+        }
+      }
+
+      if (imageFiles.length > 0) {
+        e.preventDefault()
+        handleFilesSelected(imageFiles)
+      }
+    }, [handleFilesSelected])
+
     const handleKeyDown = (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault()
@@ -214,6 +237,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
                 placeholder={
                   isRecording && partialTranscript
                     ? partialTranscript

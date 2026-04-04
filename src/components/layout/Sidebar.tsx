@@ -25,6 +25,7 @@ import {
   Pencil,
   Check,
   X,
+  MoreHorizontal,
 } from 'lucide-react'
 
 // Helper to group conversations by date
@@ -68,7 +69,9 @@ function SidebarContent({
   // Rename state
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
+  const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   // Focus input when editing starts
   useEffect(() => {
@@ -78,10 +81,23 @@ function SidebarContent({
     }
   }, [editingId])
 
+  // Close menu on outside click
+  useEffect(() => {
+    if (!menuOpenId) return
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpenId(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [menuOpenId])
+
   // Handle rename
   const handleStartRename = (convId: string, currentTitle: string) => {
     setEditingId(convId)
     setEditingTitle(currentTitle)
+    setMenuOpenId(null)
   }
 
   const handleSaveRename = async () => {
@@ -210,7 +226,7 @@ function SidebarContent({
                       <div
                         key={conv.id}
                         className={cn(
-                          'group flex items-center justify-between rounded-lg px-2 py-2 text-sm hover:bg-sidebar-accent transition-colors',
+                          'group relative flex items-center justify-between rounded-lg px-2 py-2 text-sm hover:bg-sidebar-accent transition-colors',
                           pathname === `/chat/${conv.id}` && 'bg-sidebar-accent'
                         )}
                       >
@@ -252,31 +268,54 @@ function SidebarContent({
                             >
                               {conv.title}
                             </Link>
-                            <div className="flex items-center gap-1 shrink-0 ml-2">
+                            {/* Three-dot menu — visible on hover or when open */}
+                            <div className="relative shrink-0 ml-2" ref={menuOpenId === conv.id ? menuRef : undefined}>
                               <button
                                 type="button"
-                                className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                                 onClick={(e) => {
                                   e.preventDefault()
                                   e.stopPropagation()
-                                  handleStartRename(conv.id, conv.title)
+                                  setMenuOpenId(menuOpenId === conv.id ? null : conv.id)
                                 }}
-                                title="Rename"
+                                className={cn(
+                                  'p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-opacity',
+                                  menuOpenId === conv.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                                )}
+                                aria-label="Chat options"
                               >
-                                <Pencil className="h-4 w-4" />
+                                <MoreHorizontal className="h-4 w-4" />
                               </button>
-                              <button
-                                type="button"
-                                className="p-1.5 rounded-md text-muted-foreground hover:text-red-500 hover:bg-muted/50 transition-colors"
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  e.stopPropagation()
-                                  deleteConversation(conv.id)
-                                }}
-                                title="Delete"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
+
+                              {/* Dropdown */}
+                              {menuOpenId === conv.id && (
+                                <div className="absolute right-0 top-full mt-1 w-32 rounded-lg border border-border bg-popover shadow-md z-50 py-1">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      e.stopPropagation()
+                                      handleStartRename(conv.id, conv.title)
+                                    }}
+                                    className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-popover-foreground hover:bg-accent transition-colors"
+                                  >
+                                    <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                                    Rename
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      e.stopPropagation()
+                                      setMenuOpenId(null)
+                                      deleteConversation(conv.id)
+                                    }}
+                                    className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    Delete
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           </>
                         )}
