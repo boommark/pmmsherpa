@@ -71,7 +71,8 @@ export function buildMessages(
   retrievedContext: string,
   provider: ModelProvider,
   conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [],
-  scrapedUrlContent?: string
+  scrapedUrlContent?: string,
+  imageUrls?: string[]
 ) {
   const systemPrompt = getSystemPromptWithContext(retrievedContext, provider, scrapedUrlContent)
 
@@ -86,12 +87,24 @@ export function buildMessages(
     console.log('[buildMessages] No conversation history provided')
   }
 
+  // Build the user message — multimodal if images are present
+  let userContent: string | Array<{ type: 'text'; text: string } | { type: 'image'; image: URL }>;
+  if (imageUrls && imageUrls.length > 0) {
+    userContent = [
+      ...imageUrls.map((url) => ({ type: 'image' as const, image: new URL(url) })),
+      { type: 'text' as const, text: userMessage },
+    ]
+    console.log(`[buildMessages] Multimodal message with ${imageUrls.length} image(s)`)
+  } else {
+    userContent = userMessage
+  }
+
   const messages = [
     ...conversationHistory.map((msg) => ({
       role: msg.role as 'user' | 'assistant',
       content: msg.content,
     })),
-    { role: 'user' as const, content: userMessage },
+    { role: 'user' as const, content: userContent },
   ]
 
   console.log(`[buildMessages] Final message array: ${messages.length} messages`)

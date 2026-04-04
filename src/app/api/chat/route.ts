@@ -302,13 +302,27 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             }
           }
 
+          // Extract image URLs from attachments for vision
+          const imageUrls: string[] = []
+          if (hasAttachments && attachments) {
+            for (const attachment of attachments) {
+              if (attachment.fileType.startsWith('image/') && attachment.storagePath) {
+                imageUrls.push(attachment.storagePath)
+              }
+            }
+          }
+          if (imageUrls.length > 0) {
+            console.log(`[Vision] Sending ${imageUrls.length} image(s) to LLM`)
+          }
+
           console.log(`Building messages with ${conversationHistory.length} history messages for model: ${model}`)
           const { system, messages: allMessages } = buildMessages(
             processedMessage,
             fullContext,
             model,
             conversationHistory,
-            truncatedUrlContent || undefined
+            truncatedUrlContent || undefined,
+            imageUrls.length > 0 ? imageUrls : undefined
           )
           console.log(`Total messages being sent to LLM: ${allMessages.length} (${conversationHistory.length} history + 1 new)`)
 
