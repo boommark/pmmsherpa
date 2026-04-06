@@ -2,55 +2,62 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { PRICING } from '@/lib/cost-tracker'
 
+const LLM_SERVICES = new Set(['claude', 'gemini', 'gemini_flash_lite'])
+
 export async function GET(request: NextRequest) {
-  // Auth check with user-scoped client
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: profile } = await (supabase.from('profiles') as any)
-    .select('is_admin')
-    .eq('id', user.id)
-    .single()
-
+    .select('is_admin').eq('id', user.id).single()
   if (!profile?.is_admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  // Use service role client for data queries — bypasses RLS to see ALL users
   const serviceClient = await createServiceClient()
-
   const range = parseInt(request.nextUrl.searchParams.get('range') || '30')
   const since = new Date(Date.now() - range * 24 * 60 * 60 * 1000).toISOString()
 
-  // Fetch costs and user profiles in parallel
   const [costsResult, profilesResult] = await Promise.all([
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (serviceClient.from('api_costs') as any)
-      .select('service, operation, cost_usd, created_at, user_id, input_tokens, output_tokens, units')
-      .gte('created_at', since)
-      .order('created_at', { ascending: true }),
+      .select('service, operation, cost_usd, created_at, user_id, input_tokens, output_tokens, units, unit_type')
+      .gte('created_at', since).order('created_at', { ascending: true }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (serviceClient.from('profiles') as any)
-      .select('id, email, full_name'),
+    (serviceClient.from('profiles') as any).select('id, email, full_name'),
   ])
 
   const costs = costsResult.data || []
   const profiles = profilesResult.data || []
 
-  // Build profile lookup
   const profileMap: Record<string, { email: string; full_name: string }> = {}
-  for (const p of profiles) {
-    profileMap[p.id] = { email: p.email, full_name: p.full_name }
+  for (const p of profiles) profileMap[p.id] = { email: p.email, full_name: p.full_name }
+
+  // Totals
+  let totalSpend = 0, totalInputTokens = 0, totalOutputTokens = 0
+  for (const c of costs) {
+    totalSpend += parseFloat(c.cost_usd)
+    totalInputTokens += c.input_tokens || 0
+    totalOutputTokens += c.output_tokens || 0
   }
 
-  // Total spend
-  const totalSpend = costs.reduce((s: number, c: { cost_usd: string }) => s + parseFloat(c.cost_usd), 0)
-
-  // Per-service breakdown
-  const serviceBreakdown: Record<string, number> = {}
+  // Per-service aggregation with consumption metrics
+  const serviceStats: Record<string, {
+    cost: number; calls: number; inputTokens: number; outputTokens: number;
+    units: number; unitType: string; isLLM: boolean
+  }> = {}
   for (const c of costs) {
-    serviceBreakdown[c.service] = (serviceBreakdown[c.service] || 0) + parseFloat(c.cost_usd)
+    const cost = parseFloat(c.cost_usd)
+    const isLLM = LLM_SERVICES.has(c.service)
+    if (!serviceStats[c.service]) {
+      serviceStats[c.service] = { cost: 0, calls: 0, inputTokens: 0, outputTokens: 0, units: 0, unitType: c.unit_type || (isLLM ? 'tokens' : 'requests'), isLLM }
+    }
+    const s = serviceStats[c.service]
+    s.cost += cost
+    s.calls += 1
+    s.inputTokens += c.input_tokens || 0
+    s.outputTokens += c.output_tokens || 0
+    s.units += c.units || 0
   }
 
   // Daily spend
@@ -63,39 +70,44 @@ export async function GET(request: NextRequest) {
     .map(([day, cost]) => ({ day, cost }))
     .sort((a, b) => a.day.localeCompare(b.day))
 
-  // Per-user costs
-  const userCostMap: Record<string, number> = {}
+  // Per-user with per-service consumption
+  const userMap: Record<string, {
+    cost: number; calls: number; inputTokens: number; outputTokens: number
+    services: Record<string, { cost: number; calls: number; inputTokens: number; outputTokens: number; units: number }>
+  }> = {}
   for (const c of costs) {
-    userCostMap[c.user_id] = (userCostMap[c.user_id] || 0) + parseFloat(c.cost_usd)
+    if (!userMap[c.user_id]) userMap[c.user_id] = { cost: 0, calls: 0, inputTokens: 0, outputTokens: 0, services: {} }
+    const u = userMap[c.user_id]
+    const cost = parseFloat(c.cost_usd)
+    u.cost += cost
+    u.calls += 1
+    u.inputTokens += c.input_tokens || 0
+    u.outputTokens += c.output_tokens || 0
+    if (!u.services[c.service]) u.services[c.service] = { cost: 0, calls: 0, inputTokens: 0, outputTokens: 0, units: 0 }
+    const sv = u.services[c.service]
+    sv.cost += cost
+    sv.calls += 1
+    sv.inputTokens += c.input_tokens || 0
+    sv.outputTokens += c.output_tokens || 0
+    sv.units += c.units || 0
   }
-  const topUsers = Object.entries(userCostMap)
-    .map(([userId, cost]) => ({
-      userId,
-      email: profileMap[userId]?.email || 'unknown',
-      fullName: profileMap[userId]?.full_name || '',
-      cost,
-    }))
+
+  const users = Object.entries(userMap)
+    .map(([userId, d]) => ({ userId, email: profileMap[userId]?.email || 'unknown', fullName: profileMap[userId]?.full_name || '', ...d }))
     .sort((a, b) => b.cost - a.cost)
     .slice(0, 50)
 
-  // Projection
+  // Active services (only ones with data)
+  const activeServices = Object.keys(serviceStats).sort((a, b) => serviceStats[b].cost - serviceStats[a].cost)
+
   const daysWithData = Object.keys(dailyMap).length || 1
   const avgDaily = totalSpend / daysWithData
-  const projectedMonthly = avgDaily * 30
-
-  // Top service
-  const topService = Object.entries(serviceBreakdown).sort(([, a], [, b]) => b - a)[0] || ['none', 0]
 
   return NextResponse.json({
-    totalSpend,
-    projectedMonthly,
-    avgDaily,
-    serviceBreakdown,
-    dailySpend,
-    topUsers,
-    topService: { name: topService[0], cost: topService[1] },
-    pricing: PRICING,
-    range,
+    totalSpend, projectedMonthly: avgDaily * 30, avgDaily,
+    totalInputTokens, totalOutputTokens,
+    serviceStats, activeServices,
+    dailySpend, users, pricing: PRICING, range,
     totalCalls: costs.length,
   })
 }
