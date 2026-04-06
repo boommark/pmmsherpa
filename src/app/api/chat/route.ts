@@ -9,6 +9,7 @@ import { extractUrls, scrapeUrls } from '@/lib/url-scraper'
 import { searchAndFetch } from '@/lib/web/brave-search'
 import type { ChatAttachment, WebCitation } from '@/types/chat'
 import { trackCost } from '@/lib/cost-tracker'
+import { scanInput, scanOutput, SAFE_RESPONSE, CANARY_TOKEN } from '@/lib/prompt-guard'
 import { initLogger } from 'braintrust'
 
 const btLogger = initLogger({
@@ -82,6 +83,24 @@ export async function POST(request: NextRequest) {
     const hasAttachments = attachments && attachments.length > 0
     if (!hasMessage && !hasAttachments) {
       return new Response('Message or attachments required', { status: 400 })
+    }
+
+    // Scan for prompt extraction attempts
+    if (hasMessage) {
+      const guardResult = scanInput(message)
+      if (guardResult.blocked) {
+        const encoder = new TextEncoder()
+        const safeStream = new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'text', content: SAFE_RESPONSE })}\n\n`))
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'done' })}\n\n`))
+            controller.close()
+          },
+        })
+        return new Response(safeStream, {
+          headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
+        })
+      }
     }
 
     // Create streaming response with status updates
@@ -388,9 +407,21 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
               }
             : null
 
-          // Stream text chunks
+          // Stream text chunks with output leak detection
+          let leakDetected = false
           for await (const chunk of result.textStream) {
             fullResponseText += chunk
+            // Check accumulated text for leaked prompt content every ~500 chars
+            if (!leakDetected && fullResponseText.length % 500 < chunk.length) {
+              if (scanOutput(fullResponseText)) {
+                leakDetected = true
+                console.error('[PromptGuard] Output leak detected, truncating response')
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ type: 'text', content: '\n\n' + SAFE_RESPONSE })}\n\n`)
+                )
+                break
+              }
+            }
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ type: 'text', content: chunk })}\n\n`)
             )

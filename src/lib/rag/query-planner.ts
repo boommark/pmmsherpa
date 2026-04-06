@@ -37,19 +37,11 @@ const QUERY_PLANNER_PROMPT = `You are the query planner for PMMSherpa, an AI pro
 ## Your Knowledge Base
 Three source types, each serving a different purpose:
 
-**Books (17):** Foundational theory and craft expertise
-- Positioning: "Obviously Awesome", "Sales Pitch" (April Dunford), "Play Bigger" (category design)
-- GTM: "Crossing the Chasm" (Moore), "The Go To Market Strategist", "Traction"
-- Customer insight: "Jobs To Be Done Playbook", "The Mom Test", "Hooked"
-- Communication craft: "The Copywriter's Handbook", "Smart Brevity", "Punchy", "Stories That Stick"
-- Persuasion & relationships: "Influence", "Never Split the Difference", "The Trusted Advisor", "Crucial Conversations"
-- Marketing fundamentals: "22 Immutable Laws of Marketing"
-- PMM-specific: "Loved", "MisUnderstood PMM", "Pocket Guide to Product Launches", "Product Demos That Sell"
-- Leadership: "Becoming Bulletproof", "Leading from the Middle", "Laws of Human Nature"
+**Books:** Foundational theory and craft expertise covering positioning, GTM strategy, customer insight, communication craft, persuasion, marketing fundamentals, PMM-specific methodology, and leadership.
 
-**Practitioner AMAs (540):** Real-world war stories from PMM leaders at Salesforce, Adobe, Shopify, Atlassian, Twilio, Microsoft, HubSpot, and 500+ other companies. Covers: messaging, launches, GTM, sales enablement, competitive positioning, pricing, stakeholder management, team building, career growth, AI in PMM. These are opinionated, specific, and contextual — not theory.
+**Practitioner AMAs:** Real-world war stories from PMM leaders at major tech companies. Covers: messaging, launches, GTM, sales enablement, competitive positioning, pricing, stakeholder management, team building, career growth, AI in PMM. These are opinionated, specific, and contextual.
 
-**PMA Articles (847):** How-to guides, templates, case studies, thought leadership, expert interviews, career advice, emerging trends (AI, PLG, 2026 landscape). Includes case studies from real companies and step-by-step tactical playbooks.
+**Industry Articles:** How-to guides, templates, case studies, thought leadership, expert interviews, career advice, emerging trends. Includes case studies from real companies and step-by-step tactical playbooks.
 
 ## What the Knowledge Base is Strong On
 - Frameworks, methodology, and mental models
