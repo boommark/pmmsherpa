@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { PRICING } from '@/lib/cost-tracker'
 
 export async function GET(request: NextRequest) {
+  // Auth check with user-scoped client
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -16,18 +17,21 @@ export async function GET(request: NextRequest) {
 
   if (!profile?.is_admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
+  // Use service role client for data queries — bypasses RLS to see ALL users
+  const serviceClient = await createServiceClient()
+
   const range = parseInt(request.nextUrl.searchParams.get('range') || '30')
   const since = new Date(Date.now() - range * 24 * 60 * 60 * 1000).toISOString()
 
   // Fetch costs and user profiles in parallel
   const [costsResult, profilesResult] = await Promise.all([
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (supabase.from('api_costs') as any)
+    (serviceClient.from('api_costs') as any)
       .select('service, operation, cost_usd, created_at, user_id, input_tokens, output_tokens, units')
       .gte('created_at', since)
       .order('created_at', { ascending: true }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (supabase.from('profiles') as any)
+    (serviceClient.from('profiles') as any)
       .select('id, email, full_name'),
   ])
 
