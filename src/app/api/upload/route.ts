@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { trackCost } from '@/lib/cost-tracker'
 
 export const runtime = 'nodejs'
 export const maxDuration = 120 // LlamaParse can take time for large docs
@@ -202,6 +203,16 @@ export async function POST(request: NextRequest) {
     } else if (PARSEABLE_TYPES.includes(file.type)) {
       try {
         extractedText = await parseWithLlamaParse(fileBuffer, file.name, file.type)
+        if (extractedText) {
+          trackCost({
+            userId: user.id,
+            service: 'llamaparse',
+            operation: 'doc_parse',
+            units: 1,
+            unitType: 'pages',
+            metadata: { fileName: file.name, fileType: file.type, fileSize: file.size },
+          })
+        }
       } catch (err) {
         console.error('LlamaParse extraction failed:', err)
       }

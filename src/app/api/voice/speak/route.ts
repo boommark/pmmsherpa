@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { trackCost } from '@/lib/cost-tracker'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
@@ -114,6 +116,22 @@ export async function POST(request: Request) {
         { status: 500 }
       )
     }
+
+    // Track TTS cost
+    try {
+      const supabase = await createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        trackCost({
+          userId: user.id,
+          service: 'elevenlabs',
+          operation: 'tts',
+          units: cleanText.length,
+          unitType: 'characters',
+          metadata: { voiceId },
+        })
+      }
+    } catch { /* cost tracking should not block TTS */ }
 
     return new Response(response.body, {
       headers: {

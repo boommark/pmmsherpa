@@ -4,6 +4,7 @@
  */
 
 import OpenAI from 'openai'
+import { trackCost } from '@/lib/cost-tracker'
 
 // Initialize Perplexity client using OpenAI SDK
 const perplexity = new OpenAI({
@@ -47,7 +48,8 @@ export interface ResearchResult {
 export async function conductResearch(
   query: string,
   context?: string,
-  options: ResearchOptions = {}
+  options: ResearchOptions = {},
+  userId?: string
 ): Promise<ResearchResult> {
   const model = options.model || 'sonar-pro'
 
@@ -98,6 +100,19 @@ Format your response as additional insights that enhance the original. Do NOT re
   // Extract related questions
   // @ts-expect-error - Perplexity adds related_questions to response
   const relatedQuestions: string[] = response.related_questions || []
+
+  if (userId) {
+    trackCost({
+      userId,
+      service: 'perplexity',
+      operation: 'web_research',
+      inputTokens: response.usage?.prompt_tokens || 0,
+      outputTokens: response.usage?.completion_tokens || 0,
+      units: 1,
+      unitType: 'requests',
+      metadata: { model, query },
+    })
+  }
 
   return {
     content: response.choices[0]?.message?.content || '',

@@ -7,6 +7,7 @@
 
 import { generateText } from 'ai'
 import { getFlashLiteModel } from '@/lib/llm/provider-factory'
+import { trackCost } from '@/lib/cost-tracker'
 
 export interface QueryPlan {
   ragQueries: string[]
@@ -128,7 +129,7 @@ function buildPlannerInput(input: QueryPlannerInput): string {
   return parts.join('\n\n')
 }
 
-export async function planQueries(input: QueryPlannerInput): Promise<QueryPlan> {
+export async function planQueries(input: QueryPlannerInput, userId?: string): Promise<QueryPlan> {
   const startTime = Date.now()
 
   try {
@@ -145,6 +146,16 @@ export async function planQueries(input: QueryPlannerInput): Promise<QueryPlan> 
 
     const elapsed = Date.now() - startTime
     console.log(`[QueryPlanner] Flash Lite responded in ${elapsed}ms`)
+
+    if (userId) {
+      trackCost({
+        userId,
+        service: 'gemini_flash_lite',
+        operation: 'query_plan',
+        inputTokens: result.usage?.inputTokens || 0,
+        outputTokens: result.usage?.outputTokens || 0,
+      })
+    }
 
     // Parse JSON response
     const text = result.text.trim()

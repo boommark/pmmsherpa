@@ -15,14 +15,14 @@ export async function retrieveContext({
   topK = 8,
   semanticWeight = 0.7,
   matchThreshold = 0.4,
-}: HybridSearchParams): Promise<RetrievalResult> {
+}: HybridSearchParams, userId?: string): Promise<RetrievalResult> {
   const supabase = await createServiceClient()
 
   // Expand query for better semantic matching
   const expandedQuery = expandQuery(query)
 
   // Generate embedding for the query
-  const embedding = await generateEmbedding(expandedQuery)
+  const embedding = await generateEmbedding(expandedQuery, userId)
 
   // Call hybrid search function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,14 +81,15 @@ export async function retrieveContext({
  */
 export async function multiQueryRetrieve(
   queries: string[],
-  topK: number = 10
+  topK: number = 10,
+  userId?: string
 ): Promise<RetrievalResult> {
   const startTime = Date.now()
 
   // Run all queries in parallel
   const results = await Promise.all(
     queries.map((query) =>
-      retrieveContext({ query, topK: 6 }).catch((err) => {
+      retrieveContext({ query, topK: 6 }, userId).catch((err) => {
         console.error(`[MultiQuery] Error for query "${query}":`, err)
         return { chunks: [], totalTokens: 0 } as RetrievalResult
       })

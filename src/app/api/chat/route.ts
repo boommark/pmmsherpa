@@ -8,6 +8,7 @@ import { conductResearch } from '@/lib/llm/perplexity-client'
 import { extractUrls, scrapeUrls } from '@/lib/url-scraper'
 import { searchAndFetch } from '@/lib/web/brave-search'
 import type { ChatAttachment, WebCitation } from '@/types/chat'
+import { trackCost } from '@/lib/cost-tracker'
 import { initLogger } from 'braintrust'
 
 const btLogger = initLogger({
@@ -113,7 +114,7 @@ export async function POST(request: NextRequest) {
             : Promise.resolve({ data: null, error: null })
 
           const urlScrapePromise = hasUrls
-            ? scrapeUrls(detectedUrls).catch(err => {
+            ? scrapeUrls(detectedUrls, user.id).catch(err => {
                 console.error('URL scraping error:', err)
                 return ''
               })
@@ -188,7 +189,7 @@ export async function POST(request: NextRequest) {
             conversationHistory,
             scrapedUrlContent: truncatedUrlContent || undefined,
             attachmentContext: attachmentContext || undefined,
-          })
+          }, user.id)
 
           // Show status based on what the planner decided
           if (queryPlan.webSearch?.needed) {
@@ -206,19 +207,20 @@ export async function POST(request: NextRequest) {
           const startRetrieval = Date.now()
 
           // Run RAG, Perplexity, and Brave Search in parallel
-          const ragPromise = multiQueryRetrieve(queryPlan.ragQueries)
+          const ragPromise = multiQueryRetrieve(queryPlan.ragQueries, 10, user.id)
           const perplexityPromise = queryPlan.webResearch.needed && queryPlan.webResearch.query
             ? conductResearch(
                 queryPlan.webResearch.query,
                 undefined,
-                { model: 'sonar-pro', recencyFilter: 'month' }
+                { model: 'sonar-pro', recencyFilter: 'month' },
+                user.id
               ).catch(err => {
                 console.error('Perplexity research error:', err)
                 return null
               })
             : Promise.resolve(null)
           const braveSearchPromise = queryPlan.webSearch?.needed && queryPlan.webSearch.query
-            ? searchAndFetch(queryPlan.webSearch.query, 3).catch(err => {
+            ? searchAndFetch(queryPlan.webSearch.query, 3, user.id).catch(err => {
                 console.error('Brave Search error:', err)
                 return null
               })
@@ -452,17 +454,28 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error: usageError } = await (supabase.from('usage_logs') as any).insert({
             user_id: user.id,
-            conversation_id: conversationId || null,
             model: dbModel,
             input_tokens: usage?.inputTokens || 0,
             output_tokens: usage?.outputTokens || 0,
-            total_tokens: (usage?.inputTokens || 0) + (usage?.outputTokens || 0),
             latency_ms: latencyMs,
+            endpoint: '/api/chat',
           })
 
           if (usageError) {
             console.error('Error logging usage:', usageError)
           }
+
+          // Track LLM cost
+          const llmService = dbModel === 'gemini' ? 'gemini' as const : 'claude' as const
+          trackCost({
+            userId: user.id,
+            service: llmService,
+            operation: 'chat',
+            inputTokens: usage?.inputTokens || 0,
+            outputTokens: usage?.outputTokens || 0,
+            conversationId: conversationId || null,
+            metadata: { model: dbModel },
+          })
 
           // Log to Braintrust for eval & observability
           try {

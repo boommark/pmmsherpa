@@ -1,4 +1,5 @@
 import OpenAI from 'openai'
+import { trackCost } from '@/lib/cost-tracker'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -7,12 +8,22 @@ const openai = new OpenAI({
 const EMBEDDING_MODEL = 'text-embedding-3-small'
 const EMBEDDING_DIMENSIONS = 512
 
-export async function generateEmbedding(text: string): Promise<number[]> {
+export async function generateEmbedding(text: string, userId?: string): Promise<number[]> {
   const response = await openai.embeddings.create({
     input: text,
     model: EMBEDDING_MODEL,
     dimensions: EMBEDDING_DIMENSIONS,
   })
+
+  if (userId && response.usage) {
+    trackCost({
+      userId,
+      service: 'openai_embeddings',
+      operation: 'embedding',
+      units: response.usage.total_tokens,
+      unitType: 'tokens',
+    })
+  }
 
   return response.data[0].embedding
 }

@@ -1,3 +1,5 @@
+import { trackCost } from '@/lib/cost-tracker'
+
 const URL_REGEX = /https?:\/\/[^\s<>"{}|\\^`[\]]+/g
 const MAX_TOTAL_CHARS = 40000 // Total budget across all URLs
 const MAX_URLS = 3
@@ -49,13 +51,16 @@ async function scrapeWithFirecrawl(url: string): Promise<string | null> {
   }
 }
 
-export async function scrapeUrls(urls: string[]): Promise<string> {
+export async function scrapeUrls(urls: string[], userId?: string): Promise<string> {
   const limited = urls.slice(0, MAX_URLS)
   const perUrlBudget = Math.floor(MAX_TOTAL_CHARS / limited.length)
 
   const results = await Promise.all(
     limited.map(async (url) => {
       const content = await scrapeWithFirecrawl(url)
+      if (content && userId) {
+        trackCost({ userId, service: 'firecrawl', operation: 'url_scrape', units: 1, unitType: 'pages' })
+      }
       if (!content) {
         return `--- Scraped content from ${url} ---\n[Failed to fetch content from this URL. The page may be behind a login, blocking scrapers, or temporarily unavailable.]\n--- End of ${url} ---`
       }

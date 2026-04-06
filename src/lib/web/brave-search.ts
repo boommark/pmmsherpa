@@ -3,6 +3,8 @@
  * Finds URLs matching a query, then fetches top results via Jina Reader.
  */
 
+import { trackCost } from '@/lib/cost-tracker'
+
 const BRAVE_API_BASE = 'https://api.search.brave.com/res/v1/web/search'
 const JINA_READER_BASE = 'https://r.jina.ai'
 
@@ -94,7 +96,8 @@ async function fetchViaJina(url: string): Promise<string | null> {
  */
 export async function searchAndFetch(
   query: string,
-  maxFetch = 3
+  maxFetch = 3,
+  userId?: string
 ): Promise<WebSearchResult> {
   console.log(`[BraveSearch] Searching: "${query}"`)
 
@@ -105,6 +108,10 @@ export async function searchAndFetch(
     return { query, results: [], fetchedContent: '' }
   }
 
+  if (userId) {
+    trackCost({ userId, service: 'brave_search', operation: 'web_search', units: 1, unitType: 'requests' })
+  }
+
   // Fetch top N results in parallel
   const toFetch = results.slice(0, maxFetch)
   const fetched = await Promise.allSettled(
@@ -112,14 +119,19 @@ export async function searchAndFetch(
   )
 
   const contentParts: string[] = []
+  let jinaFetchCount = 0
   fetched.forEach((result, i) => {
     if (result.status === 'fulfilled' && result.value) {
       contentParts.push(
         `--- Source: ${toFetch[i].title} (${toFetch[i].url}) ---\n${result.value}\n--- End ---`
       )
       console.log(`[BraveSearch] Fetched: ${toFetch[i].url} (${result.value.length} chars)`)
+      jinaFetchCount++
     }
   })
+  if (userId && jinaFetchCount > 0) {
+    trackCost({ userId, service: 'jina', operation: 'url_fetch', units: jinaFetchCount, unitType: 'requests' })
+  }
 
   return {
     query,
