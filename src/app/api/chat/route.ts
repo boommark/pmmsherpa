@@ -103,6 +103,43 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Rate limiting: 50 messages/day per user (admin accounts exempt)
+    const DAILY_MESSAGE_LIMIT = 30
+    const EXEMPT_EMAILS = [
+      'aratnaai@gmail.com',
+      'abhishekratna@gmail.com',
+      'abhishekratna1@gmail.com',
+      'pmmsherpatest@gmail.com',
+    ]
+
+    if (!EXEMPT_EMAILS.includes(user.email || '')) {
+      const todayStart = new Date()
+      todayStart.setUTCHours(0, 0, 0, 0)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { count, error: countError } = await (supabase.from('usage_logs') as any)
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .gte('created_at', todayStart.toISOString())
+
+      if (!countError && count !== null && count >= DAILY_MESSAGE_LIMIT) {
+        console.log(`[RateLimit] User ${user.email} hit daily limit: ${count}/${DAILY_MESSAGE_LIMIT}`)
+        const rateLimitStream = new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+              type: 'text',
+              content: "You've reached your daily limit of 30 messages. Your quota resets at midnight UTC — come back tomorrow and pick up right where you left off!"
+            })}\n\n`))
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'done' })}\n\n`))
+            controller.close()
+          },
+        })
+        return new Response(rateLimitStream, {
+          headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
+        })
+      }
+    }
+
     // Create streaming response with status updates
     const stream = new ReadableStream({
       async start(controller) {
