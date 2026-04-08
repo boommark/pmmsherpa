@@ -10,7 +10,12 @@ const SUPPORTED_FILE_TYPES: Record<string, { maxSize: number; category: string }
   'application/pdf': { maxSize: 10 * 1024 * 1024, category: 'document' },
   'application/msword': { maxSize: 10 * 1024 * 1024, category: 'document' },
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/vnd.ms-powerpoint': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/vnd.ms-excel': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { maxSize: 10 * 1024 * 1024, category: 'document' },
   'text/plain': { maxSize: 5 * 1024 * 1024, category: 'document' },
+  'text/csv': { maxSize: 5 * 1024 * 1024, category: 'document' },
   'image/png': { maxSize: 5 * 1024 * 1024, category: 'image' },
   'image/jpeg': { maxSize: 5 * 1024 * 1024, category: 'image' },
   'image/gif': { maxSize: 5 * 1024 * 1024, category: 'image' },
@@ -192,13 +197,17 @@ export async function POST(request: NextRequest) {
       'application/pdf',
       'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ]
 
-    if (file.type === 'text/plain') {
+    if (file.type === 'text/plain' || file.type === 'text/csv') {
       try {
         extractedText = await file.text()
       } catch {
-        console.warn('Failed to extract text from .txt file')
+        console.warn('Failed to extract text from text file')
       }
     } else if (PARSEABLE_TYPES.includes(file.type)) {
       try {

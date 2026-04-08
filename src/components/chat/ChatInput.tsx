@@ -278,7 +278,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
             </div>
           </div>
           <p className="text-xs text-muted-foreground/60 mt-2.5 md:mt-3 text-center hidden sm:block">
-            Attach files for context. Paste URLs for analysis. Ask anything about product marketing.
+            Attach files (PDF, PPT, DOC, XLS, images) for context. Paste URLs for analysis. Ask anything about product marketing.
           </p>
         </div>
       </div>

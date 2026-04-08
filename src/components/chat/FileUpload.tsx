@@ -10,7 +10,12 @@ export const SUPPORTED_FILE_TYPES = {
   'application/pdf': { maxSize: 10 * 1024 * 1024, category: 'document' },
   'application/msword': { maxSize: 10 * 1024 * 1024, category: 'document' },
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/vnd.ms-powerpoint': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/vnd.ms-excel': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { maxSize: 10 * 1024 * 1024, category: 'document' },
   'text/plain': { maxSize: 5 * 1024 * 1024, category: 'document' },
+  'text/csv': { maxSize: 5 * 1024 * 1024, category: 'document' },
   // Images
   'image/png': { maxSize: 5 * 1024 * 1024, category: 'image' },
   'image/jpeg': { maxSize: 5 * 1024 * 1024, category: 'image' },
@@ -50,7 +55,7 @@ export function FileUpload({ onFilesSelected, disabled, maxFiles = 5 }: FileUplo
     if (!typeConfig) {
       return {
         valid: false,
-        error: `Unsupported file type: ${file.type || 'unknown'}. Supported: PDF, DOC, DOCX, TXT, PNG, JPG, GIF, WEBP, MP4, WEBM`
+        error: `Unsupported file type: ${file.type || 'unknown'}. Supported: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, TXT, CSV, PNG, JPG, GIF, WEBP, MP4, WEBM`
       }
     }
 
@@ -127,7 +132,7 @@ export function FileUpload({ onFilesSelected, disabled, maxFiles = 5 }: FileUplo
         onClick={handleClick}
         disabled={disabled}
         className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0 text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-zinc-800/50"
-        title="Attach files (PDF, images, documents)"
+        title="Attach files (PDF, PPT, DOC, XLS, images, and more)"
       >
         <Paperclip className="h-4 w-4" />
       </Button>
