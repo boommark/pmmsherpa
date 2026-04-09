@@ -4,7 +4,7 @@
 **Embedding model:** OpenAI `text-embedding-3-small` (512 dims)
 **Search:** Hybrid (70% semantic + 30% keyword via `hybrid_search()`)
 **Last updated:** 2026-04-07
-**Total:** ~2,248 documents, ~28,132 chunks
+**Total:** ~2,792 documents, ~38,213 chunks
 
 ---
 
@@ -70,26 +70,25 @@
 YouTube transcript ingestions from product leaders, marketers, and GTM experts. Three-way classification:
 
 ### podcast_pm — Product Strategy Conversations
-**Documents:** 118 (pending ingestion) + 42 (already ingested) | **Chunks:** ~1,539 (existing) + ~2,700 (pending)
+**Documents:** 160 | **Chunks:** 5,048
 
 Product management episodes from Lenny's Podcast: product strategy, leadership, team building, product vision, roadmaps, scaling.
 
-Notable: Marty Cagan (SVPG), Brian Chesky (Airbnb), Yuhki Yamashita (Figma CPO), Claire Hughes Johnson (Stripe), Hamilton Helmer (7 Powers), Richard Rumelt (Good Strategy Bad Strategy), Stewart Butterfield (Slack)
+Notable: Marty Cagan (SVPG), Brian Chesky (Airbnb), Yuhki Yamashita (Figma CPO), Claire Hughes Johnson (Stripe), Hamilton Helmer (7 Powers), Richard Rumelt (Good Strategy Bad Strategy), Stewart Butterfield (Slack), Tobi Lutke (Shopify)
 
 ### podcast_pmm — GTM & Marketing Conversations
-**Documents:** 357 (pending ingestion) | **Chunks:** ~5,000 (pending)
+**Documents:** 357 | **Chunks:** 4,514
 
 - **Lenny's GTM episodes (90):** April Dunford (positioning), Andy Raskin (strategic narrative), Elena Verna (PLG, 4 episodes), Madhavan Ramanujam (pricing), Christopher Lochhead (category design), Rory Sutherland (marketing psychology), Seth Godin, Emily Kramer (MKT1), Sean Ellis (growth hacking)
 - **PMA episodes (267):** Pure product marketing — positioning, messaging, CI, sales enablement, GTM strategy, pricing, personas, product launches, win-loss analysis
+- **Diary of a CEO (1):** Rory Sutherland — psychological value, reframing, perceived vs. real value
 
 ### podcast_ai — AI Product & GTM Insights
-**Documents:** 66 (pending ingestion) | **Chunks:** ~1,500 (pending)
+**Documents:** 66 | **Chunks:** 2,021
 
 AI-specific episodes that surface only on AI-related queries. AI product strategy, AI PMs, AI-native companies, AI adoption, AI GTM.
 
-Notable: Kevin Weil (OpenAI CPO), Mike Krieger (Anthropic CPO), Tomer Cohen (LinkedIn CPO on AI disruption), Paul Adams (Intercom CPO on AI strategy), Julie Zhuo (managing AI), Aman Khan (becoming an AI PM)
-
-**STATUS: 541 episodes classified, pending OpenAI embedding quota refresh. Run `python3 ingest_podcasts.py` when quota available.**
+Notable: Kevin Weil (OpenAI CPO), Mike Krieger (Anthropic CPO), Tomer Cohen (LinkedIn CPO on AI disruption), Paul Adams (Intercom CPO on AI strategy), Julie Zhuo (managing AI), Aman Khan (becoming an AI PM), Amol Avasare (Anthropic Head of Growth)
 
 **Chunking:** Custom transcript chunker — paragraph-splitting at ~600 tokens with sentence-level fallback. Do NOT use blog_processor (exceeds 8K OpenAI embedding limit on wall-of-text transcripts).
 
