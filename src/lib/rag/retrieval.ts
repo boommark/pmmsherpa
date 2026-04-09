@@ -51,7 +51,7 @@ export async function retrieveContext({
     section_title: string | null
     question: string | null
     document_title: string
-    source_type: 'book' | 'blog' | 'ama'
+    source_type: 'book' | 'blog' | 'ama' | 'blog_external' | 'book_pm' | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai'
     author: string | null
     speaker_role: string | null
     url: string | null
@@ -130,8 +130,13 @@ export function formatContextForPrompt(chunks: RetrievedChunk[]): string {
 
   // Group by source type
   const books = chunks.filter((c) => c.sourceType === 'book')
+  const booksPm = chunks.filter((c) => c.sourceType === 'book_pm')
+  const podcastsPm = chunks.filter((c) => c.sourceType === 'podcast_pm')
+  const podcastsPmm = chunks.filter((c) => c.sourceType === 'podcast_pmm')
+  const podcastsAi = chunks.filter((c) => c.sourceType === 'podcast_ai')
   const amas = chunks.filter((c) => c.sourceType === 'ama')
   const blogs = chunks.filter((c) => c.sourceType === 'blog')
+  const blogExternal = chunks.filter((c) => c.sourceType === 'blog_external')
 
   const sections: string[] = []
   let sourceIdx = 1
@@ -144,6 +149,46 @@ export function formatContextForPrompt(chunks: RetrievedChunk[]): string {
       })
       .join('\n\n---\n\n')
     sections.push(`### Frameworks & Theory\n${formatted}`)
+  }
+
+  if (booksPm.length > 0) {
+    const formatted = booksPm
+      .map((chunk) => {
+        const info = formatSourceInfo(chunk)
+        return `[Source ${sourceIdx++}] ${info}\n${chunk.content}`
+      })
+      .join('\n\n---\n\n')
+    sections.push(`### Product Strategy\n${formatted}`)
+  }
+
+  if (podcastsPm.length > 0) {
+    const formatted = podcastsPm
+      .map((chunk) => {
+        const info = formatSourceInfo(chunk)
+        return `[Source ${sourceIdx++}] ${info}\n${chunk.content}`
+      })
+      .join('\n\n---\n\n')
+    sections.push(`### Product Strategy Conversations\n${formatted}`)
+  }
+
+  if (podcastsPmm.length > 0) {
+    const formatted = podcastsPmm
+      .map((chunk) => {
+        const info = formatSourceInfo(chunk)
+        return `[Source ${sourceIdx++}] ${info}\n${chunk.content}`
+      })
+      .join('\n\n---\n\n')
+    sections.push(`### GTM & Marketing Conversations\n${formatted}`)
+  }
+
+  if (podcastsAi.length > 0) {
+    const formatted = podcastsAi
+      .map((chunk) => {
+        const info = formatSourceInfo(chunk)
+        return `[Source ${sourceIdx++}] ${info}\n${chunk.content}`
+      })
+      .join('\n\n---\n\n')
+    sections.push(`### AI Product & GTM Insights\n${formatted}`)
   }
 
   if (amas.length > 0) {
@@ -164,6 +209,16 @@ export function formatContextForPrompt(chunks: RetrievedChunk[]): string {
       })
       .join('\n\n---\n\n')
     sections.push(`### Tactical Guides & Case Studies\n${formatted}`)
+  }
+
+  if (blogExternal.length > 0) {
+    const formatted = blogExternal
+      .map((chunk) => {
+        const info = formatSourceInfo(chunk)
+        return `[Source ${sourceIdx++}] ${info}\n${chunk.content}`
+      })
+      .join('\n\n---\n\n')
+    sections.push(`### Marketing Thought Leaders\n${formatted}`)
   }
 
   return sections.join('\n\n')
@@ -241,7 +296,7 @@ export async function semanticSearch(
     section_title: string | null
     question: string | null
     document_title: string
-    source_type: 'book' | 'blog' | 'ama'
+    source_type: 'book' | 'blog' | 'ama' | 'blog_external' | 'book_pm' | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai'
     author: string | null
     speaker_role: string | null
     url: string | null

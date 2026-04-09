@@ -68,7 +68,7 @@ export interface Message {
 
 export interface Citation {
   source: string;
-  source_type: 'book' | 'blog' | 'ama';
+  source_type: 'book' | 'blog' | 'ama' | 'blog_external' | 'book_pm' | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai';
   author: string | null;
   url: string | null;
   page_number: number | null;
@@ -80,7 +80,7 @@ export interface Citation {
 export interface Document {
   id: string;
   title: string;
-  source_type: 'book' | 'blog' | 'ama';
+  source_type: 'book' | 'blog' | 'ama' | 'blog_external' | 'book_pm' | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai';
   source_file: string;
   author: string | null;
   url: string | null;
