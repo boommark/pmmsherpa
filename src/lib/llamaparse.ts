@@ -99,6 +99,76 @@ export async function startJob(
 }
 
 /**
+ * Start a parse job against a URL — LlamaParse pulls the bytes itself from
+ * `source_url`. We use this path when the file lives in Supabase Storage:
+ * we mint a signed URL server-side and pass it here, so the Vercel function
+ * never buffers or proxies the file (bypasses the 4.5 MB request body cap).
+ */
+export async function startJobFromUrl(
+  sourceUrl: string,
+  fileName: string,
+): Promise<string | null> {
+  const apiKey = process.env.LLAMA_CLOUD_API_KEY
+  if (!apiKey) {
+    console.warn('[LlamaParse] LLAMA_CLOUD_API_KEY not set, skipping document parsing')
+    return null
+  }
+
+  let res: Response
+  try {
+    res = await fetch(`${BASE}/api/v2/parse`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        source_url: sourceUrl,
+        tier: 'cost_effective',
+        version: 'latest',
+        output_options: {
+          markdown: {
+            annotate_links: true,
+            tables: { output_tables_as_markdown: true },
+          },
+        },
+      }),
+    })
+  } catch (err) {
+    console.error(`[LlamaParse] network error starting URL job for ${fileName}:`, err)
+    return null
+  }
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    console.error(
+      `[LlamaParse] start URL job failed for ${fileName}: ${res.status} ${body.slice(0, 500)}`,
+    )
+    return null
+  }
+
+  let data: unknown
+  try {
+    data = await res.json()
+  } catch {
+    console.error(`[LlamaParse] start URL job returned non-JSON for ${fileName}`)
+    return null
+  }
+
+  const jobId = extractJobId(data)
+  if (!jobId) {
+    console.error(
+      `[LlamaParse] no job id in URL job response for ${fileName}:`,
+      JSON.stringify(data).slice(0, 500),
+    )
+    return null
+  }
+
+  console.log(`[LlamaParse] started URL job ${jobId} for ${fileName}`)
+  return jobId
+}
+
+/**
  * Fetch the current status and (if completed) the markdown content for a job.
  * One-shot — does not poll.
  */
