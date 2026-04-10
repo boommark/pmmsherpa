@@ -246,6 +246,27 @@ export async function POST(request: NextRequest) {
                 clientText: a.extractedText ?? undefined,
               })
             }
+
+            // If the client uploaded these before a conversation existed
+            // (so they were saved with conversation_id = NULL under /temp/),
+            // link them to this conversation now that we know its id.
+            // Without this, the next turn's "fetch by conversation_id"
+            // query wouldn't find them and the assistant would forget the
+            // file entirely.
+            if (conversationId) {
+              const ids = attachments.map((a) => a.id).filter(Boolean)
+              if (ids.length > 0) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { error: linkErr } = await (supabase.from('conversation_attachments') as any)
+                  .update({ conversation_id: conversationId })
+                  .in('id', ids)
+                  .eq('user_id', user.id)
+                  .is('conversation_id', null)
+                if (linkErr) {
+                  console.warn('[Attachments] Failed to link temp attachments to conversation:', linkErr)
+                }
+              }
+            }
           }
 
           if (conversationId) {
