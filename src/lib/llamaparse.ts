@@ -178,8 +178,14 @@ export async function fetchResult(jobId: string): Promise<ParseResult> {
 
   let res: Response
   try {
+    // `expand=markdown_full,text_full` gives us the full concatenated
+    // markdown and plain text as top-level strings on the response.
+    // `expand=markdown` / `expand=text` return paginated objects instead
+    // (e.g. `text: { pages: [{ page_number, text }] }`), which is harder
+    // to consume. We ask for the `_full` variants and fall back to the
+    // paginated shapes in the extractor if the API ever changes.
     res = await fetch(
-      `${BASE}/api/v2/parse/${jobId}?expand=markdown,text`,
+      `${BASE}/api/v2/parse/${jobId}?expand=markdown_full,text_full`,
       { headers: { Authorization: `Bearer ${apiKey}` } },
     )
   } catch (err) {
@@ -291,8 +297,13 @@ function extractError(data: any): string | null {
 function extractMarkdown(data: any): string | null {
   if (!data || typeof data !== 'object') return null
 
-  // Direct string candidates at a handful of known paths.
+  // Preferred: the `_full` fields returned by `expand=markdown_full,text_full`.
+  // These are top-level strings with the entire document concatenated. The
+  // `_full` variants are what we actually request; the non-`_full` ones are
+  // legacy paths kept in case of a shape change.
   const direct: Array<unknown> = [
+    data.markdown_full,
+    data.text_full,
     data.markdown,
     data.text,
     data.result?.markdown,
@@ -305,14 +316,21 @@ function extractMarkdown(data: any): string | null {
     if (typeof c === 'string' && c.trim()) return c
   }
 
-  // Page arrays — join markdown/text fields across pages.
-  const pageArrays: Array<unknown> = [
+  // Fallback: `expand=markdown` / `expand=text` return paginated objects:
+  //   text: { pages: [{ page_number, text }] }
+  //   markdown: { pages: [{ page_number, markdown }] }
+  // Join the page text/markdown across pages.
+  const paginated: Array<unknown> = [
+    data.markdown?.pages,
+    data.text?.pages,
+    data.result?.markdown?.pages,
+    data.result?.text?.pages,
     data.pages,
     data.result?.pages,
     data.job?.pages,
     data.job?.result?.pages,
   ]
-  for (const arr of pageArrays) {
+  for (const arr of paginated) {
     if (Array.isArray(arr) && arr.length > 0) {
       const joined = arr
         .map((p: any) => p?.markdown || p?.md || p?.text || '')

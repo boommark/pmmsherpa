@@ -18,7 +18,11 @@ function ScrollArea({
     >
       <ScrollAreaPrimitive.Viewport
         data-slot="scroll-area-viewport"
-        className="focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1"
+        // Hide the viewport's own native scrollbar so only the Radix
+        // custom scrollbar below is visible — otherwise on macOS with
+        // "Always show scrollbars" (or on Windows/Linux) you get two
+        // scrollbars stacked on top of each other.
+        className="focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1 [&::-webkit-scrollbar]:hidden [scrollbar-width:none] [-ms-overflow-style:none]"
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
