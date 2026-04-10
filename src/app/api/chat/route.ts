@@ -210,20 +210,71 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // Process attachments (truncate to budget)
-          // Three layers of fallback for extracted_text:
-          //   1. Client sent it with the request (fastest path)
-          //   2. DB already has it (parse finished between upload and send)
-          //   3. Parse still running — poll LlamaParse v2 with a short budget,
-          //      then persist the result so the next send skips the poll
-          let attachmentContext = ''
+          // Build the full set of attachments to include in this turn's
+          // context. Two sources:
+          //   1. `attachments` from this request — what the client just
+          //      uploaded or is re-sending with this message
+          //   2. `conversation_attachments` for this conversationId —
+          //      everything attached earlier in the conversation, so the
+          //      assistant "remembers" files across turns AND so stuck
+          //      attachments from earlier turns can be re-polled here
+          type AttachmentRow = {
+            id: string
+            file_name: string
+            file_type: string
+            extracted_text: string | null
+            llamaparse_job_id: string | null
+            processing_status: string | null
+          }
+
+          const attachmentsById = new Map<
+            string,
+            {
+              id: string
+              fileName: string
+              fileType: string
+              clientText?: string
+            }
+          >()
+
           if (hasAttachments && attachments) {
-            // Signal once if we need to wait on a parse; keeps the status line
-            // honest instead of silently blocking.
+            for (const a of attachments) {
+              attachmentsById.set(a.id, {
+                id: a.id,
+                fileName: a.fileName,
+                fileType: a.fileType,
+                clientText: a.extractedText ?? undefined,
+              })
+            }
+          }
+
+          if (conversationId) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { data: priorRows } = await (supabase.from('conversation_attachments') as any)
+              .select('id, file_name, file_type, extracted_text, llamaparse_job_id, processing_status')
+              .eq('conversation_id', conversationId)
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: true })
+            const rows = (priorRows || []) as AttachmentRow[]
+            for (const row of rows) {
+              if (!attachmentsById.has(row.id)) {
+                attachmentsById.set(row.id, {
+                  id: row.id,
+                  fileName: row.file_name,
+                  fileType: row.file_type,
+                })
+              }
+            }
+          }
+
+          let attachmentContext = ''
+          if (attachmentsById.size > 0) {
             let announcedParseWait = false
-            for (const attachment of attachments) {
-              let text = attachment.extractedText
-              if (!text && attachment.id) {
+            for (const attachment of attachmentsById.values()) {
+              let text: string | undefined = attachment.clientText
+              if (!text) {
+                // Fetch the current DB state — may already be completed,
+                // may still be processing with a job_id.
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const { data: dbAttachment } = await (supabase.from('conversation_attachments') as any)
                   .select('extracted_text, llamaparse_job_id, processing_status')
@@ -232,7 +283,7 @@ export async function POST(request: NextRequest) {
 
                 if (dbAttachment?.extracted_text) {
                   text = dbAttachment.extracted_text as string
-                  console.log(`[Attachments] Fetched extracted_text from DB for ${attachment.fileName}`)
+                  console.log(`[Attachments] Using persisted extracted_text for ${attachment.fileName}`)
                 } else if (
                   dbAttachment?.llamaparse_job_id &&
                   dbAttachment.processing_status === 'processing'
