@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { trackCost } from '@/lib/cost-tracker'
+import { startJob as startLlamaParseJob } from '@/lib/llamaparse'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60 // Vercel Hobby plan cap
+// We no longer block on LlamaParse inside this handler — parsing is kicked
+// off as a background job and finalized lazily by the chat route. 30s is
+// plenty for: auth + Supabase Storage upload + LlamaParse job creation.
+export const maxDuration = 30
 
-// Supported file types and their max sizes
+// Supported file types and their max sizes.
+// LlamaParse v2 handles everything in the 'document' category; text/csv/md
+// are extracted inline; images & video are stored and handed to vision/LLMs.
 const SUPPORTED_FILE_TYPES: Record<string, { maxSize: number; category: string }> = {
+  // PDFs + Office
   'application/pdf': { maxSize: 10 * 1024 * 1024, category: 'document' },
   'application/msword': { maxSize: 10 * 1024 * 1024, category: 'document' },
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { maxSize: 10 * 1024 * 1024, category: 'document' },
@@ -14,118 +21,58 @@ const SUPPORTED_FILE_TYPES: Record<string, { maxSize: number; category: string }
   'application/vnd.openxmlformats-officedocument.presentationml.presentation': { maxSize: 10 * 1024 * 1024, category: 'document' },
   'application/vnd.ms-excel': { maxSize: 10 * 1024 * 1024, category: 'document' },
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  // LibreOffice / OpenDocument
+  'application/vnd.oasis.opendocument.text': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/vnd.oasis.opendocument.spreadsheet': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/vnd.oasis.opendocument.presentation': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  // Rich / structured docs
+  'application/rtf': { maxSize: 5 * 1024 * 1024, category: 'document' },
+  'text/rtf': { maxSize: 5 * 1024 * 1024, category: 'document' },
+  'application/epub+zip': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'text/html': { maxSize: 5 * 1024 * 1024, category: 'document' },
+  // Plain text formats (extracted inline, no LlamaParse needed)
   'text/plain': { maxSize: 5 * 1024 * 1024, category: 'document' },
   'text/csv': { maxSize: 5 * 1024 * 1024, category: 'document' },
+  'text/markdown': { maxSize: 5 * 1024 * 1024, category: 'document' },
+  'text/x-markdown': { maxSize: 5 * 1024 * 1024, category: 'document' },
+  'application/json': { maxSize: 5 * 1024 * 1024, category: 'document' },
+  // Images — stored and handed to vision models
   'image/png': { maxSize: 5 * 1024 * 1024, category: 'image' },
   'image/jpeg': { maxSize: 5 * 1024 * 1024, category: 'image' },
   'image/gif': { maxSize: 5 * 1024 * 1024, category: 'image' },
   'image/webp': { maxSize: 5 * 1024 * 1024, category: 'image' },
+  'image/heic': { maxSize: 5 * 1024 * 1024, category: 'image' },
+  // Video
   'video/mp4': { maxSize: 50 * 1024 * 1024, category: 'video' },
   'video/webm': { maxSize: 50 * 1024 * 1024, category: 'video' },
+  'video/quicktime': { maxSize: 50 * 1024 * 1024, category: 'video' },
 }
 
-const LLAMA_PARSE_BASE = 'https://api.cloud.llamaindex.ai'
+// Types we send to LlamaParse v2 (anything in 'document' that isn't plain text).
+const INLINE_TEXT_TYPES = new Set<string>([
+  'text/plain',
+  'text/csv',
+  'text/markdown',
+  'text/x-markdown',
+  'application/json',
+])
 
-// Uses the LlamaParse v1 REST API (the stable, production API used by the
-// official Python and TypeScript clients). The v2 paths that previously
-// lived here do not exist and every parse job was 404ing.
-// Endpoints:
-//   POST /api/v1/parsing/upload                       -> { id }
-//   GET  /api/v1/parsing/job/{id}                     -> { status }
-//   GET  /api/v1/parsing/job/{id}/result/markdown     -> { markdown }
-// Status values: PENDING, SUCCESS, ERROR, CANCELED
-async function parseWithLlamaParse(fileBuffer: Buffer, fileName: string, mimeType: string): Promise<string | null> {
-  const apiKey = process.env.LLAMA_CLOUD_API_KEY
-  if (!apiKey) {
-    console.warn('[LlamaParse] LLAMA_CLOUD_API_KEY not set, skipping document parsing')
-    return null
-  }
-
-  // Step 1: Upload file and start parse job
-  const uploadForm = new FormData()
-  const blob = new Blob([new Uint8Array(fileBuffer)], { type: mimeType })
-  uploadForm.append('file', blob, fileName)
-  // v1 parsing config — flat form fields, not a JSON configuration blob
-  uploadForm.append('parsing_instruction', '')
-  uploadForm.append('result_type', 'markdown')
-  uploadForm.append('annotate_links', 'true')
-  uploadForm.append('output_tables_as_HTML', 'false')
-
-  const uploadRes = await fetch(`${LLAMA_PARSE_BASE}/api/v1/parsing/upload`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}` },
-    body: uploadForm,
-  })
-
-  if (!uploadRes.ok) {
-    const err = await uploadRes.text()
-    console.error(`[LlamaParse] Upload failed for ${fileName}: status=${uploadRes.status} body=${err.slice(0, 500)}`)
-    return null
-  }
-
-  const uploadJson = await uploadRes.json()
-  const jobId: string = uploadJson.id
-  if (!jobId) {
-    console.error(`[LlamaParse] Upload returned no job ID for ${fileName}:`, JSON.stringify(uploadJson).slice(0, 500))
-    return null
-  }
-  console.log(`[LlamaParse] Job created: ${jobId} for ${fileName}`)
-
-  // Step 2: Poll for completion.
-  // Vercel Hobby caps functions at 60s. Upload + cold start burns a few
-  // seconds, so budget ~50s for polling: 25 attempts × 2s = 50s max.
-  const maxAttempts = 25
-  for (let i = 0; i < maxAttempts; i++) {
-    await new Promise(r => setTimeout(r, 2000))
-
-    const pollRes = await fetch(`${LLAMA_PARSE_BASE}/api/v1/parsing/job/${jobId}`, {
-      headers: { Authorization: `Bearer ${apiKey}` },
-    })
-
-    if (!pollRes.ok) {
-      const err = await pollRes.text()
-      console.error(`[LlamaParse] Poll ${i + 1}/${maxAttempts} failed for ${jobId}: status=${pollRes.status} body=${err.slice(0, 300)}`)
-      continue
-    }
-
-    const pollData = await pollRes.json()
-    const status: string = pollData.status
-    console.log(`[LlamaParse] Poll ${i + 1}/${maxAttempts} for ${jobId}: status=${status}`)
-
-    if (status === 'SUCCESS') {
-      // Step 3: Fetch markdown result
-      const resultRes = await fetch(
-        `${LLAMA_PARSE_BASE}/api/v1/parsing/job/${jobId}/result/markdown`,
-        { headers: { Authorization: `Bearer ${apiKey}` } }
-      )
-
-      if (!resultRes.ok) {
-        const err = await resultRes.text()
-        console.error(`[LlamaParse] Result fetch failed for ${jobId}: status=${resultRes.status} body=${err.slice(0, 300)}`)
-        return null
-      }
-
-      const result = await resultRes.json()
-      const markdown: string | undefined = result.markdown
-
-      if (markdown && markdown.trim()) {
-        console.log(`[LlamaParse] Successfully parsed ${fileName}: ${markdown.length} chars`)
-        return markdown
-      }
-      console.warn(`[LlamaParse] SUCCESS but empty markdown for ${fileName}:`, JSON.stringify(result).slice(0, 500))
-      return null
-    }
-
-    if (status === 'ERROR' || status === 'CANCELED') {
-      const errorMsg = pollData.error_message || pollData.error_code || 'Unknown error'
-      console.error(`[LlamaParse] Job ${status} for ${fileName}: ${errorMsg}`)
-      return null
-    }
-  }
-
-  console.error(`[LlamaParse] Timed out after ~50s polling job ${jobId} (${fileName})`)
-  return null
-}
+const LLAMA_PARSE_TYPES = new Set<string>([
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.oasis.opendocument.text',
+  'application/vnd.oasis.opendocument.spreadsheet',
+  'application/vnd.oasis.opendocument.presentation',
+  'application/rtf',
+  'text/rtf',
+  'application/epub+zip',
+  'text/html',
+])
 
 export async function POST(request: NextRequest) {
   try {
@@ -170,13 +117,13 @@ export async function POST(request: NextRequest) {
       ? `${user.id}/${conversationId}/${sanitizedFileName}`
       : `${user.id}/temp/${sanitizedFileName}`
 
-    // Buffer the file once — used for both Supabase upload and LlamaParse
+    // Buffer once — used for both Supabase upload and LlamaParse
     const arrayBuffer = await file.arrayBuffer()
     const fileBuffer = Buffer.from(arrayBuffer)
     const uint8Array = new Uint8Array(arrayBuffer)
 
     // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('conversation-files')
       .upload(storagePath, uint8Array, {
         contentType: file.type,
@@ -191,33 +138,32 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get public URL for the file
+    // Public URL for the stored file
     const { data: urlData } = supabase.storage
       .from('conversation-files')
       .getPublicUrl(storagePath)
 
-    // Extract text from documents
+    // Resolve extracted text strategy
+    //   - INLINE_TEXT_TYPES: read the bytes right here, done
+    //   - LLAMA_PARSE_TYPES: kick off a v2 job, save job_id, finish later
+    //   - everything else (images/video): nothing to extract
     let extractedText: string | null = null
-    const PARSEABLE_TYPES = [
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-powerpoint',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    ]
+    let llamaparseJobId: string | null = null
+    let processingStatus: 'pending' | 'processing' | 'completed' | 'failed' = 'pending'
 
-    if (file.type === 'text/plain' || file.type === 'text/csv') {
+    if (INLINE_TEXT_TYPES.has(file.type)) {
       try {
         extractedText = await file.text()
-      } catch {
-        console.warn('Failed to extract text from text file')
+        processingStatus = 'completed'
+      } catch (err) {
+        console.warn('Failed to read text file inline:', err)
+        processingStatus = 'failed'
       }
-    } else if (PARSEABLE_TYPES.includes(file.type)) {
+    } else if (LLAMA_PARSE_TYPES.has(file.type)) {
       try {
-        extractedText = await parseWithLlamaParse(fileBuffer, file.name, file.type)
-        if (extractedText) {
+        llamaparseJobId = await startLlamaParseJob(fileBuffer, file.name, file.type)
+        if (llamaparseJobId) {
+          processingStatus = 'processing'
           trackCost({
             userId: user.id,
             service: 'llamaparse',
@@ -226,13 +172,19 @@ export async function POST(request: NextRequest) {
             unitType: 'pages',
             metadata: { fileName: file.name, fileType: file.type, fileSize: file.size },
           })
+        } else {
+          processingStatus = 'failed'
         }
       } catch (err) {
-        console.error('LlamaParse extraction failed:', err)
+        console.error('[Upload] LlamaParse start failed:', err)
+        processingStatus = 'failed'
       }
+    } else {
+      // Images, video — nothing to parse
+      processingStatus = 'completed'
     }
 
-    // Create attachment record in database
+    // Create attachment record
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: attachment, error: dbError } = await (supabase.from('conversation_attachments') as any)
       .insert({
@@ -243,14 +195,14 @@ export async function POST(request: NextRequest) {
         file_size: file.size,
         storage_path: urlData.publicUrl,
         extracted_text: extractedText,
-        processing_status: extractedText ? 'completed' : 'pending',
+        llamaparse_job_id: llamaparseJobId,
+        processing_status: processingStatus,
       })
       .select()
       .single()
 
     if (dbError) {
       console.error('Database insert error:', dbError)
-      // Try to clean up the uploaded file
       await supabase.storage.from('conversation-files').remove([storagePath])
       return NextResponse.json(
         { error: 'Failed to save attachment record' },
@@ -293,7 +245,6 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Attachment ID required' }, { status: 400 })
     }
 
-    // Get attachment to verify ownership and get storage path
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: attachment, error: fetchError } = await (supabase.from('conversation_attachments') as any)
       .select('*')
@@ -305,14 +256,12 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Attachment not found' }, { status: 404 })
     }
 
-    // Extract the storage path from the URL
     const storagePathMatch = attachment.storage_path.match(/conversation-files\/(.+)$/)
     if (storagePathMatch) {
       const storagePath = storagePathMatch[1]
       await supabase.storage.from('conversation-files').remove([storagePath])
     }
 
-    // Delete from database
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase.from('conversation_attachments') as any)
       .delete()
