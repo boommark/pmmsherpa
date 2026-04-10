@@ -9,6 +9,7 @@ import { extractUrls, scrapeUrls } from '@/lib/url-scraper'
 import { searchAndFetch } from '@/lib/web/brave-search'
 import type { ChatAttachment, WebCitation } from '@/types/chat'
 import { trackCost } from '@/lib/cost-tracker'
+import { pollUntilDone as pollLlamaParse } from '@/lib/llamaparse'
 import { scanInput, scanOutput, SAFE_RESPONSE, CANARY_TOKEN } from '@/lib/prompt-guard'
 import { initLogger } from 'braintrust'
 
@@ -210,26 +211,64 @@ export async function POST(request: NextRequest) {
           }
 
           // Process attachments (truncate to budget)
-          // If client didn't send extractedText, fetch from DB as fallback
+          // Three layers of fallback for extracted_text:
+          //   1. Client sent it with the request (fastest path)
+          //   2. DB already has it (parse finished between upload and send)
+          //   3. Parse still running — poll LlamaParse v2 with a short budget,
+          //      then persist the result so the next send skips the poll
           let attachmentContext = ''
           if (hasAttachments && attachments) {
+            // Signal once if we need to wait on a parse; keeps the status line
+            // honest instead of silently blocking.
+            let announcedParseWait = false
             for (const attachment of attachments) {
               let text = attachment.extractedText
               if (!text && attachment.id) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const { data: dbAttachment } = await (supabase.from('conversation_attachments') as any)
-                  .select('extracted_text')
+                  .select('extracted_text, llamaparse_job_id, processing_status')
                   .eq('id', attachment.id)
                   .maybeSingle()
+
                 if (dbAttachment?.extracted_text) {
                   text = dbAttachment.extracted_text as string
                   console.log(`[Attachments] Fetched extracted_text from DB for ${attachment.fileName}`)
+                } else if (
+                  dbAttachment?.llamaparse_job_id &&
+                  dbAttachment.processing_status === 'processing'
+                ) {
+                  if (!announcedParseWait) {
+                    sendStatus('Reading your document...')
+                    announcedParseWait = true
+                  }
+                  const parsed = await pollLlamaParse(
+                    dbAttachment.llamaparse_job_id as string,
+                    25_000, // 25s budget — most jobs finish well under this
+                  )
+                  if (parsed) {
+                    text = parsed
+                    console.log(
+                      `[Attachments] Finalized LlamaParse for ${attachment.fileName}: ${parsed.length} chars`,
+                    )
+                    // Persist so future sends skip the poll entirely
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    await (supabase.from('conversation_attachments') as any)
+                      .update({
+                        extracted_text: parsed,
+                        processing_status: 'completed',
+                      })
+                      .eq('id', attachment.id)
+                  } else {
+                    console.warn(
+                      `[Attachments] LlamaParse still running after 25s for ${attachment.fileName}`,
+                    )
+                  }
                 }
               }
               if (text) {
                 attachmentContext += `\n\n--- Attached File: ${attachment.fileName} ---\n${text}\n--- End of ${attachment.fileName} ---`
               } else {
-                attachmentContext += `\n\n[Attached file: ${attachment.fileName} (${attachment.fileType})]`
+                attachmentContext += `\n\n[Attached file: ${attachment.fileName} (${attachment.fileType}) — parsing in progress, content will be available on your next message]`
               }
             }
             attachmentContext = truncateToTokenBudget(attachmentContext, TOKEN_BUDGETS.attachments)
