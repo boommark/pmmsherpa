@@ -77,7 +77,7 @@ export interface RetrievedChunk {
   similarity: number
   documentId: string
   documentTitle: string
-  sourceType: 'book' | 'blog' | 'ama'
+  sourceType: 'book' | 'blog' | 'ama' | 'book_pm' | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai' | 'blog_external'
   author: string | null
   speakerRole: string | null
   pageNumber: number | null

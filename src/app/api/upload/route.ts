@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { trackCost } from '@/lib/cost-tracker'
 
 export const runtime = 'nodejs'
-export const maxDuration = 120 // LlamaParse can take time for large docs
+export const maxDuration = 60 // Vercel Hobby plan cap
 
 // Supported file types and their max sizes
 const SUPPORTED_FILE_TYPES: Record<string, { maxSize: number; category: string }> = {
@@ -26,10 +26,18 @@ const SUPPORTED_FILE_TYPES: Record<string, { maxSize: number; category: string }
 
 const LLAMA_PARSE_BASE = 'https://api.cloud.llamaindex.ai'
 
+// Uses the LlamaParse v1 REST API (the stable, production API used by the
+// official Python and TypeScript clients). The v2 paths that previously
+// lived here do not exist and every parse job was 404ing.
+// Endpoints:
+//   POST /api/v1/parsing/upload                       -> { id }
+//   GET  /api/v1/parsing/job/{id}                     -> { status }
+//   GET  /api/v1/parsing/job/{id}/result/markdown     -> { markdown }
+// Status values: PENDING, SUCCESS, ERROR, CANCELED
 async function parseWithLlamaParse(fileBuffer: Buffer, fileName: string, mimeType: string): Promise<string | null> {
   const apiKey = process.env.LLAMA_CLOUD_API_KEY
   if (!apiKey) {
-    console.warn('LLAMA_CLOUD_API_KEY not set, skipping document parsing')
+    console.warn('[LlamaParse] LLAMA_CLOUD_API_KEY not set, skipping document parsing')
     return null
   }
 
@@ -37,18 +45,13 @@ async function parseWithLlamaParse(fileBuffer: Buffer, fileName: string, mimeTyp
   const uploadForm = new FormData()
   const blob = new Blob([new Uint8Array(fileBuffer)], { type: mimeType })
   uploadForm.append('file', blob, fileName)
-  uploadForm.append('configuration', JSON.stringify({
-    tier: 'cost_effective',
-    version: 'latest',
-    output_options: {
-      markdown: {
-        annotate_links: true,
-        tables: { output_tables_as_markdown: true },
-      },
-    },
-  }))
+  // v1 parsing config — flat form fields, not a JSON configuration blob
+  uploadForm.append('parsing_instruction', '')
+  uploadForm.append('result_type', 'markdown')
+  uploadForm.append('annotate_links', 'true')
+  uploadForm.append('output_tables_as_HTML', 'false')
 
-  const uploadRes = await fetch(`${LLAMA_PARSE_BASE}/api/v2/parse/upload`, {
+  const uploadRes = await fetch(`${LLAMA_PARSE_BASE}/api/v1/parsing/upload`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}` },
     body: uploadForm,
@@ -56,69 +59,71 @@ async function parseWithLlamaParse(fileBuffer: Buffer, fileName: string, mimeTyp
 
   if (!uploadRes.ok) {
     const err = await uploadRes.text()
-    console.error('LlamaParse upload failed:', uploadRes.status, err)
+    console.error(`[LlamaParse] Upload failed for ${fileName}: status=${uploadRes.status} body=${err.slice(0, 500)}`)
     return null
   }
 
   const uploadJson = await uploadRes.json()
-  // LlamaParse v2 returns job fields at top level (id, status), not nested under "job"
   const jobId: string = uploadJson.id
   if (!jobId) {
-    console.error('LlamaParse upload returned no job ID:', JSON.stringify(uploadJson))
+    console.error(`[LlamaParse] Upload returned no job ID for ${fileName}:`, JSON.stringify(uploadJson).slice(0, 500))
     return null
   }
   console.log(`[LlamaParse] Job created: ${jobId} for ${fileName}`)
 
-  // Step 2: Poll for completion (max 90 seconds)
-  const maxAttempts = 45
+  // Step 2: Poll for completion.
+  // Vercel Hobby caps functions at 60s. Upload + cold start burns a few
+  // seconds, so budget ~50s for polling: 25 attempts × 2s = 50s max.
+  const maxAttempts = 25
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise(r => setTimeout(r, 2000))
 
-    const pollRes = await fetch(`${LLAMA_PARSE_BASE}/api/v2/parse/${jobId}`, {
+    const pollRes = await fetch(`${LLAMA_PARSE_BASE}/api/v1/parsing/job/${jobId}`, {
       headers: { Authorization: `Bearer ${apiKey}` },
     })
+
+    if (!pollRes.ok) {
+      const err = await pollRes.text()
+      console.error(`[LlamaParse] Poll ${i + 1}/${maxAttempts} failed for ${jobId}: status=${pollRes.status} body=${err.slice(0, 300)}`)
+      continue
+    }
+
     const pollData = await pollRes.json()
-    // v2 API: status is at top level OR under .job — check both
-    const status = pollData.status || pollData.job?.status
+    const status: string = pollData.status
     console.log(`[LlamaParse] Poll ${i + 1}/${maxAttempts} for ${jobId}: status=${status}`)
 
-    if (status === 'COMPLETED') {
+    if (status === 'SUCCESS') {
       // Step 3: Fetch markdown result
       const resultRes = await fetch(
-        `${LLAMA_PARSE_BASE}/api/v2/parse/${jobId}/result/markdown`,
+        `${LLAMA_PARSE_BASE}/api/v1/parsing/job/${jobId}/result/markdown`,
         { headers: { Authorization: `Bearer ${apiKey}` } }
       )
-      const result = await resultRes.json()
 
-      // v2 API: result structure varies — check multiple paths
-      // Path 1: { markdown: string } (single doc)
-      // Path 2: { pages: [{ markdown: string }] }
-      // Path 3: { markdown: { pages: [{ markdown: string }] } }
-      let markdown: string | null = null
-      if (typeof result.markdown === 'string') {
-        markdown = result.markdown
-      } else if (result.pages && Array.isArray(result.pages)) {
-        markdown = result.pages.map((p: { markdown?: string; text?: string }) => p.markdown || p.text || '').join('\n\n')
-      } else if (result.markdown?.pages && Array.isArray(result.markdown.pages)) {
-        markdown = result.markdown.pages.map((p: { markdown: string }) => p.markdown).join('\n\n')
+      if (!resultRes.ok) {
+        const err = await resultRes.text()
+        console.error(`[LlamaParse] Result fetch failed for ${jobId}: status=${resultRes.status} body=${err.slice(0, 300)}`)
+        return null
       }
+
+      const result = await resultRes.json()
+      const markdown: string | undefined = result.markdown
 
       if (markdown && markdown.trim()) {
         console.log(`[LlamaParse] Successfully parsed ${fileName}: ${markdown.length} chars`)
         return markdown
       }
-      console.warn(`[LlamaParse] Completed but no markdown content for ${fileName}:`, JSON.stringify(result).slice(0, 500))
+      console.warn(`[LlamaParse] SUCCESS but empty markdown for ${fileName}:`, JSON.stringify(result).slice(0, 500))
       return null
     }
 
-    if (status === 'FAILED' || status === 'CANCELLED') {
-      const errorMsg = pollData.error_message || pollData.job?.error_message || 'Unknown error'
-      console.error(`[LlamaParse] Job ${status} for ${fileName}:`, errorMsg)
+    if (status === 'ERROR' || status === 'CANCELED') {
+      const errorMsg = pollData.error_message || pollData.error_code || 'Unknown error'
+      console.error(`[LlamaParse] Job ${status} for ${fileName}: ${errorMsg}`)
       return null
     }
   }
 
-  console.error(`[LlamaParse] Timed out after 90s for job ${jobId} (${fileName})`)
+  console.error(`[LlamaParse] Timed out after ~50s polling job ${jobId} (${fileName})`)
   return null
 }
 
