@@ -1,54 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { trackCost } from '@/lib/cost-tracker'
-import { startJob as startLlamaParseJob } from '@/lib/llamaparse'
+import { startJobFromUrl } from '@/lib/llamaparse'
 
 export const runtime = 'nodejs'
-// We no longer block on LlamaParse inside this handler — parsing is kicked
-// off as a background job and finalized lazily by the chat route. 30s is
-// plenty for: auth + Supabase Storage upload + LlamaParse job creation.
+// No file buffering happens here any more — the client uploaded straight to
+// Supabase Storage, and LlamaParse pulls the bytes itself via a signed URL.
+// 30s is massive overkill; we're just minting a URL and making one API call.
 export const maxDuration = 30
 
-// Supported file types and their max sizes.
-// LlamaParse v2 handles everything in the 'document' category; text/csv/md
-// are extracted inline; images & video are stored and handed to vision/LLMs.
+// Mirror of client-side SUPPORTED_FILE_TYPES — kept in sync with
+// src/components/chat/FileUpload.tsx. The server validates too so a
+// hand-crafted request can't bypass the client checks.
 const SUPPORTED_FILE_TYPES: Record<string, { maxSize: number; category: string }> = {
   // PDFs + Office
-  'application/pdf': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/msword': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/vnd.ms-powerpoint': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/vnd.ms-excel': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/pdf': { maxSize: 50 * 1024 * 1024, category: 'document' },
+  'application/msword': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  'application/vnd.ms-powerpoint': { maxSize: 50 * 1024 * 1024, category: 'document' },
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': { maxSize: 50 * 1024 * 1024, category: 'document' },
+  'application/vnd.ms-excel': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { maxSize: 25 * 1024 * 1024, category: 'document' },
   // LibreOffice / OpenDocument
-  'application/vnd.oasis.opendocument.text': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/vnd.oasis.opendocument.spreadsheet': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/vnd.oasis.opendocument.presentation': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/vnd.oasis.opendocument.text': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  'application/vnd.oasis.opendocument.spreadsheet': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  'application/vnd.oasis.opendocument.presentation': { maxSize: 50 * 1024 * 1024, category: 'document' },
   // Rich / structured docs
-  'application/rtf': { maxSize: 5 * 1024 * 1024, category: 'document' },
-  'text/rtf': { maxSize: 5 * 1024 * 1024, category: 'document' },
-  'application/epub+zip': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'text/html': { maxSize: 5 * 1024 * 1024, category: 'document' },
-  // Plain text formats (extracted inline, no LlamaParse needed)
-  'text/plain': { maxSize: 5 * 1024 * 1024, category: 'document' },
-  'text/csv': { maxSize: 5 * 1024 * 1024, category: 'document' },
-  'text/markdown': { maxSize: 5 * 1024 * 1024, category: 'document' },
-  'text/x-markdown': { maxSize: 5 * 1024 * 1024, category: 'document' },
-  'application/json': { maxSize: 5 * 1024 * 1024, category: 'document' },
-  // Images — stored and handed to vision models
-  'image/png': { maxSize: 5 * 1024 * 1024, category: 'image' },
-  'image/jpeg': { maxSize: 5 * 1024 * 1024, category: 'image' },
-  'image/gif': { maxSize: 5 * 1024 * 1024, category: 'image' },
-  'image/webp': { maxSize: 5 * 1024 * 1024, category: 'image' },
-  'image/heic': { maxSize: 5 * 1024 * 1024, category: 'image' },
+  'application/rtf': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'text/rtf': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/epub+zip': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  'text/html': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  // Plain text formats
+  'text/plain': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'text/csv': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'text/markdown': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'text/x-markdown': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/json': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  // Images
+  'image/png': { maxSize: 10 * 1024 * 1024, category: 'image' },
+  'image/jpeg': { maxSize: 10 * 1024 * 1024, category: 'image' },
+  'image/gif': { maxSize: 10 * 1024 * 1024, category: 'image' },
+  'image/webp': { maxSize: 10 * 1024 * 1024, category: 'image' },
+  'image/heic': { maxSize: 10 * 1024 * 1024, category: 'image' },
   // Video
-  'video/mp4': { maxSize: 50 * 1024 * 1024, category: 'video' },
-  'video/webm': { maxSize: 50 * 1024 * 1024, category: 'video' },
-  'video/quicktime': { maxSize: 50 * 1024 * 1024, category: 'video' },
+  'video/mp4': { maxSize: 100 * 1024 * 1024, category: 'video' },
+  'video/webm': { maxSize: 100 * 1024 * 1024, category: 'video' },
+  'video/quicktime': { maxSize: 100 * 1024 * 1024, category: 'video' },
 }
 
-// Types we send to LlamaParse v2 (anything in 'document' that isn't plain text).
 const INLINE_TEXT_TYPES = new Set<string>([
   'text/plain',
   'text/csv',
@@ -74,6 +73,23 @@ const LLAMA_PARSE_TYPES = new Set<string>([
   'text/html',
 ])
 
+const BUCKET = 'conversation-files'
+
+/**
+ * Turn a Supabase public URL (or any variant) back into the raw object path
+ * within the bucket. We accept either:
+ *   - `${user.id}/temp/abc.pdf`                         (object path)
+ *   - `https://.../storage/v1/object/public/conversation-files/${path}`
+ */
+function extractObjectPath(input: string): string | null {
+  if (!input) return null
+  const marker = `/object/public/${BUCKET}/`
+  const idx = input.indexOf(marker)
+  if (idx !== -1) return decodeURIComponent(input.slice(idx + marker.length))
+  // Assume it's already a bucket-relative path
+  return input
+}
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -83,104 +99,131 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const formData = await request.formData()
-    const file = formData.get('file') as File | null
-    const conversationId = formData.get('conversationId') as string | null
+    // New contract: JSON body with metadata about a file the client has
+    // already uploaded to Supabase Storage. No more FormData = no more
+    // 4.5 MB Vercel request-body cap.
+    let body: {
+      storagePath?: string
+      fileName?: string
+      fileType?: string
+      fileSize?: number
+      conversationId?: string | null
+      // Optional: inline text for text/plain/csv/md/json — client reads
+      // these directly since they're tiny, and sends the content so we
+      // skip a round-trip to storage.
+      inlineText?: string
+    }
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json(
+        { error: 'Expected JSON body with { storagePath, fileName, fileType, fileSize }' },
+        { status: 400 },
+      )
+    }
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+    const { storagePath: rawPath, fileName, fileType, fileSize, conversationId, inlineText } = body
+
+    if (!rawPath || !fileName || !fileType || typeof fileSize !== 'number') {
+      return NextResponse.json(
+        { error: 'Missing required fields: storagePath, fileName, fileType, fileSize' },
+        { status: 400 },
+      )
+    }
+
+    const objectPath = extractObjectPath(rawPath)
+    if (!objectPath) {
+      return NextResponse.json({ error: 'Invalid storagePath' }, { status: 400 })
+    }
+
+    // Security: object path must start with the caller's user id. Without
+    // this a malicious client could claim someone else's file.
+    if (!objectPath.startsWith(`${user.id}/`)) {
+      return NextResponse.json(
+        { error: 'storagePath does not belong to the authenticated user' },
+        { status: 403 },
+      )
     }
 
     // Validate file type
-    const typeConfig = SUPPORTED_FILE_TYPES[file.type]
+    const typeConfig = SUPPORTED_FILE_TYPES[fileType]
     if (!typeConfig) {
-      return NextResponse.json(
-        { error: `Unsupported file type: ${file.type}` },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: `Unsupported file type: ${fileType}` }, { status: 400 })
     }
-
-    // Validate file size
-    if (file.size > typeConfig.maxSize) {
+    if (fileSize > typeConfig.maxSize) {
       const maxSizeMB = typeConfig.maxSize / (1024 * 1024)
       return NextResponse.json(
         { error: `File too large. Maximum size is ${maxSizeMB}MB` },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
-    // Generate storage path: user_id/conversation_id or user_id/temp/file_id
-    const fileId = crypto.randomUUID()
-    const fileExtension = file.name.split('.').pop() || ''
-    const sanitizedFileName = `${fileId}${fileExtension ? '.' + fileExtension : ''}`
-    const storagePath = conversationId
-      ? `${user.id}/${conversationId}/${sanitizedFileName}`
-      : `${user.id}/temp/${sanitizedFileName}`
-
-    // Buffer once — used for both Supabase upload and LlamaParse
-    const arrayBuffer = await file.arrayBuffer()
-    const fileBuffer = Buffer.from(arrayBuffer)
-    const uint8Array = new Uint8Array(arrayBuffer)
-
-    // Upload to Supabase Storage
-    const { error: uploadError } = await supabase.storage
-      .from('conversation-files')
-      .upload(storagePath, uint8Array, {
-        contentType: file.type,
-        upsert: false,
-      })
-
-    if (uploadError) {
-      console.error('Storage upload error:', uploadError)
+    // Verify the file actually exists in storage under the claimed path.
+    // Supabase doesn't expose a single-object HEAD, so we list the prefix.
+    const lastSlash = objectPath.lastIndexOf('/')
+    const folder = lastSlash > -1 ? objectPath.slice(0, lastSlash) : ''
+    const basename = lastSlash > -1 ? objectPath.slice(lastSlash + 1) : objectPath
+    const { data: listed, error: listErr } = await supabase.storage
+      .from(BUCKET)
+      .list(folder, { search: basename, limit: 1 })
+    if (listErr || !listed || listed.length === 0 || listed[0].name !== basename) {
       return NextResponse.json(
-        { error: 'Failed to upload file to storage' },
-        { status: 500 }
+        { error: 'File not found in storage at the given path' },
+        { status: 404 },
       )
     }
 
-    // Public URL for the stored file
-    const { data: urlData } = supabase.storage
-      .from('conversation-files')
-      .getPublicUrl(storagePath)
+    // Public URL for display / vision models. The bucket is public, but we
+    // still mint a signed URL for LlamaParse below so it keeps working if
+    // the bucket is locked down later.
+    const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(objectPath)
+    const publicUrl = urlData.publicUrl
 
-    // Resolve extracted text strategy
-    //   - INLINE_TEXT_TYPES: read the bytes right here, done
-    //   - LLAMA_PARSE_TYPES: kick off a v2 job, save job_id, finish later
-    //   - everything else (images/video): nothing to extract
+    // Resolve text strategy
     let extractedText: string | null = null
     let llamaparseJobId: string | null = null
     let processingStatus: 'pending' | 'processing' | 'completed' | 'failed' = 'pending'
 
-    if (INLINE_TEXT_TYPES.has(file.type)) {
-      try {
-        extractedText = await file.text()
+    if (INLINE_TEXT_TYPES.has(fileType)) {
+      if (typeof inlineText === 'string' && inlineText.length > 0) {
+        extractedText = inlineText
         processingStatus = 'completed'
-      } catch (err) {
-        console.warn('Failed to read text file inline:', err)
-        processingStatus = 'failed'
+      } else {
+        processingStatus = 'pending'
       }
-    } else if (LLAMA_PARSE_TYPES.has(file.type)) {
-      try {
-        llamaparseJobId = await startLlamaParseJob(fileBuffer, file.name, file.type)
-        if (llamaparseJobId) {
-          processingStatus = 'processing'
-          trackCost({
-            userId: user.id,
-            service: 'llamaparse',
-            operation: 'doc_parse',
-            units: 1,
-            unitType: 'pages',
-            metadata: { fileName: file.name, fileType: file.type, fileSize: file.size },
-          })
-        } else {
+    } else if (LLAMA_PARSE_TYPES.has(fileType)) {
+      // Signed URL with 1h TTL — plenty for a parse job, and short enough
+      // that a leaked URL isn't a long-term exposure.
+      const { data: signed, error: signErr } = await supabase.storage
+        .from(BUCKET)
+        .createSignedUrl(objectPath, 60 * 60)
+
+      if (signErr || !signed?.signedUrl) {
+        console.error('[Upload] createSignedUrl failed:', signErr)
+        processingStatus = 'failed'
+      } else {
+        try {
+          llamaparseJobId = await startJobFromUrl(signed.signedUrl, fileName)
+          if (llamaparseJobId) {
+            processingStatus = 'processing'
+            trackCost({
+              userId: user.id,
+              service: 'llamaparse',
+              operation: 'doc_parse',
+              units: 1,
+              unitType: 'pages',
+              metadata: { fileName, fileType, fileSize },
+            })
+          } else {
+            processingStatus = 'failed'
+          }
+        } catch (err) {
+          console.error('[Upload] LlamaParse start failed:', err)
           processingStatus = 'failed'
         }
-      } catch (err) {
-        console.error('[Upload] LlamaParse start failed:', err)
-        processingStatus = 'failed'
       }
     } else {
-      // Images, video — nothing to parse
+      // Images, video — nothing to parse, just record the row
       processingStatus = 'completed'
     }
 
@@ -190,10 +233,10 @@ export async function POST(request: NextRequest) {
       .insert({
         conversation_id: conversationId || null,
         user_id: user.id,
-        file_name: file.name,
-        file_type: file.type,
-        file_size: file.size,
-        storage_path: urlData.publicUrl,
+        file_name: fileName,
+        file_type: fileType,
+        file_size: fileSize,
+        storage_path: publicUrl,
         extracted_text: extractedText,
         llamaparse_job_id: llamaparseJobId,
         processing_status: processingStatus,
@@ -203,10 +246,11 @@ export async function POST(request: NextRequest) {
 
     if (dbError) {
       console.error('Database insert error:', dbError)
-      await supabase.storage.from('conversation-files').remove([storagePath])
+      // Clean up the stored file so we don't leave an orphan
+      await supabase.storage.from(BUCKET).remove([objectPath])
       return NextResponse.json(
         { error: 'Failed to save attachment record' },
-        { status: 500 }
+        { status: 500 },
       )
     }
 
@@ -223,7 +267,7 @@ export async function POST(request: NextRequest) {
     console.error('Upload API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -256,10 +300,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Attachment not found' }, { status: 404 })
     }
 
-    const storagePathMatch = attachment.storage_path.match(/conversation-files\/(.+)$/)
-    if (storagePathMatch) {
-      const storagePath = storagePathMatch[1]
-      await supabase.storage.from('conversation-files').remove([storagePath])
+    const objectPath = extractObjectPath(attachment.storage_path)
+    if (objectPath) {
+      await supabase.storage.from(BUCKET).remove([objectPath])
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -272,7 +315,7 @@ export async function DELETE(request: NextRequest) {
     console.error('Delete attachment error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

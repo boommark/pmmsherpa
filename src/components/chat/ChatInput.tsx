@@ -7,8 +7,32 @@ import { FileUpload, type UploadedFile, getFileCategory } from './FileUpload'
 import { AttachmentPreview } from './AttachmentPreview'
 import { useChatStore } from '@/stores/chatStore'
 import { useVoiceInput } from '@/hooks/useVoiceInput'
+import { createClient as createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+
+// Mime types we can read inline on the client (tiny files — just send the
+// text with the metadata and skip a server round-trip to storage).
+const INLINE_TEXT_TYPES = new Set<string>([
+  'text/plain',
+  'text/csv',
+  'text/markdown',
+  'text/x-markdown',
+  'application/json',
+])
+
+/** Parse a server response as JSON, falling back to the raw text if it isn't. */
+async function readErrorMessage(res: Response, fallback: string): Promise<string> {
+  const text = await res.text().catch(() => '')
+  if (!text) return fallback
+  try {
+    const json = JSON.parse(text) as { error?: string }
+    if (json?.error) return json.error
+  } catch {
+    // Not JSON — return the text directly (e.g. "Request Entity Too Large")
+  }
+  return text.slice(0, 300)
+}
 
 interface ChatInputProps {
   onSend: (message: string, attachments?: UploadedFile[]) => void
@@ -90,44 +114,115 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
 
       setAttachments((prev) => [...prev, ...newAttachments])
 
+      const supabase = createSupabaseBrowserClient()
+      const { data: userData, error: userErr } = await supabase.auth.getUser()
+      if (userErr || !userData?.user) {
+        toast.error('You must be signed in to upload files.')
+        setAttachments((prev) =>
+          prev.map((a) =>
+            newAttachments.some((n) => n.id === a.id)
+              ? { ...a, status: 'error' as const, error: 'Not signed in' }
+              : a,
+          ),
+        )
+        return
+      }
+      const userId = userData.user.id
+
       for (const attachment of newAttachments) {
         try {
           setAttachments((prev) =>
             prev.map((a) =>
-              a.id === attachment.id ? { ...a, status: 'uploading' as const, progress: 10 } : a
-            )
+              a.id === attachment.id
+                ? { ...a, status: 'uploading' as const, progress: 10 }
+                : a,
+            ),
           )
 
-          const formData = new FormData()
-          formData.append('file', attachment.file)
-          if (conversationId) {
-            formData.append('conversationId', conversationId)
+          // Step 1: Upload the bytes straight to Supabase Storage.
+          // Bypasses Vercel's 4.5 MB request-body cap entirely.
+          const fileExtension = attachment.file.name.split('.').pop() || ''
+          const storedName = `${crypto.randomUUID()}${fileExtension ? '.' + fileExtension : ''}`
+          const objectPath = conversationId
+            ? `${userId}/${conversationId}/${storedName}`
+            : `${userId}/temp/${storedName}`
+
+          const { error: uploadError } = await supabase.storage
+            .from('conversation-files')
+            .upload(objectPath, attachment.file, {
+              contentType: attachment.file.type,
+              upsert: false,
+            })
+
+          if (uploadError) {
+            throw new Error(uploadError.message || 'Storage upload failed')
           }
 
+          setAttachments((prev) =>
+            prev.map((a) =>
+              a.id === attachment.id ? { ...a, progress: 60 } : a,
+            ),
+          )
+
+          // Step 2: Read inline for tiny text formats so the assistant can
+          // see the content immediately (no LlamaParse, no polling).
+          let inlineText: string | undefined
+          if (INLINE_TEXT_TYPES.has(attachment.file.type)) {
+            try {
+              inlineText = await attachment.file.text()
+            } catch {
+              // non-fatal — server will leave extracted_text null
+            }
+          }
+
+          // Step 3: Tell the server metadata so it can create the
+          // attachment row and kick off LlamaParse via signed URL.
           const response = await fetch('/api/upload', {
             method: 'POST',
-            body: formData,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              storagePath: objectPath,
+              fileName: attachment.file.name,
+              fileType: attachment.file.type,
+              fileSize: attachment.file.size,
+              conversationId: conversationId || null,
+              inlineText,
+            }),
           })
 
           if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.error || 'Upload failed')
+            const msg = await readErrorMessage(response, `Upload failed (${response.status})`)
+            throw new Error(msg)
           }
 
-          const data = await response.json()
+          let data: {
+            id: string
+            storagePath: string
+            extractedText: string | null
+            processingStatus: string
+          }
+          try {
+            data = await response.json()
+          } catch {
+            throw new Error('Server returned an unexpected response')
+          }
 
           setAttachments((prev) =>
             prev.map((a) =>
               a.id === attachment.id
                 ? {
                     ...a,
+                    // Swap the local UUID for the DB row id so the chat
+                    // route can look the row up later for lazy LlamaParse
+                    // result retrieval.
+                    id: data.id,
                     status: 'completed' as const,
                     progress: 100,
                     storagePath: data.storagePath,
-                    extractedText: data.extractedText,
+                    extractedText: data.extractedText ?? undefined,
                   }
-                : a
-            )
+                : a,
+            ),
           )
         } catch (error) {
           console.error('File upload error:', error)
@@ -139,8 +234,8 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                     status: 'error' as const,
                     error: error instanceof Error ? error.message : 'Upload failed',
                   }
-                : a
-            )
+                : a,
+            ),
           )
         }
       }

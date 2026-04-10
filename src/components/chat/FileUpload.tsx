@@ -4,26 +4,45 @@ import { useCallback, useRef } from 'react'
 import { Paperclip } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-// Supported file types and their max sizes
+// Supported file types and their max sizes.
+// Files are uploaded directly from the browser to Supabase Storage, so these
+// caps aren't bounded by Vercel's 4.5 MB request-body limit — they're bounded
+// only by what makes sense for parsing cost / latency. Keep in sync with the
+// server-side table in src/app/api/upload/route.ts.
 export const SUPPORTED_FILE_TYPES = {
-  // Documents
-  'application/pdf': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/msword': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/vnd.ms-powerpoint': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/vnd.ms-excel': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { maxSize: 10 * 1024 * 1024, category: 'document' },
-  'text/plain': { maxSize: 5 * 1024 * 1024, category: 'document' },
-  'text/csv': { maxSize: 5 * 1024 * 1024, category: 'document' },
+  // PDFs + Office
+  'application/pdf': { maxSize: 50 * 1024 * 1024, category: 'document' },
+  'application/msword': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  'application/vnd.ms-powerpoint': { maxSize: 50 * 1024 * 1024, category: 'document' },
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': { maxSize: 50 * 1024 * 1024, category: 'document' },
+  'application/vnd.ms-excel': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  // LibreOffice / OpenDocument
+  'application/vnd.oasis.opendocument.text': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  'application/vnd.oasis.opendocument.spreadsheet': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  'application/vnd.oasis.opendocument.presentation': { maxSize: 50 * 1024 * 1024, category: 'document' },
+  // Rich / structured docs
+  'application/rtf': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'text/rtf': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/epub+zip': { maxSize: 25 * 1024 * 1024, category: 'document' },
+  'text/html': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  // Plain text formats
+  'text/plain': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'text/csv': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'text/markdown': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'text/x-markdown': { maxSize: 10 * 1024 * 1024, category: 'document' },
+  'application/json': { maxSize: 10 * 1024 * 1024, category: 'document' },
   // Images
-  'image/png': { maxSize: 5 * 1024 * 1024, category: 'image' },
-  'image/jpeg': { maxSize: 5 * 1024 * 1024, category: 'image' },
-  'image/gif': { maxSize: 5 * 1024 * 1024, category: 'image' },
-  'image/webp': { maxSize: 5 * 1024 * 1024, category: 'image' },
-  // Videos
-  'video/mp4': { maxSize: 50 * 1024 * 1024, category: 'video' },
-  'video/webm': { maxSize: 50 * 1024 * 1024, category: 'video' },
+  'image/png': { maxSize: 10 * 1024 * 1024, category: 'image' },
+  'image/jpeg': { maxSize: 10 * 1024 * 1024, category: 'image' },
+  'image/gif': { maxSize: 10 * 1024 * 1024, category: 'image' },
+  'image/webp': { maxSize: 10 * 1024 * 1024, category: 'image' },
+  'image/heic': { maxSize: 10 * 1024 * 1024, category: 'image' },
+  // Video
+  'video/mp4': { maxSize: 100 * 1024 * 1024, category: 'video' },
+  'video/webm': { maxSize: 100 * 1024 * 1024, category: 'video' },
+  'video/quicktime': { maxSize: 100 * 1024 * 1024, category: 'video' },
 } as const
 
 export type SupportedMimeType = keyof typeof SUPPORTED_FILE_TYPES
