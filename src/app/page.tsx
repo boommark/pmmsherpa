@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { AnimatedOrb } from "@/components/ui/animated-orb";
+import { LogoBanner } from "@/components/ui/logo-banner";
 import { ArrowRight } from "lucide-react";
 
 function MountainIcon({ className }: { className?: string }) {
@@ -95,7 +96,7 @@ export default function LandingPage() {
               </span>
             </h1>
             <p className="mb-12 text-lg text-[#5f6368] sm:text-xl max-w-xl mx-auto leading-relaxed">
-              PMMSherpa gives product marketers the strategic depth, practitioner experience, and ready-to-ship deliverables to move with confidence, not just speed.
+              The world&apos;s best GTM knowledge, brought to life and ready to work with you.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link href="/request-access">
@@ -119,6 +120,10 @@ export default function LandingPage() {
           </div>
         </div>
 
+        {/* Logo Banner — above the fold */}
+        <div className="relative">
+          <LogoBanner />
+        </div>
 
         {/* Hero Demo Video */}
         <div className="max-w-5xl mx-auto px-5 md:px-8 pb-20 md:pb-28 relative">
