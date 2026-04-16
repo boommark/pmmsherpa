@@ -9,7 +9,7 @@
 
 - [x] **GATE-01**: System tracks messages per user per calendar month _(Plan 01-01: `messages_used_this_period` column + atomic increment RPC live on Flytr; Plan 02 wires it into `/api/chat`)_
 - [ ] **GATE-02**: Free tier users are limited to 10 messages per month _(Plan 02)_
-- [x] **GATE-03**: Founder accounts (abhishekratna@gmail.com, aratnaai@gmail.com) bypass all limits _(CORRECTED: aratnaai replaces abhishekratna1 — Plan 01-01 applied the backfill; the RPC's `WHERE tier != 'founder'` clause prevents counter increments for founders)_
+- [x] **GATE-03**: Founder accounts (abhishekratna@gmail.com, aratnaai@gmail.com) bypass all limits _(Plan 01-01 applied the founder backfill; the RPC's `WHERE tier != 'founder'` clause prevents counter increments for founders)_
 - [x] **GATE-04**: Message counter resets on the 1st of each calendar month _(Plan 01-01: `period_start date DEFAULT date_trunc('month', now())::date` column stores period anchor; Plan 02 implements the lazy reset UPDATE on each chat request)_
 - [ ] **GATE-05**: System blocks message submission when monthly limit is reached _(Plan 02)_
 
@@ -88,4 +88,4 @@
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-16 — Plan 01-01 completed GATE-01 / GATE-03 / GATE-04 at DB+RPC level; GATE-03 founder email corrected (aratnaai@gmail.com replaces abhishekratna1@gmail.com)*
+*Last updated: 2026-04-16 — Plan 01-01 completed GATE-01 / GATE-03 / GATE-04 at DB+RPC level; GATE-03 corrected to aratnaai@gmail.com (canonical founder email pair); Plan 01-02 completed GATE-02 / GATE-05*

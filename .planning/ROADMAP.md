@@ -22,7 +22,7 @@
 **Success Criteria** (what must be TRUE when this phase completes):
 1. New `tier` and `messages_used_this_period` columns exist on the profiles table
 2. POST /api/chat increments the usage counter and returns 429 when the monthly limit is exceeded
-3. Founder accounts (abhishekratna@gmail.com, abhishekratna1@gmail.com) can send unlimited messages with no 429
+3. Founder accounts (abhishekratna@gmail.com, aratnaai@gmail.com) can send unlimited messages with no 429
 4. Usage counter resets automatically when period_start is in a previous calendar month
 5. Free tier users are blocked after 10 messages with a clear machine-readable error response
 
