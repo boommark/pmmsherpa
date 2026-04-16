@@ -7,7 +7,7 @@
 
 ## Phases
 
-- [ ] **Phase 1: Usage Gating Backend** — DB schema, API middleware, founder exemption, monthly reset
+- [~] **Phase 1: Usage Gating Backend** — DB schema, API middleware, founder exemption, monthly reset (1/2 plans complete)
 - [ ] **Phase 2: Usage UI** — Counter in chat, soft warning banner, exhaustion modal
 - [ ] **Phase 3: Pricing Page** — Free vs Starter comparison section on homepage
 - [ ] **Phase 4: Stripe Billing** — Stripe product, checkout, webhook tier upgrade, subscription management
@@ -29,7 +29,7 @@
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — DB migration (016_usage_gating.sql) + Profile TypeScript interface extension; applied to Flytr; founder backfill verified
+- [x] 01-01-PLAN.md — DB migration (016_usage_gating.sql) + Profile TypeScript interface extension; applied to Flytr; founder backfill verified (completed 2026-04-16, commits fb26cc0, f66d8e6)
 - [ ] 01-02-PLAN.md — /api/chat monthly gate (pre-LLM 429 + post-LLM increment) + FREE_TIER_MONTHLY_LIMIT constant + REQUIREMENTS.md GATE-03 correction + staging-first ship to production
 
 ---
@@ -85,11 +85,11 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Usage Gating Backend | 0/2 | Planned | - |
+| 1. Usage Gating Backend | 1/2 | Executing | - |
 | 2. Usage UI | 0/? | Not started | - |
 | 3. Pricing Page | 0/? | Not started | - |
 | 4. Stripe Billing | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-15*
-*Last updated: 2026-04-15 — Initial roadmap for v1.1*
+*Last updated: 2026-04-16 — Plan 01-01 complete (DB schema + atomic RPC live on Flytr)*
