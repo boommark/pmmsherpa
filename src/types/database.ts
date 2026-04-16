@@ -19,6 +19,10 @@ export interface Profile {
   theme: 'light' | 'dark' | 'system';
   voice_preference: TTSVoice;
   elevenlabs_voice_id: ElevenLabsVoiceId | null;
+  // Usage gating — Phase 1 (v1.1)
+  tier: 'free' | 'founder' | 'starter';
+  messages_used_this_period: number;
+  period_start: string;  // ISO date string from Postgres `date` column, e.g. "2026-04-01"
   created_at: string;
   updated_at: string;
 }
