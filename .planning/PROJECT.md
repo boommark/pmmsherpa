@@ -24,7 +24,7 @@ Expert GTM advisory grounded in the world's best practitioner knowledge, availab
 
 ### Active
 
-- [ ] Free tier usage gating (10 messages/month, founder exempt)
+- [x] Free tier usage gating (10 messages/month, founder exempt) — Validated in Phase 1: usage-gating-backend
 - [ ] Usage counter in chat UI
 - [ ] Exhaustion modal with upgrade CTA
 - [ ] Pricing page on homepage (Free vs Starter)
@@ -54,15 +54,15 @@ Expert GTM advisory grounded in the world's best practitioner knowledge, availab
 
 - **Stack**: Next.js 16, Supabase PostgreSQL, Vercel hosting — all changes must fit this stack
 - **Workflow**: staging → main deploy pipeline, never push directly to main
-- **Founder exempt**: Abhishek Ratna (abhishekratna@gmail.com, abhishekratna1@gmail.com) must bypass all usage limits
+- **Founder exempt**: Abhishek Ratna (abhishekratna@gmail.com, aratnaai@gmail.com) must bypass all usage limits
 - **Existing users**: 155 approved users currently have unlimited access — need grace period communication
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| 10 messages/month free tier | Low enough to gate power usage, high enough to experience value (5 real advisory sessions) | — Pending |
-| Calendar month reset (1st of each month) | Simpler than rolling 30-day window for users and implementation | — Pending |
+| 10 messages/month free tier | Low enough to gate power usage, high enough to experience value (5 real advisory sessions) | Shipped Phase 1 |
+| Calendar month reset (1st of each month) | Simpler than rolling 30-day window for users and implementation. Lazy reset on first chat of new month. | Shipped Phase 1 |
 | $11.99/mo Starter tier | Below Claude Pro ($20) and Jasper ($69), captures price-sensitive users who want web UI with modest usage | — Pending |
 | Stripe for billing | Standard, well-documented, existing API key available | — Pending |
 
@@ -79,4 +79,4 @@ Expert GTM advisory grounded in the world's best practitioner knowledge, availab
 - Stripe checkout for Starter tier ($11.99/mo)
 
 ---
-*Last updated: 2026-04-15 after milestone v1.1 initialization*
+*Last updated: 2026-04-16 — Phase 1 (usage-gating-backend) complete. Free tier gating live on production.*
