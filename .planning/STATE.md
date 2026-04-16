@@ -1,50 +1,52 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.1
-milestone_name: "Free Tier Usage Gating & Pricing"
+milestone_name: milestone
 current_phase: 01
-current_plan: 2
-total_plans_in_phase: 2
-status: executing
-last_updated: "2026-04-16T04:42:34Z"
+current_plan: 2 of 2 (01-01 complete, 01-02 next)
+status: completed
+last_updated: "2026-04-16T04:52:34.354Z"
+last_activity: 2026-04-16 — Plan 01-01 complete (DB migration + RPC + TS types)
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
+  percent: 5
 ---
 
 # State
 
 ## Current Position
 
-Phase: 01 (usage-gating-backend) — EXECUTING
-Current Plan: 2 of 2 (01-01 complete, 01-02 next)
-Status: Plan 01-01 complete, ready for Plan 01-02
-Last activity: 2026-04-16 — Plan 01-01 complete (DB migration + RPC + TS types)
+Phase: 01 (usage-gating-backend) — PAUSED AT CHECKPOINT
+Current Plan: 2 of 2 (01-01 complete, 01-02 code tasks complete; staging merge awaits user)
+Status: Plan 01-02 code tasks done (Tasks 1-3 committed); Task 4 is checkpoint:human-verify (staging merge + smoke tests)
+Last activity: 2026-04-16 — Plan 01-02 code tasks complete (constants, route.ts gate, docs correction)
 
-Progress: [##--------] 12.5% (1/8 plans complete across 4 phases; 1/2 in Phase 01)
+Progress: [###-------] ~25% (1.75/8 plans complete; Phase 01 code done, pending staging verification)
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** Expert GTM advisory grounded in the world's best practitioner knowledge, available the moment you need it.
-**Current focus:** Phase 01 — usage-gating-backend, Plan 02 (chat API monthly gate)
+**Current focus:** Phase 01 — checkpoint:human-verify (merge feature branch to staging, run 5-test smoke suite)
 **Current phase:** 01
-**Next action:** Run /gsd:execute-plan 01-02 (on feature/phase-01-usage-gating branch)
+**Next action:** User merges feature/phase-01-usage-gating to staging, runs smoke tests, types "approved"
 
 ## Performance Metrics
 
 - Requirements defined: 17
 - Phases planned: 4
 - Phases complete: 0/4
-- Plans complete: 1/8 (01-01)
-- Requirements completed: 3/17 (GATE-01, GATE-03, GATE-04 — partially; fully gated by Plan 02 shipping to prod)
+- Plans complete: 1/8 (01-01); 01-02 code tasks done (pending staging verification)
+- Requirements completed: 5/17 (GATE-01, GATE-02, GATE-03, GATE-04, GATE-05 — code shipped, pending prod)
 
 | Plan | Duration | Tasks | Files | Completed |
 |------|----------|-------|-------|-----------|
 | 01-01 | ~15 min | 3 | 2 | 2026-04-16 |
+| 01-02 | ~10 min | 4 | 4 | 2026-04-16 (code; staging pending) |
 
 ## Accumulated Context
 
@@ -57,14 +59,14 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 - Stripe API key available, no products created yet
 - Live profile count in Flytr: **205 total** (STATE previously noted 155 — stale); 2 founders + 203 free after Plan 01-01 applied
 - Migration 016 (tier / messages_used_this_period / period_start columns + founder backfill + increment_messages_used RPC + idx_profiles_period_start) applied live to Flytr on 2026-04-16
-- Feature branch `feature/phase-01-usage-gating` branched off `staging`, Plan 02 continues on same branch (not yet pushed)
+- Feature branch `feature/phase-01-usage-gating` has 6 commits (fb26cc0, f66d8e6 from Plan 01; ed017b3, 1d38d90, 2f758fb, bc83096, a6bdac7 from Plan 02) — NOT yet merged to staging (awaits user approval)
 
 ## Key Decisions
 
 - Free tier: 10 messages/month per user
 - Reset: Calendar month (1st of each month), simpler than rolling 30-day window
 - Pricing: $11.99/mo Starter tier
-- **Founder exempt (CORRECTED in Plan 01-01):** `abhishekratna@gmail.com` and `aratnaai@gmail.com`. Supersedes older list that had `abhishekratna1@gmail.com`. Plan 02 will update REQUIREMENTS.md GATE-03 to reflect this.
+- **Founder exempt:** `abhishekratna@gmail.com` and `aratnaai@gmail.com`. DB-driven via `tier='founder'` — no code email array needed. REQUIREMENTS.md and ROADMAP.md both corrected in Plan 01-02.
 - `pmmsherpatest@gmail.com` is NOT exempt (pays like everyone else for cleaner test data)
 - Billing: Stripe (API key available, no products created yet)
 - **Atomic RPC for concurrent safety:** Use `increment_messages_used(uuid)` Postgres function instead of JS-side read-modify-write for counter bumps (race-safe)
@@ -84,9 +86,9 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 - Stack: Next.js 16, Supabase PostgreSQL, Vercel, Tailwind + shadcn/ui
 - Staging workflow: feature branch → staging → main (never push directly to main)
 - Supabase project: Flytr (ogbjdvnkejkqqebyetqx)
-- Active working branch: `feature/phase-01-usage-gating` (off staging; 2 commits ahead; not pushed)
-- Last session: 2026-04-16 — stopped at Plan 01-01 complete, ready for Plan 01-02
+- Active working branch: `feature/phase-01-usage-gating` (7 commits ahead of staging; not yet pushed)
+- Last session: 2026-04-16 — stopped at Plan 01-02 Task 4 checkpoint:human-verify (staging merge awaits user)
 
 ---
 *State initialized: 2026-04-15*
-*Last updated: 2026-04-16 — Plan 01-01 complete, DB schema + RPC live on Flytr*
+*Last updated: 2026-04-16 — Plan 01-02 code tasks complete; monthly gate, RPC increment, docs correction committed on feature branch; awaiting staging merge approval*

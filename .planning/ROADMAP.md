@@ -30,7 +30,7 @@
 
 Plans:
 - [x] 01-01-PLAN.md — DB migration (016_usage_gating.sql) + Profile TypeScript interface extension; applied to Flytr; founder backfill verified (completed 2026-04-16, commits fb26cc0, f66d8e6)
-- [ ] 01-02-PLAN.md — /api/chat monthly gate (pre-LLM 429 + post-LLM increment) + FREE_TIER_MONTHLY_LIMIT constant + REQUIREMENTS.md GATE-03 correction + staging-first ship to production
+- [~] 01-02-PLAN.md — /api/chat monthly gate (pre-LLM 429 + post-LLM increment) + FREE_TIER_MONTHLY_LIMIT constant + REQUIREMENTS.md GATE-03 correction + staging-first ship to production (code tasks done; staging merge + prod ship awaiting user approval)
 
 ---
 
@@ -85,11 +85,11 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Usage Gating Backend | 1/2 | Executing | - |
+| 1. Usage Gating Backend | 1.5/2 | Code done; staging pending | - |
 | 2. Usage UI | 0/? | Not started | - |
 | 3. Pricing Page | 0/? | Not started | - |
 | 4. Stripe Billing | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-15*
-*Last updated: 2026-04-16 — Plan 01-01 complete (DB schema + atomic RPC live on Flytr)*
+*Last updated: 2026-04-16 — Plan 01-02 code tasks complete (monthly gate + RPC increment + docs correction on feature branch); awaiting staging merge*
