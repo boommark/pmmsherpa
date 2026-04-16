@@ -1,13 +1,29 @@
 import { trackCost } from '@/lib/cost-tracker'
 
-const URL_REGEX = /https?:\/\/[^\s<>"{}|\\^`[\]]+/g
+// Matches full URLs with protocol
+const FULL_URL_REGEX = /https?:\/\/[^\s<>"{}|\\^`[\]]+/g
+
+// Matches bare domains like "writer.ai", "zoominfo.com", "app.writer.com/pricing"
+// Requires a recognized TLD to avoid false positives on normal words
+const BARE_DOMAIN_REGEX = /(?<![/@\w])(?:[\w-]+\.)+(?:com|org|net|io|ai|co|dev|app|xyz|me|info|biz|us|uk|ca|de|fr|tech|cloud|design|marketing|agency|so|gg|sh|fm|tv|ly|to|cc|studio|pro|page|site|online|store|shop|blog|news|world|team|tools|run|space|software|systems|solutions|health|finance|education|consulting|ventures|capital|media|digital|global|group|inc|ltd|enterprise)(?:\/[^\s<>"{}|\\^`[\]]*)?/gi
+
 const MAX_TOTAL_CHARS = 40000 // Total budget across all URLs
 const MAX_URLS = 3
 
 export function extractUrls(text: string): string[] {
-  const matches = text.match(URL_REGEX) || []
+  // First find full URLs (with protocol)
+  const fullMatches = text.match(FULL_URL_REGEX) || []
+
+  // Then find bare domains, but exclude any that are already part of a full URL
+  const bareMatches = text.match(BARE_DOMAIN_REGEX) || []
+  const bareUrls = bareMatches
+    .filter(bare => !fullMatches.some(full => full.includes(bare)))
+    .map(bare => `https://${bare}`)
+
+  const all = [...fullMatches, ...bareUrls]
+
   // Deduplicate and strip trailing punctuation
-  return [...new Set(matches.map(url => url.replace(/[.,;:!?)]+$/, '')))]
+  return [...new Set(all.map(url => url.replace(/[.,;:!?)]+$/, '')))]
 }
 
 async function scrapeWithFirecrawl(url: string): Promise<string | null> {
