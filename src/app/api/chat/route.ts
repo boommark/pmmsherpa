@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { streamText } from 'ai'
 import { createClient } from '@/lib/supabase/server'
+import { FREE_TIER_MONTHLY_LIMIT } from '@/lib/constants'
 import { getModel, buildMessages, getModelDisplayName, getDbModelValue, type ModelProvider } from '@/lib/llm/provider-factory'
 import { multiQueryRetrieve, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
 import { planQueries } from '@/lib/rag/query-planner'
@@ -104,42 +105,92 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Rate limiting: 50 messages/day per user (admin accounts exempt)
-    const DAILY_MESSAGE_LIMIT = 30
-    const EXEMPT_EMAILS = [
-      'aratnaai@gmail.com',
-      'abhishekratna@gmail.com',
-      'abhishekratna1@gmail.com',
-      'pmmsherpatest@gmail.com',
-    ]
+    // ========================================
+    // Monthly usage gate (Phase 1 — GATE-01..05)
+    // ========================================
+    // Pre-LLM: (a) lazy-reset the counter if period_start is in a prior
+    // calendar month, (b) SELECT tier + messages_used_this_period,
+    // (c) decide in JS whether to 429. NO increment here — the increment
+    // is an atomic RPC call in the post-LLM block (see Task 2b).
+    //
+    // Race note: a user at exactly 9/10 with concurrent requests could
+    // still get 1 extra message (pre-check is SELECT + JS comparison,
+    // not atomic). Acceptable tradeoff for keeping "failed requests
+    // don't count" simple.
+    const currentMonthStart = new Date()
+    currentMonthStart.setUTCDate(1)
+    currentMonthStart.setUTCHours(0, 0, 0, 0)
+    const currentMonthStartIso = currentMonthStart.toISOString().slice(0, 10) // "YYYY-MM-DD"
 
-    if (!EXEMPT_EMAILS.includes(user.email || '')) {
-      const todayStart = new Date()
-      todayStart.setUTCHours(0, 0, 0, 0)
+    // Lazy reset: if the stored period_start is in a prior month, bring
+    // it forward and zero the counter. Matches exactly zero or one row.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: gateRow, error: gateError } = await (supabase.from('profiles') as any)
+      .update({
+        period_start: currentMonthStartIso,
+        messages_used_this_period: 0,
+      })
+      .eq('id', user.id)
+      .lt('period_start', currentMonthStartIso)
+      .select('tier, messages_used_this_period, period_start')
+      .maybeSingle()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { count, error: countError } = await (supabase.from('usage_logs') as any)
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gte('created_at', todayStart.toISOString())
-
-      if (!countError && count !== null && count >= DAILY_MESSAGE_LIMIT) {
-        console.log(`[RateLimit] User ${user.email} hit daily limit: ${count}/${DAILY_MESSAGE_LIMIT}`)
-        const rateLimitStream = new ReadableStream({
-          start(controller) {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-              type: 'text',
-              content: "You've reached your daily limit of 30 messages. Your quota resets at midnight UTC — come back tomorrow and pick up right where you left off!"
-            })}\n\n`))
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'done' })}\n\n`))
-            controller.close()
-          },
-        })
-        return new Response(rateLimitStream, {
-          headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
-        })
-      }
+    if (gateError) {
+      console.error('[UsageGate] Lazy reset error:', gateError)
     }
+
+    // Read current state. If the lazy reset matched, gateRow is the new
+    // row; otherwise SELECT it directly.
+    let tier: string
+    let messagesUsed: number
+
+    if (gateRow) {
+      tier = gateRow.tier
+      messagesUsed = gateRow.messages_used_this_period // 0 after reset
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: profileRow, error: profileError } = await (supabase.from('profiles') as any)
+        .select('tier, messages_used_this_period')
+        .eq('id', user.id)
+        .single()
+
+      if (profileError || !profileRow) {
+        console.error('[UsageGate] Failed to read profile:', profileError)
+        return new Response(
+          JSON.stringify({ error: 'profile_read_failed' }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        )
+      }
+
+      tier = profileRow.tier
+      messagesUsed = profileRow.messages_used_this_period
+    }
+
+    // Gate: founders always pass; free tier passes if under the limit.
+    if (tier !== 'founder' && messagesUsed >= FREE_TIER_MONTHLY_LIMIT) {
+      // Build reset_at = first day of NEXT calendar month at UTC midnight.
+      const now = new Date()
+      const resetAt = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1))
+      const resetAtIso = resetAt.toISOString().replace(/\.\d{3}Z$/, 'Z') // "2026-05-01T00:00:00Z"
+
+      console.log(`[UsageGate] User ${user.email} hit monthly limit: ${messagesUsed}/${FREE_TIER_MONTHLY_LIMIT}, resets ${resetAtIso}`)
+
+      return new Response(
+        JSON.stringify({
+          error: 'message_limit_exceeded',
+          limit: FREE_TIER_MONTHLY_LIMIT,
+          reset_at: resetAtIso,
+          message: 'Thanks for using PMM Sherpa. Upgrade to keep going — your free quota resets next month.',
+          upgrade_url: '/pricing',
+        }),
+        {
+          status: 429,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+    }
+    // Gate passed — control falls through to the SSE stream below.
+    // Post-LLM increment lives in Task 2b (calls supabase.rpc('increment_messages_used', ...)).
 
     // Create streaming response with status updates
     const stream = new ReadableStream({
