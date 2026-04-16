@@ -21,3 +21,13 @@ export type UseCase = (typeof USE_CASES)[number]
 export const isSuperAdmin = (email: string | null | undefined): boolean => {
   return email === SUPER_ADMIN_EMAIL
 }
+
+// Usage gating — Phase 1 (v1.1)
+// Free-tier users are limited to this many messages per calendar month.
+// Increment happens ONLY after a successful LLM response in /api/chat,
+// via the atomic `increment_messages_used(uuid)` RPC (migration 016).
+// Counter resets lazily on the 1st of each calendar month (UTC).
+export const FREE_TIER_MONTHLY_LIMIT = 10
+
+// Tier values for the profiles.tier column. 'starter' is reserved for Phase 4.
+export type UserTier = 'free' | 'founder' | 'starter'
