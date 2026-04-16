@@ -695,6 +695,31 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             console.error('Error logging usage:', usageError)
           }
 
+          // Monthly usage counter increment (Phase 1 — GATE-01)
+          // Runs ONLY after a successful LLM response (we're inside the SSE
+          // stream's try block, past the LLM call). Calls the atomic
+          // increment_messages_used(uuid) RPC from migration 016 — this is
+          // race-safe because the UPDATE inside the function reads-and-writes
+          // in a single Postgres statement with a row lock. A JS-side
+          // non-atomic update (read-then-write with a stale JS variable)
+          // would lose concurrent increments.
+          //
+          // Founders are excluded by the function's own WHERE clause
+          // (tier != 'founder'), so their counter never increments.
+          //
+          // The pre-LLM gate is the source of truth for blocking; a missed
+          // increment here at worst gives the user one free extra message
+          // (next request will still pass the gate because messagesUsed
+          // was not bumped). We log the error but do not fail the request.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error: counterError } = await (supabase.rpc as any)(
+            'increment_messages_used',
+            { p_user_id: user.id }
+          )
+          if (counterError) {
+            console.error('[UsageGate] increment_messages_used RPC failed:', counterError)
+          }
+
           // Track LLM cost
           const llmService = dbModel === 'gemini' ? 'gemini' as const : 'claude' as const
           trackCost({
