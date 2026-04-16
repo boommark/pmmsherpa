@@ -7,11 +7,11 @@
 
 ### Usage Gating
 
-- [x] **GATE-01**: System tracks messages per user per calendar month _(Plan 01-01: `messages_used_this_period` column + atomic increment RPC live on Flytr; Plan 02 wires it into `/api/chat`)_
-- [ ] **GATE-02**: Free tier users are limited to 10 messages per month _(Plan 02)_
+- [x] **GATE-01**: System tracks messages per user per calendar month _(Plan 01-01: column + RPC; Plan 01-02: wired into `/api/chat` post-LLM; verified on staging Test 1: counter 5->6)_
+- [x] **GATE-02**: Free tier users are limited to 10 messages per month _(Plan 01-02: pre-LLM gate returns HTTP 429 when `messagesUsed >= FREE_TIER_MONTHLY_LIMIT`; verified on staging Test 2)_
 - [x] **GATE-03**: Founder accounts (abhishekratna@gmail.com, aratnaai@gmail.com) bypass all limits _(Plan 01-01 applied the founder backfill; the RPC's `WHERE tier != 'founder'` clause prevents counter increments for founders)_
-- [x] **GATE-04**: Message counter resets on the 1st of each calendar month _(Plan 01-01: `period_start date DEFAULT date_trunc('month', now())::date` column stores period anchor; Plan 02 implements the lazy reset UPDATE on each chat request)_
-- [ ] **GATE-05**: System blocks message submission when monthly limit is reached _(Plan 02)_
+- [x] **GATE-04**: Message counter resets on the 1st of each calendar month _(Plan 01-01: `period_start` column; Plan 01-02: lazy reset UPDATE in pre-LLM gate; verified on staging Test 4: prior-month reset to current month + count=1)_
+- [x] **GATE-05**: System blocks message submission when monthly limit is reached _(Plan 01-02: HTTP 429 JSON with 5 locked fields returned before SSE stream opens; verified on staging Tests 2 + 5)_
 
 ### Usage UI
 
@@ -63,11 +63,11 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| GATE-01 | Phase 1 (01-01 schema + RPC applied; 01-02 wiring) | Complete (01-01) |
-| GATE-02 | Phase 1 (01-02) | Pending |
-| GATE-03 | Phase 1 (01-01 founder backfill applied) | Complete (01-01) |
-| GATE-04 | Phase 1 (01-01 `period_start` column in place; 01-02 lazy reset) | Complete (01-01) |
-| GATE-05 | Phase 1 (01-02) | Pending |
+| GATE-01 | Phase 1 (01-01 schema + RPC; 01-02 wiring) | Complete |
+| GATE-02 | Phase 1 (01-02 pre-LLM gate) | Complete |
+| GATE-03 | Phase 1 (01-01 founder backfill; 01-02 docs correction) | Complete |
+| GATE-04 | Phase 1 (01-01 period_start; 01-02 lazy reset) | Complete |
+| GATE-05 | Phase 1 (01-02 HTTP 429 JSON) | Complete |
 | UI-01 | Phase 2 | Pending |
 | UI-02 | Phase 2 | Pending |
 | UI-03 | Phase 2 | Pending |

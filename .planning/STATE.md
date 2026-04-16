@@ -19,34 +19,34 @@ progress:
 
 ## Current Position
 
-Phase: 01 (usage-gating-backend) — PAUSED AT CHECKPOINT
-Current Plan: 2 of 2 (01-01 complete, 01-02 code tasks complete; staging merge awaits user)
-Status: Plan 01-02 code tasks done (Tasks 1-3 committed); Task 4 is checkpoint:human-verify (staging merge + smoke tests)
-Last activity: 2026-04-16 — Plan 01-02 code tasks complete (constants, route.ts gate, docs correction)
+Phase: 01 (usage-gating-backend) — COMPLETE
+Current Plan: 2 of 2 — both plans complete
+Status: Phase 1 shipped to production on pmmsherpa.com
+Last activity: 2026-04-16 — Plan 01-02 complete; all 5 GATE requirements verified and live
 
-Progress: [###-------] ~25% (1.75/8 plans complete; Phase 01 code done, pending staging verification)
+Progress: [#####-----] 25% (2/8 plans complete across 4 phases; Phase 01 done)
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-04-15)
 
 **Core value:** Expert GTM advisory grounded in the world's best practitioner knowledge, available the moment you need it.
-**Current focus:** Phase 01 — checkpoint:human-verify (merge feature branch to staging, run 5-test smoke suite)
-**Current phase:** 01
-**Next action:** User merges feature/phase-01-usage-gating to staging, runs smoke tests, types "approved"
+**Current focus:** Phase 01 complete. Ready for Phase 02 (Usage UI).
+**Current phase:** 02 (next)
+**Next action:** Plan Phase 02 (Usage UI — counter in chat, soft warning banner, exhaustion modal)
 
 ## Performance Metrics
 
 - Requirements defined: 17
 - Phases planned: 4
-- Phases complete: 0/4
-- Plans complete: 1/8 (01-01); 01-02 code tasks done (pending staging verification)
-- Requirements completed: 5/17 (GATE-01, GATE-02, GATE-03, GATE-04, GATE-05 — code shipped, pending prod)
+- Phases complete: 1/4 (Phase 01)
+- Plans complete: 2/8 (01-01, 01-02)
+- Requirements completed: 5/17 (GATE-01, GATE-02, GATE-03, GATE-04, GATE-05 — verified on staging, live on prod)
 
 | Plan | Duration | Tasks | Files | Completed |
 |------|----------|-------|-------|-----------|
 | 01-01 | ~15 min | 3 | 2 | 2026-04-16 |
-| 01-02 | ~10 min | 4 | 4 | 2026-04-16 (code; staging pending) |
+| 01-02 | ~10 min | 5 | 4 | 2026-04-16 |
 
 ## Accumulated Context
 
@@ -59,7 +59,8 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 - Stripe API key available, no products created yet
 - Live profile count in Flytr: **205 total** (STATE previously noted 155 — stale); 2 founders + 203 free after Plan 01-01 applied
 - Migration 016 (tier / messages_used_this_period / period_start columns + founder backfill + increment_messages_used RPC + idx_profiles_period_start) applied live to Flytr on 2026-04-16
-- Feature branch `feature/phase-01-usage-gating` has 6 commits (fb26cc0, f66d8e6 from Plan 01; ed017b3, 1d38d90, 2f758fb, bc83096, a6bdac7 from Plan 02) — NOT yet merged to staging (awaits user approval)
+- Phase 01 shipped to production: staging merge `68728f6`, production merge `163a20d` on main
+- Feature branch `feature/phase-01-usage-gating` fully merged through staging to main
 
 ## Key Decisions
 
@@ -86,9 +87,9 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 - Stack: Next.js 16, Supabase PostgreSQL, Vercel, Tailwind + shadcn/ui
 - Staging workflow: feature branch → staging → main (never push directly to main)
 - Supabase project: Flytr (ogbjdvnkejkqqebyetqx)
-- Active working branch: `feature/phase-01-usage-gating` (7 commits ahead of staging; not yet pushed)
-- Last session: 2026-04-16 — stopped at Plan 01-02 Task 4 checkpoint:human-verify (staging merge awaits user)
+- Active working branch: `main` (Phase 01 complete; feature branch merged)
+- Last session: 2026-04-16 — Phase 01 complete, all 5 GATE requirements live on pmmsherpa.com
 
 ---
 *State initialized: 2026-04-15*
-*Last updated: 2026-04-16 — Plan 01-02 code tasks complete; monthly gate, RPC increment, docs correction committed on feature branch; awaiting staging merge approval*
+*Last updated: 2026-04-16 — Phase 01 complete. All 5 GATE requirements verified and live on pmmsherpa.com. Ready for Phase 02.*

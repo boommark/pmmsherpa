@@ -53,8 +53,8 @@ completed: 2026-04-16
 
 - **Duration:** ~10 min
 - **Started:** 2026-04-16T04:47:26Z
-- **Completed:** 2026-04-16T04:57:00Z (approx)
-- **Tasks:** 3/5 auto complete (Tasks 1, 2a, 2b, 3); Tasks 4 + 5 are staging-merge + production-ship (awaiting user approval per plan)
+- **Completed:** 2026-04-16 (code tasks ~10 min; staging + prod ship by user)
+- **Tasks:** 5/5 complete (Tasks 1-3 auto, Task 4 human-verify approved, Task 5 user-executed)
 - **Files modified:** 4
 
 ## Accomplishments
@@ -77,7 +77,8 @@ completed: 2026-04-16
 | 2b | Atomic post-LLM increment via RPC | `bc83096` | src/app/api/chat/route.ts |
 | 3 | Correct GATE-03 founder email in REQUIREMENTS + ROADMAP | `a6bdac7` | .planning/REQUIREMENTS.md, .planning/ROADMAP.md |
 
-Tasks 4 (merge to staging + smoke tests) and 5 (merge to main + production ship) are paused at the human-verify checkpoint per plan.
+| 4 | Merge to staging + smoke tests | `68728f6` | git merge (no source files) |
+| 5 | Merge staging to main + production ship | `163a20d` | git merge (no source files) |
 
 ## route.ts Diff Summary
 
@@ -136,20 +137,23 @@ Returned with `Content-Type: application/json` and `status: 429` BEFORE the SSE 
 - `npm run build` — exits 0, output: `Compiled successfully in 2.8s` + `Generating static pages (38/38)`
 - The `supabase.rpc as any` cast is needed because the generated Supabase types don't include `increment_messages_used` in their function signatures. Runtime correctness confirmed by Plan 01-01's smoke tests (0→1→2 RPC calls, founder exclusion verified).
 
-## Staging Verification (Task 4 — AWAITING USER)
+## Staging Verification (Task 4 — APPROVED)
 
-Task 4 is a `checkpoint:human-verify`. The feature branch `feature/phase-01-usage-gating` has all 4 code commits but has NOT been merged to staging yet. User must:
+Staging merge commit: `68728f6` (`merge: phase-01 usage gating backend`)
+All 5 GATE smoke tests passed on https://staging.pmmsherpa.com:
 
-1. Merge feature branch to staging and push
-2. Wait for Vercel staging deploy
-3. Run 5-test smoke suite (GATE-01 through GATE-05) against https://staging.pmmsherpa.com
-4. Type "approved" with results
+- **Test 1 (GATE-01):** Counter incremented 5 to 6 after successful chat (HTTP 200 + SSE done)
+- **Test 2 (GATE-02/05):** HTTP 429 with all 5 locked JSON fields at limit
+- **Test 3 (GATE-03):** Founder at 9999 messages received HTTP 200 + SSE done; counter stayed 9999
+- **Test 4 (GATE-04):** Prior-month period_start triggered lazy reset to current month; counter 0 to 1
+- **Test 5 (GATE-05):** All 5 JSON keys present (`error`, `limit`, `message`, `reset_at`, `upgrade_url`)
 
-See `.planning/phases/01-usage-gating-backend/01-02-PLAN.md` Task 4 `<how-to-verify>` for full SQL + curl commands.
+## Production Ship (Task 5 — COMPLETE)
 
-## Production Ship (Task 5 — PENDING STAGING APPROVAL)
-
-After staging approved: merge staging → main, push, confirm Vercel production deploy, update Obsidian shipped-features log.
+Production merge commit: `163a20d` (`merge: phase-01 usage gating backend -> production`)
+Vercel production deploy: Ready (45s)
+Obsidian shipped features log updated with "Free-tier usage gating" entry.
+Live at: https://pmmsherpa.com
 
 ## Deviations from Plan
 
@@ -199,5 +203,5 @@ Build verification: `npm run build` exits 0. TypeScript: zero errors on modified
 ---
 *Phase: 01-usage-gating-backend*
 *Plan: 02*
-*Status: Paused at Task 4 checkpoint:human-verify (staging merge awaiting user approval)*
-*Completed (code tasks): 2026-04-16*
+*Status: COMPLETE — live on pmmsherpa.com*
+*Completed: 2026-04-16*
