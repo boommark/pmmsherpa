@@ -185,6 +185,23 @@ export async function planQueries(input: QueryPlannerInput, userId?: string): Pr
       console.log(`[QueryPlanner] Fallback: search intent detected from message`)
     }
 
+    // Fallback: explicit research requests should trigger Perplexity web research
+    // Catches "do research", "research this", "research on X", "research and then write"
+    const explicitResearchPatterns = [
+      /\b(?:do|run|conduct|perform)\s+(?:some\s+)?research\b/,
+      /\bresearch\s+(?:on|about|into|this|and)\b/,
+    ]
+    if (!plan.webResearch.needed && explicitResearchPatterns.some(p => p.test(msg))) {
+      // Build a research query from conversation context — use the topic being discussed
+      const topicFromContext = plan.contextSummary || input.message
+      plan.webResearch = {
+        needed: true,
+        query: topicFromContext.slice(0, 200),
+        reason: 'Explicit research request detected from message',
+      }
+      console.log(`[QueryPlanner] Fallback: explicit research request detected, query: "${plan.webResearch.query}"`)
+    }
+
     console.log(`[QueryPlanner] Generated ${plan.ragQueries.length} RAG queries, web research: ${plan.webResearch?.needed ? 'YES' : 'NO'}, web search: ${plan.webSearch?.needed ? 'YES' : 'NO'}`)
     console.log(`[QueryPlanner] Queries: ${JSON.stringify(plan.ragQueries)}`)
     if (plan.webResearch?.needed) {
