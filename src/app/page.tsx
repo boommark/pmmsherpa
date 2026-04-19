@@ -50,7 +50,7 @@ const testimonials = [
 
 export default function LandingPage() {
   return (
-    <div className="landing-light min-h-screen bg-white relative overflow-hidden" style={{ colorScheme: "light" }}>
+    <div className="landing-light min-h-screen bg-white relative overflow-x-hidden" style={{ colorScheme: "light" }}>
 
       {/* Navigation */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl">
