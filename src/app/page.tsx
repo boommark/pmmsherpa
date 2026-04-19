@@ -106,7 +106,7 @@ export default function LandingPage() {
               </span>
             </h1>
             <p className="mb-12 text-lg text-[#5f6368] sm:text-xl max-w-2xl mx-auto leading-relaxed">
-              Every GTM decision you make alone is a risk. Positioning, pricing, launches, competitive strategy. PMMSherpa pressure-tests your thinking against thousands of real-world GTM decisions before it matters.
+              The world&apos;s best GTM knowledge, brought to life by agentic RAG and ready to work with you.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link href="/request-access">
