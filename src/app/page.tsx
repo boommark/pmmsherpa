@@ -337,7 +337,7 @@ export default function LandingPage() {
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">01</span>
                 <div className="flex items-center gap-3">
-                  <Image src="/icons/query-planning.png" alt="Query Planning" width={44} height={44} className="object-contain" />
+                  <Image src="/icons/query-planning.png" alt="Query Planning" width={96} height={44} className="object-contain" />
                   <h3 className="text-xl font-bold text-[#191c1e]">Query Planning</h3>
                 </div>
               </div>
@@ -353,7 +353,7 @@ export default function LandingPage() {
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">02</span>
                 <div className="flex items-center gap-3">
-                  <Image src="/icons/agentic-rag.png" alt="Agentic RAG" width={44} height={44} className="object-contain" />
+                  <Image src="/icons/agentic-rag.png" alt="Agentic RAG" width={96} height={44} className="object-contain" />
                   <h3 className="text-xl font-bold text-[#191c1e]">Agentic RAG</h3>
                 </div>
               </div>
@@ -369,7 +369,7 @@ export default function LandingPage() {
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">03</span>
                 <div className="flex items-center gap-3">
-                  <Image src="/icons/knowledge-layers.png" alt="Knowledge Layers" width={44} height={44} className="object-contain" />
+                  <Image src="/icons/knowledge-layers.png" alt="Knowledge Layers" width={96} height={44} className="object-contain" />
                   <h3 className="text-xl font-bold text-[#191c1e]">Knowledge Layers</h3>
                 </div>
               </div>
@@ -385,7 +385,7 @@ export default function LandingPage() {
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">04</span>
                 <div className="flex items-center gap-3">
-                  <Image src="/icons/web-augmentation.png" alt="Web Augmentation" width={44} height={44} className="object-contain" />
+                  <Image src="/icons/web-augmentation.png" alt="Web Augmentation" width={96} height={44} className="object-contain" />
                   <h3 className="text-xl font-bold text-[#191c1e]">Web Augmentation</h3>
                 </div>
               </div>
