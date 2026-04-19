@@ -140,7 +140,7 @@ export default function LandingPage() {
           <LogoBanner />
         </div>
 
-        {/* Featured Testimonial: VP Fortune 200 - above the fold */}
+        {/* Featured Testimonial: Asli Simsek - above the fold */}
         <div className="max-w-2xl mx-auto px-5 md:px-8 py-10 md:py-14">
           <div className="rounded-2xl bg-white p-8 md:p-10 shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-[#e8ecf4]/40">
             {/* Quote mark */}
@@ -155,15 +155,19 @@ export default function LandingPage() {
             </div>
             {/* Quote */}
             <p className="text-[15px] text-[#3a3f47] leading-[1.75] mb-6">
-              {testimonials[0].quote}
+              {testimonials[2].quote}
             </p>
             {/* Attribution */}
-            <div className="pt-5 border-t border-[#f0f2f5]">
-              <div className="text-sm font-bold text-[#191c1e]">
-                {testimonials[0].name}
-              </div>
-              <div className="text-xs text-[#5f6368] mt-0.5">
-                {testimonials[0].role}
+            <div className="flex items-center gap-4 pt-5 border-t border-[#f0f2f5]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={testimonials[2].photo} alt={testimonials[2].name} className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
+              <div>
+                <div className="text-sm font-bold bg-gradient-to-r from-[#0058be] to-[#2170e4] bg-clip-text text-transparent">
+                  {testimonials[2].name}
+                </div>
+                <div className="text-xs text-[#5f6368] mt-0.5">
+                  {testimonials[2].role}
+                </div>
               </div>
             </div>
           </div>
@@ -286,7 +290,7 @@ export default function LandingPage() {
           </div>
 
           <div className="max-w-5xl mx-auto space-y-6">
-            {[testimonials[2], testimonials[3], testimonials[1]].map((t, i) => (
+            {[testimonials[3], testimonials[1], testimonials[0]].map((t, i) => (
               <div
                 key={i}
                 className="rounded-2xl p-8 md:p-10 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
