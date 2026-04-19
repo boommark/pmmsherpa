@@ -103,7 +103,7 @@ export default function LandingPage() {
               Stop guessing.
               <br />
               <span className="bg-gradient-to-r from-[#0058be] to-[#2170e4] bg-clip-text text-transparent">
-                Start knowing.
+                Start winning.
               </span>
             </h1>
             <p className="mb-12 text-lg text-[#5f6368] sm:text-xl max-w-2xl mx-auto leading-relaxed">
