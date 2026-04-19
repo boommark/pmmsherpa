@@ -139,7 +139,7 @@ export default function LandingPage() {
         <div className="max-w-2xl mx-auto px-5 md:px-8 py-10 md:py-14">
           <div className="rounded-2xl bg-white p-8 md:p-10 shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-[#e8ecf4]/40">
             {/* Quote mark */}
-            <div className="text-4xl text-[#0058be] font-serif leading-none mb-4">&ldquo;&rdquo;</div>
+            <div className="text-4xl text-[#0058be] font-serif leading-none mb-4">&ldquo;</div>
             {/* Stars */}
             <div className="flex gap-1 mb-5">
               {[...Array(5)].map((_, i) => (
@@ -194,7 +194,7 @@ export default function LandingPage() {
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">01</span>
                 <div className="flex items-center gap-3">
-                  <Image src="/icons/frame.png" alt="Frame" width={36} height={36} className="object-contain" />
+                  <Image src="/icons/frame.png" alt="Frame" width={44} height={44} className="object-contain" />
                   <h3 className="text-xl font-bold text-[#191c1e]">Frame</h3>
                 </div>
               </div>
@@ -211,7 +211,7 @@ export default function LandingPage() {
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">02</span>
                 <div className="flex items-center gap-3">
-                  <Image src="/icons/consult.png" alt="Consult" width={36} height={36} className="object-contain" />
+                  <Image src="/icons/consult.png" alt="Consult" width={44} height={44} className="object-contain" />
                   <h3 className="text-xl font-bold text-[#191c1e]">Consult</h3>
                 </div>
               </div>
@@ -228,7 +228,7 @@ export default function LandingPage() {
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">03</span>
                 <div className="flex items-center gap-3">
-                  <Image src="/icons/validate.png" alt="Validate" width={36} height={36} className="object-contain" />
+                  <Image src="/icons/validate.png" alt="Validate" width={44} height={44} className="object-contain" />
                   <h3 className="text-xl font-bold text-[#191c1e]">Validate</h3>
                 </div>
               </div>
@@ -245,7 +245,7 @@ export default function LandingPage() {
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">04</span>
                 <div className="flex items-center gap-3">
-                  <Image src="/icons/grow.png" alt="Grow" width={36} height={36} className="object-contain" />
+                  <Image src="/icons/grow.png" alt="Grow" width={44} height={44} className="object-contain" />
                   <h3 className="text-xl font-bold text-[#191c1e]">Grow</h3>
                 </div>
               </div>
@@ -290,11 +290,11 @@ export default function LandingPage() {
                 }}
               >
                 <blockquote>
-                  <div className="text-3xl font-serif text-[#2170e4]/40 leading-none mb-3">&ldquo;</div>
+                  <div className="text-4xl font-serif text-[#2170e4]/40 leading-none mb-4">&ldquo;</div>
                   {/* Stars */}
                   <div className="flex gap-1 mb-4">
                     {[...Array(5)].map((_, j) => (
-                      <svg key={j} className="w-4 h-4 text-[#f59e0b]" fill="currentColor" viewBox="0 0 20 20">
+                      <svg key={j} className="w-5 h-5 text-[#f59e0b]" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                     ))}
