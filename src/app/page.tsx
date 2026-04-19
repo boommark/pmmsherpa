@@ -25,22 +25,22 @@ const testimonials = [
   {
     quote: "PMM Sherpa is a great example of an effective vertical AI solution. It\u2019s purpose built. The output isn\u2019t just fast; it\u2019s grounded in real-world frameworks and actual PMM experience. It\u2019s levels above what I get from a general-purpose model like Claude.",
     name: "VP of Product Marketing",
-    company: "Fortune 200 ERP Provider",
+    role: "Fortune 200 ERP Provider",
   },
   {
     quote: "PMM Sherpa gave me access to expert product marketing feedback loops and suggestions for my scenario rapidly and focus on what it seems like a season of professional would say. Easy to use and just works. Definitely seems more focused and professional than just using a flagship model alone.",
-    name: "Founder & ex-Meta Senior Engineer",
-    company: "",
+    name: "Founder",
+    role: "ex-Meta Senior Engineer",
   },
   {
     quote: "Most AI tools make you do the thinking and then dress it up. Sherpa does the opposite. It comes in educated, applies the right frameworks to your actual problem, and pushes back when your reasoning isn\u2019t there yet. Where other tools generate, Sherpa evaluates. It catches things most tools don\u2019t: where your argument has gaps, where friction will show up with buyers, where you\u2019re circling the problem without landing on a real position. Anyone who touches GTM will feel the difference immediately. And honestly, the name says it all.",
     name: "PMM Leader",
-    company: "CMO Alliance Member",
+    role: "CMO Alliance Member",
   },
   {
     quote: "PMM Sherpa actually feels like a new individual thinking about your project with you. It\u2019s really a team partner working alongside you. No lecturing, no pandering, no generic frameworks dressed up with language as insight. Just a thinking partner that meets you at your level and pushes you forward.",
-    name: "Serial Founder & AI Researcher",
-    company: "",
+    name: "Serial Founder",
+    role: "AI Researcher",
   },
 ];
 
@@ -158,7 +158,7 @@ export default function LandingPage() {
                 {testimonials[0].name}
               </div>
               <div className="text-xs text-[#5f6368] mt-0.5">
-                {testimonials[0].company}
+                {testimonials[0].role}
               </div>
             </div>
           </div>
@@ -290,7 +290,15 @@ export default function LandingPage() {
                 }}
               >
                 <blockquote>
-                  <div className="text-3xl font-serif text-[#2170e4]/40 leading-none mb-4">&ldquo;</div>
+                  <div className="text-3xl font-serif text-[#2170e4]/40 leading-none mb-3">&ldquo;</div>
+                  {/* Stars */}
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, j) => (
+                      <svg key={j} className="w-4 h-4 text-[#f59e0b]" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
                   <p className="text-[15px] md:text-base text-[#c8d0e0] leading-[1.8] mb-6">
                     {t.quote}
                   </p>
@@ -298,11 +306,9 @@ export default function LandingPage() {
                     <div className="text-sm font-semibold bg-gradient-to-r from-[#5a9cf5] to-[#2170e4] bg-clip-text text-transparent tracking-wide">
                       {t.name}
                     </div>
-                    {t.company && (
-                      <div className="text-xs text-[#6b7280] mt-1">
-                        {t.company}
-                      </div>
-                    )}
+                    <div className="text-xs text-[#6b7280] mt-1">
+                      {t.role}
+                    </div>
                   </footer>
                 </blockquote>
               </div>
