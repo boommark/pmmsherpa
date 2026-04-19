@@ -61,6 +61,7 @@ export default function LandingPage() {
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-[#5f6368]">
             <a href="#what-it-does" className="hover:text-[#191c1e] transition-colors">What It Does</a>
+            <a href="#under-the-hood" className="hover:text-[#191c1e] transition-colors">Under the Hood</a>
             <a href="#how-it-works" className="hover:text-[#191c1e] transition-colors">How It Works</a>
             <a href="#who-its-for" className="hover:text-[#191c1e] transition-colors">Who It&apos;s For</a>
           </div>
@@ -106,7 +107,7 @@ export default function LandingPage() {
               </span>
             </h1>
             <p className="mb-12 text-lg text-[#5f6368] sm:text-xl max-w-2xl mx-auto leading-relaxed">
-              The world&apos;s best GTM knowledge, powered by agentic RAG, ready to work with you.
+              The world&apos;s best GTM knowledge, brought to life and ready to work with you.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link href="/request-access">
@@ -317,8 +318,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Under the Hood - Stacked alternating layout with large icons */}
-      <section className="py-20 md:py-28 bg-white">
+      {/* Under the Hood */}
+      <section id="under-the-hood" className="py-20 md:py-28 bg-white scroll-mt-20">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <div className="text-center mb-16 md:mb-20">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">Under the Hood</p>
@@ -330,68 +331,68 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="max-w-5xl mx-auto space-y-20 md:space-y-28">
-            {/* 01 Query Planning */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
-              <div className="flex justify-center">
-                <div className="relative w-72 h-44 md:w-96 md:h-56">
-                  <Image src="/icons/query-planning.png" alt="Query Planning" fill className="object-contain" />
+          <div className="max-w-4xl mx-auto space-y-0">
+            {/* Query Planning */}
+            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-10 md:py-14 border-b border-[#e2e5ea]/50">
+              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
+                <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">01</span>
+                <div className="flex items-center gap-3">
+                  <Image src="/icons/query-planning.png" alt="Query Planning" width={44} height={44} className="object-contain" />
+                  <h3 className="text-xl font-bold text-[#191c1e]">Query Planning</h3>
                 </div>
               </div>
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-2 block">01</span>
-                <h3 className="text-2xl font-bold text-[#191c1e] mb-4">Query Planning</h3>
-                <p className="text-base text-[#5f6368] leading-relaxed">
+              <div className="md:pt-4">
+                <p className="text-base text-[#3a3f47] leading-relaxed">
                   A lightweight model decomposes your question in ~100ms, extracting underlying GTM concepts you didn&apos;t explicitly name. It generates 2-3 parallel retrieval queries targeting different knowledge dimensions. You get answers to questions you didn&apos;t know to ask.
                 </p>
               </div>
             </div>
 
-            {/* 02 Agentic RAG */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
-              <div className="order-2 md:order-1">
-                <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-2 block">02</span>
-                <h3 className="text-2xl font-bold text-[#191c1e] mb-4">Agentic RAG</h3>
-                <p className="text-base text-[#5f6368] leading-relaxed">
+            {/* Agentic RAG */}
+            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-10 md:py-14 border-b border-[#e2e5ea]/50">
+              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
+                <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">02</span>
+                <div className="flex items-center gap-3">
+                  <Image src="/icons/agentic-rag.png" alt="Agentic RAG" width={44} height={44} className="object-contain" />
+                  <h3 className="text-xl font-bold text-[#191c1e]">Agentic RAG</h3>
+                </div>
+              </div>
+              <div className="md:pt-4">
+                <p className="text-base text-[#3a3f47] leading-relaxed">
                   Hybrid retrieval fuses 70% semantic similarity with 30% keyword precision across 38,000+ curated fragments. Domain-specific query expansion translates go-to-market shorthand automatically (GTM, ICP, JTBD, PLG). You talk like a GTM leader. Sherpa searches like one.
                 </p>
               </div>
-              <div className="order-1 md:order-2 flex justify-center">
-                <div className="relative w-72 h-44 md:w-96 md:h-56">
-                  <Image src="/icons/agentic-rag.png" alt="Agentic RAG" fill className="object-contain" />
-                </div>
-              </div>
             </div>
 
-            {/* 03 Knowledge Layers */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
-              <div className="flex justify-center">
-                <div className="relative w-72 h-44 md:w-96 md:h-56">
-                  <Image src="/icons/knowledge-layers.png" alt="Knowledge Layers" fill className="object-contain" />
+            {/* Knowledge Layers */}
+            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-10 md:py-14 border-b border-[#e2e5ea]/50">
+              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
+                <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">03</span>
+                <div className="flex items-center gap-3">
+                  <Image src="/icons/knowledge-layers.png" alt="Knowledge Layers" width={44} height={44} className="object-contain" />
+                  <h3 className="text-xl font-bold text-[#191c1e]">Knowledge Layers</h3>
                 </div>
               </div>
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-2 block">03</span>
-                <h3 className="text-2xl font-bold text-[#191c1e] mb-4">Knowledge Layers</h3>
-                <p className="text-base text-[#5f6368] leading-relaxed">
+              <div className="md:pt-4">
+                <p className="text-base text-[#3a3f47] leading-relaxed">
                   Nine structured layers: methodology, practitioner war stories, tactical playbooks, expert conversations, and more. Retrieved fragments are grouped by type before synthesis, so the model knows whether it&apos;s reading proven theory or a real-world outcome from a named company.
                 </p>
               </div>
             </div>
 
-            {/* 04 Web Augmentation */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
-              <div className="order-2 md:order-1">
-                <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-2 block">04</span>
-                <h3 className="text-2xl font-bold text-[#191c1e] mb-4">Web Augmentation</h3>
-                <p className="text-base text-[#5f6368] leading-relaxed">
+            {/* Web Augmentation */}
+            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-10 md:py-14">
+              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
+                <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">04</span>
+                <div className="flex items-center gap-3">
+                  <Image src="/icons/web-augmentation.png" alt="Web Augmentation" width={44} height={44} className="object-contain" />
+                  <h3 className="text-xl font-bold text-[#191c1e]">Web Augmentation</h3>
+                </div>
+              </div>
+              <div className="md:pt-4">
+                <p className="text-base text-[#3a3f47] leading-relaxed">
                   The query planner decides per-question whether to fetch live data. Competitor pricing gets a web search. Positioning frameworks stay in the curated knowledge base. The system picks the right source for each part of your question, automatically.
                 </p>
-              </div>
-              <div className="order-1 md:order-2 flex justify-center">
-                <div className="relative w-72 h-44 md:w-96 md:h-56">
-                  <Image src="/icons/web-augmentation.png" alt="Web Augmentation" fill className="object-contain" />
-                </div>
               </div>
             </div>
           </div>
@@ -613,6 +614,7 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center gap-8 text-sm text-[#5f6368]">
               <a href="#what-it-does" className="hover:text-[#191c1e] transition-colors">What It Does</a>
+              <a href="#under-the-hood" className="hover:text-[#191c1e] transition-colors">Under the Hood</a>
               <a href="#how-it-works" className="hover:text-[#191c1e] transition-colors">How It Works</a>
               <a href="#who-its-for" className="hover:text-[#191c1e] transition-colors">Who It&apos;s For</a>
               <Link href="/login" className="hover:text-[#191c1e] transition-colors">Log in</Link>
