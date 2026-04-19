@@ -8,7 +8,7 @@
 ## Phases
 
 - [x] **Phase 1: Usage Gating Backend** — DB schema, API middleware, founder exemption, monthly reset (2/2 plans complete, live on prod)
-- [ ] **Phase 2: Usage UI** — Counter in chat, soft warning banner, exhaustion modal
+- [ ] **Phase 2: Usage UI** — Counter in chat, soft warning banner, exhaustion modal (2 plans)
 - [ ] **Phase 3: Pricing Page** — Free vs Starter comparison section on homepage
 - [ ] **Phase 4: Stripe Billing** — Stripe product, checkout, webhook tier upgrade, subscription management
 
@@ -41,12 +41,16 @@ Plans:
 
 **Success Criteria** (what must be TRUE when this phase completes):
 1. Chat input area displays "X of 10 messages remaining this month" visible to the user
-2. Warning banner appears when 2 or fewer messages remain
-3. Modal appears when user hits 0 messages and contains an upgrade CTA button
+2. Warning banner appears when 3 or fewer messages remain
+3. Modal appears when user hits 0 messages and attempts to send, contains an upgrade CTA button
 4. Modal CTA links to the pricing page or pricing section
 5. Counter updates in real-time after each message is sent (no page refresh required)
 
-**Plans:** TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Extend Zustand chatStore with usage state + create UsageCounter, WarningBanner, ExhaustionModal components
+- [ ] 02-02-PLAN.md — Wire components into ChatContainer/ChatInput: profile fetch, 429 handling, rendering, disabled state + staging verification
 
 ---
 
@@ -86,10 +90,10 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Usage Gating Backend | 2/2 | Complete | 2026-04-16 |
-| 2. Usage UI | 0/? | Not started | - |
+| 2. Usage UI | 0/2 | Planned | - |
 | 3. Pricing Page | 0/? | Not started | - |
 | 4. Stripe Billing | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-04-15*
-*Last updated: 2026-04-16 — Phase 01 COMPLETE. All 5 GATE requirements verified on staging and shipped to production.*
+*Last updated: 2026-04-18 — Phase 02 planned: 2 plans in 2 waves (store+components, then wiring+verification).*
