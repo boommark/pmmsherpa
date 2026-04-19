@@ -135,8 +135,28 @@ export default function LandingPage() {
           <LogoBanner />
         </div>
 
+        {/* Featured Testimonial: VP Fortune 200 - above the fold */}
+        <div className="max-w-3xl mx-auto px-5 md:px-8 py-10 md:py-14">
+          <div className="relative rounded-2xl bg-[#f8f9fd] p-10 md:p-12">
+            <div className="absolute left-0 top-10 bottom-10 w-[3px] rounded-full bg-gradient-to-b from-[#0058be] to-[#2170e4]" />
+            <blockquote>
+              <p className="text-lg md:text-xl text-[#3a3f47] leading-[1.7] mb-6 pl-2">
+                &ldquo;{testimonials[0].quote}&rdquo;
+              </p>
+              <footer className="pl-2">
+                <div className="text-sm font-semibold bg-gradient-to-r from-[#0058be] to-[#2170e4] bg-clip-text text-transparent tracking-wide">
+                  {testimonials[0].name}
+                </div>
+                <div className="text-xs text-[#5f6368] mt-0.5">
+                  {testimonials[0].company}
+                </div>
+              </footer>
+            </blockquote>
+          </div>
+        </div>
+
         {/* Hero Demo Video */}
-        <div className="max-w-5xl mx-auto px-5 md:px-8 pb-20 md:pb-28 pt-10 relative">
+        <div className="max-w-5xl mx-auto px-5 md:px-8 pb-20 md:pb-28 relative">
           <div className="max-w-4xl mx-auto">
             <div className="rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,88,190,0.10)] ring-1 ring-[#e8ecf4]/60">
               <video autoPlay loop muted playsInline className="w-full h-auto">
@@ -188,7 +208,7 @@ export default function LandingPage() {
               </div>
               <div className="md:pt-4">
                 <p className="text-base text-[#3a3f47] leading-relaxed mb-3">
-                  The senior PMM who picks up every time. Draws from thousands of documented GTM decisions across hundreds of companies (Salesforce, Atlassian, Figma, Gong, Twilio, HubSpot, and 500+ more) to find practitioners who&apos;ve faced your exact situation.
+                  The senior GTM advisor who picks up every time. Draws from thousands of documented go-to-market decisions across hundreds of companies (Salesforce, Atlassian, Figma, Gong, Twilio, HubSpot, and 500+ more) to find practitioners who&apos;ve faced your exact situation.
                 </p>
                 <p className="text-xs font-medium text-[#0058be] tracking-wide">STRATEGY · COMPETITIVE · PRICING</p>
               </div>
@@ -205,7 +225,7 @@ export default function LandingPage() {
               </div>
               <div className="md:pt-4">
                 <p className="text-base text-[#3a3f47] leading-relaxed mb-3">
-                  Don&apos;t find out your messaging is off after it&apos;s live. Scores your work against professional standards drawn from the same frameworks top PMM leaders use at companies from Series A to Fortune 500.
+                  Don&apos;t find out your messaging is off after it&apos;s live. Scores your work against professional standards drawn from the same frameworks top GTM leaders use at companies from Series A to Fortune 500.
                 </p>
                 <p className="text-xs font-medium text-[#0058be] tracking-wide">REVIEW · STRESS-TEST · SHARPEN</p>
               </div>
@@ -222,7 +242,7 @@ export default function LandingPage() {
               </div>
               <div className="md:pt-4">
                 <p className="text-base text-[#3a3f47] leading-relaxed mb-3">
-                  Most PMMs don&apos;t have a mentor who&apos;s done the job at the next level. Now you do. Career guidance informed by hundreds of practitioner conversations spanning every PMM career stage, from IC to VP, startup to enterprise.
+                  Most GTM leaders don&apos;t have a mentor who&apos;s done the job at the next level. Now you do. Career guidance informed by hundreds of practitioner conversations spanning every GTM career stage, from IC to VP, startup to enterprise.
                 </p>
                 <p className="text-xs font-medium text-[#0058be] tracking-wide">CAREER · SKILL GAPS · LEADERSHIP</p>
               </div>
@@ -265,18 +285,15 @@ export default function LandingPage() {
                   <p className="text-[15px] md:text-base text-[#c8d0e0] leading-[1.8] mb-6">
                     {t.quote}
                   </p>
-                  <footer className="flex items-center gap-3 pt-2 border-t border-white/[0.06]">
-                    <div className="w-8 h-[2px] rounded-full bg-gradient-to-r from-[#0058be] to-[#2170e4]" />
-                    <div>
-                      <div className="text-sm font-semibold text-white/90 tracking-wide">
-                        {t.name}
-                      </div>
-                      {t.company && (
-                        <div className="text-xs text-[#8e9199] mt-0.5">
-                          {t.company}
-                        </div>
-                      )}
+                  <footer className="pt-4 border-t border-white/[0.06]">
+                    <div className="text-sm font-semibold bg-gradient-to-r from-[#5a9cf5] to-[#2170e4] bg-clip-text text-transparent tracking-wide">
+                      {t.name}
                     </div>
+                    {t.company && (
+                      <div className="text-xs text-[#6b7280] mt-1">
+                        {t.company}
+                      </div>
+                    )}
                   </footer>
                 </blockquote>
               </div>
@@ -302,7 +319,7 @@ export default function LandingPage() {
             {/* 01 Query Planning */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
               <div className="flex justify-center">
-                <div className="relative w-64 h-40 md:w-80 md:h-48">
+                <div className="relative w-72 h-44 md:w-96 md:h-56">
                   <Image src="/icons/query-planning.png" alt="Query Planning" fill className="object-contain" />
                 </div>
               </div>
@@ -310,7 +327,7 @@ export default function LandingPage() {
                 <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-2 block">01</span>
                 <h3 className="text-2xl font-bold text-[#191c1e] mb-4">Query Planning</h3>
                 <p className="text-base text-[#5f6368] leading-relaxed">
-                  A lightweight model decomposes your question in ~100ms, extracting underlying PMM concepts you didn&apos;t explicitly name. It generates 2-3 parallel retrieval queries targeting different knowledge dimensions. You get answers to questions you didn&apos;t know to ask.
+                  A lightweight model decomposes your question in ~100ms, extracting underlying GTM concepts you didn&apos;t explicitly name. It generates 2-3 parallel retrieval queries targeting different knowledge dimensions. You get answers to questions you didn&apos;t know to ask.
                 </p>
               </div>
             </div>
@@ -321,11 +338,11 @@ export default function LandingPage() {
                 <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-2 block">02</span>
                 <h3 className="text-2xl font-bold text-[#191c1e] mb-4">Agentic RAG</h3>
                 <p className="text-base text-[#5f6368] leading-relaxed">
-                  Hybrid retrieval fuses 70% semantic similarity with 30% keyword precision across 38,000+ curated fragments. Domain-specific query expansion translates PMM shorthand automatically (GTM, ICP, JTBD, PLG). You talk like a PMM. Sherpa searches like one.
+                  Hybrid retrieval fuses 70% semantic similarity with 30% keyword precision across 38,000+ curated fragments. Domain-specific query expansion translates go-to-market shorthand automatically (GTM, ICP, JTBD, PLG). You talk like a GTM leader. Sherpa searches like one.
                 </p>
               </div>
               <div className="order-1 md:order-2 flex justify-center">
-                <div className="relative w-64 h-40 md:w-80 md:h-48">
+                <div className="relative w-72 h-44 md:w-96 md:h-56">
                   <Image src="/icons/agentic-rag.png" alt="Agentic RAG" fill className="object-contain" />
                 </div>
               </div>
@@ -334,7 +351,7 @@ export default function LandingPage() {
             {/* 03 Knowledge Layers */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
               <div className="flex justify-center">
-                <div className="relative w-64 h-40 md:w-80 md:h-48">
+                <div className="relative w-72 h-44 md:w-96 md:h-56">
                   <Image src="/icons/knowledge-layers.png" alt="Knowledge Layers" fill className="object-contain" />
                 </div>
               </div>
@@ -357,7 +374,7 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="order-1 md:order-2 flex justify-center">
-                <div className="relative w-64 h-40 md:w-80 md:h-48">
+                <div className="relative w-72 h-44 md:w-96 md:h-56">
                   <Image src="/icons/web-augmentation.png" alt="Web Augmentation" fill className="object-contain" />
                 </div>
               </div>
@@ -438,7 +455,7 @@ export default function LandingPage() {
                   One recommendation, backed by the sharpest minds in GTM.
                 </h3>
                 <p className="text-[#8e9199] leading-relaxed">
-                  Every response draws from the practitioner experience and playbooks that shaped the best product marketers in tech. PMMSherpa commits to a recommendation. You decide what to do with it.
+                  Every response draws from the practitioner experience and playbooks that shaped the best GTM leaders in tech. PMMSherpa commits to a recommendation. You decide what to do with it.
                 </p>
               </div>
             </div>
@@ -531,7 +548,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Founders</h3>
               <p className="text-sm text-[#5f6368] leading-relaxed">
-                Your first PMM hire is $180K and three months to ramp. PMMSherpa gives you strategic depth from day one, without the headcount.
+                Your first GTM hire is $180K and three months to ramp. PMMSherpa gives you strategic depth from day one, without the headcount.
               </p>
             </div>
           </div>
