@@ -26,21 +26,25 @@ const testimonials = [
     quote: "PMM Sherpa is a great example of an effective vertical AI solution. It\u2019s purpose built. The output isn\u2019t just fast; it\u2019s grounded in real-world frameworks and actual PMM experience. It\u2019s levels above what I get from a general-purpose model like Claude.",
     name: "VP of Product Marketing",
     role: "Fortune 200 ERP Provider",
+    photo: "",
   },
   {
     quote: "PMM Sherpa gave me access to expert product marketing feedback loops and suggestions for my scenario rapidly and focus on what it seems like a seasoned professional would say. Easy to use and just works. Definitely seems more focused and professional than just using a flagship model alone.",
-    name: "Founder",
-    role: "ex-Meta Senior Engineer",
+    name: "Daniel Wolff",
+    role: "Senior Engineering Consultant, ex-Meta, authID",
+    photo: "/homepage/dan_wolff_profile.jpeg",
   },
   {
     quote: "Most AI tools make you do the thinking and then dress it up. Sherpa does the opposite. It comes in educated, applies the right frameworks to your actual problem, and pushes back when your reasoning isn\u2019t there yet. Where other tools generate, Sherpa evaluates. It catches things most tools don\u2019t: where your argument has gaps, where friction will show up with buyers, where you\u2019re circling the problem without landing on a real position. Anyone who touches GTM will feel the difference immediately. And honestly, the name says it all.",
-    name: "PMM Leader",
-    role: "CMO Alliance Member",
+    name: "Asli Simsek",
+    role: "Product Marketing Manager, CMO Alliance Member",
+    photo: "/homepage/asli-simsek.png",
   },
   {
     quote: "PMM Sherpa actually feels like a new individual thinking about your project with you. It\u2019s really a team partner working alongside you. No lecturing, no pandering, no generic frameworks dressed up with language as insight. Just a thinking partner that meets you at your level and pushes you forward.",
-    name: "Serial Founder",
-    role: "AI Researcher",
+    name: "Shreyas Sriram",
+    role: "Founder, Practice Intuition / AI Researcher",
+    photo: "/homepage/shreyas-sriram.jpeg",
   },
 ];
 
@@ -303,12 +307,18 @@ export default function LandingPage() {
                   <p className="text-[15px] md:text-base text-[#c8d0e0] leading-[1.8] mb-6">
                     {t.quote}
                   </p>
-                  <footer className="pt-4 border-t border-white/[0.06]">
-                    <div className="text-sm font-semibold bg-gradient-to-r from-[#5a9cf5] to-[#2170e4] bg-clip-text text-transparent tracking-wide">
-                      {t.name}
-                    </div>
-                    <div className="text-xs text-[#6b7280] mt-1">
-                      {t.role}
+                  <footer className="flex items-center gap-4 pt-4 border-t border-white/[0.06]">
+                    {t.photo && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={t.photo} alt={t.name} className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
+                    )}
+                    <div>
+                      <div className="text-sm font-semibold bg-gradient-to-r from-[#5a9cf5] to-[#2170e4] bg-clip-text text-transparent tracking-wide">
+                        {t.name}
+                      </div>
+                      <div className="text-xs text-[#6b7280] mt-1">
+                        {t.role}
+                      </div>
                     </div>
                   </footer>
                 </blockquote>
