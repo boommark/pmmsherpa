@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 100" width="280" height="100">
+  <!-- Infor logo - red wordmark -->
+  <!-- dot on the i -->
+  <circle cx="18" cy="18" r="10" fill="#e2231a"/>
+  <!-- i stem -->
+  <rect x="8" y="35" width="20" height="50" rx="2" fill="#e2231a"/>
+  <!-- n -->
+  <path d="M42 55 C42 42 52 33 65 33 C78 33 88 42 88 55 L88 85 L68 85 L68 58 C68 52 65 48 60 48 C55 48 52 52 52 58 L52 85 L42 85 Z" fill="#e2231a" transform="translate(0,0) scale(1)"/>
+  <!-- f -->
+  <path d="M100 85 L100 48 L93 48 L93 35 L100 35 L100 25 C100 12 108 5 120 5 L128 5 L128 18 L123 18 C118 18 116 20 116 25 L116 35 L128 35 L128 48 L116 48 L116 85 Z" fill="#e2231a" transform="translate(-2,0)"/>
+  <!-- o -->
+  <path d="M155 33 C172 33 185 46 185 59 C185 72 172 85 155 85 C138 85 125 72 125 59 C125 46 138 33 155 33 Z M155 48 C147 48 141 52 141 59 C141 66 147 72 155 72 C163 72 169 66 169 59 C169 52 163 48 155 48 Z" fill="#e2231a" transform="translate(-4,0)"/>
+  <!-- r -->
+  <path d="M195 85 L195 35 L211 35 L211 45 C215 37 222 33 230 33 L230 50 L225 50 C216 50 211 55 211 63 L211 85 Z" fill="#e2231a" transform="translate(-6,0)"/>
+</svg>

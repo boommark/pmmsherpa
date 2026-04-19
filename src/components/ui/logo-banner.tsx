@@ -3,24 +3,27 @@
 interface LogoItem {
   name: string;
   file: string;
+  scale?: number; // Override for logos with extreme aspect ratios
 }
 
 // Row 1: Starts with Google, mega-brands and major enterprise
 const row1Logos: LogoItem[] = [
   { name: "Google", file: "google" },
+  { name: "Microsoft", file: "microsoft" },
   { name: "Amazon", file: "amazon" },
   { name: "NVIDIA", file: "nvidia" },
   { name: "Cisco", file: "cisco" },
   { name: "IBM", file: "ibm" },
   { name: "Oracle", file: "oracle" },
+  { name: "Infor", file: "infor" },
   { name: "Uber", file: "uber" },
   { name: "Boeing", file: "boeing" },
   { name: "WhatsApp", file: "whatsapp" },
   { name: "SAP", file: "sap" },
   { name: "T-Mobile", file: "t-mobile" },
   { name: "GSK", file: "gsk" },
-  { name: "Atlassian", file: "atlassian" },
-  { name: "Palo Alto Networks", file: "palo-alto-networks" },
+  { name: "Atlassian", file: "atlassian", scale: 1.5 },
+  { name: "Palo Alto Networks", file: "palo-alto-networks", scale: 1.4 },
   { name: "BCG", file: "bcg" },
   { name: "Indeed", file: "indeed" },
   { name: "UiPath", file: "uipath" },
@@ -77,8 +80,8 @@ function LogoTrack({ logos, direction }: { logos: LogoItem[]; direction: "left" 
               src={`/logos/${logo.file}.svg`}
               alt={logo.name}
               style={{
-                maxWidth: 140,
-                maxHeight: 38,
+                maxWidth: 140 * (logo.scale || 1),
+                maxHeight: 38 * (logo.scale || 1),
                 width: "auto",
                 height: "auto",
                 objectFit: "contain",
