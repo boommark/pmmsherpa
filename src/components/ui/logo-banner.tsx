@@ -3,6 +3,7 @@
 interface LogoItem {
   name: string;
   file: string;
+  wide?: boolean;
 }
 
 // Row 1: Starts with Google, mega-brands and major enterprise
@@ -21,8 +22,8 @@ const row1Logos: LogoItem[] = [
   { name: "SAP", file: "sap" },
   { name: "T-Mobile", file: "t-mobile" },
   { name: "GSK", file: "gsk" },
-  { name: "Atlassian", file: "atlassian" },
-  { name: "Palo Alto Networks", file: "palo-alto-networks" },
+  { name: "Atlassian", file: "atlassian", wide: true },
+  { name: "Palo Alto Networks", file: "palo-alto-networks", wide: true },
   { name: "BCG", file: "bcg" },
   { name: "Indeed", file: "indeed" },
   { name: "UiPath", file: "uipath" },
@@ -69,8 +70,9 @@ function LogoTrack({ logos, direction }: { logos: LogoItem[]; direction: "left" 
             key={`${logo.file}-${i}`}
             className="flex-shrink-0 flex items-center justify-center opacity-[0.35] grayscale hover:opacity-70 hover:grayscale-0 transition-all duration-300"
             style={{
+              width: logo.wide ? 220 : 160,
               height: 52,
-              marginRight: 40,
+              marginRight: 32,
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -78,8 +80,10 @@ function LogoTrack({ logos, direction }: { logos: LogoItem[]; direction: "left" 
               src={`/logos/${logo.file}.svg`}
               alt={logo.name}
               style={{
-                height: 30,
+                maxWidth: logo.wide ? 200 : 140,
+                maxHeight: 38,
                 width: "auto",
+                height: "auto",
                 objectFit: "contain",
               }}
             />
