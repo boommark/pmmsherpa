@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { AnimatedOrb } from "@/components/ui/animated-orb";
 import { LogoBanner } from "@/components/ui/logo-banner";
-import { ArrowRight, Search, Layers, Brain, FileCheck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 function MountainIcon({ className }: { className?: string }) {
   return (
@@ -56,30 +56,58 @@ const testimonials = [
   },
 ];
 
-function Testimonial({ index, variant = "light" }: { index: number; variant?: "light" | "dark" }) {
+function TestimonialCard({ index }: { index: number }) {
   const t = testimonials[index];
-  const isDark = variant === "dark";
 
   return (
-    <div className="max-w-3xl mx-auto py-10 md:py-14 px-5 md:px-8">
-      <blockquote className="relative">
-        <div className={`absolute -top-2 -left-2 text-5xl font-serif leading-none ${isDark ? "text-[#2170e4]/30" : "text-[#0058be]/15"}`}>
-          &ldquo;
-        </div>
-        <p className={`text-lg md:text-xl leading-relaxed pl-6 ${isDark ? "text-[#c8d0e0]" : "text-[#3a3f47]"} italic`}>
-          {t.quote}
+    <div className="relative rounded-2xl bg-white p-8 md:p-10 border border-[#e8ecf4]/60 shadow-[0_4px_24px_rgba(0,88,190,0.06)] hover:shadow-[0_8px_40px_rgba(0,88,190,0.10)] transition-all duration-300">
+      {/* Accent bar */}
+      <div className="absolute left-0 top-8 bottom-8 w-[3px] rounded-full bg-gradient-to-b from-[#0058be] to-[#2170e4]" />
+      <blockquote>
+        <p className="text-[15px] text-[#3a3f47] leading-[1.75] mb-6">
+          &ldquo;{t.quote}&rdquo;
         </p>
-        <footer className="mt-5 pl-6">
-          <div className={`text-sm font-semibold ${isDark ? "text-white" : "text-[#191c1e]"}`}>
-            {t.name}
-          </div>
-          {t.company && (
-            <div className={`text-xs mt-0.5 ${isDark ? "text-[#8e9199]" : "text-[#5f6368]"}`}>
-              {t.company}
+        <footer className="flex items-center gap-3">
+          <div className="w-1 h-8 rounded-full bg-[#e8ecf4]" />
+          <div>
+            <div className="text-sm font-semibold text-[#191c1e] tracking-wide">
+              {t.name}
             </div>
-          )}
+            {t.company && (
+              <div className="text-xs text-[#5f6368] mt-0.5">
+                {t.company}
+              </div>
+            )}
+          </div>
         </footer>
       </blockquote>
+    </div>
+  );
+}
+
+function FeaturedTestimonial({ index }: { index: number }) {
+  const t = testimonials[index];
+
+  return (
+    <div className="max-w-3xl mx-auto">
+      <div className="relative rounded-2xl bg-[#f8f9fd] p-10 md:p-12">
+        <div className="absolute left-0 top-10 bottom-10 w-[3px] rounded-full bg-gradient-to-b from-[#0058be] to-[#2170e4]" />
+        <blockquote>
+          <p className="text-lg md:text-xl text-[#3a3f47] leading-[1.7] mb-6 pl-2">
+            &ldquo;{t.quote}&rdquo;
+          </p>
+          <footer className="pl-2">
+            <div className="text-sm font-semibold text-[#191c1e] tracking-wide">
+              {t.name}
+            </div>
+            {t.company && (
+              <div className="text-xs text-[#5f6368] mt-0.5">
+                {t.company}
+              </div>
+            )}
+          </footer>
+        </blockquote>
+      </div>
     </div>
   );
 }
@@ -145,8 +173,8 @@ export default function LandingPage() {
                 Start knowing.
               </span>
             </h1>
-            <p className="mb-12 text-lg text-[#5f6368] sm:text-xl max-w-xl mx-auto leading-relaxed">
-              The world&apos;s best GTM knowledge, brought to life and ready to work with you.
+            <p className="mb-12 text-lg text-[#5f6368] sm:text-xl max-w-2xl mx-auto leading-relaxed">
+              Agentic RAG powered by the world&apos;s deepest GTM knowledge base. Not a chatbot with marketing tips. A retrieval system that thinks like a senior PMM.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link href="/request-access">
@@ -175,9 +203,9 @@ export default function LandingPage() {
           <LogoBanner />
         </div>
 
-        {/* Testimonial 1: VP Fortune 200 */}
-        <div className="max-w-6xl mx-auto">
-          <Testimonial index={0} />
+        {/* Featured Testimonial: VP Fortune 200 */}
+        <div className="max-w-6xl mx-auto px-5 md:px-8 py-10 md:py-14">
+          <FeaturedTestimonial index={0} />
         </div>
 
         {/* Hero Demo Video */}
@@ -217,7 +245,7 @@ export default function LandingPage() {
                 <h3 className="text-lg font-semibold text-[#191c1e]">Frame</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-3">
-                Start from a foundation, not a feeling. Every recommendation is grounded in a structured knowledge base spanning positioning methodology, pricing strategy, category design, and GTM playbooks — retrieved in real-time based on your specific question.
+                Start from a foundation, not a feeling. Every recommendation is grounded in a structured knowledge base spanning positioning methodology, pricing strategy, category design, and GTM playbooks, retrieved in real-time based on your specific question.
               </p>
               <p className="text-xs text-[#a0a4ab]">Positioning · Messaging · GTM Planning</p>
             </div>
@@ -228,7 +256,7 @@ export default function LandingPage() {
                 <h3 className="text-lg font-semibold text-[#191c1e]">Consult</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-3">
-                The senior PMM who picks up every time. Draws from thousands of documented GTM decisions across hundreds of companies — Salesforce, Atlassian, Figma, Gong, Twilio, HubSpot, and 500+ more — to find practitioners who&apos;ve faced your exact situation.
+                The senior PMM who picks up every time. Draws from thousands of documented GTM decisions across hundreds of companies (Salesforce, Atlassian, Figma, Gong, Twilio, HubSpot, and 500+ more) to find practitioners who&apos;ve faced your exact situation.
               </p>
               <p className="text-xs text-[#a0a4ab]">Strategy · Competitive · Pricing</p>
             </div>
@@ -250,112 +278,112 @@ export default function LandingPage() {
                 <h3 className="text-lg font-semibold text-[#191c1e]">Grow</h3>
               </div>
               <p className="text-sm text-[#5f6368] leading-relaxed mb-3">
-                Most PMMs don&apos;t have a mentor who&apos;s done the job at the next level. Now you do. Career guidance informed by hundreds of practitioner conversations spanning every PMM career stage — IC to VP, startup to enterprise.
+                Most PMMs don&apos;t have a mentor who&apos;s done the job at the next level. Now you do. Career guidance informed by hundreds of practitioner conversations spanning every PMM career stage, from IC to VP, startup to enterprise.
               </p>
               <p className="text-xs text-[#a0a4ab]">Career · Skill Gaps · Leadership</p>
             </div>
           </div>
-
-          {/* Testimonial 2: CMO Alliance */}
-          <Testimonial index={2} />
         </div>
       </section>
 
-      {/* Knowledge System — architecture proof for skeptics */}
+      {/* Testimonials */}
       <section className="py-20 md:py-28 bg-white">
+        <div className="max-w-6xl mx-auto px-5 md:px-8">
+          <div className="text-center mb-14">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">What Users Say</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e]">
+              The difference is immediate
+            </h2>
+          </div>
+
+          <div className="mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6">
+            <TestimonialCard index={2} />
+            <TestimonialCard index={1} />
+            <div className="md:col-span-2">
+              <TestimonialCard index={3} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Under the Hood */}
+      <section className="py-20 md:py-28" style={{
+        background: "linear-gradient(180deg, #f8f9fd 0%, #f0f3fa 50%, #f8f9fd 100%)",
+      }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <div className="text-center mb-16">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">Under the Hood</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e] mb-5">
-              This isn&apos;t a prompt. It&apos;s a knowledge system.
+              Agentic RAG, not a prompt wrapper
             </h2>
             <p className="text-base text-[#5f6368] max-w-2xl mx-auto leading-relaxed">
-              Most AI marketing tools are a language model with instructions taped to the front. PMMSherpa is a retrieval system built on a structured, curated knowledge base.
+              Most AI marketing tools are a language model with a system prompt. PMMSherpa is a multi-stage retrieval pipeline that plans, searches, assembles, and synthesizes before generating a single word.
             </p>
           </div>
 
-          {/* Query trace */}
-          <div className="max-w-4xl mx-auto">
-            <div className="rounded-2xl border border-[#e8ecf4]/60 overflow-hidden">
-              <div className="bg-[#f8f9fd] px-6 md:px-8 py-5 border-b border-[#e8ecf4]/60">
-                <div className="flex items-center gap-3">
-                  <Search className="w-4 h-4 text-[#0058be]" />
-                  <p className="text-sm text-[#3a3f47] font-medium">
-                    &ldquo;How do I position my AI-powered analytics product against established BI tools?&rdquo;
-                  </p>
-                </div>
+          <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {/* Query Planning */}
+            <div className="rounded-2xl bg-white p-8 md:p-10 border border-[#e8ecf4]/60 shadow-[0_4px_24px_rgba(0,88,190,0.04)]">
+              <div className="w-20 h-20 mb-6">
+                <CustomIcon src="/icons/query-planning.png" alt="Query Planning" size={80} />
               </div>
-
-              <div className="px-6 md:px-8 py-6 bg-white">
-                <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-5">Knowledge retrieval: 12 fragments surfaced</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#f0f3fa] flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Layers className="w-4 h-4 text-[#0058be]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#191c1e]">Positioning methodology</p>
-                      <p className="text-xs text-[#5f6368] mt-0.5">Competitive displacement framework, category entry strategies</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#f0f3fa] flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Brain className="w-4 h-4 text-[#0058be]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#191c1e]">Practitioner experience</p>
-                      <p className="text-xs text-[#5f6368] mt-0.5">PMMs at 4 companies who&apos;ve made this exact competitive move</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#f0f3fa] flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <FileCheck className="w-4 h-4 text-[#0058be]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#191c1e]">Pricing strategy</p>
-                      <p className="text-xs text-[#5f6368] mt-0.5">Value framing against incumbents, willingness-to-pay signals</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#f0f3fa] flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Search className="w-4 h-4 text-[#0058be]" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#191c1e]">Category design</p>
-                      <p className="text-xs text-[#5f6368] mt-0.5">When to create a new category vs. compete in an existing one</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 pt-5 border-t border-[#f0f3fa]">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[#0058be] animate-pulse" />
-                    <p className="text-xs text-[#5f6368]">
-                      Synthesized into a single, opinionated recommendation with cited reasoning
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <h3 className="text-base font-bold text-[#191c1e] uppercase tracking-wide mb-3">Query Planning</h3>
+              <p className="text-sm text-[#5f6368] leading-relaxed">
+                A lightweight model decomposes your question in ~100ms, extracting underlying PMM concepts you didn&apos;t explicitly name. It generates 2-3 parallel retrieval queries targeting different knowledge dimensions. You get answers to questions you didn&apos;t know to ask.
+              </p>
             </div>
 
-            {/* Stats bar */}
-            <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              <div>
-                <p className="text-2xl md:text-3xl font-extrabold text-[#0058be]">38,000+</p>
-                <p className="text-xs text-[#5f6368] mt-1">Curated knowledge fragments</p>
+            {/* Agentic RAG */}
+            <div className="rounded-2xl bg-white p-8 md:p-10 border border-[#e8ecf4]/60 shadow-[0_4px_24px_rgba(0,88,190,0.04)]">
+              <div className="w-20 h-20 mb-6">
+                <CustomIcon src="/icons/agentic-rag.png" alt="Agentic RAG" size={80} />
               </div>
-              <div>
-                <p className="text-2xl md:text-3xl font-extrabold text-[#0058be]">9</p>
-                <p className="text-xs text-[#5f6368] mt-1">Knowledge layers</p>
+              <h3 className="text-base font-bold text-[#191c1e] uppercase tracking-wide mb-3">Agentic RAG</h3>
+              <p className="text-sm text-[#5f6368] leading-relaxed">
+                Hybrid retrieval fuses 70% semantic similarity with 30% keyword precision across 38,000+ curated fragments. Domain-specific query expansion translates PMM shorthand automatically (GTM, ICP, JTBD, PLG). You talk like a PMM. Sherpa searches like one.
+              </p>
+            </div>
+
+            {/* Knowledge Layers */}
+            <div className="rounded-2xl bg-white p-8 md:p-10 border border-[#e8ecf4]/60 shadow-[0_4px_24px_rgba(0,88,190,0.04)]">
+              <div className="w-20 h-20 mb-6">
+                <CustomIcon src="/icons/knowledge-layers.png" alt="Knowledge Layers" size={80} />
               </div>
-              <div>
-                <p className="text-2xl md:text-3xl font-extrabold text-[#0058be]">500+</p>
-                <p className="text-xs text-[#5f6368] mt-1">Companies represented</p>
+              <h3 className="text-base font-bold text-[#191c1e] uppercase tracking-wide mb-3">Knowledge Layers</h3>
+              <p className="text-sm text-[#5f6368] leading-relaxed">
+                Nine structured layers: methodology, practitioner war stories, tactical playbooks, expert conversations, and more. Retrieved fragments are grouped by type before synthesis, so the model knows whether it&apos;s reading proven theory or a real-world outcome from a named company.
+              </p>
+            </div>
+
+            {/* Web Augmentation */}
+            <div className="rounded-2xl bg-white p-8 md:p-10 border border-[#e8ecf4]/60 shadow-[0_4px_24px_rgba(0,88,190,0.04)]">
+              <div className="w-20 h-20 mb-6">
+                <CustomIcon src="/icons/web-augmentation.png" alt="Web Augmentation" size={80} />
               </div>
-              <div>
-                <p className="text-2xl md:text-3xl font-extrabold text-[#0058be]">2,800+</p>
-                <p className="text-xs text-[#5f6368] mt-1">Source documents indexed</p>
-              </div>
+              <h3 className="text-base font-bold text-[#191c1e] uppercase tracking-wide mb-3">Web Augmentation</h3>
+              <p className="text-sm text-[#5f6368] leading-relaxed">
+                The query planner decides per-question whether to fetch live data. Competitor pricing gets a web search. Positioning frameworks stay in the curated knowledge base. The system picks the right source for each part of your question, automatically.
+              </p>
+            </div>
+          </div>
+
+          {/* Stats bar */}
+          <div className="max-w-4xl mx-auto mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+              <p className="text-2xl md:text-3xl font-extrabold text-[#0058be]">38,000+</p>
+              <p className="text-xs text-[#5f6368] mt-1">Curated knowledge fragments</p>
+            </div>
+            <div>
+              <p className="text-2xl md:text-3xl font-extrabold text-[#0058be]">9</p>
+              <p className="text-xs text-[#5f6368] mt-1">Knowledge layers</p>
+            </div>
+            <div>
+              <p className="text-2xl md:text-3xl font-extrabold text-[#0058be]">500+</p>
+              <p className="text-xs text-[#5f6368] mt-1">Companies represented</p>
+            </div>
+            <div>
+              <p className="text-2xl md:text-3xl font-extrabold text-[#0058be]">2,800+</p>
+              <p className="text-xs text-[#5f6368] mt-1">Source documents indexed</p>
             </div>
           </div>
         </div>
@@ -417,11 +445,6 @@ export default function LandingPage() {
                 </p>
               </div>
             </div>
-          </div>
-
-          {/* Testimonial 3: Ex-Meta Founder */}
-          <div className="max-w-5xl mx-auto mb-24 md:mb-32">
-            <Testimonial index={1} variant="dark" />
           </div>
 
           {/* Step 3 */}
@@ -518,16 +541,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA with testimonial */}
+      {/* CTA */}
       <section className="py-20 md:py-28" style={{
         background: "linear-gradient(180deg, #ffffff 0%, #f8f9fd 100%)",
       }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          {/* Testimonial 4: Serial Founder — emotional closer */}
-          <div className="max-w-3xl mx-auto mb-14">
-            <Testimonial index={3} />
-          </div>
-
           <div className="max-w-3xl mx-auto">
             <div className="rounded-2xl p-10 md:p-14 text-center" style={{
               background: "linear-gradient(135deg, #0058be 0%, #1a6dd6 50%, #2170e4 100%)",
