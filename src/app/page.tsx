@@ -106,7 +106,7 @@ export default function LandingPage() {
               </span>
             </h1>
             <p className="mb-12 text-lg text-[#5f6368] sm:text-xl max-w-2xl mx-auto leading-relaxed">
-              Your positioning is a guess until someone pressure-tests it. Your messaging is a draft until an expert pushes back. Now you have that expert on call.
+              Every GTM decision you make alone is a risk. Positioning, pricing, launches, competitive strategy. PMMSherpa pressure-tests your thinking against thousands of real-world GTM decisions before it matters.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link href="/request-access">
@@ -190,7 +190,7 @@ export default function LandingPage() {
 
           <div className="max-w-4xl mx-auto space-y-0">
             {/* Frame */}
-            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-10 md:py-14 border-b border-[#e2e5ea]/50">
+            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-10 md:py-14 border-b border-[#e2e5ea]/50 cursor-default">
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">01</span>
                 <div className="flex items-center gap-3">
