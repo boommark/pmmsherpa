@@ -45,7 +45,7 @@ const testimonials = [
     company: "",
   },
   {
-    quote: "PMM Sherpa doesn\u2019t just surface information \u2014 it applies a PMM lens to everything and asks follow-up questions that push your thinking. It feels less like a search tool and more like having a PMM mentor in your corner. The fact that it\u2019s regularly updated with vetted frameworks and source material adds a layer of trust that generic AI tools can\u2019t replicate.",
+    quote: "Most AI tools make you do the thinking and then dress it up. Sherpa does the opposite. It comes in educated, applies the right frameworks to your actual problem, and pushes back when your reasoning isn\u2019t there yet. Where other tools generate, Sherpa evaluates. It catches things most tools don\u2019t: where your argument has gaps, where friction will show up with buyers, where you\u2019re circling the problem without landing on a real position. Anyone who touches GTM will feel the difference immediately. And honestly, the name says it all.",
     name: "PMM Leader",
     company: "CMO Alliance Member",
   },
