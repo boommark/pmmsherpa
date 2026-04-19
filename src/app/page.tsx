@@ -21,18 +21,6 @@ function MountainIcon({ className }: { className?: string }) {
   );
 }
 
-function CustomIcon({ src, alt, size = 40 }: { src: string; alt: string; size?: number }) {
-  return (
-    <Image
-      src={src}
-      alt={alt}
-      width={size}
-      height={size}
-      className="object-contain"
-    />
-  );
-}
-
 const testimonials = [
   {
     quote: "PMM Sherpa is a great example of an effective vertical AI solution. It\u2019s purpose built. The output isn\u2019t just fast; it\u2019s grounded in real-world frameworks and actual PMM experience. It\u2019s levels above what I get from a general-purpose model like Claude.",
@@ -55,62 +43,6 @@ const testimonials = [
     company: "",
   },
 ];
-
-function TestimonialCard({ index }: { index: number }) {
-  const t = testimonials[index];
-
-  return (
-    <div className="relative rounded-2xl bg-white p-8 md:p-10 border border-[#e8ecf4]/60 shadow-[0_4px_24px_rgba(0,88,190,0.06)] hover:shadow-[0_8px_40px_rgba(0,88,190,0.10)] transition-all duration-300">
-      {/* Accent bar */}
-      <div className="absolute left-0 top-8 bottom-8 w-[3px] rounded-full bg-gradient-to-b from-[#0058be] to-[#2170e4]" />
-      <blockquote>
-        <p className="text-[15px] text-[#3a3f47] leading-[1.75] mb-6">
-          &ldquo;{t.quote}&rdquo;
-        </p>
-        <footer className="flex items-center gap-3">
-          <div className="w-1 h-8 rounded-full bg-[#e8ecf4]" />
-          <div>
-            <div className="text-sm font-semibold text-[#191c1e] tracking-wide">
-              {t.name}
-            </div>
-            {t.company && (
-              <div className="text-xs text-[#5f6368] mt-0.5">
-                {t.company}
-              </div>
-            )}
-          </div>
-        </footer>
-      </blockquote>
-    </div>
-  );
-}
-
-function FeaturedTestimonial({ index }: { index: number }) {
-  const t = testimonials[index];
-
-  return (
-    <div className="max-w-3xl mx-auto">
-      <div className="relative rounded-2xl bg-[#f8f9fd] p-10 md:p-12">
-        <div className="absolute left-0 top-10 bottom-10 w-[3px] rounded-full bg-gradient-to-b from-[#0058be] to-[#2170e4]" />
-        <blockquote>
-          <p className="text-lg md:text-xl text-[#3a3f47] leading-[1.7] mb-6 pl-2">
-            &ldquo;{t.quote}&rdquo;
-          </p>
-          <footer className="pl-2">
-            <div className="text-sm font-semibold text-[#191c1e] tracking-wide">
-              {t.name}
-            </div>
-            {t.company && (
-              <div className="text-xs text-[#5f6368] mt-0.5">
-                {t.company}
-              </div>
-            )}
-          </footer>
-        </blockquote>
-      </div>
-    </div>
-  );
-}
 
 export default function LandingPage() {
   return (
@@ -174,7 +106,7 @@ export default function LandingPage() {
               </span>
             </h1>
             <p className="mb-12 text-lg text-[#5f6368] sm:text-xl max-w-2xl mx-auto leading-relaxed">
-              Agentic RAG powered by the world&apos;s deepest GTM knowledge base. Not a chatbot with marketing tips. A retrieval system that thinks like a senior PMM.
+              Your positioning is a guess until someone pressure-tests it. Your messaging is a draft until an expert pushes back. Now you have that expert on call.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link href="/request-access">
@@ -203,22 +135,11 @@ export default function LandingPage() {
           <LogoBanner />
         </div>
 
-        {/* Featured Testimonial: VP Fortune 200 */}
-        <div className="max-w-6xl mx-auto px-5 md:px-8 py-10 md:py-14">
-          <FeaturedTestimonial index={0} />
-        </div>
-
         {/* Hero Demo Video */}
-        <div className="max-w-5xl mx-auto px-5 md:px-8 pb-20 md:pb-28 relative">
+        <div className="max-w-5xl mx-auto px-5 md:px-8 pb-20 md:pb-28 pt-10 relative">
           <div className="max-w-4xl mx-auto">
             <div className="rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,88,190,0.10)] ring-1 ring-[#e8ecf4]/60">
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-auto"
-              >
+              <video autoPlay loop muted playsInline className="w-full h-auto">
                 <source src="/homepage/hero-demo.mp4" type="video/mp4" />
               </video>
             </div>
@@ -226,92 +147,148 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* What It Does */}
+      {/* What It Does - Stacked vertical layout */}
       <section id="what-it-does" className="py-20 md:py-28 scroll-mt-20" style={{
         background: "linear-gradient(180deg, #f8f9fd 0%, #f0f3fa 50%, #f8f9fd 100%)",
       }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="text-center mb-14">
+          <div className="text-center mb-16 md:mb-20">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">What It Does</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e] mb-4">
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e]">
               Four ways to work without second-guessing yourself
             </h2>
           </div>
 
-          <div className="mx-auto max-w-5xl grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
-            <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
-              <div className="flex items-center gap-3 mb-4">
-                <CustomIcon src="/icons/frame.png" alt="Frame" size={48} />
-                <h3 className="text-lg font-semibold text-[#191c1e]">Frame</h3>
+          <div className="max-w-4xl mx-auto space-y-0">
+            {/* Frame */}
+            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-10 md:py-14 border-b border-[#e2e5ea]/50">
+              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
+                <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">01</span>
+                <div className="flex items-center gap-3">
+                  <Image src="/icons/frame.png" alt="Frame" width={36} height={36} className="object-contain" />
+                  <h3 className="text-xl font-bold text-[#191c1e]">Frame</h3>
+                </div>
               </div>
-              <p className="text-sm text-[#5f6368] leading-relaxed mb-3">
-                Start from a foundation, not a feeling. Every recommendation is grounded in a structured knowledge base spanning positioning methodology, pricing strategy, category design, and GTM playbooks, retrieved in real-time based on your specific question.
-              </p>
-              <p className="text-xs text-[#a0a4ab]">Positioning · Messaging · GTM Planning</p>
+              <div className="md:pt-4">
+                <p className="text-base text-[#3a3f47] leading-relaxed mb-3">
+                  Start from a foundation, not a feeling. Every recommendation is grounded in a structured knowledge base spanning positioning methodology, pricing strategy, category design, and GTM playbooks, retrieved in real-time based on your specific question.
+                </p>
+                <p className="text-xs font-medium text-[#0058be] tracking-wide">POSITIONING · MESSAGING · GTM PLANNING</p>
+              </div>
             </div>
 
-            <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
-              <div className="flex items-center gap-3 mb-4">
-                <CustomIcon src="/icons/consult.png" alt="Consult" size={48} />
-                <h3 className="text-lg font-semibold text-[#191c1e]">Consult</h3>
+            {/* Consult */}
+            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-10 md:py-14 border-b border-[#e2e5ea]/50">
+              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
+                <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">02</span>
+                <div className="flex items-center gap-3">
+                  <Image src="/icons/consult.png" alt="Consult" width={36} height={36} className="object-contain" />
+                  <h3 className="text-xl font-bold text-[#191c1e]">Consult</h3>
+                </div>
               </div>
-              <p className="text-sm text-[#5f6368] leading-relaxed mb-3">
-                The senior PMM who picks up every time. Draws from thousands of documented GTM decisions across hundreds of companies (Salesforce, Atlassian, Figma, Gong, Twilio, HubSpot, and 500+ more) to find practitioners who&apos;ve faced your exact situation.
-              </p>
-              <p className="text-xs text-[#a0a4ab]">Strategy · Competitive · Pricing</p>
+              <div className="md:pt-4">
+                <p className="text-base text-[#3a3f47] leading-relaxed mb-3">
+                  The senior PMM who picks up every time. Draws from thousands of documented GTM decisions across hundreds of companies (Salesforce, Atlassian, Figma, Gong, Twilio, HubSpot, and 500+ more) to find practitioners who&apos;ve faced your exact situation.
+                </p>
+                <p className="text-xs font-medium text-[#0058be] tracking-wide">STRATEGY · COMPETITIVE · PRICING</p>
+              </div>
             </div>
 
-            <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
-              <div className="flex items-center gap-3 mb-4">
-                <CustomIcon src="/icons/validate.png" alt="Validate" size={48} />
-                <h3 className="text-lg font-semibold text-[#191c1e]">Validate</h3>
+            {/* Validate */}
+            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-10 md:py-14 border-b border-[#e2e5ea]/50">
+              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
+                <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">03</span>
+                <div className="flex items-center gap-3">
+                  <Image src="/icons/validate.png" alt="Validate" width={36} height={36} className="object-contain" />
+                  <h3 className="text-xl font-bold text-[#191c1e]">Validate</h3>
+                </div>
               </div>
-              <p className="text-sm text-[#5f6368] leading-relaxed mb-3">
-                Don&apos;t find out your messaging is off after it&apos;s live. Scores your work against professional standards drawn from the same frameworks top PMM leaders use at companies from Series A to Fortune 500.
-              </p>
-              <p className="text-xs text-[#a0a4ab]">Review · Stress-test · Sharpen</p>
+              <div className="md:pt-4">
+                <p className="text-base text-[#3a3f47] leading-relaxed mb-3">
+                  Don&apos;t find out your messaging is off after it&apos;s live. Scores your work against professional standards drawn from the same frameworks top PMM leaders use at companies from Series A to Fortune 500.
+                </p>
+                <p className="text-xs font-medium text-[#0058be] tracking-wide">REVIEW · STRESS-TEST · SHARPEN</p>
+              </div>
             </div>
 
-            <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-7 md:p-8 transition-all hover:bg-white hover:shadow-[0_8px_30px_rgba(0,88,190,0.08)] hover:-translate-y-1 border border-[#e8ecf4]/60">
-              <div className="flex items-center gap-3 mb-4">
-                <CustomIcon src="/icons/grow.png" alt="Grow" size={48} />
-                <h3 className="text-lg font-semibold text-[#191c1e]">Grow</h3>
+            {/* Grow */}
+            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-10 md:py-14">
+              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
+                <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">04</span>
+                <div className="flex items-center gap-3">
+                  <Image src="/icons/grow.png" alt="Grow" width={36} height={36} className="object-contain" />
+                  <h3 className="text-xl font-bold text-[#191c1e]">Grow</h3>
+                </div>
               </div>
-              <p className="text-sm text-[#5f6368] leading-relaxed mb-3">
-                Most PMMs don&apos;t have a mentor who&apos;s done the job at the next level. Now you do. Career guidance informed by hundreds of practitioner conversations spanning every PMM career stage, from IC to VP, startup to enterprise.
-              </p>
-              <p className="text-xs text-[#a0a4ab]">Career · Skill Gaps · Leadership</p>
+              <div className="md:pt-4">
+                <p className="text-base text-[#3a3f47] leading-relaxed mb-3">
+                  Most PMMs don&apos;t have a mentor who&apos;s done the job at the next level. Now you do. Career guidance informed by hundreds of practitioner conversations spanning every PMM career stage, from IC to VP, startup to enterprise.
+                </p>
+                <p className="text-xs font-medium text-[#0058be] tracking-wide">CAREER · SKILL GAPS · LEADERSHIP</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 md:py-28 bg-white">
-        <div className="max-w-6xl mx-auto px-5 md:px-8">
+      {/* Testimonials - Dark section with glassmorphic cards */}
+      <section className="py-20 md:py-28 relative overflow-hidden" style={{
+        background: "linear-gradient(135deg, #0a1628 0%, #0f1d35 40%, #162544 100%)",
+      }}>
+        {/* Subtle gradient orbs for depth */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full opacity-[0.07]" style={{
+          background: "radial-gradient(circle, #2170e4 0%, transparent 70%)",
+        }} />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full opacity-[0.05]" style={{
+          background: "radial-gradient(circle, #5a9cf5 0%, transparent 70%)",
+        }} />
+
+        <div className="max-w-6xl mx-auto px-5 md:px-8 relative">
           <div className="text-center mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">What Users Say</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e]">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#5a9cf5] mb-3">What Users Say</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-white">
               The difference is immediate
             </h2>
           </div>
 
-          <div className="mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6">
-            <TestimonialCard index={2} />
-            <TestimonialCard index={1} />
-            <div className="md:col-span-2">
-              <TestimonialCard index={3} />
-            </div>
+          <div className="max-w-5xl mx-auto space-y-6">
+            {testimonials.map((t, i) => (
+              <div
+                key={i}
+                className="rounded-2xl p-8 md:p-10 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
+                style={{
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                }}
+              >
+                <blockquote>
+                  <div className="text-3xl font-serif text-[#2170e4]/40 leading-none mb-4">&ldquo;</div>
+                  <p className="text-[15px] md:text-base text-[#c8d0e0] leading-[1.8] mb-6">
+                    {t.quote}
+                  </p>
+                  <footer className="flex items-center gap-3 pt-2 border-t border-white/[0.06]">
+                    <div className="w-8 h-[2px] rounded-full bg-gradient-to-r from-[#0058be] to-[#2170e4]" />
+                    <div>
+                      <div className="text-sm font-semibold text-white/90 tracking-wide">
+                        {t.name}
+                      </div>
+                      {t.company && (
+                        <div className="text-xs text-[#8e9199] mt-0.5">
+                          {t.company}
+                        </div>
+                      )}
+                    </div>
+                  </footer>
+                </blockquote>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Under the Hood */}
-      <section className="py-20 md:py-28" style={{
-        background: "linear-gradient(180deg, #f8f9fd 0%, #f0f3fa 50%, #f8f9fd 100%)",
-      }}>
+      {/* Under the Hood - Stacked alternating layout with large icons */}
+      <section className="py-20 md:py-28 bg-white">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 md:mb-20">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">Under the Hood</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e] mb-5">
               Agentic RAG, not a prompt wrapper
@@ -321,54 +298,74 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {/* Query Planning */}
-            <div className="rounded-2xl bg-white p-8 md:p-10 border border-[#e8ecf4]/60 shadow-[0_4px_24px_rgba(0,88,190,0.04)]">
-              <div className="w-20 h-20 mb-6">
-                <CustomIcon src="/icons/query-planning.png" alt="Query Planning" size={80} />
+          <div className="max-w-5xl mx-auto space-y-20 md:space-y-28">
+            {/* 01 Query Planning */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+              <div className="flex justify-center">
+                <div className="relative w-64 h-40 md:w-80 md:h-48">
+                  <Image src="/icons/query-planning.png" alt="Query Planning" fill className="object-contain" />
+                </div>
               </div>
-              <h3 className="text-base font-bold text-[#191c1e] uppercase tracking-wide mb-3">Query Planning</h3>
-              <p className="text-sm text-[#5f6368] leading-relaxed">
-                A lightweight model decomposes your question in ~100ms, extracting underlying PMM concepts you didn&apos;t explicitly name. It generates 2-3 parallel retrieval queries targeting different knowledge dimensions. You get answers to questions you didn&apos;t know to ask.
-              </p>
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-2 block">01</span>
+                <h3 className="text-2xl font-bold text-[#191c1e] mb-4">Query Planning</h3>
+                <p className="text-base text-[#5f6368] leading-relaxed">
+                  A lightweight model decomposes your question in ~100ms, extracting underlying PMM concepts you didn&apos;t explicitly name. It generates 2-3 parallel retrieval queries targeting different knowledge dimensions. You get answers to questions you didn&apos;t know to ask.
+                </p>
+              </div>
             </div>
 
-            {/* Agentic RAG */}
-            <div className="rounded-2xl bg-white p-8 md:p-10 border border-[#e8ecf4]/60 shadow-[0_4px_24px_rgba(0,88,190,0.04)]">
-              <div className="w-20 h-20 mb-6">
-                <CustomIcon src="/icons/agentic-rag.png" alt="Agentic RAG" size={80} />
+            {/* 02 Agentic RAG */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+              <div className="order-2 md:order-1">
+                <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-2 block">02</span>
+                <h3 className="text-2xl font-bold text-[#191c1e] mb-4">Agentic RAG</h3>
+                <p className="text-base text-[#5f6368] leading-relaxed">
+                  Hybrid retrieval fuses 70% semantic similarity with 30% keyword precision across 38,000+ curated fragments. Domain-specific query expansion translates PMM shorthand automatically (GTM, ICP, JTBD, PLG). You talk like a PMM. Sherpa searches like one.
+                </p>
               </div>
-              <h3 className="text-base font-bold text-[#191c1e] uppercase tracking-wide mb-3">Agentic RAG</h3>
-              <p className="text-sm text-[#5f6368] leading-relaxed">
-                Hybrid retrieval fuses 70% semantic similarity with 30% keyword precision across 38,000+ curated fragments. Domain-specific query expansion translates PMM shorthand automatically (GTM, ICP, JTBD, PLG). You talk like a PMM. Sherpa searches like one.
-              </p>
+              <div className="order-1 md:order-2 flex justify-center">
+                <div className="relative w-64 h-40 md:w-80 md:h-48">
+                  <Image src="/icons/agentic-rag.png" alt="Agentic RAG" fill className="object-contain" />
+                </div>
+              </div>
             </div>
 
-            {/* Knowledge Layers */}
-            <div className="rounded-2xl bg-white p-8 md:p-10 border border-[#e8ecf4]/60 shadow-[0_4px_24px_rgba(0,88,190,0.04)]">
-              <div className="w-20 h-20 mb-6">
-                <CustomIcon src="/icons/knowledge-layers.png" alt="Knowledge Layers" size={80} />
+            {/* 03 Knowledge Layers */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+              <div className="flex justify-center">
+                <div className="relative w-64 h-40 md:w-80 md:h-48">
+                  <Image src="/icons/knowledge-layers.png" alt="Knowledge Layers" fill className="object-contain" />
+                </div>
               </div>
-              <h3 className="text-base font-bold text-[#191c1e] uppercase tracking-wide mb-3">Knowledge Layers</h3>
-              <p className="text-sm text-[#5f6368] leading-relaxed">
-                Nine structured layers: methodology, practitioner war stories, tactical playbooks, expert conversations, and more. Retrieved fragments are grouped by type before synthesis, so the model knows whether it&apos;s reading proven theory or a real-world outcome from a named company.
-              </p>
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-2 block">03</span>
+                <h3 className="text-2xl font-bold text-[#191c1e] mb-4">Knowledge Layers</h3>
+                <p className="text-base text-[#5f6368] leading-relaxed">
+                  Nine structured layers: methodology, practitioner war stories, tactical playbooks, expert conversations, and more. Retrieved fragments are grouped by type before synthesis, so the model knows whether it&apos;s reading proven theory or a real-world outcome from a named company.
+                </p>
+              </div>
             </div>
 
-            {/* Web Augmentation */}
-            <div className="rounded-2xl bg-white p-8 md:p-10 border border-[#e8ecf4]/60 shadow-[0_4px_24px_rgba(0,88,190,0.04)]">
-              <div className="w-20 h-20 mb-6">
-                <CustomIcon src="/icons/web-augmentation.png" alt="Web Augmentation" size={80} />
+            {/* 04 Web Augmentation */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+              <div className="order-2 md:order-1">
+                <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-2 block">04</span>
+                <h3 className="text-2xl font-bold text-[#191c1e] mb-4">Web Augmentation</h3>
+                <p className="text-base text-[#5f6368] leading-relaxed">
+                  The query planner decides per-question whether to fetch live data. Competitor pricing gets a web search. Positioning frameworks stay in the curated knowledge base. The system picks the right source for each part of your question, automatically.
+                </p>
               </div>
-              <h3 className="text-base font-bold text-[#191c1e] uppercase tracking-wide mb-3">Web Augmentation</h3>
-              <p className="text-sm text-[#5f6368] leading-relaxed">
-                The query planner decides per-question whether to fetch live data. Competitor pricing gets a web search. Positioning frameworks stay in the curated knowledge base. The system picks the right source for each part of your question, automatically.
-              </p>
+              <div className="order-1 md:order-2 flex justify-center">
+                <div className="relative w-64 h-40 md:w-80 md:h-48">
+                  <Image src="/icons/web-augmentation.png" alt="Web Augmentation" fill className="object-contain" />
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Stats bar */}
-          <div className="max-w-4xl mx-auto mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="max-w-4xl mx-auto mt-20 pt-14 border-t border-[#e8ecf4]/60 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
               <p className="text-2xl md:text-3xl font-extrabold text-[#0058be]">38,000+</p>
               <p className="text-xs text-[#5f6368] mt-1">Curated knowledge fragments</p>
@@ -510,7 +507,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="rounded-2xl bg-white p-7 md:p-8 border border-[#e8ecf4]/60 hover:shadow-[0_8px_30px_rgba(0,88,190,0.06)] transition-all">
               <div className="w-16 h-16 mb-5">
-                <CustomIcon src="/icons/product-marketer.png" alt="Product Marketers" size={64} />
+                <Image src="/icons/product-marketer.png" alt="Product Marketers" width={64} height={64} className="object-contain" />
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Product Marketers</h3>
               <p className="text-sm text-[#5f6368] leading-relaxed">
@@ -520,7 +517,7 @@ export default function LandingPage() {
 
             <div className="rounded-2xl bg-white p-7 md:p-8 border border-[#e8ecf4]/60 hover:shadow-[0_8px_30px_rgba(0,88,190,0.06)] transition-all">
               <div className="w-16 h-16 mb-5">
-                <CustomIcon src="/icons/product-manager.png" alt="Product Managers" size={64} />
+                <Image src="/icons/product-manager.png" alt="Product Managers" width={64} height={64} className="object-contain" />
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Product Managers</h3>
               <p className="text-sm text-[#5f6368] leading-relaxed">
@@ -530,7 +527,7 @@ export default function LandingPage() {
 
             <div className="rounded-2xl bg-white p-7 md:p-8 border border-[#e8ecf4]/60 hover:shadow-[0_8px_30px_rgba(0,88,190,0.06)] transition-all">
               <div className="w-16 h-16 mb-5">
-                <CustomIcon src="/icons/technical-founder.png" alt="Founders" size={64} />
+                <Image src="/icons/technical-founder.png" alt="Founders" width={64} height={64} className="object-contain" />
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Founders</h3>
               <p className="text-sm text-[#5f6368] leading-relaxed">
