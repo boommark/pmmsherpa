@@ -28,7 +28,7 @@ const testimonials = [
     role: "Fortune 200 ERP Provider",
   },
   {
-    quote: "PMM Sherpa gave me access to expert product marketing feedback loops and suggestions for my scenario rapidly and focus on what it seems like a season of professional would say. Easy to use and just works. Definitely seems more focused and professional than just using a flagship model alone.",
+    quote: "PMM Sherpa gave me access to expert product marketing feedback loops and suggestions for my scenario rapidly and focus on what it seems like a seasoned professional would say. Easy to use and just works. Definitely seems more focused and professional than just using a flagship model alone.",
     name: "Founder",
     role: "ex-Meta Senior Engineer",
   },
@@ -282,7 +282,7 @@ export default function LandingPage() {
           </div>
 
           <div className="max-w-5xl mx-auto space-y-6">
-            {testimonials.map((t, i) => (
+            {[testimonials[2], testimonials[3], testimonials[1]].map((t, i) => (
               <div
                 key={i}
                 className="rounded-2xl p-8 md:p-10 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
@@ -337,7 +337,7 @@ export default function LandingPage() {
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">01</span>
                 <div className="flex items-center gap-3">
-                  <Image src="/icons/query-planning.png" alt="Query Planning" width={96} height={44} className="object-contain" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}<img src="/icons/query-planning.png" alt="Query Planning" className="h-11 w-auto object-contain" />
                   <h3 className="text-xl font-bold text-[#191c1e]">Query Planning</h3>
                 </div>
               </div>
@@ -353,7 +353,7 @@ export default function LandingPage() {
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">02</span>
                 <div className="flex items-center gap-3">
-                  <Image src="/icons/agentic-rag.png" alt="Agentic RAG" width={96} height={44} className="object-contain" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}<img src="/icons/agentic-rag.png" alt="Agentic RAG" className="h-11 w-auto object-contain" />
                   <h3 className="text-xl font-bold text-[#191c1e]">Agentic RAG</h3>
                 </div>
               </div>
@@ -369,7 +369,7 @@ export default function LandingPage() {
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">03</span>
                 <div className="flex items-center gap-3">
-                  <Image src="/icons/knowledge-layers.png" alt="Knowledge Layers" width={96} height={44} className="object-contain" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}<img src="/icons/knowledge-layers.png" alt="Knowledge Layers" className="h-11 w-auto object-contain" />
                   <h3 className="text-xl font-bold text-[#191c1e]">Knowledge Layers</h3>
                 </div>
               </div>
@@ -385,7 +385,7 @@ export default function LandingPage() {
               <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
                 <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">04</span>
                 <div className="flex items-center gap-3">
-                  <Image src="/icons/web-augmentation.png" alt="Web Augmentation" width={96} height={44} className="object-contain" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}<img src="/icons/web-augmentation.png" alt="Web Augmentation" className="h-11 w-auto object-contain" />
                   <h3 className="text-xl font-bold text-[#191c1e]">Web Augmentation</h3>
                 </div>
               </div>
