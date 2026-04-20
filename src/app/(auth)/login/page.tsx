@@ -79,24 +79,16 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md relative z-10">
         <div className="rounded-2xl bg-white/80 dark:bg-[#1e2125]/80 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,88,190,0.06)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-[#e8ecf4]/60 dark:border-transparent p-8">
-          {/* Header */}
-          <div className="text-center space-y-4 mb-8">
-            <div className="flex justify-center mb-6">
+          {/* Header — orb only, no duplicate logo */}
+          <div className="text-center space-y-3 mb-8">
+            <div className="flex justify-center mb-4">
               <AnimatedOrb size="md" />
             </div>
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-[#0058be] flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M2 20L7 10l5 6 4-10 6 14" />
-                </svg>
-              </div>
-              <span className="text-xl font-bold text-[#0058be] dark:text-[#a8c0f0]">
-                PMMSherpa
-              </span>
-            </div>
-            <h1 className="text-2xl font-bold text-[#191c1e] dark:text-[#e2e4e8]">Welcome back</h1>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0058be] to-[#3b82f6] bg-clip-text text-transparent">
+              Welcome to PMM Sherpa
+            </h1>
             <p className="text-muted-foreground text-sm">
-              Sign in to your AI-powered product marketing assistant
+              Your expert product marketing advisor, powered by 38,000+ knowledge fragments
             </p>
           </div>
 
@@ -129,7 +121,7 @@ export default function LoginPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-white/80 dark:bg-[#1e2125]/80 px-2 text-muted-foreground">
-                or sign in with email
+                or continue with email
               </span>
             </div>
           </div>

@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
-import { Loader2 } from 'lucide-react'
+import { Loader2, CheckCircle2 } from 'lucide-react'
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -30,6 +30,7 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -70,7 +71,7 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -84,14 +85,48 @@ export default function SignupPage() {
         return
       }
 
-      // Redirect to complete-profile (middleware will handle this too)
-      router.push('/complete-profile')
-      router.refresh()
+      // If Supabase returns a session immediately (email confirmation disabled),
+      // redirect to complete-profile
+      if (data.session) {
+        router.push('/complete-profile')
+        router.refresh()
+        return
+      }
+
+      // Otherwise, email confirmation is required — show confirmation message
+      setEmailSent(true)
     } catch {
       setError('An unexpected error occurred')
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (emailSent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#111418] p-4 relative overflow-hidden">
+        <BlobBackground />
+        <div className="w-full max-w-md relative z-10">
+          <div className="rounded-2xl bg-white/80 dark:bg-[#1e2125]/80 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,88,190,0.06)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-[#e8ecf4]/60 dark:border-transparent p-8 text-center">
+            <div className="mx-auto mb-6 w-16 h-16 bg-[#0058be] rounded-2xl flex items-center justify-center">
+              <CheckCircle2 className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold mb-2 text-[#191c1e] dark:text-[#e2e4e8]">Check your email</h1>
+            <p className="text-muted-foreground mb-4">
+              We sent a confirmation link to <strong className="text-foreground">{email}</strong>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Click the link in the email to activate your account, then sign in.
+            </p>
+            <div className="mt-6">
+              <Link href="/login" className="text-sm text-[#0058be] dark:text-[#a8c0f0] hover:underline font-medium">
+                Back to Sign In
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -100,24 +135,16 @@ export default function SignupPage() {
 
       <div className="w-full max-w-md relative z-10 my-8">
         <div className="rounded-2xl bg-white/80 dark:bg-[#1e2125]/80 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,88,190,0.06)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-[#e8ecf4]/60 dark:border-transparent p-8">
-          {/* Header */}
-          <div className="text-center space-y-4 mb-8">
-            <div className="flex justify-center mb-6">
+          {/* Header — orb only, no duplicate logo */}
+          <div className="text-center space-y-3 mb-8">
+            <div className="flex justify-center mb-4">
               <AnimatedOrb size="md" />
             </div>
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-[#0058be] flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M2 20L7 10l5 6 4-10 6 14" />
-                </svg>
-              </div>
-              <span className="text-xl font-bold text-[#0058be] dark:text-[#a8c0f0]">
-                PMMSherpa
-              </span>
-            </div>
-            <h1 className="text-2xl font-bold text-[#191c1e] dark:text-[#e2e4e8]">Create your account</h1>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0058be] to-[#3b82f6] bg-clip-text text-transparent">
+              Welcome to PMM Sherpa
+            </h1>
             <p className="text-muted-foreground text-sm">
-              Your AI-powered product marketing advisor
+              Create your account to get started
             </p>
           </div>
 
@@ -127,7 +154,7 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* Google OAuth */}
+          {/* Google OAuth — fastest path */}
           <Button
             type="button"
             variant="outline"
