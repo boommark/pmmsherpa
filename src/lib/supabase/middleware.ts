@@ -58,6 +58,13 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  // Redirect old /request-access to /login
+  if (request.nextUrl.pathname.startsWith('/request-access')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
   // Redirect authenticated users away from auth pages (except complete-profile)
   const authRoutes = ['/login', '/signup']
   const isAuthRoute = authRoutes.some((route) =>

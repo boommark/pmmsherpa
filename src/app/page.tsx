@@ -100,7 +100,7 @@ export default function LandingPage() {
                 Log in
               </Button>
             </Link>
-            <Link href="/request-access">
+            <Link href="/login">
               <Button className="rounded-full bg-[#0058be] hover:bg-[#004a9e] text-white shadow-none font-medium px-5">
                 Get Started
               </Button>
@@ -138,12 +138,12 @@ export default function LandingPage() {
               The GTM knowledge powering today&apos;s top companies, ready to work with you.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/request-access">
+              <Link href="/login">
                 <Button
                   size="lg"
                   className="gap-2 rounded-full bg-[#0058be] hover:bg-[#004a9e] text-white font-medium px-8 shadow-none h-12 text-base"
                 >
-                  Request Access <ArrowRight className="h-4 w-4" />
+                  Get Started Free <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/login">
@@ -527,12 +527,12 @@ export default function LandingPage() {
               <p className="mb-8 text-sm text-blue-300/80 max-w-lg mx-auto">
                 38,000+ knowledge fragments. 9 knowledge layers. 500+ companies. One conversation away.
               </p>
-              <Link href="/request-access">
+              <Link href="/login">
                 <Button
                   size="lg"
                   className="gap-2 rounded-full bg-white text-[#0058be] hover:bg-blue-50 font-semibold px-8 shadow-none h-12 text-base"
                 >
-                  Request Access <ArrowRight className="h-4 w-4" />
+                  Get Started Free <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
