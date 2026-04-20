@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 // Lazy-init to avoid build-time errors when env var isn't available
 let _stripe: Stripe | null = null
 
-export function getStripe(): Stripe {
+function getStripe(): Stripe {
   if (!_stripe) {
     if (!process.env.STRIPE_SECRET_KEY) {
       throw new Error('STRIPE_SECRET_KEY is not set')
@@ -15,9 +15,10 @@ export function getStripe(): Stripe {
   return _stripe
 }
 
-// Convenience alias for existing imports
+// Lazy proxy — defers Stripe client creation to first use at runtime
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const stripe = new Proxy({} as Stripe, {
   get(_, prop) {
-    return (getStripe() as Record<string | symbol, unknown>)[prop]
+    return (getStripe() as any)[prop]
   },
 })
