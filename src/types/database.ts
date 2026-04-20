@@ -19,10 +19,21 @@ export interface Profile {
   theme: 'light' | 'dark' | 'system';
   voice_preference: TTSVoice;
   elevenlabs_voice_id: ElevenLabsVoiceId | null;
-  // Usage gating — Phase 1 (v1.1)
+  // Profile completion (migration 017)
+  linkedin_url: string | null;
+  phone: string | null;
+  profession: string | null;
+  company: string | null;
+  use_cases: string[];
+  consent_given: boolean;
+  profile_completed: boolean;
+  // Stripe billing (migration 018)
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  // Usage gating
   tier: 'free' | 'founder' | 'starter';
   messages_used_this_period: number;
-  period_start: string;  // ISO date string from Postgres `date` column, e.g. "2026-04-01"
+  period_start: string;
   created_at: string;
   updated_at: string;
 }
