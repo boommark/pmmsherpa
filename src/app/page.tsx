@@ -146,15 +146,6 @@ export default function LandingPage() {
                   Get Started Free <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/login">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="rounded-full bg-white text-[#191c1e] hover:bg-[#f8f9fb] px-8 border border-[#e2e5ea] h-12 text-base"
-                >
-                  Sign In
-                </Button>
-              </Link>
             </div>
           </div>
         </div>
