@@ -164,28 +164,6 @@ export default function LandingPage() {
           <LogoBanner />
         </div>
 
-        {/* Stat Strip - proper centered grid */}
-        <div className="max-w-3xl mx-auto px-5 md:px-8 py-5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div>
-              <p className="text-xl font-bold text-[#0058be]">Hundreds</p>
-              <p className="text-xs text-[#4a4f57] mt-0.5">of users</p>
-            </div>
-            <div>
-              <p className="text-xl font-bold text-[#0058be]">100+</p>
-              <p className="text-xs text-[#4a4f57] mt-0.5">organizations</p>
-            </div>
-            <div>
-              <p className="text-xl font-bold text-[#0058be]">38,000+</p>
-              <p className="text-xs text-[#4a4f57] mt-0.5">curated fragments</p>
-            </div>
-            <div>
-              <p className="text-xl font-bold text-[#0058be]">9</p>
-              <p className="text-xs text-[#4a4f57] mt-0.5">knowledge layers</p>
-            </div>
-          </div>
-        </div>
-
         {/* Featured Testimonial: Asli Simsek - vertical compact shadow card */}
         <div className="max-w-2xl mx-auto px-5 md:px-8 py-4 md:py-6">
           <div className="rounded-2xl bg-white p-5 md:p-7 shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-[#e8ecf4]/40">
