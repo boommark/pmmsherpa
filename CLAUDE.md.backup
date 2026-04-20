@@ -141,7 +141,7 @@ PERPLEXITY_API_KEY=pplx-...
 NEXT_PUBLIC_APP_URL=https://pmmsherpa.com
 
 # Vercel (for CLI deployments)
-VERCEL_TOKEN=rQeCMwL63rT10pN5NpA2iBov
+VERCEL_TOKEN=<stored in ~/.vercel-token>
 ```
 
 **Note**: Vercel token is stored locally in `.vercel-token.txt` (gitignored) for CLI deployments.
@@ -294,11 +294,11 @@ python ingest_documents.py
 
 **Option 1: Using Vercel CLI** (Recommended)
 ```bash
-# Quick deploy with token
-npx vercel --token rQeCMwL63rT10pN5NpA2iBov --prod --yes
+# Quick deploy with token (stored in ~/.vercel-token)
+npx vercel --token $(cat ~/.vercel-token) --prod --yes
 
 # Or set environment variable first
-export VERCEL_TOKEN="rQeCMwL63rT10pN5NpA2iBov"
+export VERCEL_TOKEN="$(cat ~/.vercel-token)"
 npx vercel --prod --yes
 ```
 

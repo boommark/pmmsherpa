@@ -1,6 +1,6 @@
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
-import { getSystemPromptWithContext } from './system-prompt'
+import { getSystemPromptParts } from './system-prompt'
 
 // All available model providers (Anthropic and Google only)
 export type ModelProvider =
@@ -74,7 +74,7 @@ export function buildMessages(
   scrapedUrlContent?: string,
   imageUrls?: string[]
 ) {
-  const systemPrompt = getSystemPromptWithContext(retrievedContext, provider, scrapedUrlContent)
+  const systemParts = getSystemPromptParts(retrievedContext, provider, scrapedUrlContent)
 
   // Log conversation history for debugging
   if (conversationHistory.length > 0) {
@@ -110,7 +110,7 @@ export function buildMessages(
   console.log(`[buildMessages] Final message array: ${messages.length} messages`)
 
   return {
-    system: systemPrompt,
+    systemParts,
     messages,
   }
 }

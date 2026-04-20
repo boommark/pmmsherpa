@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server'
 import { streamText } from 'ai'
 import { createClient } from '@/lib/supabase/server'
 import { FREE_TIER_MONTHLY_LIMIT } from '@/lib/constants'
-import { getModel, buildMessages, getModelDisplayName, getDbModelValue, type ModelProvider } from '@/lib/llm/provider-factory'
+import { getModel, buildMessages, getModelDisplayName, getDbModelValue, MODEL_CONFIG, type ModelProvider } from '@/lib/llm/provider-factory'
 import { multiQueryRetrieve, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
 import { planQueries } from '@/lib/rag/query-planner'
 import { conductResearch } from '@/lib/llm/perplexity-client'
@@ -536,7 +536,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           }
 
           console.log(`Building messages with ${conversationHistory.length} history messages for model: ${model}`)
-          const { system, messages: allMessages } = buildMessages(
+          const { systemParts, messages: allMessages } = buildMessages(
             processedMessage,
             fullContext,
             model,
@@ -559,10 +559,40 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           // Get the database model value for storage
           const dbModel = getDbModelValue(model)
 
+          // Build the message list with system prompt.
+          // For Anthropic: use two system messages so the static persona prompt
+          // gets prompt-cached (ephemeral, 5 min TTL). The dynamic RAG context
+          // changes every request and is not cached.
+          // For other providers: use a single system message (no caching API).
+          const isAnthropic = MODEL_CONFIG[model].provider === 'anthropic'
+          const systemMessages = isAnthropic
+            ? [
+                {
+                  role: 'system' as const,
+                  content: systemParts.staticPart,
+                  providerOptions: {
+                    anthropic: { cacheControl: { type: 'ephemeral' as const } },
+                  },
+                },
+                {
+                  role: 'system' as const,
+                  content: systemParts.dynamicPart,
+                },
+              ]
+            : [
+                {
+                  role: 'system' as const,
+                  content: systemParts.staticPart + systemParts.dynamicPart,
+                },
+              ]
+
+          if (isAnthropic) {
+            console.log(`[PromptCaching] Anthropic prompt caching enabled — static system prompt (${systemParts.staticPart.length} chars) marked as ephemeral`)
+          }
+
           const result = streamText({
             model: llmModel,
-            system,
-            messages: allMessages,
+            messages: [...systemMessages, ...allMessages],
             maxOutputTokens: 8192,
             temperature: 0.7,
             providerOptions: {

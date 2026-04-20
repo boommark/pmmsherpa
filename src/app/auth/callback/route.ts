@@ -9,11 +9,24 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get('redirect_to') ?? searchParams.get('next') ?? '/chat'
   const isRecovery = next === '/set-password' || type === 'recovery'
 
-  // Handle PKCE code exchange (standard login flow)
+  // Handle PKCE code exchange (standard login + Google OAuth flow)
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
+      // Check if profile is complete — new users (e.g., first Google sign-in) need to finish setup
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('profile_completed')
+          .eq('id', user.id)
+          .single() as { data: { profile_completed: boolean } | null }
+
+        if (profile && !profile.profile_completed) {
+          return NextResponse.redirect(`${origin}/complete-profile`)
+        }
+      }
       return NextResponse.redirect(`${origin}${next}`)
     }
     console.error('Code exchange error:', error)

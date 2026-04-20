@@ -31,7 +31,7 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protected routes
+  // Protected routes — require auth + completed profile
   const protectedRoutes = ['/chat', '/history', '/saved', '/settings']
   const isProtectedRoute = protectedRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route)
@@ -43,15 +43,44 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Redirect authenticated users away from auth pages
+  // If user is authenticated and accessing a protected route, check profile completion
+  if (isProtectedRoute && user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('profile_completed')
+      .eq('id', user.id)
+      .single()
+
+    if (profile && !profile.profile_completed) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/complete-profile'
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Redirect old /request-access to /login
+  if (request.nextUrl.pathname.startsWith('/request-access')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  // Redirect authenticated users away from auth pages (except complete-profile)
   const authRoutes = ['/login', '/signup']
   const isAuthRoute = authRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route)
   )
 
   if (isAuthRoute && user) {
+    // Check if profile is complete — if not, send to complete-profile instead of chat
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('profile_completed')
+      .eq('id', user.id)
+      .single()
+
     const url = request.nextUrl.clone()
-    url.pathname = '/chat'
+    url.pathname = profile?.profile_completed ? '/chat' : '/complete-profile'
     return NextResponse.redirect(url)
   }
 

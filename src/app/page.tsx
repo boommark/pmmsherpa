@@ -97,10 +97,10 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <Link href="/login">
               <Button variant="ghost" className="rounded-full text-[#5f6368] hover:text-[#191c1e] hover:bg-[#f2f4f7]">
-                Log in
+                Sign In
               </Button>
             </Link>
-            <Link href="/request-access">
+            <Link href="/login">
               <Button className="rounded-full bg-[#0058be] hover:bg-[#004a9e] text-white shadow-none font-medium px-5">
                 Get Started
               </Button>
@@ -138,21 +138,12 @@ export default function LandingPage() {
               The GTM knowledge powering today&apos;s top companies, ready to work with you.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link href="/request-access">
+              <Link href="/login">
                 <Button
                   size="lg"
                   className="gap-2 rounded-full bg-[#0058be] hover:bg-[#004a9e] text-white font-medium px-8 shadow-none h-12 text-base"
                 >
-                  Request Access <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="/login">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="rounded-full bg-white text-[#191c1e] hover:bg-[#f8f9fb] px-8 border border-[#e2e5ea] h-12 text-base"
-                >
-                  Sign In
+                  Get Started Free <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -505,12 +496,12 @@ export default function LandingPage() {
               <p className="mb-8 text-sm text-blue-300/80 max-w-lg mx-auto">
                 38,000+ knowledge fragments. 9 knowledge layers. 500+ companies. One conversation away.
               </p>
-              <Link href="/request-access">
+              <Link href="/login">
                 <Button
                   size="lg"
                   className="gap-2 rounded-full bg-white text-[#0058be] hover:bg-blue-50 font-semibold px-8 shadow-none h-12 text-base"
                 >
-                  Request Access <ArrowRight className="h-4 w-4" />
+                  Get Started Free <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -532,7 +523,7 @@ export default function LandingPage() {
               <a href="#what-it-does" className="hover:text-[#191c1e] transition-colors">What It Does</a>
               <a href="#how-it-works" className="hover:text-[#191c1e] transition-colors">How It Works</a>
               <a href="#who-its-for" className="hover:text-[#191c1e] transition-colors">Who It&apos;s For</a>
-              <Link href="/login" className="hover:text-[#191c1e] transition-colors">Log in</Link>
+              <Link href="/login" className="hover:text-[#191c1e] transition-colors">Sign In</Link>
             </div>
           </div>
         </div>

@@ -26,7 +26,11 @@ import {
   Check,
   X,
   MoreHorizontal,
+  Zap,
+  ArrowUpCircle,
+  Infinity,
 } from 'lucide-react'
+import { FREE_TIER_MONTHLY_LIMIT } from '@/lib/constants'
 
 // Helper to group conversations by date
 function getDateGroup(date: Date): string {
@@ -356,9 +360,50 @@ function SidebarContent({
           })}
         </ul>
 
+        {/* Tier Badge + Upgrade */}
+        {!collapsed && profile && profile.tier !== 'founder' && (
+          <div className="mt-4 pt-4">
+            {profile.tier === 'free' ? (
+              <div className="px-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Free Plan</span>
+                  <span className="text-xs text-muted-foreground">
+                    {profile.messages_used_this_period}/{FREE_TIER_MONTHLY_LIMIT}
+                  </span>
+                </div>
+                <div className="w-full bg-[#282b30] rounded-full h-1.5">
+                  <div
+                    className="bg-[#0058be] h-1.5 rounded-full transition-all"
+                    style={{ width: `${Math.min(100, (profile.messages_used_this_period / FREE_TIER_MONTHLY_LIMIT) * 100)}%` }}
+                  />
+                </div>
+                <Link href="/complete-profile" onClick={onNavigate}>
+                  <Button
+                    size="sm"
+                    className="w-full bg-gradient-to-r from-[#0058be] to-[#3b82f6] hover:from-[#004a9e] hover:to-[#2563eb] text-white shadow-none text-xs h-8 mt-1"
+                  >
+                    <ArrowUpCircle className="h-3.5 w-3.5 mr-1.5" />
+                    Upgrade to Starter
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="px-3">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#0058be]/10">
+                  <Zap className="h-3.5 w-3.5 text-[#0058be]" />
+                  <span className="text-xs font-semibold text-[#0058be] dark:text-[#a8c0f0]">Starter</span>
+                  <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
+                    <Infinity className="h-3 w-3" /> Unlimited
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* User Profile Section — spacing divider instead of border */}
         {!collapsed && profile && (
-          <div className="mt-4 pt-4">
+          <div className="mt-3 pt-3">
             <Link
               href="/settings"
               onClick={onNavigate}
