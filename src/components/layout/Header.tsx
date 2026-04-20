@@ -27,7 +27,7 @@ export function Header() {
 
   const handleSignOut = async () => {
     await signOut()
-    router.push('/login')
+    window.location.href = '/login'
   }
 
   // Handle clicking the logo to start a new chat — single click, no scroll flash
