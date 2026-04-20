@@ -97,7 +97,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <Link href="/login">
               <Button variant="ghost" className="rounded-full text-[#5f6368] hover:text-[#191c1e] hover:bg-[#f2f4f7]">
-                Log in
+                Sign In
               </Button>
             </Link>
             <Link href="/login">
@@ -545,7 +545,7 @@ export default function LandingPage() {
               <a href="#what-it-does" className="hover:text-[#191c1e] transition-colors">What It Does</a>
               <a href="#how-it-works" className="hover:text-[#191c1e] transition-colors">How It Works</a>
               <a href="#who-its-for" className="hover:text-[#191c1e] transition-colors">Who It&apos;s For</a>
-              <Link href="/login" className="hover:text-[#191c1e] transition-colors">Log in</Link>
+              <Link href="/login" className="hover:text-[#191c1e] transition-colors">Sign In</Link>
             </div>
           </div>
         </div>
