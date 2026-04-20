@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
-import { USE_CASES } from '@/lib/constants'
 import { Loader2, CheckCircle2, Zap, Gift } from 'lucide-react'
 
 export default function CompleteProfilePage() {
@@ -26,9 +25,6 @@ export default function CompleteProfilePage() {
 
   const [formData, setFormData] = useState({
     linkedinUrl: '',
-    profession: '',
-    company: '',
-    useCases: [] as string[],
     consentGiven: false,
   })
 
@@ -45,15 +41,6 @@ export default function CompleteProfilePage() {
     }
     loadUser()
   }, [supabase, router])
-
-  const handleUseCaseToggle = (useCase: string) => {
-    setFormData(prev => ({
-      ...prev,
-      useCases: prev.useCases.includes(useCase)
-        ? prev.useCases.filter(u => u !== useCase)
-        : [...prev.useCases, useCase]
-    }))
-  }
 
   const validateLinkedInUrl = (url: string): boolean => {
     if (!url) return false
@@ -75,11 +62,6 @@ export default function CompleteProfilePage() {
       return
     }
 
-    if (formData.useCases.length === 0) {
-      setError('Please select at least one area of interest')
-      return
-    }
-
     if (!formData.consentGiven) {
       setError('Please accept the communication consent to continue')
       return
@@ -93,9 +75,6 @@ export default function CompleteProfilePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           linkedinUrl: formData.linkedinUrl,
-          profession: formData.profession || null,
-          company: formData.company || null,
-          useCases: formData.useCases,
           consentGiven: formData.consentGiven,
         }),
       })
@@ -158,24 +137,16 @@ export default function CompleteProfilePage() {
 
       <div className="w-full max-w-lg relative z-10 my-8">
         <div className="rounded-2xl bg-white/80 dark:bg-[#1e2125]/80 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,88,190,0.06)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-[#e8ecf4]/60 dark:border-transparent p-8">
-          {/* Header */}
-          <div className="text-center space-y-4 mb-8">
+          {/* Header — orb only, no duplicate logo */}
+          <div className="text-center space-y-3 mb-8">
             <div className="flex justify-center mb-4">
-              <AnimatedOrb size="sm" />
+              <AnimatedOrb size="md" />
             </div>
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-[#0058be] flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M2 20L7 10l5 6 4-10 6 14" />
-                </svg>
-              </div>
-              <span className="text-xl font-bold text-[#0058be] dark:text-[#a8c0f0]">
-                PMMSherpa
-              </span>
-            </div>
-            <h1 className="text-2xl font-bold text-[#191c1e] dark:text-[#e2e4e8]">Complete Your Profile</h1>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0058be] to-[#3b82f6] bg-clip-text text-transparent">
+              {userName ? `Welcome, ${userName}!` : 'Complete Your Profile'}
+            </h1>
             <p className="text-muted-foreground text-sm">
-              {userName ? `Welcome, ${userName}! ` : ''}Tell us a bit about yourself so we can personalize your experience.
+              Tell us a bit about yourself so we can personalize your experience.
             </p>
           </div>
 
@@ -205,48 +176,6 @@ export default function CompleteProfilePage() {
                 required
                 className="h-11 rounded-xl bg-[#f2f4f7] dark:bg-[#282b30] border-none focus:bg-[#d8e2ff] dark:focus:bg-[#33363b] focus:ring-0 transition-colors"
               />
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="profession" className="text-sm font-medium">Role</Label>
-                <Input
-                  id="profession"
-                  placeholder="Product Marketing Manager"
-                  value={formData.profession}
-                  onChange={(e) => setFormData(prev => ({ ...prev, profession: e.target.value }))}
-                  className="h-11 rounded-xl bg-[#f2f4f7] dark:bg-[#282b30] border-none focus:bg-[#d8e2ff] dark:focus:bg-[#33363b] focus:ring-0 transition-colors"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="company" className="text-sm font-medium">Company</Label>
-                <Input
-                  id="company"
-                  placeholder="Acme Inc."
-                  value={formData.company}
-                  onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
-                  className="h-11 rounded-xl bg-[#f2f4f7] dark:bg-[#282b30] border-none focus:bg-[#d8e2ff] dark:focus:bg-[#33363b] focus:ring-0 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">What are you interested in? *</Label>
-              <div className="grid gap-3 sm:grid-cols-2 p-4 rounded-xl bg-[#f2f4f7] dark:bg-[#282b30]">
-                {USE_CASES.map((useCase) => (
-                  <div key={useCase} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`uc-${useCase}`}
-                      checked={formData.useCases.includes(useCase)}
-                      onCheckedChange={() => handleUseCaseToggle(useCase)}
-                      className="border-[#0058be]/30 data-[state=checked]:bg-[#0058be] data-[state=checked]:border-[#0058be]"
-                    />
-                    <label htmlFor={`uc-${useCase}`} className="text-sm cursor-pointer leading-tight">
-                      {useCase}
-                    </label>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* Plan selection */}
