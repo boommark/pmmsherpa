@@ -87,7 +87,7 @@ PERPLEXITY_API_KEY                  # Web research (quick research mode)
 NEXT_PUBLIC_APP_URL                 # https://pmmsherpa.com (prod) / https://staging.pmmsherpa.com (staging)
 ```
 
-Vercel token for CLI deploys: `rQeCMwL63rT10pN5NpA2iBov`
+Vercel token for CLI deploys: stored in `~/.vercel-token` (never commit tokens to git)
 
 ---
 
@@ -149,10 +149,10 @@ git push origin main
 ### Quick deploy commands
 ```bash
 # Deploy current branch to staging preview
-npx vercel --token rQeCMwL63rT10pN5NpA2iBov --yes
+npx vercel --token $(cat ~/.vercel-token) --yes
 
 # Deploy to production (only after staging verified)
-npx vercel --token rQeCMwL63rT10pN5NpA2iBov --prod --yes
+npx vercel --token $(cat ~/.vercel-token) --prod --yes
 ```
 
 ### Branch structure
