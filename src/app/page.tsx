@@ -1,9 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { AnimatedOrb } from "@/components/ui/animated-orb";
 import { LogoBanner } from "@/components/ui/logo-banner";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Crosshair, MessageSquare, ShieldCheck, TrendingUp, Target, Box, Rocket } from "lucide-react";
 
 function MountainIcon({ className }: { className?: string }) {
   return (
@@ -48,6 +47,33 @@ const testimonials = [
   },
 ];
 
+const whatItDoes = [
+  {
+    icon: Crosshair,
+    title: "Frame",
+    description: "Every recommendation is grounded in positioning methodology, pricing strategy, category design, and GTM playbooks. Foundation, not feeling.",
+    tags: "POSITIONING · MESSAGING · GTM PLANNING",
+  },
+  {
+    icon: MessageSquare,
+    title: "Consult",
+    description: "The senior GTM advisor who picks up every time. Draws from the thought leadership of leading GTM professionals at today\u2019s top organizations.",
+    tags: "STRATEGY · COMPETITIVE · PRICING",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Validate",
+    description: "Don\u2019t find out your messaging is off after it\u2019s live. Scores your work against the same frameworks top GTM leaders use.",
+    tags: "REVIEW · STRESS-TEST · SHARPEN",
+  },
+  {
+    icon: TrendingUp,
+    title: "Grow",
+    description: "Most GTM leaders don\u2019t have a mentor who\u2019s done the job at the next level. Now you do. Career guidance and job search strategy from IC to VP, startup to enterprise.",
+    tags: "CAREER · JOB SEARCH · LEADERSHIP",
+  },
+];
+
 export default function LandingPage() {
   return (
     <div className="landing-light min-h-screen bg-white relative overflow-x-hidden" style={{ colorScheme: "light" }}>
@@ -86,12 +112,11 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-[500px] md:h-[600px] pointer-events-none">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/homepage/hero-background.png"
             alt=""
-            fill
-            className="object-contain object-top opacity-[0.30]"
-            priority
+            className="absolute inset-0 w-full h-full object-contain object-top opacity-[0.30]"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white" />
         </div>
@@ -139,62 +164,53 @@ export default function LandingPage() {
           <LogoBanner />
         </div>
 
-        {/* Stat Strip */}
-        <div className="max-w-4xl mx-auto px-5 md:px-8 py-6">
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-center">
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-[#0058be]">Hundreds</span>
-              <span className="text-sm text-[#4a4f57]">of users</span>
+        {/* Stat Strip - proper centered grid */}
+        <div className="max-w-3xl mx-auto px-5 md:px-8 py-5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <p className="text-xl font-bold text-[#0058be]">Hundreds</p>
+              <p className="text-xs text-[#4a4f57] mt-0.5">of users</p>
             </div>
-            <div className="hidden sm:block w-px h-5 bg-[#e2e5ea]" />
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-[#0058be]">100+</span>
-              <span className="text-sm text-[#4a4f57]">organizations</span>
+            <div>
+              <p className="text-xl font-bold text-[#0058be]">100+</p>
+              <p className="text-xs text-[#4a4f57] mt-0.5">organizations</p>
             </div>
-            <div className="hidden sm:block w-px h-5 bg-[#e2e5ea]" />
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-[#0058be]">38,000+</span>
-              <span className="text-sm text-[#4a4f57]">curated fragments</span>
+            <div>
+              <p className="text-xl font-bold text-[#0058be]">38,000+</p>
+              <p className="text-xs text-[#4a4f57] mt-0.5">curated fragments</p>
             </div>
-            <div className="hidden sm:block w-px h-5 bg-[#e2e5ea]" />
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-[#0058be]">9</span>
-              <span className="text-sm text-[#4a4f57]">knowledge layers</span>
+            <div>
+              <p className="text-xl font-bold text-[#0058be]">9</p>
+              <p className="text-xs text-[#4a4f57] mt-0.5">knowledge layers</p>
             </div>
           </div>
         </div>
 
-        {/* Featured Testimonial: Asli Simsek - compact shadow card */}
-        <div className="max-w-3xl mx-auto px-5 md:px-8 py-6 md:py-8">
-          <div className="rounded-2xl bg-white p-6 md:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-[#e8ecf4]/40">
-            <div className="md:flex md:gap-6 md:items-start">
-              {/* Quote + Stars */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="text-3xl text-[#0058be] font-serif leading-none">&ldquo;</div>
-                  <div className="flex gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="w-4 h-4 text-[#f59e0b]" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
-                </div>
-                <p className="text-[15px] text-[#3a3f47] leading-[1.7] mb-4 md:mb-0">
-                  {testimonials[2].quote}
-                </p>
+        {/* Featured Testimonial: Asli Simsek - vertical compact shadow card */}
+        <div className="max-w-2xl mx-auto px-5 md:px-8 py-4 md:py-6">
+          <div className="rounded-2xl bg-white p-5 md:p-7 shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-[#e8ecf4]/40">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="text-2xl text-[#0058be] font-serif leading-none">&ldquo;</div>
+              <div className="flex gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-4 h-4 text-[#f59e0b]" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
               </div>
-              {/* Attribution */}
-              <div className="flex items-center gap-3 pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-[#f0f2f5] md:pl-6 md:flex-shrink-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={testimonials[2].photo} alt={testimonials[2].name} className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
-                <div>
-                  <div className="text-sm font-bold bg-gradient-to-r from-[#0058be] to-[#2170e4] bg-clip-text text-transparent">
-                    {testimonials[2].name}
-                  </div>
-                  <div className="text-xs text-[#5f6368] mt-0.5">
-                    {testimonials[2].role}
-                  </div>
+            </div>
+            <p className="text-[15px] text-[#3a3f47] leading-[1.7] mb-4">
+              {testimonials[2].quote}
+            </p>
+            <div className="flex items-center gap-3 pt-3 border-t border-[#f0f2f5]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={testimonials[2].photo} alt={testimonials[2].name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+              <div>
+                <div className="text-sm font-bold bg-gradient-to-r from-[#0058be] to-[#2170e4] bg-clip-text text-transparent">
+                  {testimonials[2].name}
+                </div>
+                <div className="text-xs text-[#5f6368] mt-0.5">
+                  {testimonials[2].role}
                 </div>
               </div>
             </div>
@@ -202,7 +218,7 @@ export default function LandingPage() {
         </div>
 
         {/* Hero Demo Video */}
-        <div className="max-w-5xl mx-auto px-5 md:px-8 pb-12 md:pb-16 relative">
+        <div className="max-w-5xl mx-auto px-5 md:px-8 pb-10 md:pb-14 relative">
           <div className="max-w-4xl mx-auto">
             <div className="rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,88,190,0.10)] ring-1 ring-[#e8ecf4]/60">
               <video autoPlay loop muted playsInline className="w-full h-auto">
@@ -213,92 +229,37 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* What It Does - Stacked vertical layout */}
+      {/* What It Does - Cyclops-style: icon + title inline, description below */}
       <section id="what-it-does" className="py-14 md:py-20 scroll-mt-20" style={{
         background: "linear-gradient(180deg, #f8f9fd 0%, #f0f3fa 50%, #f8f9fd 100%)",
       }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="text-center mb-12 md:mb-16">
+          <div className="text-center mb-10 md:mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">What It Does</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e]">
               Four ways to work without second-guessing yourself
             </h2>
           </div>
 
-          <div className="max-w-4xl mx-auto space-y-0">
-            {/* Frame */}
-            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-8 md:py-10 border-b border-[#e2e5ea]/50 cursor-default">
-              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
-                <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">01</span>
-                <div className="flex items-center gap-3">
-                  <Image src="/icons/frame.png" alt="Frame" width={44} height={44} className="object-contain" />
-                  <h3 className="text-xl font-bold text-[#191c1e]">Frame</h3>
+          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
+            {whatItDoes.map((item, i) => (
+              <div key={i} className={`py-7 ${i < 2 ? 'border-b border-[#e2e5ea]/50' : ''} ${i === 2 ? 'md:border-b md:border-[#e2e5ea]/50' : ''}`}>
+                <div className="flex items-center gap-3 mb-3">
+                  <item.icon className="h-5 w-5 text-[#0058be] flex-shrink-0" strokeWidth={2} />
+                  <h3 className="text-lg font-bold text-[#191c1e]">{item.title}</h3>
                 </div>
-              </div>
-              <div className="md:pt-4">
-                <p className="text-base text-[#3a3f47] leading-relaxed mb-3">
-                  Every recommendation is grounded in positioning methodology, pricing strategy, category design, and GTM playbooks. Foundation, not feeling.
+                <p className="text-sm text-[#3a3f47] leading-relaxed mb-2">
+                  {item.description}
                 </p>
-                <p className="text-xs font-medium text-[#0058be] tracking-wide">POSITIONING · MESSAGING · GTM PLANNING</p>
+                <p className="text-xs font-medium text-[#0058be] tracking-wide">{item.tags}</p>
               </div>
-            </div>
-
-            {/* Consult */}
-            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-8 md:py-10 border-b border-[#e2e5ea]/50">
-              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
-                <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">02</span>
-                <div className="flex items-center gap-3">
-                  <Image src="/icons/consult.png" alt="Consult" width={44} height={44} className="object-contain" />
-                  <h3 className="text-xl font-bold text-[#191c1e]">Consult</h3>
-                </div>
-              </div>
-              <div className="md:pt-4">
-                <p className="text-base text-[#3a3f47] leading-relaxed mb-3">
-                  The senior GTM advisor who picks up every time. Draws from the thought leadership of leading GTM professionals at today&apos;s top organizations.
-                </p>
-                <p className="text-xs font-medium text-[#0058be] tracking-wide">STRATEGY · COMPETITIVE · PRICING</p>
-              </div>
-            </div>
-
-            {/* Validate */}
-            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-8 md:py-10 border-b border-[#e2e5ea]/50">
-              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
-                <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">03</span>
-                <div className="flex items-center gap-3">
-                  <Image src="/icons/validate.png" alt="Validate" width={44} height={44} className="object-contain" />
-                  <h3 className="text-xl font-bold text-[#191c1e]">Validate</h3>
-                </div>
-              </div>
-              <div className="md:pt-4">
-                <p className="text-base text-[#3a3f47] leading-relaxed mb-3">
-                  Don&apos;t find out your messaging is off after it&apos;s live. Scores your work against the same frameworks top GTM leaders use.
-                </p>
-                <p className="text-xs font-medium text-[#0058be] tracking-wide">REVIEW · STRESS-TEST · SHARPEN</p>
-              </div>
-            </div>
-
-            {/* Grow */}
-            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-10 py-8 md:py-10">
-              <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-48">
-                <span className="text-5xl md:text-6xl font-extrabold text-[#0058be]/10 leading-none">04</span>
-                <div className="flex items-center gap-3">
-                  <Image src="/icons/grow.png" alt="Grow" width={44} height={44} className="object-contain" />
-                  <h3 className="text-xl font-bold text-[#191c1e]">Grow</h3>
-                </div>
-              </div>
-              <div className="md:pt-4">
-                <p className="text-base text-[#3a3f47] leading-relaxed mb-3">
-                  Most GTM leaders don&apos;t have a mentor who&apos;s done the job at the next level. Now you do. Career guidance and job search strategy from IC to VP, startup to enterprise.
-                </p>
-                <p className="text-xs font-medium text-[#0058be] tracking-wide">CAREER · JOB SEARCH · LEADERSHIP</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Testimonials - Dark section with glassmorphic cards */}
-      <section className="py-14 md:py-20 relative overflow-hidden" style={{
+      <section className="py-12 md:py-16 relative overflow-hidden" style={{
         background: "linear-gradient(135deg, #0a1628 0%, #0f1d35 40%, #162544 100%)",
       }}>
         {/* Subtle gradient orbs for depth */}
@@ -310,45 +271,46 @@ export default function LandingPage() {
         }} />
 
         <div className="max-w-6xl mx-auto px-5 md:px-8 relative">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#5a9cf5] mb-3">What Users Say</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-white">
               The difference is immediate
             </h2>
           </div>
 
-          <div className="max-w-5xl mx-auto space-y-5">
+          <div className="max-w-5xl mx-auto space-y-4">
             {[testimonials[3], testimonials[1], testimonials[0]].map((t, i) => (
               <div
                 key={i}
-                className="rounded-2xl p-6 md:p-8 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
+                className="rounded-2xl p-5 md:p-6 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
                 style={{
                   background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
                 }}
               >
                 <blockquote>
-                  <div className="text-4xl font-serif text-[#2170e4]/40 leading-none mb-3">&ldquo;</div>
-                  {/* Stars */}
-                  <div className="flex gap-1 mb-3">
-                    {[...Array(5)].map((_, j) => (
-                      <svg key={j} className="w-5 h-5 text-[#f59e0b]" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="text-2xl font-serif text-[#2170e4]/40 leading-none">&ldquo;</div>
+                    <div className="flex gap-0.5">
+                      {[...Array(5)].map((_, j) => (
+                        <svg key={j} className="w-4 h-4 text-[#f59e0b]" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-[15px] md:text-base text-[#c8d0e0] leading-[1.8] mb-5">
+                  <p className="text-[15px] md:text-base text-[#c8d0e0] leading-[1.75] mb-4">
                     {t.quote}
                   </p>
-                  <footer className="flex items-center gap-4 pt-4 border-t border-white/[0.06]">
+                  <footer className="flex items-center gap-3 pt-3 border-t border-white/[0.06]">
                     {t.photo && (
                       /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={t.photo} alt={t.name} className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
+                      <img src={t.photo} alt={t.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
                     )}
                     <div>
                       <div className="text-sm font-semibold bg-gradient-to-r from-[#5a9cf5] to-[#2170e4] bg-clip-text text-transparent tracking-wide">
                         {t.name}
                       </div>
-                      <div className="text-xs text-[#6b7280] mt-1">
+                      <div className="text-xs text-[#6b7280] mt-0.5">
                         {t.role}
                       </div>
                     </div>
@@ -365,7 +327,7 @@ export default function LandingPage() {
         background: "linear-gradient(180deg, #0a1628 0%, #0f1d35 50%, #0a1628 100%)",
       }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="text-center mb-14 md:mb-16">
+          <div className="text-center mb-12 md:mb-14">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#5a9cf5] mb-3">How It Works</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] mb-4 text-white">
               Ask. Get depth. Ship.
@@ -376,7 +338,7 @@ export default function LandingPage() {
           </div>
 
           {/* Step 1 */}
-          <div className="max-w-5xl mx-auto mb-16 md:mb-20">
+          <div className="max-w-5xl mx-auto mb-10 md:mb-14">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 text-sm font-medium text-[#5a9cf5] mb-4">
@@ -402,7 +364,7 @@ export default function LandingPage() {
           </div>
 
           {/* Step 2 */}
-          <div className="max-w-5xl mx-auto mb-16 md:mb-20">
+          <div className="max-w-5xl mx-auto mb-10 md:mb-14">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               <div className="order-2 md:order-1 rounded-2xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
                 <video autoPlay loop muted playsInline className="w-full h-auto">
@@ -428,7 +390,7 @@ export default function LandingPage() {
           </div>
 
           {/* Step 3 */}
-          <div className="max-w-5xl mx-auto mb-16 md:mb-20">
+          <div className="max-w-5xl mx-auto mb-10 md:mb-14">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 text-sm font-medium text-[#5a9cf5] mb-4">
@@ -480,7 +442,7 @@ export default function LandingPage() {
           </div>
 
           {/* Stats bar */}
-          <div className="max-w-4xl mx-auto mt-16 pt-10 border-t border-white/[0.08] grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="max-w-4xl mx-auto mt-14 pt-10 border-t border-white/[0.08] grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
               <p className="text-2xl md:text-3xl font-extrabold text-[#5a9cf5]">38,000+</p>
               <p className="text-xs text-[#6b7280] mt-1">Curated knowledge fragments</p>
@@ -501,7 +463,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Who It's For */}
+      {/* Who It's For - Lucide SVG icons */}
       <section id="who-its-for" className="py-14 md:py-20 scroll-mt-20" style={{
         background: "linear-gradient(180deg, #ffffff 0%, #f8f9fd 50%, #ffffff 100%)",
       }}>
@@ -515,8 +477,8 @@ export default function LandingPage() {
 
           <div className="mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="rounded-2xl bg-white p-7 md:p-8 border border-[#e8ecf4]/60 hover:shadow-[0_8px_30px_rgba(0,88,190,0.06)] transition-all">
-              <div className="w-16 h-16 mb-5">
-                <Image src="/icons/product-marketer.png" alt="Product Marketers" width={64} height={64} className="object-contain" />
+              <div className="w-12 h-12 rounded-xl bg-[#0058be]/[0.08] flex items-center justify-center mb-5">
+                <Target className="h-6 w-6 text-[#0058be]" strokeWidth={1.75} />
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Product Marketers</h3>
               <p className="text-sm text-[#4a4f57] leading-relaxed">
@@ -525,8 +487,8 @@ export default function LandingPage() {
             </div>
 
             <div className="rounded-2xl bg-white p-7 md:p-8 border border-[#e8ecf4]/60 hover:shadow-[0_8px_30px_rgba(0,88,190,0.06)] transition-all">
-              <div className="w-16 h-16 mb-5">
-                <Image src="/icons/product-manager.png" alt="Product Managers" width={64} height={64} className="object-contain" />
+              <div className="w-12 h-12 rounded-xl bg-[#0058be]/[0.08] flex items-center justify-center mb-5">
+                <Box className="h-6 w-6 text-[#0058be]" strokeWidth={1.75} />
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Product Managers</h3>
               <p className="text-sm text-[#4a4f57] leading-relaxed">
@@ -535,8 +497,8 @@ export default function LandingPage() {
             </div>
 
             <div className="rounded-2xl bg-white p-7 md:p-8 border border-[#e8ecf4]/60 hover:shadow-[0_8px_30px_rgba(0,88,190,0.06)] transition-all">
-              <div className="w-16 h-16 mb-5">
-                <Image src="/icons/technical-founder.png" alt="Founders" width={64} height={64} className="object-contain" />
+              <div className="w-12 h-12 rounded-xl bg-[#0058be]/[0.08] flex items-center justify-center mb-5">
+                <Rocket className="h-6 w-6 text-[#0058be]" strokeWidth={1.75} />
               </div>
               <h3 className="text-lg font-semibold text-[#191c1e] mb-3">Founders</h3>
               <p className="text-sm text-[#4a4f57] leading-relaxed">
