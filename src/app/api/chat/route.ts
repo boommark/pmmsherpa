@@ -9,10 +9,11 @@ import { conductResearch } from '@/lib/llm/perplexity-client'
 import { extractUrls, scrapeUrls } from '@/lib/url-scraper'
 import { searchAndFetch } from '@/lib/web/brave-search'
 import type { ChatAttachment, WebCitation } from '@/types/chat'
-import { trackCost } from '@/lib/cost-tracker'
+import { trackCost, calculateCost } from '@/lib/cost-tracker'
 import { pollUntilDone as pollLlamaParse } from '@/lib/llamaparse'
 import { scanInput, scanOutput, SAFE_RESPONSE, CANARY_TOKEN } from '@/lib/prompt-guard'
 import { initLogger } from 'braintrust'
+import { getPostHogClient } from '@/lib/posthog-server'
 
 const btLogger = initLogger({
   projectName: 'PMMSherpa',
@@ -174,6 +175,18 @@ export async function POST(request: NextRequest) {
       const resetAtIso = resetAt.toISOString().replace(/\.\d{3}Z$/, 'Z') // "2026-05-01T00:00:00Z"
 
       console.log(`[UsageGate] User ${user.email} hit monthly limit: ${messagesUsed}/${FREE_TIER_MONTHLY_LIMIT}, resets ${resetAtIso}`)
+
+      getPostHogClient().capture({
+        distinctId: user.id,
+        event: 'usage_limit_hit',
+        properties: {
+          email: user.email,
+          tier,
+          messages_used: messagesUsed,
+          limit: FREE_TIER_MONTHLY_LIMIT,
+          resets_at: resetAtIso,
+        },
+      })
 
       return new Response(
         JSON.stringify({
@@ -816,6 +829,27 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           } catch (btError) {
             console.error('Braintrust logging error:', btError)
           }
+
+          // Track completion in PostHog
+          const llmCostUsd = calculateCost(llmService, {
+            inputTokens: usage?.inputTokens || 0,
+            outputTokens: usage?.outputTokens || 0,
+          })
+          getPostHogClient().capture({
+            distinctId: user.id,
+            event: 'chat_message_completed',
+            properties: {
+              model,
+              input_tokens: usage?.inputTokens || 0,
+              output_tokens: usage?.outputTokens || 0,
+              total_tokens: (usage?.inputTokens || 0) + (usage?.outputTokens || 0),
+              latency_ms: latencyMs,
+              cost_usd: llmCostUsd,
+              rag_chunks_retrieved: chunks.length,
+              web_research_used: !!perplexityResult,
+              has_attachments: !!(hasAttachments),
+            },
+          })
 
           // Signal completion
           controller.enqueue(
