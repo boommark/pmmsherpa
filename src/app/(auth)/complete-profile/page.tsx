@@ -146,7 +146,7 @@ export default function CompleteProfilePage() {
               {userName ? `Welcome, ${userName}!` : 'Complete Your Profile'}
             </h1>
             <p className="text-muted-foreground text-sm">
-              Tell us a bit about yourself so we can personalize your experience.
+              One last step before you get started.
             </p>
           </div>
 
