@@ -22,13 +22,13 @@ function MountainIcon({ className }: { className?: string }) {
 
 const testimonials = [
   {
-    quote: "PMM Sherpa is a great example of an effective vertical AI solution. It\u2019s purpose built. The output isn\u2019t just fast; it\u2019s grounded in real-world frameworks and actual PMM experience. It\u2019s levels above what I get from a general-purpose model like Claude.",
+    quote: "PMMSherpa is a great example of an effective vertical AI solution. It\u2019s purpose built. The output isn\u2019t just fast; it\u2019s grounded in real-world frameworks and actual PMM experience. It\u2019s levels above what I get from a general-purpose model like Claude.",
     name: "VP of Product Marketing",
     role: "Fortune 200 ERP Provider",
     photo: "",
   },
   {
-    quote: "PMM Sherpa gave me access to expert product marketing feedback loops and suggestions for my scenario rapidly and focus on what it seems like a seasoned professional would say. Easy to use and just works. Definitely seems more focused and professional than just using a flagship model alone.",
+    quote: "PMMSherpa gave me access to expert product marketing feedback loops and suggestions for my scenario rapidly and focus on what it seems like a seasoned professional would say. Easy to use and just works. Definitely seems more focused and professional than just using a flagship model alone.",
     name: "Daniel Wolff",
     role: "Senior Engineering Consultant, ex-Meta, authID",
     photo: "/homepage/dan_wolff_profile.jpeg",
@@ -40,13 +40,13 @@ const testimonials = [
     photo: "/homepage/asli-simsek.png",
   },
   {
-    quote: "PMM Sherpa actually feels like a new individual thinking about your project with you. It\u2019s really a team partner working alongside you. No lecturing, no pandering, no generic frameworks dressed up with language as insight. Just a thinking partner that meets you at your level and pushes you forward.",
+    quote: "PMMSherpa actually feels like a new individual thinking about your project with you. It\u2019s really a team partner working alongside you. No lecturing, no pandering, no generic frameworks dressed up with language as insight. Just a thinking partner that meets you at your level and pushes you forward.",
     name: "Shreyas Sriram",
     role: "Founder, Practice Intuition / AI Researcher",
     photo: "/homepage/shreyas-sriram.jpeg",
   },
   {
-    quote: "I\u2019ve spent over a decade in product marketing, refining frameworks for everything from positioning to go-to-market strategy, and PMM Sherpa feels like working with an experienced partner. The frameworks are built in, and the outputs are far more useful than a general-purpose LLM. It helps me move faster while maintaining quality, and its strong point of view challenges my thinking in ways other tools don\u2019t.",
+    quote: "I\u2019ve spent over a decade in product marketing, refining frameworks for everything from positioning to go-to-market strategy, and PMMSherpa feels like working with an experienced partner. The frameworks are built in, and the outputs are far more useful than a general-purpose LLM. It helps me move faster while maintaining quality, and its strong point of view challenges my thinking in ways other tools don\u2019t.",
     name: "Brian Remmel",
     role: "Principal Product Marketing Manager, Palo Alto Networks",
     photo: "/homepage/brain_remmel_bio.jpeg",
@@ -167,7 +167,7 @@ export default function LandingPage() {
           <LogoBanner />
         </div>
 
-        {/* Featured Testimonial: Asli Simsek - vertical compact shadow card */}
+        {/* Featured Testimonial: Brian Remmel - vertical compact shadow card */}
         <div className="max-w-2xl mx-auto px-5 md:px-8 py-4 md:py-6">
           <div className="rounded-2xl bg-white p-5 md:p-7 shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-[#e8ecf4]/40">
             <div className="flex items-center gap-2 mb-3">
@@ -181,17 +181,17 @@ export default function LandingPage() {
               </div>
             </div>
             <p className="text-[15px] text-[#3a3f47] leading-[1.7] mb-4">
-              {testimonials[2].quote}
+              {testimonials[4].quote}
             </p>
             <div className="flex items-center gap-3 pt-3 border-t border-[#f0f2f5]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={testimonials[2].photo} alt={testimonials[2].name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+              <img src={testimonials[4].photo} alt={testimonials[4].name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
               <div>
                 <div className="text-sm font-bold bg-gradient-to-r from-[#0058be] to-[#2170e4] bg-clip-text text-transparent">
-                  {testimonials[2].name}
+                  {testimonials[4].name}
                 </div>
                 <div className="text-xs text-[#5f6368] mt-0.5">
-                  {testimonials[2].role}
+                  {testimonials[4].role}
                 </div>
               </div>
             </div>
@@ -260,7 +260,7 @@ export default function LandingPage() {
           </div>
 
           <div className="max-w-5xl mx-auto space-y-4">
-            {[testimonials[4], testimonials[5], testimonials[3], testimonials[1], testimonials[0]].map((t, i) => (
+            {[testimonials[2], testimonials[3], testimonials[1], testimonials[0], testimonials[5]].map((t, i) => (
               <div
                 key={i}
                 className="rounded-2xl p-5 md:p-6 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
