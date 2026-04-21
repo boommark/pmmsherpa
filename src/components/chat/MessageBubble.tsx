@@ -9,8 +9,10 @@ import { Loader2, Copy, Pencil, Check, Volume2, VolumeX, FileText, Image as Imag
 import { toast } from 'sonner'
 import { copyForGoogleDocs, type CopyOptions } from '@/lib/utils/clipboard'
 import type { ChatMessage } from '@/types/chat'
-import type { Citation } from '@/types/database'
+import type { Citation, ExpandedResearchDb } from '@/types/database'
 import { useVoiceOutput } from '@/hooks/useVoiceOutput'
+import { useProfile } from '@/hooks/useSupabase'
+import { WebSources } from './WebSources'
 
 interface MessageBubbleProps {
   message: ChatMessage
@@ -35,6 +37,8 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
   const isUser = message.role === 'user'
   const isStreaming = message.isStreaming
   const [copied, setCopied] = useState(false)
+  const { profile } = useProfile()
+  const isPaidUser = profile?.tier === 'starter' || profile?.tier === 'founder'
 
   const { isPlaying, isLoading: isVoiceLoading, speak, stop } = useVoiceOutput({
     onError: (error) => {
@@ -211,6 +215,11 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
           )}
         </div>
       </div>
+
+      {/* Web Sources — Starter/Founder only */}
+      {!isUser && !isStreaming && isPaidUser && message.expandedResearch && (
+        <WebSources expandedResearch={message.expandedResearch as ExpandedResearchDb} />
+      )}
 
       {/* Action buttons */}
       {!isStreaming && (
