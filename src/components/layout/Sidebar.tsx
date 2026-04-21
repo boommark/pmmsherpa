@@ -135,14 +135,22 @@ function SidebarContent({
         .toUpperCase()
     : profile?.email?.[0]?.toUpperCase() || 'U'
 
-  // Handle new chat click — set store flag so ChatContainer immediately
-  // renders the welcome screen, then navigate.
+  // Handle new chat click — clear state and navigate
+  const chatStore = useChatStore()
   const handleNewChat = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
+    // Immediately clear chat state so welcome screen shows
+    chatStore.clearMessages()
+    chatStore.setConversationId(null)
     setPendingNewChat(true)
     onNavigate?.()
-    router.push(`/chat?t=${Date.now()}`)
-  }, [setPendingNewChat, router, onNavigate])
+    // Force navigation even if already on /chat
+    if (pathname.startsWith('/chat')) {
+      router.replace(`/chat?t=${Date.now()}`)
+    } else {
+      router.push('/chat')
+    }
+  }, [chatStore, setPendingNewChat, router, onNavigate, pathname])
 
   // Group conversations by date
   const groupedConversations = useMemo(() => {
@@ -165,7 +173,7 @@ function SidebarContent({
   const groupOrder = ['Today', 'Yesterday', 'Previous 7 Days', 'Previous 30 Days', 'Older']
 
   const navItems = [
-    { href: '/chat', icon: MessageSquare, label: 'New Chat' },
+    { href: '/chat', icon: MessageSquare, label: 'New Chat', isNewChat: true },
     { href: '/history', icon: History, label: 'History' },
     { href: '/saved', icon: Bookmark, label: 'Saved' },
     { href: '/settings/preferences', icon: Settings, label: 'Settings' },
@@ -340,21 +348,36 @@ function SidebarContent({
             const isActive = pathname === item.href
             return (
               <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={onNavigate}
-                  className={cn(
-                    'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                    'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
-                    isActive
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                      : 'text-sidebar-foreground',
-                    collapsed && 'justify-center'
-                  )}
-                >
-                  <item.icon className="h-4 w-4" />
-                  {!collapsed && <span className="ml-3">{item.label}</span>}
-                </Link>
+                {item.isNewChat ? (
+                  <button
+                    onClick={handleNewChat}
+                    className={cn(
+                      'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors w-full',
+                      'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                      'text-sidebar-foreground',
+                      collapsed && 'justify-center'
+                    )}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {!collapsed && <span className="ml-3">{item.label}</span>}
+                  </button>
+                ) : (
+                  <Link
+                    href={item.href}
+                    onClick={onNavigate}
+                    className={cn(
+                      'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                      'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                      isActive
+                        ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                        : 'text-sidebar-foreground',
+                      collapsed && 'justify-center'
+                    )}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {!collapsed && <span className="ml-3">{item.label}</span>}
+                  </Link>
+                )}
               </li>
             )
           })}

@@ -8,8 +8,8 @@ import { MessageList } from './MessageList'
 import { ChatInput, type ChatInputRef } from './ChatInput'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
-import Image from 'next/image'
-import { Loader2 } from 'lucide-react'
+// Image import removed — tiles now use Lucide icons
+import { Loader2, Crosshair, ShieldCheck, Rocket, Target, TrendingUp } from 'lucide-react'
 import type { ChatMessage, ChatAttachment } from '@/types/chat'
 import type { UploadedFile } from './FileUpload'
 import { VoiceModeOverlay } from '@/components/voice/VoiceModeOverlay'
@@ -546,63 +546,77 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             </div>
           </div>
 
-          {/* Pillar tiles */}
+          {/* Starter prompt tiles */}
           <div className="w-full max-w-2xl mx-auto px-4 md:px-6 py-3 md:py-7">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3.5">
               <button
-                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
-                onClick={() => handleSendMessage("Help me build a positioning statement for my B2B developer tools product")}
+                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
+                onClick={() => chatInputRef.current?.setInput("Here's our positioning: [paste it]. Where is it vague? Where would a buyer not see how we're different? Rewrite the weak parts.")}
               >
                 <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
-                  <Image src="/icons/frame.png" alt="" width={28} height={28} className="shrink-0 w-5 h-5 md:w-7 md:h-7" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Frame</span>
+                  <Crosshair className="shrink-0 w-4 h-4 md:w-5 md:h-5 text-[#0058be]" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Position</span>
                 </div>
-                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug">
-                  Help me build a positioning statement for my B2B dev tools product
+                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug font-medium">
+                  Sound like everyone else?
                 </p>
-                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Positioning, messaging, GTM planning</p>
+                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Sharpen what makes you different</p>
               </button>
 
               <button
-                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
-                onClick={() => handleSendMessage("We're losing deals to a competitor who's 40% cheaper. How should I respond?")}
+                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
+                onClick={() => chatInputRef.current?.setInput("Audit this page: [paste URL]. Grade it against proven frameworks and give me the 5 most impactful rewrites.")}
               >
                 <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
-                  <Image src="/icons/consult.png" alt="" width={28} height={28} className="shrink-0 w-5 h-5 md:w-7 md:h-7" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Consult</span>
+                  <ShieldCheck className="shrink-0 w-4 h-4 md:w-5 md:h-5 text-[#0058be]" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Audit</span>
                 </div>
-                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug">
-                  We&apos;re losing deals to a competitor who&apos;s 40% cheaper. How should I respond?
+                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug font-medium">
+                  Is your page actually converting?
                 </p>
-                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Strategy, competitive, pricing questions</p>
+                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Pressure-test any asset</p>
               </button>
 
               <button
-                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
-                onClick={() => handleSendMessage("Review this messaging and tell me where it's weak")}
+                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
+                onClick={() => chatInputRef.current?.setInput("We're launching [product/feature] in [timeframe]. Generate a launch brief: tier, messaging, success metrics, and timeline.")}
               >
                 <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
-                  <Image src="/icons/validate.png" alt="" width={28} height={28} className="shrink-0 w-5 h-5 md:w-7 md:h-7" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Validate</span>
+                  <Rocket className="shrink-0 w-4 h-4 md:w-5 md:h-5 text-[#0058be]" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Launch</span>
                 </div>
-                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug">
-                  Review this messaging and tell me where it&apos;s weak
+                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug font-medium">
+                  Alignment breaks down at launch
                 </p>
-                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Stress-test work against expert standards</p>
+                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Plan launches that stick</p>
               </button>
 
               <button
-                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
-                onClick={() => handleSendMessage("I'm transitioning from IC to PMM manager. What should I focus on first?")}
+                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
+                onClick={() => chatInputRef.current?.setInput("Build a battlecard: us [your product] vs [competitor]. Objection handling, discovery questions, and where they're weak.")}
               >
                 <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
-                  <Image src="/icons/grow.png" alt="" width={28} height={28} className="shrink-0 w-5 h-5 md:w-7 md:h-7" />
+                  <Target className="shrink-0 w-4 h-4 md:w-5 md:h-5 text-[#0058be]" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Compete</span>
+                </div>
+                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug font-medium">
+                  Sales needs a battlecard by morning
+                </p>
+                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Win more deals</p>
+              </button>
+
+              <button
+                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all sm:col-span-2"
+                onClick={() => chatInputRef.current?.setInput("I'm preparing to move from [current role] to [target role]. Here's what I've shipped: [list projects]. Help me frame the strongest narrative.")}
+              >
+                <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
+                  <TrendingUp className="shrink-0 w-4 h-4 md:w-5 md:h-5 text-[#0058be]" />
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Grow</span>
                 </div>
-                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug">
-                  I&apos;m transitioning from IC to PMM manager. What should I focus on first?
+                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug font-medium">
+                  Ready for your next level?
                 </p>
-                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Career guidance, skill gaps, leadership</p>
+                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Career strategy that lands</p>
               </button>
             </div>
           </div>
