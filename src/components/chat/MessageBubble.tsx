@@ -208,7 +208,7 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
           >
             {message.content}
           </ReactMarkdown>
-          {isStreaming && (
+          {isStreaming && message.content && (
             <span className="inline-flex items-center ml-1">
               <Loader2 className="h-3 w-3 animate-spin" />
             </span>
