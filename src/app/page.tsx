@@ -45,6 +45,18 @@ const testimonials = [
     role: "Founder, Practice Intuition / AI Researcher",
     photo: "/homepage/shreyas-sriram.jpeg",
   },
+  {
+    quote: "I\u2019ve spent over a decade in product marketing, refining frameworks for everything from positioning to go-to-market strategy, and PMM Sherpa feels like working with an experienced partner. The frameworks are built in, and the outputs are far more useful than a general-purpose LLM. It helps me move faster while maintaining quality, and its strong point of view challenges my thinking in ways other tools don\u2019t.",
+    name: "Brian Remmel",
+    role: "Principal Product Marketing Manager, Palo Alto Networks",
+    photo: "/homepage/brain_remmel_bio.jpeg",
+  },
+  {
+    quote: "I\u2019ve tried most AI tools that claim to \u201Chelp with branding,\u201D and almost all of them feel like they\u2019re guessing with confidence. PMMSherpa is different. What stood out immediately was the precision of its thinking. The insights weren\u2019t generic or dressed-up clich\u00E9s. They felt sharp, considered and actually usable. The kind of output you\u2019d expect from someone who understands brand strategy, not just language patterns. There\u2019s an understanding of nuance here. Of tone, positioning and what makes something distinctive versus just different. If you work in branding, this is one of the few AI tools that doesn\u2019t feel like it\u2019s wasting your time.",
+    name: "Head of Creative Strategy",
+    role: "ex-Edelman",
+    photo: "",
+  },
 ];
 
 const whatItDoes = [
@@ -248,7 +260,7 @@ export default function LandingPage() {
           </div>
 
           <div className="max-w-5xl mx-auto space-y-4">
-            {[testimonials[3], testimonials[1], testimonials[0]].map((t, i) => (
+            {[testimonials[4], testimonials[5], testimonials[3], testimonials[1], testimonials[0]].map((t, i) => (
               <div
                 key={i}
                 className="rounded-2xl p-5 md:p-6 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.2)]"
