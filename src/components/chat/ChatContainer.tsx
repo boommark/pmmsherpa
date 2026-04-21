@@ -541,7 +541,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                 What are you working on?
               </h2>
               <p className="text-xs md:text-base text-muted-foreground/70 max-w-lg mx-auto" style={{ letterSpacing: '0.01em' }}>
-                Grounded in the frameworks, war stories, and playbooks of thousands of real-world PMM leaders.
+                Grounded in the frameworks, war stories, and playbooks of thousands of real-world PMM leaders.{' '}
+                <a href="/guides" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">Explore Guides</a> for ready-to-use prompts.
               </p>
             </div>
           </div>
