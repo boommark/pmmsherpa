@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input'
 import {
   MessageSquare,
   History,
-  Bookmark,
+  BookOpen,
   Settings,
   Plus,
   PanelLeftClose,
@@ -175,7 +175,7 @@ function SidebarContent({
   const navItems = [
     { href: '/chat', icon: MessageSquare, label: 'New Chat', isNewChat: true },
     { href: '/history', icon: History, label: 'History' },
-    { href: '/saved', icon: Bookmark, label: 'Saved' },
+    { href: '/guides', icon: BookOpen, label: 'Guides', highlighted: true },
     { href: '/settings/preferences', icon: Settings, label: 'Settings' },
   ]
 
@@ -370,7 +370,9 @@ function SidebarContent({
                       'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
                       isActive
                         ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                        : 'text-sidebar-foreground',
+                        : item.highlighted
+                          ? 'text-[#0058be] dark:text-[#a8c0f0]'
+                          : 'text-sidebar-foreground',
                       collapsed && 'justify-center'
                     )}
                   >
