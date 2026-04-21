@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Copy, Check, Crosshair, ShieldCheck, Rocket, Target, TrendingUp, DollarSign, Users } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Copy, Check, Crosshair, ShieldCheck, Rocket, Target, TrendingUp, DollarSign, Map, ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface Guide {
   id: number
@@ -21,7 +22,7 @@ interface Guide {
 const GUIDES: Guide[] = [
   {
     id: 1,
-    icon: Crosshair,
+    icon: Map,
     label: 'GTM Strategy',
     title: "GTM strategy shouldn't take weeks of guesswork",
     hook: "Most GTM plans take weeks of research, stakeholder alignment, and framework hunting. PMM Sherpa gives you instant access to 34 books, 534 practitioner AMAs, and 800+ blog posts — applied to your specific problem.",
@@ -49,12 +50,12 @@ const GUIDES: Guide[] = [
     icon: ShieldCheck,
     label: 'Asset Audits',
     title: "Your landing page might be working against you",
-    hook: "Audit your existing assets — landing pages, decks, one-pagers — against proven frameworks from Dunford, StoryBrand, and Hormozi. Get specific, actionable rewrites, not generic feedback.",
+    hook: "Audit your existing assets — landing pages, decks, one-pagers — against proven positioning, storytelling, and value frameworks. Get specific, actionable rewrites, not generic feedback.",
     description: "Pressure-test landing pages, decks, and messaging",
     prompts: [
       {
         title: "Landing page audit",
-        prompt: "Audit this landing page: [paste URL]. Grade it against Dunford's positioning framework, StoryBrand, and Hormozi's value equation. Pull 2-3 competitor pages and show me where they're beating me. Give me the 5 most impactful rewrites.",
+        prompt: "Audit this landing page: [paste URL]. Grade it against proven positioning, storytelling, and value frameworks. Pull 2-3 competitor pages and show me where they're beating me. Give me the 5 most impactful rewrites.",
         tip: "Paste the full URL. Sherpa will read the page and analyze the actual copy."
       },
       {
@@ -74,7 +75,7 @@ const GUIDES: Guide[] = [
     icon: TrendingUp,
     label: 'Career Growth',
     title: "PMM Sherpa works on your career too",
-    hook: "Apply the same frameworks you use for product positioning to your own career. Drawn from 534 AMAs from PMM leaders at Gong, Notion, HubSpot, and hundreds more.",
+    hook: "Apply the same frameworks you use for product positioning to your own career. Drawn from hundreds of practitioner interviews and career-focused resources from PMM leaders across top companies.",
     description: "Interview prep, promotions, and career strategy",
     prompts: [
       {
@@ -99,12 +100,12 @@ const GUIDES: Guide[] = [
     icon: Crosshair,
     label: 'Positioning',
     title: "Positioning that doesn't sound like every other SaaS",
-    hook: "Build positioning across 4 dimensions — competitive, category design, adoption curve, language ownership — using Dunford, Lochhead, Moore, and Ries & Trout simultaneously.",
+    hook: "Build positioning across 4 dimensions — competitive differentiation, category design, adoption curve, and language ownership — using multiple proven frameworks simultaneously.",
     description: "Differentiation that buyers actually feel",
     prompts: [
       {
         title: "Positioning statement",
-        prompt: "Write a positioning statement for [product]. We compete mainly against [competitors]. Our ICP is [describe them]. Use Dunford's framework as the base, but cross-check against Lochhead's category design and Moore's adoption curve. No generic SaaS language.",
+        prompt: "Write a positioning statement for [product]. We compete mainly against [competitors]. Our ICP is [describe them]. Use competitive positioning as the base, but cross-check against category design principles and technology adoption frameworks. No generic SaaS language.",
         tip: "Name your actual competitors. 'We compete against Salesforce and HubSpot' gives Sherpa real context to work with."
       },
       {
@@ -124,7 +125,7 @@ const GUIDES: Guide[] = [
     icon: DollarSign,
     label: 'Pricing',
     title: "Stop guessing on pricing",
-    hook: "Move beyond competitor averaging to data-driven pricing using Ramanujam's willingness-to-pay methodology, Kyle Poyar's SaaS pricing insights, and Elena Verna's PLG pricing frameworks.",
+    hook: "Move beyond competitor averaging to data-driven pricing using willingness-to-pay methodology, modern SaaS pricing insights, and PLG pricing frameworks.",
     description: "Price with confidence, not guesswork",
     prompts: [
       {
@@ -139,7 +140,7 @@ const GUIDES: Guide[] = [
       },
       {
         title: "Evaluate a pricing model switch",
-        prompt: "We're considering switching from per-seat to usage-based pricing. Our product is [describe it]. Walk me through the pros and cons using Ramanujam's framework. What metrics should we price on, and what are the risks of getting it wrong?",
+        prompt: "We're considering switching from per-seat to usage-based pricing. Our product is [describe it]. Walk me through the pros and cons using proven pricing frameworks. What metrics should we price on, and what are the risks of getting it wrong?",
         tip: "Include your current ARR range and customer count — the right pricing model depends on your scale."
       }
     ]
@@ -149,7 +150,7 @@ const GUIDES: Guide[] = [
     icon: Rocket,
     label: 'Launches',
     title: "Launches fail when alignment breaks down",
-    hook: "Generate aligned launch artifacts — Product, Sales, CS, and CEO documents — from a single source of truth. Using Mary Sheehan's launch guide, PMA tiering playbooks, and real PMM leader AMAs.",
+    hook: "Generate aligned launch artifacts — Product, Sales, CS, and CEO documents — from a single source of truth. Using proven launch playbooks, tiering frameworks, and hundreds of real PMM leader experiences.",
     description: "Plan launches that keep four teams aligned",
     prompts: [
       {
@@ -174,7 +175,7 @@ const GUIDES: Guide[] = [
     icon: Target,
     label: 'Sales Enablement',
     title: "Sales needs a battlecard by tomorrow morning",
-    hook: "Generate competitive battlecards — strategic, tactical, defensive — that AEs will actually use. Analyzed through Dunford's competitive framework and Moore's whole-product model.",
+    hook: "Generate competitive battlecards — strategic, tactical, defensive — that AEs will actually use. Analyzed through competitive positioning frameworks and whole-product analysis.",
     description: "Battlecards, objection handling, discovery questions",
     prompts: [
       {
@@ -214,8 +215,18 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
-export default function GuidesPage() {
+function GuidesContent() {
   const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null)
+  const searchParams = useSearchParams()
+
+  // Auto-open guide from query param (e.g., /guides?g=3)
+  useEffect(() => {
+    const guideId = searchParams.get('g')
+    if (guideId) {
+      const guide = GUIDES.find(g => g.id === parseInt(guideId))
+      if (guide) setSelectedGuide(guide)
+    }
+  }, [searchParams])
 
   if (selectedGuide) {
     return (
@@ -251,6 +262,35 @@ export default function GuidesPage() {
             </div>
           ))}
         </div>
+
+        {/* Prev / Next navigation */}
+        <div className="flex items-center justify-between mt-10 pt-6 border-t border-border">
+          {selectedGuide.id > 1 ? (
+            <button
+              onClick={() => setSelectedGuide(GUIDES[selectedGuide.id - 2])}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <div className="text-left">
+                <p className="text-xs text-muted-foreground/60">Previous</p>
+                <p className="font-medium text-sm">{GUIDES[selectedGuide.id - 2].label}</p>
+              </div>
+            </button>
+          ) : <div />}
+
+          {selectedGuide.id < GUIDES.length ? (
+            <button
+              onClick={() => setSelectedGuide(GUIDES[selectedGuide.id])}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground/60">Next</p>
+                <p className="font-medium text-sm">{GUIDES[selectedGuide.id].label}</p>
+              </div>
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          ) : <div />}
+        </div>
       </div>
     )
   }
@@ -281,5 +321,13 @@ export default function GuidesPage() {
         ))}
       </div>
     </div>
+  )
+}
+
+export default function GuidesPage() {
+  return (
+    <Suspense>
+      <GuidesContent />
+    </Suspense>
   )
 }

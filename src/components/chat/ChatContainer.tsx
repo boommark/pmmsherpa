@@ -9,7 +9,19 @@ import { ChatInput, type ChatInputRef } from './ChatInput'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
 // Image import removed — tiles now use Lucide icons
-import { Loader2, Crosshair, ShieldCheck, Rocket, Target, TrendingUp } from 'lucide-react'
+import { Loader2, Crosshair, ShieldCheck, Rocket, Target, TrendingUp, DollarSign, Map, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
+
+// Landing tiles — aligned with /guides icons and first prompts
+const LANDING_TILES = [
+  { icon: Map, label: 'Strategy', hook: "GTM taking weeks?", prompt: "I'm a PMM at [company]. We sell [product] to [audience]. Our biggest GTM challenge right now is [describe it]. What frameworks and strategies should I consider, and what would you recommend as a first move?", guideId: 1 },
+  { icon: ShieldCheck, label: 'Audit', hook: "Is your page converting?", prompt: "Audit this landing page: [paste URL]. Grade it against proven positioning, storytelling, and value frameworks. Give me the 5 most impactful rewrites.", guideId: 2 },
+  { icon: TrendingUp, label: 'Career', hook: "Ready for your next level?", prompt: "I'm interviewing for a [title] role at a [type of company]. My background is [brief summary]. Give me: the top 5 questions the hiring manager will likely ask, a strong answer structure for each, and a positioning statement for myself as a candidate.", guideId: 3 },
+  { icon: Crosshair, label: 'Position', hook: "Sound like everyone else?", prompt: "Write a positioning statement for [product]. We compete mainly against [competitors]. Our ICP is [describe them]. Use competitive positioning as the base, cross-check against category design and adoption frameworks. No generic SaaS language.", guideId: 4 },
+  { icon: DollarSign, label: 'Pricing', hook: "Stop guessing on pricing", prompt: "Pressure-test this pricing: [describe your tiers and prices]. Our ICP is [describe them]. Our main competitors charge [what you know]. Where am I leaving money on the table? Where will I lose deals?", guideId: 5 },
+  { icon: Rocket, label: 'Launch', hook: "Alignment breaks at launch", prompt: "From this product spec, generate a complete launch brief: launch tier recommendation, target audience, key messaging, success metrics, channel plan, and a timeline with owner assignments. Here's the spec: [paste it]", guideId: 6 },
+  { icon: Target, label: 'Compete', hook: "Battlecard by morning?", prompt: "Build a competitive battlecard: us ([product]) vs. [competitor]. Include: their positioning, their strengths, their weaknesses, our differentiators, objection handling for their top 3 claims, and discovery questions that expose their gaps.", guideId: 7 },
+]
 import type { ChatMessage, ChatAttachment } from '@/types/chat'
 import type { UploadedFile } from './FileUpload'
 import { VoiceModeOverlay } from '@/components/voice/VoiceModeOverlay'
@@ -547,78 +559,34 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             </div>
           </div>
 
-          {/* Starter prompt tiles */}
+          {/* 7 compact tiles — aligned with Guides */}
           <div className="w-full max-w-2xl mx-auto px-4 md:px-6 py-3 md:py-7">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3.5">
-              <button
-                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
-                onClick={() => chatInputRef.current?.setInput("Here's our positioning: [paste it]. Where is it vague? Where would a buyer not see how we're different? Rewrite the weak parts.")}
-              >
-                <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
-                  <Crosshair className="shrink-0 w-4 h-4 md:w-5 md:h-5 text-[#0058be]" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Position</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-2.5">
+              {LANDING_TILES.map((tile) => (
+                <div
+                  key={tile.guideId}
+                  className={`group text-left px-4 py-3 md:px-5 md:py-4 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all ${tile.guideId === 7 ? 'sm:col-span-2' : ''}`}
+                >
+                  <button
+                    className="w-full text-left"
+                    onClick={() => chatInputRef.current?.setInput(tile.prompt)}
+                  >
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <tile.icon className="shrink-0 w-4 h-4 text-[#0058be]" />
+                      <span className="text-[11px] font-semibold uppercase tracking-widest text-[#0058be]">{tile.label}</span>
+                    </div>
+                    <p className="text-[13px] md:text-[14px] text-foreground/90 leading-snug font-medium">
+                      {tile.hook}
+                    </p>
+                  </button>
+                  <Link
+                    href={`/guides?g=${tile.guideId}`}
+                    className="inline-flex items-center gap-1 mt-1.5 text-[11px] text-[#0058be]/70 hover:text-[#0058be] transition-colors"
+                  >
+                    See prompts <ArrowRight className="h-3 w-3" />
+                  </Link>
                 </div>
-                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug font-medium">
-                  Sound like everyone else?
-                </p>
-                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Sharpen what makes you different</p>
-              </button>
-
-              <button
-                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
-                onClick={() => chatInputRef.current?.setInput("Audit this page: [paste URL]. Grade it against proven frameworks and give me the 5 most impactful rewrites.")}
-              >
-                <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
-                  <ShieldCheck className="shrink-0 w-4 h-4 md:w-5 md:h-5 text-[#0058be]" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Audit</span>
-                </div>
-                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug font-medium">
-                  Is your page actually converting?
-                </p>
-                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Pressure-test any asset</p>
-              </button>
-
-              <button
-                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
-                onClick={() => chatInputRef.current?.setInput("We're launching [product/feature] in [timeframe]. Generate a launch brief: tier, messaging, success metrics, and timeline.")}
-              >
-                <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
-                  <Rocket className="shrink-0 w-4 h-4 md:w-5 md:h-5 text-[#0058be]" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Launch</span>
-                </div>
-                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug font-medium">
-                  Alignment breaks down at launch
-                </p>
-                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Plan launches that stick</p>
-              </button>
-
-              <button
-                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all"
-                onClick={() => chatInputRef.current?.setInput("Build a battlecard: us [your product] vs [competitor]. Objection handling, discovery questions, and where they're weak.")}
-              >
-                <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
-                  <Target className="shrink-0 w-4 h-4 md:w-5 md:h-5 text-[#0058be]" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Compete</span>
-                </div>
-                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug font-medium">
-                  Sales needs a battlecard by morning
-                </p>
-                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Win more deals</p>
-              </button>
-
-              <button
-                className="group text-left px-4 py-2.5 md:px-6 md:py-5 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all sm:col-span-2"
-                onClick={() => chatInputRef.current?.setInput("I'm preparing to move from [current role] to [target role]. Here's what I've shipped: [list projects]. Help me frame the strongest narrative.")}
-              >
-                <div className="flex items-center gap-2 md:gap-2.5 mb-0.5 md:mb-1.5">
-                  <TrendingUp className="shrink-0 w-4 h-4 md:w-5 md:h-5 text-[#0058be]" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-[#0058be]">Grow</span>
-                </div>
-                <p className="text-[13px] md:text-[15px] text-foreground/90 leading-snug font-medium">
-                  Ready for your next level?
-                </p>
-                <p className="text-xs text-muted-foreground/60 mt-1 hidden md:block">Career strategy that lands</p>
-              </button>
+              ))}
             </div>
           </div>
 
