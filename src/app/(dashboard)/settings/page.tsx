@@ -80,9 +80,9 @@ export default function SettingsPage() {
       return
     }
 
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image must be less than 5MB')
+    // Validate file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Image must be less than 10MB')
       return
     }
 
@@ -349,7 +349,7 @@ export default function SettingsPage() {
                     </div>
                   )}
                   <p className="text-xs text-muted-foreground">
-                    PNG, JPG, GIF or WebP. Max 5MB.
+                    PNG, JPG, GIF or WebP. Max 10MB.
                   </p>
                 </div>
               </div>
