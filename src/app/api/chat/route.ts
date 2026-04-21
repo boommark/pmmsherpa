@@ -487,6 +487,30 @@ Web Sources:
 ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           }
 
+          // Merge Brave Search results into web citations
+          if (braveSearchResult?.results?.length) {
+            const braveCitations = braveSearchResult.results.map((r: { title: string; url: string; description: string }) => ({
+              title: r.title,
+              url: r.url,
+              snippet: r.description,
+            }))
+            webCitations = [...webCitations, ...braveCitations]
+          }
+
+          // Add user-pasted URLs as web citations
+          if (scrapedUrlContent && detectedUrls?.length) {
+            for (const url of detectedUrls) {
+              // Avoid duplicating if already in webCitations
+              if (!webCitations.some(c => c.url === url)) {
+                webCitations.push({
+                  title: new URL(url).hostname.replace('www.', ''),
+                  url,
+                  snippet: 'User-provided URL analyzed in this response',
+                })
+              }
+            }
+          }
+
           // Build web search context if available
           let webSearchContext = ''
           if (braveSearchResult?.fetchedContent) {
@@ -607,10 +631,10 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             encoder.encode(`data: ${JSON.stringify({ type: 'citations', citations })}\n\n`)
           )
 
-          // Send web research data if available
-          if (perplexityResult && webCitations.length > 0) {
+          // Send web research data if available (includes Perplexity + Brave + user URLs)
+          if (webCitations.length > 0) {
             const expandedResearch = {
-              content: perplexityResult.content,
+              content: perplexityResult?.content || '',
               webCitations,
               relatedQuestions,
               researchType: 'quick'
@@ -627,9 +651,9 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           let fullResponseText = ''
 
           // Build expanded research object for database storage
-          const expandedResearchForDb = perplexityResult && webCitations.length > 0
+          const expandedResearchForDb = webCitations.length > 0
             ? {
-                content: perplexityResult.content,
+                content: perplexityResult?.content || '',
                 webCitations,
                 relatedQuestions,
                 researchType: 'quick'
