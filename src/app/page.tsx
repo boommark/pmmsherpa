@@ -140,10 +140,10 @@ export default function LandingPage() {
             </div>
 
             <h1 className="mb-6 text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e] sm:text-5xl md:text-[3.5rem] leading-[1.1]">
-              Stop Guessing.
+              Stop guessing,
               <br />
               <span className="bg-gradient-to-r from-[#0058be] to-[#2170e4] bg-clip-text text-transparent">
-                Start Converting.
+                Start converting.
               </span>
             </h1>
             <p className="mb-10 text-lg text-[#4a4f57] sm:text-xl max-w-2xl mx-auto leading-relaxed">
