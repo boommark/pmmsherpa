@@ -143,10 +143,10 @@ export default function CompleteProfilePage() {
               <AnimatedOrb size="md" />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0058be] to-[#3b82f6] bg-clip-text text-transparent">
-              {userName ? `Welcome, ${userName}!` : 'Complete Your Profile'}
+              {userName ? `Welcome, ${userName}!` : 'Almost there!'}
             </h1>
             <p className="text-muted-foreground text-sm">
-              One last step before you get started.
+              Connect your LinkedIn and choose your plan to get started.
             </p>
           </div>
 
