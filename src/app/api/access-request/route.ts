@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 import { getAdminNotificationEmail } from '@/lib/email/templates'
+import { getPostHogClient } from '@/lib/posthog-server'
 
 // Use service role for inserting access requests
 const supabase = createClient(
@@ -88,11 +89,11 @@ export async function POST(request: NextRequest) {
       // If rejected, allow them to try again (will create new user below)
     }
 
-    // Create user in Supabase Auth immediately, but as banned (pending approval)
+    // Create user in Supabase Auth — auto-approved, no ban
     const { data: newUser, error: createUserError } = await supabase.auth.admin.createUser({
       email: email.toLowerCase(),
       password: password,
-      email_confirm: true, // Skip email confirmation since admin will verify
+      email_confirm: true, // Skip email confirmation since LinkedIn is collected
       user_metadata: {
         full_name: fullName,
         phone: phone || null,
@@ -100,7 +101,6 @@ export async function POST(request: NextRequest) {
         company: company || null,
         linkedin_url: linkedinUrl,
       },
-      ban_duration: '876000h', // Ban for ~100 years (essentially forever until approved)
     })
 
     if (createUserError) {
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Insert access request record linking to the new user
+    // Insert access request record — auto-approved
     const { data: accessRequest, error: insertError } = await supabase
       .from('access_requests')
       .insert({
@@ -129,8 +129,9 @@ export async function POST(request: NextRequest) {
         company: company || null,
         linkedin_url: linkedinUrl,
         use_cases: useCases,
-        status: 'pending',
-        user_id: newUser.user?.id, // Link to the created user
+        status: 'approved',
+        user_id: newUser.user?.id,
+        approved_at: new Date().toISOString(),
       })
       .select()
       .single()
@@ -171,6 +172,17 @@ export async function POST(request: NextRequest) {
       // Log error but don't fail the request - admin can see in database
       console.error('Error sending admin notification email:', emailError)
     }
+
+    getPostHogClient().capture({
+      distinctId: newUser.user?.id || email.toLowerCase(),
+      event: 'access_request_submitted',
+      properties: {
+        email: email.toLowerCase(),
+        profession: profession || null,
+        company: company || null,
+        use_cases: useCases,
+      },
+    })
 
     return NextResponse.json({
       success: true,

@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { linkedinUrl, consentGiven } = body
+    const { linkedinUrl, consentGiven, termsAccepted } = body
 
     if (!linkedinUrl) {
       return NextResponse.json({ error: 'LinkedIn profile URL is required' }, { status: 400 })
@@ -32,6 +32,10 @@ export async function POST(request: NextRequest) {
 
     if (!consentGiven) {
       return NextResponse.json({ error: 'Communication consent is required' }, { status: 400 })
+    }
+
+    if (!termsAccepted) {
+      return NextResponse.json({ error: 'You must accept the Terms of Service and Privacy Policy' }, { status: 400 })
     }
 
     const serviceClient = await createServiceClient()

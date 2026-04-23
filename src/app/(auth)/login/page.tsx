@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
 import { Loader2 } from 'lucide-react'
+import posthog from 'posthog-js'
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -56,13 +57,20 @@ export default function LoginPage() {
     setError(null)
     setIsLoading(true)
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
       if (error) {
         setError(error.message)
         return
+      }
+      if (data.user) {
+        posthog.identify(data.user.id, {
+          email: data.user.email,
+          name: data.user.user_metadata?.full_name || data.user.user_metadata?.name,
+        })
+        posthog.capture('user_logged_in', { method: 'email' })
       }
       router.push('/chat')
       router.refresh()

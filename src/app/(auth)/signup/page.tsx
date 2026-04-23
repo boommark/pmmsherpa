@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
 import { Loader2, CheckCircle2 } from 'lucide-react'
+import posthog from 'posthog-js'
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -88,12 +89,18 @@ export default function SignupPage() {
       // If Supabase returns a session immediately (email confirmation disabled),
       // redirect to complete-profile
       if (data.session) {
+        posthog.identify(data.session.user.id, {
+          email: data.session.user.email,
+          name: fullName,
+        })
+        posthog.capture('user_signed_up', { method: 'email' })
         router.push('/complete-profile')
         router.refresh()
         return
       }
 
       // Otherwise, email confirmation is required — show confirmation message
+      posthog.capture('user_signed_up', { method: 'email', email_confirmation_required: true })
       setEmailSent(true)
     } catch {
       setError('An unexpected error occurred')
@@ -248,6 +255,13 @@ export default function SignupPage() {
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create Account
             </Button>
+
+            <p className="text-xs text-center text-muted-foreground leading-relaxed">
+              By creating an account you agree to our{' '}
+              <Link href="/terms" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">Terms of Service</Link>
+              {' '}and{' '}
+              <Link href="/privacy" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">Privacy Policy</Link>.
+            </p>
           </form>
 
           {/* Footer */}

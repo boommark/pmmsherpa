@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 
 /**
  * Handles auth redirects that arrive via URL hash fragment (implicit flow).
@@ -17,9 +18,15 @@ export function AuthRedirectHandler() {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event) => {
+      (event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
           router.push('/set-password')
+        }
+        if (event === 'SIGNED_IN' && session?.user) {
+          posthog.identify(session.user.id, {
+            email: session.user.email,
+            name: session.user.user_metadata?.full_name || session.user.user_metadata?.name,
+          })
         }
       }
     )

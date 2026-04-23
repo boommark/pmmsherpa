@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
 import { Loader2, CheckCircle2, Zap, Gift } from 'lucide-react'
+import posthog from 'posthog-js'
 
 export default function CompleteProfilePage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -26,6 +27,7 @@ export default function CompleteProfilePage() {
   const [formData, setFormData] = useState({
     linkedinUrl: '',
     consentGiven: false,
+    termsAccepted: false,
   })
 
   // Pre-fill from authenticated user
@@ -67,6 +69,11 @@ export default function CompleteProfilePage() {
       return
     }
 
+    if (!formData.termsAccepted) {
+      setError('Please accept the Terms of Service and Privacy Policy to continue')
+      return
+    }
+
     setIsLoading(true)
 
     try {
@@ -76,6 +83,7 @@ export default function CompleteProfilePage() {
         body: JSON.stringify({
           linkedinUrl: formData.linkedinUrl,
           consentGiven: formData.consentGiven,
+          termsAccepted: formData.termsAccepted,
         }),
       })
 
@@ -85,8 +93,11 @@ export default function CompleteProfilePage() {
         throw new Error(data.error || 'Failed to complete profile')
       }
 
+      posthog.capture('profile_completed', { plan: selectedPlan })
+
       // If user chose Starter, redirect to Stripe Checkout
       if (selectedPlan === 'starter') {
+        posthog.capture('starter_plan_selected')
         const checkoutResp = await fetch('/api/stripe/create-checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -220,7 +231,7 @@ export default function CompleteProfilePage() {
               </div>
             </div>
 
-            {/* Consent checkbox */}
+            {/* Consent checkbox — email/marketing */}
             <div className="flex items-start space-x-3 p-4 rounded-xl bg-[#f2f4f7] dark:bg-[#282b30]">
               <Checkbox
                 id="consent"
@@ -230,6 +241,27 @@ export default function CompleteProfilePage() {
               />
               <label htmlFor="consent" className="text-sm cursor-pointer leading-relaxed text-muted-foreground">
                 I understand that PMM Sherpa or its founders may reach out to me with product notification emails and promotional emails. *
+              </label>
+            </div>
+
+            {/* Terms & Privacy agreement — required for Free and all paid tiers */}
+            <div className="flex items-start space-x-3 p-4 rounded-xl bg-[#f2f4f7] dark:bg-[#282b30]">
+              <Checkbox
+                id="terms"
+                checked={formData.termsAccepted}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, termsAccepted: checked === true }))}
+                className="mt-0.5 border-[#0058be]/30 data-[state=checked]:bg-[#0058be] data-[state=checked]:border-[#0058be]"
+              />
+              <label htmlFor="terms" className="text-sm cursor-pointer leading-relaxed text-muted-foreground">
+                I agree to the{' '}
+                <Link href="/terms" target="_blank" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">
+                  Terms of Service
+                </Link>
+                {' '}and{' '}
+                <Link href="/privacy" target="_blank" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">
+                  Privacy Policy
+                </Link>
+                {' '}of PMM Sherpa. *
               </label>
             </div>
 
@@ -250,10 +282,14 @@ export default function CompleteProfilePage() {
           </form>
         </div>
 
-        <div className="text-center mt-6">
-          <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <div className="text-center mt-6 flex items-center justify-center gap-4 text-sm text-muted-foreground">
+          <Link href="/" className="hover:text-foreground transition-colors">
             &larr; Back to home
           </Link>
+          <span className="text-[#e5e7eb] dark:text-[#3a3d42]">|</span>
+          <a href="mailto:support@pmmsherpa.com" className="hover:text-foreground transition-colors">
+            Contact Us
+          </a>
         </div>
       </div>
     </div>

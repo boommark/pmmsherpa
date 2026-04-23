@@ -29,11 +29,21 @@ export default function PaymentSuccessPage() {
             Welcome to PMM Sherpa Starter!
           </h1>
           <p className="text-muted-foreground mb-4">
-            Your subscription is active. Unlimited chats, uploads, and all models are now unlocked.
+            Your subscription is active. All models, file uploads, and web research are now unlocked.
           </p>
           <p className="text-sm text-muted-foreground">
             Redirecting to chat...
           </p>
+        </div>
+
+        <div className="mt-6 flex items-center justify-center gap-4 text-sm text-muted-foreground">
+          <a href="mailto:support@pmmsherpa.com" className="hover:text-foreground transition-colors">
+            Contact Us
+          </a>
+          <span className="text-[#e5e7eb] dark:text-[#3a3d42]">|</span>
+          <a href="/terms" className="hover:text-foreground transition-colors">Terms</a>
+          <span className="text-[#e5e7eb] dark:text-[#3a3d42]">|</span>
+          <a href="/privacy" className="hover:text-foreground transition-colors">Privacy</a>
         </div>
       </div>
     </div>
