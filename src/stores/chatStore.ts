@@ -11,8 +11,12 @@ interface ChatStore extends ChatState {
   // Flag: sidebar initiated new-chat navigation; ChatContainer should
   // show the welcome screen immediately and clear stale messages on mount.
   pendingNewChat: boolean
+  // Usage gate state — null until first fetched
+  messagesRemaining: number | null
+  userTier: 'free' | 'starter' | 'founder' | null
   // Actions
   setPendingNewChat: (pending: boolean) => void
+  setUsageState: (state: { messagesRemaining: number; userTier: 'free' | 'starter' | 'founder' }) => void
   setMessages: (messages: ChatMessage[]) => void
   addMessage: (message: ChatMessage) => void
   updateMessage: (id: string, updates: Partial<ChatMessage>) => void
@@ -46,9 +50,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   statusMessage: null,
   abortController: null,
   pendingNewChat: false,
+  messagesRemaining: null,
+  userTier: null,
 
   // Actions
   setPendingNewChat: (pending) => set({ pendingNewChat: pending }),
+  setUsageState: ({ messagesRemaining, userTier }) => set({ messagesRemaining, userTier }),
   setMessages: (messages) => set({ messages }),
 
   addMessage: (message) =>

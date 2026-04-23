@@ -10,6 +10,7 @@ import { useVoiceInput } from '@/hooks/useVoiceInput'
 import { createClient as createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import posthog from 'posthog-js'
 
 // Mime types we can read inline on the client (tiny files — just send the
 // text with the metadata and skip a server round-trip to storage).
@@ -224,6 +225,10 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 : a,
             ),
           )
+          posthog.capture('file_uploaded', {
+            file_type: attachment.file.type,
+            file_size_bytes: attachment.file.size,
+          })
         } catch (error) {
           console.error('File upload error:', error)
           setAttachments((prev) =>

@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ModelSelector } from '@/components/chat/ModelSelector'
-import { LogOut, User, Settings, Menu } from 'lucide-react'
+import { LogOut, User, Settings, Menu, Mail } from 'lucide-react'
 
 export function Header() {
   const { profile } = useProfile()
@@ -103,6 +103,13 @@ export function Header() {
           <DropdownMenuItem onClick={() => router.push('/settings/preferences')}>
             <Settings className="mr-2 h-4 w-4" />
             Settings
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <a href="mailto:support@pmmsherpa.com" className="cursor-pointer">
+              <Mail className="mr-2 h-4 w-4" />
+              Contact Us
+            </a>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut}>

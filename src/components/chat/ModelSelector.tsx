@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Brain, Zap } from 'lucide-react'
+import posthog from 'posthog-js'
 
 interface ModelSelectorProps {
   value: ModelProvider
@@ -32,7 +33,10 @@ export function ModelSelector({ value, onChange, disabled }: ModelSelectorProps)
   return (
     <Select
       value={value}
-      onValueChange={(v) => onChange(v as ModelProvider)}
+      onValueChange={(v) => {
+        posthog.capture('model_changed', { from_model: value, to_model: v })
+        onChange(v as ModelProvider)
+      }}
       disabled={disabled}
     >
       <SelectTrigger className="w-[140px] sm:w-[180px] md:w-[220px]">

@@ -20,6 +20,7 @@ export function MessageList({ messages, statusMessage, onEditPrompt }: MessageLi
   const isUserScrollingRef = useRef(false)
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const shouldAutoScrollRef = useRef(true)
+  const prevStreamingRef = useRef(false)
 
   // Check if any message is currently streaming
   const isStreaming = messages.some(m => m.isStreaming)
@@ -104,6 +105,19 @@ export function MessageList({ messages, statusMessage, onEditPrompt }: MessageLi
       scrollToBottom('auto')
     }
   }, [messages, isStreaming, scrollToBottom])
+
+  // After streaming ends, do a final scroll to keep input visible on mobile
+  useEffect(() => {
+    if (prevStreamingRef.current && !isStreaming && shouldAutoScrollRef.current) {
+      // Streaming just finished — wait for markdown/layout reflow then scroll
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          scrollToBottom('smooth')
+        }, 150)
+      })
+    }
+    prevStreamingRef.current = isStreaming
+  }, [isStreaming, scrollToBottom])
 
   // On initial load of a conversation, scroll to bottom
   useEffect(() => {

@@ -26,6 +26,7 @@ import type { ChatMessage, ChatAttachment } from '@/types/chat'
 import type { UploadedFile } from './FileUpload'
 import { VoiceModeOverlay } from '@/components/voice/VoiceModeOverlay'
 import { useVoiceMode } from '@/hooks/useVoiceMode'
+import posthog from 'posthog-js'
 
 interface ChatContainerProps {
   conversationId?: string
@@ -210,10 +211,17 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           activeConversationId = newConv.id
           isNewConversation = true
           setConversationId(newConv.id)
+          posthog.capture('conversation_created', { model: currentModel })
         } else {
           throw new Error('Failed to create conversation')
         }
       }
+
+      posthog.capture('message_sent', {
+        model: currentModel,
+        has_attachments: (chatAttachments?.length ?? 0) > 0,
+        is_new_conversation: isNewConversation,
+      })
 
       const abortController = new AbortController()
       setAbortController(abortController)
@@ -464,6 +472,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   }, [voiceModeOpen, voiceMode])
 
   const handleOpenVoiceMode = useCallback(() => {
+    posthog.capture('voice_mode_opened')
     setVoiceModeOpen(true)
     setVoiceResponseText('')
   }, [])
@@ -541,60 +550,64 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           </div>
         </div>
       ) : isNewChatWelcome || (messages.length === 0 && !conversationId) ? (
-        <div className="flex-1 overflow-y-auto">
-          {/* Top section with orb and headline */}
-          <div className="flex flex-col justify-center items-center px-4 md:px-6 pt-4 md:pt-14">
-            <div className="flex justify-center mb-2 md:mb-6">
-              <AnimatedOrb size="md" />
+        <>
+          <div className="flex-1 overflow-y-auto min-h-0">
+            {/* Top section with orb and headline */}
+            <div className="flex flex-col justify-center items-center px-4 md:px-6 pt-4 md:pt-14">
+              <div className="flex justify-center mb-2 md:mb-6">
+                <AnimatedOrb size="md" />
+              </div>
+
+              <div className="text-center space-y-1.5 md:space-y-3 max-w-2xl mx-auto">
+                <h2 className="text-lg md:text-3xl font-extrabold tracking-tight" style={{ letterSpacing: '-0.02em' }}>
+                  What are you working on?
+                </h2>
+                <p className="text-xs md:text-base text-muted-foreground/70 max-w-lg mx-auto" style={{ letterSpacing: '0.01em' }}>
+                  Grounded in the frameworks, war stories, and playbooks of thousands of real-world PMM leaders.{' '}
+                  <a href="/guides" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">Explore Guides</a> for ready-to-use prompts.
+                </p>
+              </div>
             </div>
 
-            <div className="text-center space-y-1.5 md:space-y-3 max-w-2xl mx-auto">
-              <h2 className="text-lg md:text-3xl font-extrabold tracking-tight" style={{ letterSpacing: '-0.02em' }}>
-                What are you working on?
-              </h2>
-              <p className="text-xs md:text-base text-muted-foreground/70 max-w-lg mx-auto" style={{ letterSpacing: '0.01em' }}>
-                Grounded in the frameworks, war stories, and playbooks of thousands of real-world PMM leaders.{' '}
-                <a href="/guides" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">Explore Guides</a> for ready-to-use prompts.
-              </p>
+            {/* 7 compact tiles — aligned with Guides */}
+            <div className="w-full max-w-2xl mx-auto px-4 md:px-6 py-3 md:py-7">
+              <div className="grid grid-cols-2 gap-2 md:gap-2.5">
+                {LANDING_TILES.map((tile) => (
+                  <div
+                    key={tile.guideId}
+                    className={`group text-left px-3 py-2.5 md:px-5 md:py-4 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all ${tile.guideId === 7 ? 'col-span-2' : ''}`}
+                  >
+                    <button
+                      className="w-full text-left"
+                      onClick={() => {
+                        posthog.capture('landing_tile_clicked', { tile: tile.label, guide_id: tile.guideId })
+                        chatInputRef.current?.setInput(tile.prompt)
+                      }}
+                    >
+                      <div className="flex items-center gap-1.5 md:gap-2 mb-0.5">
+                        <tile.icon className="shrink-0 w-3.5 h-3.5 md:w-4 md:h-4 text-[#0058be]" />
+                        <span className="text-[10px] md:text-[11px] font-semibold uppercase tracking-widest text-[#0058be]">{tile.label}</span>
+                      </div>
+                      <p className="text-[12px] md:text-[14px] text-foreground/90 leading-snug font-medium">
+                        {tile.hook}
+                      </p>
+                    </button>
+                    <Link
+                      href={`/guides?g=${tile.guideId}`}
+                      className="inline-flex items-center gap-1 mt-1 md:mt-1.5 text-[10px] md:text-[11px] text-[#0058be]/70 hover:text-[#0058be] transition-colors"
+                    >
+                      See prompts <ArrowRight className="h-2.5 w-2.5 md:h-3 md:w-3" />
+                    </Link>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-
-          {/* 7 compact tiles — aligned with Guides */}
-          <div className="w-full max-w-2xl mx-auto px-4 md:px-6 py-3 md:py-7">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-2.5">
-              {LANDING_TILES.map((tile) => (
-                <div
-                  key={tile.guideId}
-                  className={`group text-left px-4 py-3 md:px-5 md:py-4 rounded-xl bg-card dark:bg-card backdrop-blur-sm border border-transparent hover:border-[#0058be]/20 hover:shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all ${tile.guideId === 7 ? 'sm:col-span-2' : ''}`}
-                >
-                  <button
-                    className="w-full text-left"
-                    onClick={() => chatInputRef.current?.setInput(tile.prompt)}
-                  >
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <tile.icon className="shrink-0 w-4 h-4 text-[#0058be]" />
-                      <span className="text-[11px] font-semibold uppercase tracking-widest text-[#0058be]">{tile.label}</span>
-                    </div>
-                    <p className="text-[13px] md:text-[14px] text-foreground/90 leading-snug font-medium">
-                      {tile.hook}
-                    </p>
-                  </button>
-                  <Link
-                    href={`/guides?g=${tile.guideId}`}
-                    className="inline-flex items-center gap-1 mt-1.5 text-[11px] text-[#0058be]/70 hover:text-[#0058be] transition-colors"
-                  >
-                    See prompts <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Chat input — sticky at bottom of scroll container */}
-          <div className="sticky bottom-0 w-full bg-background">
+          {/* Chat input — always visible, pinned below scroll area */}
+          <div className="shrink-0">
             <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} onOpenVoiceMode={handleOpenVoiceMode} />
           </div>
-        </div>
+        </>
       ) : (
         <>
           <div className="flex-1 overflow-hidden min-h-0">

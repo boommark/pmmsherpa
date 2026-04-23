@@ -29,6 +29,7 @@ import {
   Zap,
   ArrowUpCircle,
   Infinity,
+  Mail,
 } from 'lucide-react'
 import { FREE_TIER_MONTHLY_LIMIT } from '@/lib/constants'
 
@@ -383,6 +384,21 @@ function SidebarContent({
               </li>
             )
           })}
+          <li>
+            <a
+              href="mailto:support@pmmsherpa.com"
+              className={cn(
+                'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                'text-sidebar-foreground',
+                collapsed && 'justify-center'
+              )}
+              title="Contact Us"
+            >
+              <Mail className="h-4 w-4" />
+              {!collapsed && <span className="ml-3">Contact Us</span>}
+            </a>
+          </li>
         </ul>
 
         {/* Tier Badge + Upgrade */}
