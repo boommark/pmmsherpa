@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { streamText } from 'ai'
 import { createClient } from '@/lib/supabase/server'
-import { FREE_TIER_MONTHLY_LIMIT } from '@/lib/constants'
+import { getMonthlyLimitForTier } from '@/lib/constants'
 import { getModel, buildMessages, getModelDisplayName, getDbModelValue, MODEL_CONFIG, type ModelProvider } from '@/lib/llm/provider-factory'
 import { multiQueryRetrieve, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
 import { planQueries } from '@/lib/rag/query-planner'
@@ -167,14 +167,16 @@ export async function POST(request: NextRequest) {
       messagesUsed = profileRow.messages_used_this_period
     }
 
-    // Gate: founders always pass; free tier passes if under the limit.
-    if (tier !== 'founder' && messagesUsed >= FREE_TIER_MONTHLY_LIMIT) {
+    // Gate: per-tier cap. Founders bypass entirely (Infinity). Free=10,
+    // Starter=200. See getMonthlyLimitForTier in src/lib/constants.ts.
+    const monthlyLimit = getMonthlyLimitForTier(tier)
+    if (messagesUsed >= monthlyLimit) {
       // Build reset_at = first day of NEXT calendar month at UTC midnight.
       const now = new Date()
       const resetAt = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1))
       const resetAtIso = resetAt.toISOString().replace(/\.\d{3}Z$/, 'Z') // "2026-05-01T00:00:00Z"
 
-      console.log(`[UsageGate] User ${user.email} hit monthly limit: ${messagesUsed}/${FREE_TIER_MONTHLY_LIMIT}, resets ${resetAtIso}`)
+      console.log(`[UsageGate] User ${user.email} hit monthly limit: ${messagesUsed}/${monthlyLimit} (tier=${tier}), resets ${resetAtIso}`)
 
       getPostHogClient().capture({
         distinctId: user.id,
@@ -183,17 +185,21 @@ export async function POST(request: NextRequest) {
           email: user.email,
           tier,
           messages_used: messagesUsed,
-          limit: FREE_TIER_MONTHLY_LIMIT,
+          limit: monthlyLimit,
           resets_at: resetAtIso,
         },
       })
 
+      const upgradeMessage = tier === 'free'
+        ? 'Thanks for using PMM Sherpa. Upgrade to keep going — your free quota resets next month.'
+        : 'You\'ve hit your monthly message cap. Your quota resets on the 1st of next month.'
+
       return new Response(
         JSON.stringify({
           error: 'message_limit_exceeded',
-          limit: FREE_TIER_MONTHLY_LIMIT,
+          limit: monthlyLimit,
           reset_at: resetAtIso,
-          message: 'Thanks for using PMM Sherpa. Upgrade to keep going — your free quota resets next month.',
+          message: upgradeMessage,
           upgrade_url: '/pricing',
         }),
         {

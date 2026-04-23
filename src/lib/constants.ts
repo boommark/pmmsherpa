@@ -23,11 +23,21 @@ export const isSuperAdmin = (email: string | null | undefined): boolean => {
 }
 
 // Usage gating — Phase 1 (v1.1)
-// Free-tier users are limited to this many messages per calendar month.
-// Increment happens ONLY after a successful LLM response in /api/chat,
-// via the atomic `increment_messages_used(uuid)` RPC (migration 016).
-// Counter resets lazily on the 1st of each calendar month (UTC).
+// Per-tier monthly message caps. Increment happens ONLY after a successful
+// LLM response in /api/chat, via the atomic `increment_messages_used(uuid)`
+// RPC (migration 016). Counter resets lazily on the 1st of each calendar
+// month (UTC). Founders bypass the gate entirely.
 export const FREE_TIER_MONTHLY_LIMIT = 10
+export const STARTER_TIER_MONTHLY_LIMIT = 200
 
-// Tier values for the profiles.tier column. 'starter' is reserved for Phase 4.
+// Tier values for the profiles.tier column.
 export type UserTier = 'free' | 'founder' | 'starter'
+
+// Returns the monthly message cap for a tier. Founders return Infinity
+// (callers should also short-circuit on tier==='founder' to skip the
+// counter check entirely). Unknown tiers fall back to the free cap.
+export function getMonthlyLimitForTier(tier: string): number {
+  if (tier === 'founder') return Infinity
+  if (tier === 'starter') return STARTER_TIER_MONTHLY_LIMIT
+  return FREE_TIER_MONTHLY_LIMIT
+}
