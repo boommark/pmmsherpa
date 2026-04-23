@@ -1,0 +1,58 @@
+# Sherpa Eval v1 — Harness Configuration
+# Fill in API keys and URLs before running.
+
+# PMM Sherpa (prod)
+sherpa:
+  base_url: "https://pmmsherpa.com"
+  # Uses the same auth as a logged-in user. Set a test user's session cookie.
+  # Or: call the API directly with a service key.
+  eval_flag: true
+
+# OpenAI (GPT-5 vanilla + GPT-5 with search)
+openai:
+  api_key: "${OPENAI_API_KEY}"
+  model_vanilla: "gpt-5"
+  model_search: "gpt-5"
+
+# Anthropic (Claude Opus 4.6 vanilla)
+anthropic:
+  api_key: "${ANTHROPIC_API_KEY}"
+  model: "claude-opus-4-6"
+
+# Jasper (7-day trial)
+jasper:
+  api_key: "${JASPER_API_KEY}"
+  # If no API available, set mode to "browser" and fill in workspace_url
+  mode: "api"  # "api" or "browser"
+  workspace_url: ""
+
+# Writer (free trial)
+writer:
+  api_key: "${WRITER_API_KEY}"
+  # If no API available, set mode to "browser" and fill in workspace_url
+  mode: "api"  # "api" or "browser"
+  workspace_url: ""
+
+# DIY baselines — always browser-based (real UIs)
+diy_baselines:
+  custom_gpt:
+    url: ""  # Fill after creating workspace per browser/setup_workspaces.md
+  gemini_gem:
+    url: ""  # Fill after creating workspace
+  claude_project:
+    url: ""  # Fill after creating workspace
+
+# Output
+output_dir: "../reports/v1"
+
+# Systems to run (comment out to skip)
+enabled_systems:
+  - sherpa
+  - openai_vanilla
+  - openai_search
+  - claude_vanilla
+  - jasper
+  - writer
+  - custom_gpt
+  - gemini_gem
+  - claude_project

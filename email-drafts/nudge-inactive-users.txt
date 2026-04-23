@@ -1,0 +1,25 @@
+Subject: Your PMM Sherpa account is ready
+
+
+Hi,
+
+I noticed you signed up for PMM Sherpa but haven't had a chance to log in yet. Your account is fully active and waiting for you. If you missed the approval email, it may have landed in your Promotions tab.
+
+PMM Sherpa puts the world's best marketing and GTM knowledge to work on your specific problems, right now. No digging through books or blogs. Just ask your question and get an expert answer grounded in real frameworks.
+
+Here's your direct link to get started: https://pmmsherpa.com/chat
+
+If you hit any issues logging in, just reply to this email and I'll sort it out personally.
+
+Abhishek, Founder, PMM Sherpa
+
+
+---
+SUPPRESSION LIST (exclude from all sends):
+- rgoldman@atlassian.com
+- yash@glacis.com
+- sscaife@atlassian.com
+- abhishekratna@gmail.com (admin)
+- abhishekratna1@gmail.com (admin)
+- aratnaai@gmail.com (admin)
+- pmmsherpatest@gmail.com (test)

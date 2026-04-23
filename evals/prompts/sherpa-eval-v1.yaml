@@ -1,0 +1,755 @@
+version: 1
+created: 2026-04-16
+description: |
+  Sherpa Eval v1 — 35 prompts across 4 tiers benchmarking PMM Sherpa against
+  vanilla LLMs, commercial agentic tools (Jasper, Writer), and DIY RAG baselines
+  (Custom GPT, Gemini Gem, Claude Project) with uploaded PMM book pack.
+
+  Tier 1 — Framework knowledge (10): tests citation accuracy + framework fidelity
+  Tier 2 — Applied advisory (10): tests specificity + actionability
+  Tier 3 — Deliverables (10): tests written craft + structural completeness
+  Tier 4 — Edge cases (5): tests web research trigger, framework correction,
+           spoken-artifact mode, review mode, career-advice intent
+
+# ---------------------------------------------------------------------------
+# Fictional product context used across Tier 3 deliverable prompts.
+# Keeps outputs comparable across systems — all systems get the same brief.
+# ---------------------------------------------------------------------------
+fictional_product:
+  name: Loopview
+  category: AI agent observability platform
+  one_liner: |
+    Loopview gives platform engineers real-time traces of every step an AI agent
+    takes across distributed systems — tool calls, LLM invocations, retrievals,
+    and handoffs — with sub-millisecond overhead via eBPF.
+  competitors:
+    - Langfuse (open-source, developer-first)
+    - LangSmith (LangChain's commercial platform)
+    - Arize Phoenix (enterprise ML observability extending to LLMs)
+  icp: Platform engineering teams at 50-500 employee AI-native B2B companies
+  pricing_benchmark: Langfuse $99-$999/mo, LangSmith $39-$bespoke, Arize enterprise
+
+# ---------------------------------------------------------------------------
+# PROMPTS
+# ---------------------------------------------------------------------------
+prompts:
+
+  # =========================================================================
+  # TIER 1 — FRAMEWORK KNOWLEDGE (10) — advisory mode
+  # Tests: citation accuracy, framework fidelity
+  # =========================================================================
+
+  - id: T1-01
+    tier: 1
+    mode: advisory
+    title: Positioning vs messaging
+    prompt: "What's the difference between positioning and messaging, per April Dunford?"
+    expected_sources:
+      - { author: April Dunford, work: Obviously Awesome }
+    required_facts:
+      - Positioning is strategic context (who it's for, what category, unique value)
+      - Messaging is tactical expression (how you say it per channel/audience)
+      - Positioning must precede messaging
+      - Dunford's positioning has 5 components (competitive alternatives, unique attributes, value, target market, market category)
+    reference_notes: |
+      Ideal answer: leads with the distinction, grounds in Dunford's 5-component
+      framework, shows how one positioning yields multiple messages.
+      Avoids: generic "positioning is the big picture" hand-waving.
+    reference_answer: TBD
+
+  - id: T1-02
+    tier: 1
+    mode: advisory
+    title: Bowling pin strategy
+    prompt: "How does the bowling pin strategy work, and when should a startup use it?"
+    expected_sources:
+      - { author: Geoffrey Moore, work: Crossing the Chasm }
+    required_facts:
+      - Dominate one niche first, leverage success to enter adjacent niches
+      - Each niche shares needs/references with the next (the "pins")
+      - Critical for crossing-the-chasm stage, less relevant once in tornado
+      - Niche selection criteria (compelling reason to buy, whole product, references)
+    reference_notes: |
+      Ideal answer: vivid metaphor upfront, names Moore's chasm stages, explains why
+      picking the right first pin matters. Avoids: generic "focus on a niche" advice.
+    reference_answer: TBD
+
+  - id: T1-03
+    tier: 1
+    mode: advisory
+    title: StoryBrand SB7 framework
+    prompt: "Walk me through StoryBrand's SB7 framework."
+    expected_sources:
+      - { author: Donald Miller, work: Building a StoryBrand }
+    required_facts:
+      - Seven elements — character, problem, guide, plan, call to action, failure, success
+      - Customer is the hero, brand is the guide (not the hero)
+      - Problem has three layers (external, internal, philosophical)
+    reference_notes: |
+      Ideal answer: names the 7 beats, explains the "brand as guide" pivot, gives
+      one concrete mapping. Avoids: listing the 7 steps without the conceptual anchor.
+    reference_answer: TBD
+
+  - id: T1-04
+    tier: 1
+    mode: advisory
+    title: Category design
+    prompt: "What's category design and when does it make sense to pursue it?"
+    expected_sources:
+      - { author: Al Ramadan et al., work: Play Bigger }
+    required_facts:
+      - Define a new category vs compete in an existing one
+      - Category kings capture ~76% of category market value
+      - Requires a point of view, a lightning strike event, and sustained evangelism
+      - Doesn't work for late entrants to established categories
+    reference_notes: |
+      Ideal answer: explicit tradeoff — category design takes capital + time, not for
+      everyone. Mentions the 76% number. Avoids: telling everyone to "create a
+      category" without the context on when NOT to.
+    reference_answer: TBD
+
+  - id: T1-05
+    tier: 1
+    mode: advisory
+    title: Ries & Trout laws for early-stage B2B
+    prompt: "Which of Ries & Trout's 22 Immutable Laws of Marketing are most important for an early-stage B2B company?"
+    expected_sources:
+      - { author: Al Ries & Jack Trout, work: 22 Immutable Laws of Marketing }
+    required_facts:
+      - Law of Leadership (be first)
+      - Law of Category (if you can't be first, create a new category)
+      - Law of the Mind (first in mind beats first in market)
+      - Law of Focus (own a word)
+      - Law of the Ladder (strategy depends on your rung)
+    reference_notes: |
+      Ideal answer: picks 3-5 laws and explains why those specifically matter for B2B
+      early stage. Ties them to concrete decisions (category vs incumbent, etc.).
+    reference_answer: TBD
+
+  - id: T1-06
+    tier: 1
+    mode: advisory
+    title: Dunford's 5 components of positioning
+    prompt: "Walk me through Dunford's 5 components of positioning and how they fit together."
+    expected_sources:
+      - { author: April Dunford, work: Obviously Awesome }
+    required_facts:
+      - Competitive alternatives (what would the customer use if not you, including nothing)
+      - Unique attributes (what you have that the alternatives don't)
+      - Value (what those attributes deliver to the customer)
+      - Target market characteristics (who values these most)
+      - Market category (context that primes buyer expectations)
+    reference_notes: |
+      Ideal answer: names all 5 in the correct order (alternatives first), explains
+      why Dunford starts with alternatives not the product. One concrete example.
+    reference_answer: TBD
+
+  - id: T1-07
+    tier: 1
+    mode: advisory
+    title: ICP vs buyer persona
+    prompt: "What's the difference between an ICP and a buyer persona, and why does the distinction matter?"
+    expected_sources:
+      - { author: practitioner corpus, work: Sharebird AMAs + PMA blogs }
+    required_facts:
+      - ICP = account-level (company size, industry, tech stack, fit criteria)
+      - Persona = person-level (role, priorities, goals, objections)
+      - ICP used for targeting/qualification, persona for messaging/content
+      - Multiple personas exist within one ICP
+    reference_notes: |
+      Ideal answer: crisp account-vs-person distinction upfront, then the "why it
+      matters" (wasted ad spend vs tone-deaf messaging). Practitioner voice.
+    reference_answer: TBD
+
+  - id: T1-08
+    tier: 1
+    mode: advisory
+    title: GTM wedge
+    prompt: "How does Maja Voje's concept of the GTM wedge work?"
+    expected_sources:
+      - { author: Maja Voje, work: Go-to-Market Strategist }
+    required_facts:
+      - Narrow entry point — specific segment with acute pain
+      - Proof of value comes from winning decisively in the wedge, not breadth
+      - Wedge expands outward as trust and learnings compound
+      - Selection criteria (willingness to pay, reachability, reference value)
+    reference_notes: |
+      Ideal answer: Voje-grounded, explains the "win small to expand" logic, gives
+      selection criteria for picking the right wedge.
+    reference_answer: TBD
+
+  - id: T1-09
+    tier: 1
+    mode: advisory
+    title: Status quo vs competitor selling
+    prompt: "What does Dunford mean by 'selling against the status quo' vs 'selling against competitors,' and which matters more?"
+    expected_sources:
+      - { author: April Dunford, work: Sales Pitch }
+    required_facts:
+      - Buyers default to doing nothing — status quo is the real #1 competitor
+      - Insight-led pitch reframes the problem before presenting the product
+      - Competitor framing only matters once the buyer has decided to act
+      - Dunford's 5-step pitch structure (insight, alternatives, value, proof, action)
+    reference_notes: |
+      Ideal answer: status quo wins first, reframes as insight-led selling. Names
+      Dunford's pitch structure. Avoids: generic "create urgency" advice.
+    reference_answer: TBD
+
+  - id: T1-10
+    tier: 1
+    mode: advisory
+    title: Feature vs benefit vs value
+    prompt: "Feature, benefit, value — what's the difference, and how do you know when you're confusing them?"
+    expected_sources:
+      - { author: April Dunford, work: Obviously Awesome }
+    required_facts:
+      - Feature = what the product does (technical capability)
+      - Benefit = customer outcome from the feature
+      - Value = what the outcome is worth to the ICP relative to alternatives
+      - Common mistake — stating features while calling them benefits
+    reference_notes: |
+      Ideal answer: defines all three with a concrete example chain (feature →
+      benefit → value). Shows the diagnostic test ("does an alternative deliver
+      this same benefit?").
+    reference_answer: TBD
+
+  # =========================================================================
+  # TIER 2 — APPLIED ADVISORY (10) — advisory mode
+  # Tests: specificity, actionability (vs McKinsey-soup fluff)
+  # =========================================================================
+
+  - id: T2-01
+    tier: 2
+    mode: advisory
+    title: Positioning against a 10x incumbent
+    prompt: "I'm launching a dev tool into a market dominated by an incumbent with 10x our budget. How should I think about positioning?"
+    expected_sources:
+      - { author: April Dunford, work: Obviously Awesome }
+      - { author: Geoffrey Moore, work: Crossing the Chasm }
+    required_facts:
+      - Don't compete on breadth; find the ICP segment the incumbent underserves
+      - Sell against the status quo, not head-on against the incumbent
+      - Moore's bowling pin — pick one niche where you can dominate
+      - Specific tactics (customer interviews to find unmet needs, narrow case studies)
+    reference_notes: |
+      Ideal answer: commits to "go narrow" recommendation, explains why with named
+      frameworks, gives 3-4 concrete tactics. Avoids: "differentiate yourself"
+      platitudes.
+    reference_answer: TBD
+
+  - id: T2-02
+    tier: 2
+    mode: advisory
+    title: 3-tier pricing page in a week
+    prompt: "My CEO wants a 3-tier pricing page live by Friday. Walk me through the decisions I need to make, in order."
+    expected_sources:
+      - { author: PMA blogs, work: PMA pricing playbooks }
+      - { author: practitioner AMAs, work: Sharebird pricing threads }
+    required_facts:
+      - Pick a value metric (seats, events, volume, outcomes)
+      - Decide anchor strategy (is there a "hero" tier?)
+      - Name tiers for the ICP not by size (Starter/Team/Enterprise vs Small/Medium/Large)
+      - Decide what moves between tiers (features, limits, support, SLA)
+      - Price-ladder the value, not the cost
+    reference_notes: |
+      Ideal answer: gives a sequenced checklist, each step specific and actionable.
+      Names concrete decisions (value metric, anchor, packaging logic).
+    reference_answer: TBD
+
+  - id: T2-03
+    tier: 2
+    mode: advisory
+    title: Category design or crossing-the-chasm?
+    prompt: "We're late entrants to a crowded category. Does Play Bigger's category design advice apply, or is Crossing the Chasm more relevant?"
+    expected_sources:
+      - { author: Al Ramadan et al., work: Play Bigger }
+      - { author: Geoffrey Moore, work: Crossing the Chasm }
+    required_facts:
+      - Category design is hardest for late entrants (category kings already set)
+      - Moore's bowling pin works better — sub-category domination, not category creation
+      - Alternative — redefine a sub-category where you can be first
+      - When NOT to create a category (no capital for evangelism, no clear POV)
+    reference_notes: |
+      Ideal answer: takes a side — "Chasm is the right frame for you" — and explains
+      why with the late-entrant constraint. Offers the sub-category redefinition as
+      a third option.
+    reference_answer: TBD
+
+  - id: T2-04
+    tier: 2
+    mode: advisory
+    title: Win/loss interview structure
+    prompt: "I need to run win/loss interviews on our last 20 deals. What's the best structure and which 5 questions matter most?"
+    expected_sources:
+      - { author: PMA blogs, work: PMA win/loss playbooks }
+      - { author: practitioner AMAs, work: Sharebird win/loss threads }
+    required_facts:
+      - Interview recent deals (both won and lost), 30-45 min
+      - Third-party interviewer preferred if possible (reduces bias)
+      - Key questions — trigger event, alternatives considered, decision criteria,
+        influencers, timeline, price role, dealbreakers
+      - Analyze by segment and loss reason, not just overall win rate
+    reference_notes: |
+      Ideal answer: gives both structure and 5 specific questions verbatim. Names
+      the bias-reduction tactics. Practical.
+    reference_answer: TBD
+
+  - id: T2-05
+    tier: 2
+    mode: advisory
+    title: Solo PMM first 30/60/90 days
+    prompt: "I'm the first PMM at a 50-person B2B startup. What should my first 30/60/90 days look like?"
+    expected_sources:
+      - { author: practitioner AMAs, work: Sharebird first-90-days threads }
+    required_facts:
+      - First 30 — listen tour (customers, sales, CS, product, founders)
+      - Audit existing positioning/messaging/sales materials
+      - First 60 — one visible quick win (battlecard, positioning refresh, launch)
+      - First 90 — strategic work (ICP refinement, messaging framework)
+      - Metrics to set expectations with leadership (win rate, pipeline coverage)
+    reference_notes: |
+      Ideal answer: concrete activities by phase, names the listen-audit-win-plan
+      arc, mentions expectation-setting with leadership. Practitioner voice.
+    reference_answer: TBD
+
+  - id: T2-06
+    tier: 2
+    mode: advisory
+    title: Picking 3 features from 12
+    prompt: "My product has 12 features across 4 categories. How do I pick the 3 to lead with in messaging?"
+    expected_sources:
+      - { author: April Dunford, work: Obviously Awesome }
+      - { author: Al Ries & Jack Trout, work: 22 Immutable Laws }
+    required_facts:
+      - Dunford test — features must be unique AND valuable AND matter to ICP
+      - Ries & Trout's Law of Focus — own one word
+      - Kill features that alternatives (including status quo) can claim
+      - Test picks with actual customers, not internal stakeholders
+    reference_notes: |
+      Ideal answer: gives a concrete filtering process, not just "pick what's
+      important." Names the Dunford test and the Law of Focus.
+    reference_answer: TBD
+
+  - id: T2-07
+    tier: 2
+    mode: advisory
+    title: Evaluating category creation
+    prompt: "Our category name confuses buyers. How do I evaluate whether to rename it, slot into an existing one, or try to create a new category?"
+    expected_sources:
+      - { author: April Dunford, work: Obviously Awesome }
+      - { author: Al Ramadan et al., work: Play Bigger }
+    required_facts:
+      - Category is a context-setting tool (Dunford) — it primes buyer expectations
+      - Test category fit with actual buyers (what category do THEY use?)
+      - Category creation requires capital + POV + time — not for most
+      - Three options (rename, reframe into existing, create new) with decision criteria
+    reference_notes: |
+      Ideal answer: 3-option framing, honest tradeoff on category creation cost,
+      concrete test ("what do buyers call it?"). Avoids: pushing category creation.
+    reference_answer: TBD
+
+  - id: T2-08
+    tier: 2
+    mode: advisory
+    title: PMM team structure
+    prompt: "My product marketing team is 3 people and growing to 8 over the next year. How should I structure roles?"
+    expected_sources:
+      - { author: practitioner AMAs, work: Sharebird PMM team structure }
+    required_facts:
+      - Common splits — product-led (launches/outbound), market-led (research/positioning),
+        sales-enablement (battlecards/enablement)
+      - Alternative split — by product line or segment
+      - At 8 people, typically a head + 2-3 specialists per dimension
+      - Avoid the "everyone does everything" trap
+    reference_notes: |
+      Ideal answer: gives 2-3 org models with tradeoffs, recommends one for the
+      context. Mentions concrete role titles.
+    reference_answer: TBD
+
+  - id: T2-09
+    tier: 2
+    mode: advisory
+    title: Diagnosing a flopped launch
+    prompt: "Our last launch flopped. How do I diagnose what went wrong?"
+    expected_sources:
+      - { author: PMA blogs, work: PMA launch retro playbooks }
+      - { author: practitioner AMAs, work: Sharebird launch postmortems }
+    required_facts:
+      - Check the hypothesis first — was the launch even needed?
+      - Check tier appropriateness (was it oversold or undersold internally?)
+      - Check execution — channels, enablement, timing, cross-functional alignment
+      - Check measurement — what signal should have existed?
+      - Common failure modes — internal launch vs external launch mismatch
+    reference_notes: |
+      Ideal answer: diagnostic frame (hypothesis → tier → execution → measurement),
+      not a generic "review what went wrong" list.
+    reference_answer: TBD
+
+  - id: T2-10
+    tier: 2
+    mode: advisory
+    title: Collateral request vs messaging problem
+    prompt: "Sales keeps asking for more collateral but I suspect the real problem is messaging. How do I investigate?"
+    expected_sources:
+      - { author: practitioner AMAs, work: Sharebird sales-PMM threads }
+    required_facts:
+      - Observe 5-10 sales calls before building anything
+      - Analyze loss reasons — pattern vs one-off
+      - Test messaging variants with customers before committing
+      - Collateral can't fix a weak message — symptom vs cause
+      - Sales sometimes asks for collateral because messaging is unclear to them
+    reference_notes: |
+      Ideal answer: reframes the problem, gives investigation steps, commits to the
+      "observe before building" principle. Practitioner tone.
+    reference_answer: TBD
+
+  # =========================================================================
+  # TIER 3 — DELIVERABLES (10) — written_artifact mode
+  # Tests: written craft, structural completeness, voice quality for artifacts
+  # All reference the Loopview fictional product context above.
+  # =========================================================================
+
+  - id: T3-01
+    tier: 3
+    mode: written_artifact
+    title: Positioning statement for Loopview
+    prompt: |
+      Write a positioning statement for Loopview using April Dunford's 5-component
+      framework.
+
+      Product: Loopview — AI agent observability platform. eBPF-based tracing of
+      LLM calls, tool invocations, retrievals, and agent handoffs across
+      distributed systems. Sub-millisecond overhead.
+
+      Competitors: Langfuse (OSS, developer-first), LangSmith (LangChain's tool,
+      tightly coupled to LangChain), Arize Phoenix (ML observability extending to
+      LLMs, enterprise-heavy).
+
+      ICP: Platform engineering teams at 50-500 employee AI-native B2B companies
+      shipping production agentic products.
+    expected_sources:
+      - { author: April Dunford, work: Obviously Awesome }
+    required_facts:
+      - Names competitive alternatives (Langfuse, LangSmith, Arize, doing nothing/log-diving)
+      - Names unique attributes (eBPF, framework-agnostic, sub-ms overhead)
+      - Value derived from attributes (faster debugging, production-readiness)
+      - Target market characteristics (platform eng at AI-native mid-market)
+      - Category (AI agent observability, or sub-category reframe)
+    reference_notes: |
+      Ideal artifact: follows Dunford's 5-component structure explicitly, no fluff,
+      no buzzwords ("revolutionary," "unprecedented"). Short, editorial prose.
+    reference_answer: TBD
+
+  - id: T3-02
+    tier: 3
+    mode: written_artifact
+    title: Messaging hierarchy for Loopview
+    prompt: |
+      Using the Loopview product context, write a messaging hierarchy with:
+      - 1 value proposition (1 sentence)
+      - 3 message pillars (each 1 sentence + 1-sentence rationale)
+      - 2 proof points per pillar (specific, evidence-based)
+    expected_sources:
+      - { author: PMA blogs, work: PMA messaging hierarchy templates }
+      - { author: April Dunford, work: Obviously Awesome }
+    required_facts:
+      - Value prop names the ICP and the outcome (not the features)
+      - 3 pillars are parallel in structure but distinct in content
+      - Proof points are specific (numbers, named customers, mechanism)
+      - Hierarchy is navigable — VP → pillars → proof points
+    reference_notes: |
+      Ideal artifact: clean, structured, outcome-led. Proof points show mechanism
+      (eBPF = no agent instrumentation, framework-agnostic = works with LangChain
+      / LlamaIndex / custom / Pydantic AI).
+    reference_answer: TBD
+
+  - id: T3-03
+    tier: 3
+    mode: written_artifact
+    title: Battlecard vs Langfuse
+    prompt: |
+      Write a sales battlecard comparing Loopview vs Langfuse.
+      Include: 60-second positioning, win themes (3), landmine questions to ask
+      prospects (3), objection handling (3 common objections), when to walk away.
+    expected_sources:
+      - { author: PMA blogs, work: PMA battlecard templates }
+      - { author: Klue, work: battlecard best practices }
+    required_facts:
+      - 60-second positioning (readable in under a minute)
+      - Win themes framed as prospect outcomes, not feature comparisons
+      - Landmine questions surface pain Langfuse can't solve
+      - Objections are real (pricing, OSS preference, integration)
+      - Walk-away criteria named
+    reference_notes: |
+      Ideal artifact: PMA/Klue battlecard structure, every section usable mid-call.
+      No academic prose.
+    reference_answer: TBD
+
+  - id: T3-04
+    tier: 3
+    mode: written_artifact
+    title: Tiered launch plan for Loopview
+    prompt: |
+      Draft a tiered launch plan (Tier 1 / Tier 2 / Tier 3) for Loopview's new
+      real-time agent tracing feature, shipping in 6 weeks. Include activities by
+      tier, channels, internal enablement, and success metrics.
+    expected_sources:
+      - { author: PMA blogs, work: PMA launch tiering playbooks }
+      - { author: practitioner AMAs, work: Sharebird launch threads }
+    required_facts:
+      - Tier determination (is this Tier 1 or 2?) with reasoning
+      - Activities mapped to channels (blog, email, social, webinar, PR, partner)
+      - Internal enablement (sales, CS, support, exec comms)
+      - Success metrics beyond vanity (pipeline influenced, trial conversions)
+    reference_notes: |
+      Ideal artifact: tier assignment defended, each activity has an owner + date,
+      metrics are outcome-based.
+    reference_answer: TBD
+
+  - id: T3-05
+    tier: 3
+    mode: written_artifact
+    title: PRD to customer narrative
+    prompt: |
+      Turn this PRD excerpt into a compelling 3-paragraph customer-facing
+      narrative for Loopview's blog:
+
+      "System uses eBPF-based kernel-level tracing to capture LLM token flow
+      and tool invocation graphs across distributed agentic systems with
+      sub-millisecond instrumentation overhead. Supports OpenTelemetry semantic
+      conventions. Framework-agnostic — no code changes required for LangChain,
+      LlamaIndex, Pydantic AI, or custom agent loops."
+    expected_sources:
+      - { author: Donald Miller, work: Building a StoryBrand }
+      - { author: Ann Handley, work: Everybody Writes / blog craft }
+    required_facts:
+      - Outcome-first opening (not feature opening)
+      - Concrete scenario with a named-role protagonist
+      - Peer-tested language (no "revolutionary," no "leverage," no "unlock")
+      - Proof point with mechanism
+    reference_notes: |
+      Ideal artifact: reads like a human-written blog, not spec-translated marketing
+      copy. Customer is the hero. "eBPF" appears once or twice, not as the headline.
+    reference_answer: TBD
+
+  - id: T3-06
+    tier: 3
+    mode: written_artifact
+    title: Win/loss interview guide
+    prompt: |
+      Write a win/loss interview guide (10 questions) for Loopview's last 5
+      deals. Include 2-3 probing follow-ups per question. Guide should work for
+      both won and lost deals.
+    expected_sources:
+      - { author: PMA blogs, work: PMA win/loss playbooks }
+    required_facts:
+      - Trigger event / status quo pain
+      - Alternatives considered (including "do nothing")
+      - Decision criteria and their weights
+      - Influencers and champion
+      - Timeline and budget process
+      - Dealbreakers and almost-dealbreakers
+      - Post-decision reflection (what would they do differently?)
+    reference_notes: |
+      Ideal artifact: 10 questions with follow-ups, interviewer instructions,
+      structured for easy analysis later.
+    reference_answer: TBD
+
+  - id: T3-07
+    tier: 3
+    mode: written_artifact
+    title: Analyst briefing opener
+    prompt: |
+      Write the opening 3 paragraphs (~300 words) of an analyst briefing to
+      Gartner positioning Loopview in the AI infrastructure observability space.
+      Assume the analyst covers ML observability and is skeptical of yet another
+      LLM-observability entrant.
+    expected_sources:
+      - { author: PMA blogs, work: PMA analyst relations playbooks }
+      - { author: April Dunford, work: Obviously Awesome }
+    required_facts:
+      - Category framing (where Loopview fits in the broader landscape)
+      - Differentiated POV (not just feature list)
+      - Customer proof (named patterns, not logos if unnamed)
+      - Acknowledge skepticism directly (not defensive, not evasive)
+    reference_notes: |
+      Ideal artifact: analyst-voice, confident but specific, leads with the market
+      shift that creates Loopview's wedge. No puffery.
+    reference_answer: TBD
+
+  - id: T3-08
+    tier: 3
+    mode: written_artifact
+    title: Pricing page copy for 3 tiers
+    prompt: |
+      Write pricing page copy for Loopview's 3 tiers — Developer, Team,
+      Enterprise. Price points $0, $99/user/mo, Custom. Include tier descriptions
+      (2-3 sentences), 4-5 bullet features per tier, and a CTA per tier.
+    expected_sources:
+      - { author: PMA blogs, work: PMA pricing page playbooks }
+    required_facts:
+      - Tier descriptions lead with outcome, not features
+      - Features framed as capabilities-for-outcomes, not checklist
+      - Clear step-up logic between tiers
+      - CTAs match buyer intent at each tier
+    reference_notes: |
+      Ideal artifact: scannable, honest, no buzzword soup. Each tier feels
+      different in voice because the buyer is different.
+    reference_answer: TBD
+
+  - id: T3-09
+    tier: 3
+    mode: written_artifact
+    title: Competitive teardown
+    prompt: |
+      Write a competitive teardown of Langfuse vs LangSmith. Cover — product
+      strengths/weaknesses, GTM approach, customer segment focus, moat and
+      defensibility. Conclude with 3 implications for Loopview's market entry.
+    expected_sources:
+      - { author: April Dunford, work: Obviously Awesome }
+      - { author: practitioner AMAs, work: Sharebird competitive intel threads }
+    required_facts:
+      - Honest analysis (not a hit piece on either)
+      - Structural framework (product / GTM / customer / moat)
+      - Named implications, not "opportunities for us"
+      - Concrete takeaways for Loopview's entry
+    reference_notes: |
+      Ideal artifact: reads like a senior PMM wrote it for an exec. Calls out
+      Langfuse's OSS-first GTM and LangSmith's LangChain-coupling risk.
+    reference_answer: TBD
+
+  - id: T3-10
+    tier: 3
+    mode: written_artifact
+    title: Objection-handling script
+    prompt: |
+      Write an objection-handling script for the objection "We already use
+      DataDog for observability — why do we need Loopview?" Provide 3 rebuttals,
+      each 2 sentences, plus a 1-sentence follow-up question the seller should
+      ask next.
+    expected_sources:
+      - { author: PMA blogs, work: objection handling }
+      - { author: April Dunford, work: Sales Pitch }
+    required_facts:
+      - Reframe (different use case, not a feature fight)
+      - Specific LLM-native signals DataDog can't see (token flow, agent handoffs, retrieval relevance)
+      - Crisp (2 sentences each, conversational)
+      - Follow-up question surfaces the real pain
+    reference_notes: |
+      Ideal artifact: each rebuttal delivers a distinct reframe, all usable in a
+      live sales call, ends with a question that opens the conversation.
+    reference_answer: TBD
+
+  # =========================================================================
+  # TIER 4 — EDGE CASES (5)
+  # Tests: web research trigger, framework correction, spoken-artifact mode,
+  # review mode, career-advice intent
+  # =========================================================================
+
+  - id: T4-01
+    tier: 4
+    mode: advisory
+    title: Current market data (triggers web research)
+    prompt: "What's Langfuse's current pricing in April 2026, and how does it compare to LangSmith's pricing?"
+    expected_sources:
+      - web_research_required: true
+    required_facts:
+      - Pricing cannot be reliably answered from training data (changes frequently)
+      - Good answer acknowledges data freshness and cites web sources
+      - System should trigger web research (Perplexity and/or Brave) in Sherpa's pipeline
+      - Comparison framing (per-user, per-event, feature tier)
+    reference_notes: |
+      Tests — does Sherpa correctly route to web research? Do vanilla LLMs
+      hallucinate stale pricing? Do DIY-RAG baselines acknowledge they can't know?
+    reference_answer: TBD
+
+  - id: T4-02
+    tier: 4
+    mode: advisory
+    title: Framework misapplication (tests correction)
+    prompt: |
+      I'm thinking about using Moore's Crossing the Chasm to position our
+      2-year-old product that already has 500 paying enterprise customers. How
+      should I apply it?
+    expected_sources:
+      - { author: Geoffrey Moore, work: Crossing the Chasm }
+      - { author: Geoffrey Moore, work: Inside the Tornado }
+    required_facts:
+      - Chasm is a PRE-chasm framework (between early adopters and early majority)
+      - 500 enterprise customers means you're past the chasm
+      - Correct framework is Tornado (inside the tornado) or Main Street
+      - Gentle correction, not a lecture — meet the user where they are
+    reference_notes: |
+      Tests — does the system correct a misapplied framework, or does it just go
+      along with the premise? Sherpa should correct gently and redirect to the
+      right Moore framework.
+    reference_answer: TBD
+
+  - id: T4-03
+    tier: 4
+    mode: spoken_artifact
+    title: Keynote opening (90-second talk track)
+    prompt: |
+      Write a 90-second talk track for our CEO's opening at Loopview's product
+      launch keynote next week. Audience — 200 platform engineering leaders.
+      Product — AI agent observability platform. Tone — confident, human, not
+      salesy. Include [pause] cues where the speaker should stop for effect.
+    expected_sources:
+      - { author: Jerry Weissman, work: Presenting to Win (if in corpus) }
+      - { author: Roy Peter Clark, work: Writing Tools }
+      - { author: Donovan, work: How to Deliver a TED Talk }
+    required_facts:
+      - Short sentences (mostly under 15 words)
+      - Rhetorical questions that create pause
+      - Sixth-grade language at the emotional punches
+      - Burst-and-pause rhythm (not essay prose)
+      - Concrete moment that grounds the abstract ("at 3am last Tuesday...")
+    reference_notes: |
+      Tests — does the system detect spoken-artifact mode and shift voice register?
+      Sherpa should — vanilla LLMs typically produce essay-prose monologue.
+    reference_answer: TBD
+
+  - id: T4-04
+    tier: 4
+    mode: advisory
+    title: Critique a weak positioning statement
+    prompt: |
+      Critique this positioning statement:
+
+      "We are the leading AI-powered platform for modern teams looking to
+      leverage cutting-edge observability to unlock unprecedented insights."
+
+      Then rewrite it.
+    expected_sources:
+      - { author: April Dunford, work: Obviously Awesome }
+    required_facts:
+      - Critique names specifics — no ICP, no alternatives, no unique attributes, no value
+      - Calls out buzzword density ("leading," "AI-powered," "cutting-edge," "unprecedented")
+      - Applies Dunford's 5-component diagnostic
+      - Rewrite fixes the gaps (names ICP, unique attributes, concrete value)
+    reference_notes: |
+      Tests — does the system give honest critique, not sycophantic "good start"?
+      Vanilla LLMs often praise weak work. Sherpa should be direct.
+    reference_answer: TBD
+
+  - id: T4-05
+    tier: 4
+    mode: advisory
+    title: Career advice (intent classification)
+    prompt: |
+      I'm a senior PMM feeling stuck. My VP Marketing is promoted-from-within
+      and has no experience outside this company. Every strategy conversation
+      feels like pushing against a wall. How do I keep growing in this role?
+    expected_sources:
+      - { author: Robert Greene, work: Laws of Human Nature }
+      - { author: David Maister, work: The Trusted Advisor }
+      - { author: practitioner AMAs, work: Sharebird career threads }
+    required_facts:
+      - Reframe — growth doesn't require VP buy-in, it requires experience building
+      - Specific tactics — cross-functional exposure, external network, strategic side projects
+      - Acknowledge the tension before solving it (this IS hard)
+      - Practitioner voice, not career-coach pablum
+    reference_notes: |
+      Tests — does Sherpa detect career intent, shift tone (more Trusted Advisor,
+      less framework-heavy)? Does it avoid generic "find a mentor" advice?
+    reference_answer: TBD
