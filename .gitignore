@@ -55,3 +55,21 @@ scripts/.ingestion_checkpoint.json
 scripts/.substack_checkpoint.json
 scripts/.linkedin_checkpoint.json
 scripts/.linkedin_session.json
+.env.local
+
+# Recipient lists (PII)
+scripts/.*_recipients.json
+
+# Local debug/analysis artifacts
+*.mov
+completions_usage_*.csv
+screenjumper_debug.*
+data/user-analysis-*.md
+scripts/*.log
+.claude/
+
+# iCloud sync duplicates
+* 2.*
+* 3.*
+*\ 2
+*\ 3
