@@ -1,14 +1,10 @@
-# PMMSherpa - Claude Code Project Context
+# PMMSherpa - Codex Project Context
 
 > **Read this file at the start of every session.**
-
-## Token Efficiency
-
-- **Use /fast mode** for routine edits, file reads, simple bug fixes. Same Opus model, shorter output.
-- **Responses**: Terse, no preamble, no trailing summaries. Lead with the action or answer.
-- **File reads**: Read only the lines you need (use `offset`/`limit`), not entire files.
-- **Searches**: Use Glob/Grep directly for targeted lookups. Reserve Agent(Explore) for broad discovery.
-- **Relevant MCP tools for this project**: `mcp__supabase-pro__*`, `mcp__perplexity__search`, `mcp__brave-search__*`. Ignore HubSpot, OneNote, Classroom, Model Armor, Meet, Forms, Keep, Airtable — they are not used here.
+>
+> **Ideas log:** Whenever a session produces a substantive idea exploration (research + recommendations, >300 words), auto-write it to `IDEAS.md` and mirror to `~/Documents/AbhishekR/PMM Sherpa/Product Ideas.md` — prepended, newest on top. Don't ask. Full convention lives in `IDEAS.md`.
+>
+> **Backlog intake + exploration:** `IDEAS.md` has an "Idea Backlog" table (near the top) for rough ideas with status flags (🔴 Not explored → 🟢 Explored → ✅ Shipped / ❌ Rejected). (a) When the user drops rough idea lists, append each as a new `BL-XXX` row at the bottom of the table (🔴), and mirror the table update to Obsidian. (b) When the user says "explore BL-XXX" (or equivalent), do: feasibility research → GTM eval via the `/pmm-sherpa` skill → auto-write dated exploration entry (per rule above) → flip the backlog row to 🟢 with the entry date in the Explored column → mirror both files. Confirm in one line.
 
 ## Quick Start
 
@@ -22,12 +18,12 @@ npm run build      # Production build check
 
 ## Project Overview
 
-AI-powered Product Marketing advisor with agentic RAG knowledge base (38,213+ chunks across 9 knowledge layers: 34 books, 583 podcast episodes, 532 Sharebird AMAs, 827 PMA blogs, 23 substacks, 790 thought-leader blogs), multi-model LLM support, and real-time streaming. Hundreds of users across 100+ organizations.
+AI-powered Product Marketing assistant with RAG knowledge base (21,893 chunks from PMM books, PMA blogs, Sharebird AMAs), multi-model LLM support, and real-time streaming.
 
 - **Production**: https://pmmsherpa.com
 - **Staging**: https://staging.pmmsherpa.com
 - **GitHub**: https://github.com/boommark/pmmsherpa
-- **Supabase**: Project "pmm-sherpa" (Pro) — https://supabase.com/dashboard/project/cfztsohetqiaudijlocj
+- **Supabase**: Project "Flytr" — https://supabase.com/dashboard/project/ogbjdvnkejkqqebyetqx
 - **Admin email**: abhishekratna@gmail.com
 
 ---
@@ -38,11 +34,10 @@ AI-powered Product Marketing advisor with agentic RAG knowledge base (38,213+ ch
 |-----------|------------|
 | Framework | Next.js 16 (App Router), TypeScript, Turbopack |
 | Database | Supabase PostgreSQL + pgvector |
-| Auth | Supabase Auth (Google OAuth + email/password, profile completion gate) |
-| Billing | Stripe Checkout ($9.99/mo Starter), webhooks, customer portal |
-| LLM | Claude Opus 4.5, Claude Sonnet 4.5, Gemini 3 Pro, Gemini 2.5 Pro |
+| Auth | Supabase Auth (email/password, ban-until-approved flow) |
+| LLM | Codex Opus 4.5, Codex Sonnet 4.5, Gemini 3 Pro, Gemini 2.5 Pro |
 | Embeddings | OpenAI `text-embedding-3-small` (512 dim) |
-| UI | Tailwind CSS v4 + shadcn/ui + Lucide icons, dark mode |
+| UI | Tailwind CSS + shadcn/ui, dark mode |
 | State | Zustand (`src/stores/chatStore.ts`) |
 | Email | Resend (domain: pmmsherpa.com) |
 | Hosting | Vercel (auto-deploy on push) |
@@ -52,18 +47,16 @@ AI-powered Product Marketing advisor with agentic RAG knowledge base (38,213+ ch
 ## Key Files
 
 ```
-src/app/page.tsx                       # Landing page / homepage
 src/app/api/chat/route.ts              # Main streaming chat endpoint (SSE)
 src/app/api/access-request/route.ts   # Access request submission
 src/components/chat/ChatContainer.tsx  # Chat orchestrator (main logic)
 src/components/chat/ChatInput.tsx      # Input bar (model selector, research toggle)
 src/components/chat/MessageBubble.tsx  # Message rendering (markdown, citations, actions)
 src/lib/rag/retrieval.ts              # Hybrid search (70% semantic + 30% keyword)
-src/lib/llm/provider-factory.ts       # LLM abstraction (Claude/Gemini)
+src/lib/llm/provider-factory.ts       # LLM abstraction (Codex/Gemini)
 src/lib/llm/system-prompt.ts          # PMM expert system prompt
 src/stores/chatStore.ts               # Zustand state
 src/lib/email/templates.ts            # Email templates
-sherpa design/DESIGN.md               # Design system & branding guidelines
 ```
 
 ---
@@ -90,7 +83,7 @@ Key function: `hybrid_search(query_embedding, query_text, match_count)`
 NEXT_PUBLIC_SUPABASE_URL            # Supabase project URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY       # Supabase anon key
 SUPABASE_SERVICE_ROLE_KEY           # Supabase service role (server only)
-ANTHROPIC_API_KEY                   # Claude models
+ANTHROPIC_API_KEY                   # Codex models
 GOOGLE_API_KEY                      # Gemini models
 OPENAI_API_KEY                      # Embeddings (+ optional TTS)
 RESEND_API_KEY                      # Transactional email
@@ -118,23 +111,16 @@ SSE event types: `status` → `citations` → `text` (chunks) → `done` | `erro
 
 ---
 
-## Signup Flow (Auto-Approve)
+## Access Request Flow
 
-Users are auto-approved. No manual admin action needed.
+Direct signup disabled. Users request access → admin approves.
 
-**Email/password signup** (`/signup` → `/complete-profile`):
-1. User signs up (name, email, password) → email confirmation link sent
-2. User confirms email → redirected to `/complete-profile`
-3. User provides LinkedIn URL + consent + selects plan
-4. Profile marked `profile_completed = true` → user enters `/chat`
-5. Admin gets notification email (name, email, LinkedIn, auth provider)
+1. User fills form (name, email, password, LinkedIn URL, use cases)
+2. Account created in Supabase Auth with `ban_duration: '876000h'`
+3. Admin gets email → clicks link to Supabase Auth dashboard → clicks "Remove ban"
+4. User can immediately log in with password set during signup
 
-**Google OAuth** (`/signup` or `/login` → Google → `/complete-profile`):
-1. User clicks "Continue with Google" → OAuth flow
-2. Redirected to `/complete-profile` (LinkedIn + consent + plan)
-3. Same steps 4-5 as above
-
-**LinkedIn gate**: Middleware checks `profile_completed` on all protected routes (`/chat`, `/history`, `/saved`, `/settings`). Users without LinkedIn profile are redirected to `/complete-profile`.
+Admin approval URL: `https://supabase.com/dashboard/project/ogbjdvnkejkqqebyetqx/auth/users`
 
 ---
 
