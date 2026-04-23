@@ -37,14 +37,14 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: '16x16 32x32', type: 'image/x-icon' },
-      { url: '/icon', sizes: '32x32', type: 'image/png' },
-      { url: '/icon-192', sizes: '192x192', type: 'image/png' },
-      { url: '/icon-512', sizes: '512x512', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '16x16 32x32 48x48', type: 'image/x-icon' },
+      { url: '/icon.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/pwa-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/pwa-512.png', sizes: '512x512', type: 'image/png' },
     ],
     shortcut: '/favicon.ico',
     apple: [
-      { url: '/apple-icon', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
   manifest: '/manifest.webmanifest',
