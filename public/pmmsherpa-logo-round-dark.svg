@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Black round frame -->
+  <circle cx="256" cy="256" r="256" fill="#111418"/>
+  <!-- White mountain mark -->
+  <polyline
+    points="89.33,389.33 172.67,222.67 256,322.67 322.67,156 422.67,389.33"
+    fill="none"
+    stroke="white"
+    stroke-width="37"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0058be"/>
+      <stop offset="100%" stop-color="#2170e4"/>
+    </linearGradient>
+  </defs>
+  <!-- Round frame -->
+  <circle cx="256" cy="256" r="256" fill="url(#brandGradient)"/>
+  <!-- Exact mountain mark from gen-logo.mjs: points on 24x24 grid scaled to 400px canvas with 56px padding -->
+  <polyline
+    points="89.33,389.33 172.67,222.67 256,322.67 322.67,156 422.67,389.33"
+    fill="none"
+    stroke="white"
+    stroke-width="37"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

@@ -531,10 +531,12 @@ export default function LandingPage() {
               </div>
               <span className="font-medium text-[#191c1e]">PMMSherpa</span>
             </div>
-            <div className="flex items-center gap-8 text-sm text-[#5f6368]">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-[#5f6368]">
               <a href="#what-it-does" className="hover:text-[#191c1e] transition-colors">What It Does</a>
               <a href="#how-it-works" className="hover:text-[#191c1e] transition-colors">How It Works</a>
               <a href="#who-its-for" className="hover:text-[#191c1e] transition-colors">Who It&apos;s For</a>
+              <Link href="/terms" className="hover:text-[#191c1e] transition-colors">Terms</Link>
+              <Link href="/privacy" className="hover:text-[#191c1e] transition-colors">Privacy</Link>
               <Link href="/login" className="hover:text-[#191c1e] transition-colors">Sign In</Link>
             </div>
           </div>

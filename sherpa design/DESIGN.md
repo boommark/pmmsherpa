@@ -1,78 +1,194 @@
-# Design System Strategy: High-End Editorial AI
+# PMM Sherpa Design System
 
-## 1. Overview & Creative North Star
-The Creative North Star for this design system is **"The Digital Curator."** 
+> Updated April 2026 after homepage redesign v2.
 
-We are moving away from the cluttered, "dashboard-heavy" look of typical SaaS tools. Instead, we are building a high-end strategy publication that happens to be powered by AI. The goal is to make the user feel like they are interacting with a bespoke intelligence briefing. 
+## 1. Creative North Star
 
-To achieve this, we prioritize **Intentional Asymmetry** and **Tonal Depth**. Use generous white space (referencing the **spacing-2** or **spacing-3** tokens) to create an expensive, "airy" feel. Break the rigid grid by overlapping glass-morphic cards over subtle background shifts, ensuring the UI feels like a curated canvas rather than a set of boxes.
+**"The Digital Curator"** — a high-end strategy publication powered by AI. The user should feel like they're interacting with a bespoke intelligence briefing, not a SaaS dashboard.
 
----
-
-## 2. Colors & Surface Philosophy
-The palette is built on "Alabaster" neutrals and "Precision Blue" accents, designed to feel cool, calm, and hyper-competent.
-
-### The "No-Line" Rule
-**Explicit Instruction:** Do not use 1px solid borders for sectioning or layout. Containers must never be "boxed in" by lines. Instead, define boundaries using:
-- **Background Shifts:** Place a `surface_container_low` (#f2f4f7) element against a `surface` (#f7f9fc) background.
-- **Tonal Transitions:** Use a soft shift from `surface_container_lowest` (#ffffff) to `surface_container` (#eceef1) to indicate a change in context.
-
-### Surface Hierarchy & Nesting
-Treat the UI as physical layers of fine paper or frosted glass.
-- **Level 0 (Foundation):** `surface` (#f7f9fc).
-- **Level 1 (Sections):** `surface_container_low` (#f2f4f7) for large content areas.
-- **Level 2 (Interaction):** `surface_container_lowest` (#ffffff) for primary cards or data inputs to make them "pop" forward.
-- **The "Glass & Gradient" Rule:** For floating modals or high-energy AI insights, use `surface_container_lowest` at 80% opacity with a `backdrop-blur` of 20px. Apply a subtle linear gradient from `primary` (#0058be) to `primary_container` (#2170e4) only on high-value CTAs to give them a "jewel-like" sapphire glow.
+Prioritize **clarity and density** over decorative white space. Every element earns its vertical space. Reference sites: Tebra.com (trust-forward, compact feature sections), Cyclops.ai (clean 2x2 grids, inline SVG icons).
 
 ---
 
-## 3. Typography: Editorial Sophistication
-We use **DM Sans** to bridge the gap between tech-modernity and editorial tradition.
+## 2. Colors
 
-- **Display & Headline:** Use `display-lg` and `headline-lg` with a `-0.02em` letter-spacing for a tight, authoritative look. These should feel like magazine mastheads.
-- **Body & Captions:** Use `body-md` (#0.875rem) with an increased letter-spacing of `+0.01em` to ensure the AI-generated text feels readable and premium.
-- **The Hierarchy Rule:** Never use more than three font weights on a single screen. Favor `ExtraBold` for headlines and `Medium` or `Regular` for body text. Use `label-sm` in `primary` (#0058be) uppercase for category tags to inject "Precision Blue" energy into the editorial flow.
+### Primary Palette
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `primary` | `#0058be` | CTAs, icon accents, links, tags |
+| `primary-hover` | `#004a9e` | Button hover states |
+| `primary-gradient` | `#0058be → #2170e4` | Gradient text, hero CTA fills |
+| `on-primary` | `#ffffff` | Text on primary backgrounds |
+| `primary-fixed` | `#d8e2ff` | Input focus highlights |
+
+### Neutrals (Alabaster System)
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `text-primary` | `#191c1e` | Headlines, nav text |
+| `text-body` | `#3a3f47` | Body copy |
+| `text-secondary` | `#4a4f57` | Subtitles, descriptions (improved contrast from old #5f6368) |
+| `text-muted` | `#5f6368` | Nav links, footer, tertiary labels |
+| `surface` | `#f7f9fc` | Page background |
+| `surface-section` | `#f8f9fd → #f0f3fa` | "What It Does" section gradient |
+| `border-subtle` | `#e8ecf4` | Card borders (at 60% opacity) |
+| `border-divider` | `#e2e5ea` | Section dividers (at 50% opacity) |
+
+### Dark Mode (Dark sections: Testimonials, How It Works)
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `dark-bg` | `#0a1628 → #0f1d35` | Section backgrounds |
+| `dark-text` | `#c8d0e0` | Body text on dark |
+| `dark-muted` | `#8e9199` | Secondary text on dark |
+| `dark-accent` | `#5a9cf5` | Labels, step badges on dark |
+| `dark-border` | `white/[0.08]` | Card borders on dark |
+
+### Hard Rules
+- Never use pure black (`#000000`). Use `#191c1e` for text.
+- `#0058be` is a laser, not a paint bucket. Use for the one thing you want the user to do.
+- Amber `#f59e0b` is reserved exclusively for star ratings.
 
 ---
 
-## 4. Elevation & Depth
-In this system, depth is a function of light and tone, not shadows.
+## 3. Typography
 
-- **The Layering Principle:** Achieve lift by "stacking." A `surface_container_lowest` card placed on a `surface_container_high` background creates a natural, soft-touch elevation without artificial shadows.
-- **Ambient Shadows:** If a floating element (like a dropdown) requires a shadow, use a diffuse, multi-layered blur. 
-    - *Formula:* `0px 10px 40px rgba(25, 28, 30, 0.04)`. The shadow must be a tinted version of `on_surface` to feel like natural ambient light.
-- **The "Ghost Border" Fallback:** If accessibility requires a border, use the `outline_variant` token at **15% opacity**. This creates a "suggestion" of a boundary rather than a hard wall.
+**Font:** System default (inherited from Tailwind). Previously DM Sans — can be reinstated if needed.
+
+### Hierarchy
+
+| Level | Class | Weight | Usage |
+|-------|-------|--------|-------|
+| Display | `text-4xl md:text-[3.5rem]` | `font-extrabold` | Hero headline only |
+| Section heading | `text-3xl md:text-4xl` | `font-extrabold` | Section titles |
+| Step heading | `text-2xl` | `font-semibold` | How It Works step titles |
+| Feature title | `text-lg` | `font-bold` | What It Does item titles, Who It's For card titles |
+| Body | `text-base` (16px) | `font-normal` | Descriptions, paragraphs |
+| Body small | `text-sm` (14px) | `font-normal` | Card descriptions, technical notes |
+| Label | `text-xs` | `font-semibold uppercase tracking-widest` | Section labels (WHAT IT DOES, HOW IT WORKS) |
+| Tags | `text-xs` | `font-medium tracking-wide` | Feature tags (POSITIONING · MESSAGING) |
+
+### Rules
+- `tracking-[-0.03em]` on all extrabold headlines for tight, authoritative feel
+- Max three font weights per screen: extrabold, semibold/bold, normal
+- Body text line-height: `leading-relaxed` (1.625)
+- Testimonial quotes: `text-[15px] leading-[1.7]` — slightly smaller than body for visual distinction
 
 ---
 
-## 5. Components
+## 4. Icons
+
+**Library:** Lucide React (installed via shadcn/ui). No PNG icons on the homepage.
+
+### Homepage Icon Mapping
+
+| Section | Icon | Lucide Name |
+|---------|------|-------------|
+| What It Does — Frame | Crosshair | `Crosshair` |
+| What It Does — Consult | Speech bubble | `MessageSquare` |
+| What It Does — Validate | Checkmark shield | `ShieldCheck` |
+| What It Does — Grow | Upward trend | `TrendingUp` |
+| Who It's For — Product Marketers | Target | `Target` |
+| Who It's For — Product Managers | Box | `Box` |
+| Who It's For — Founders | Rocket | `Rocket` |
+| CTAs | Arrow right | `ArrowRight` |
+
+### Styling Rules
+- **Inline with title:** Icon and title on the same horizontal line (Cyclops.ai pattern)
+- **"What It Does" icons:** `h-5 w-5 text-[#0058be]` with `strokeWidth={2}`
+- **"Who It's For" icons:** `h-6 w-6 text-[#0058be]` with `strokeWidth={1.75}`, inside a `w-12 h-12 rounded-xl bg-[#0058be]/[0.08]` container
+- **No PNG icons on landing page.** All icons must be Lucide SVGs for transparency and consistency.
+- Old PNG icons in `/public/icons/` (frame.png, consult.png, etc.) are kept for potential chat UI use but are not used on the homepage.
+
+---
+
+## 5. Layout Patterns
+
+### Section Padding (Global)
+- Standard sections: `py-14 md:py-20`
+- Testimonials section (dark): `py-12 md:py-16`
+- Never exceed `py-20 md:py-28` — that creates the "wasted white space" problem
+
+### Section Order (Homepage)
+1. Nav (sticky, blur backdrop)
+2. Hero (orb, headline, subtext, CTAs)
+3. Logo banner (scrolling company logos)
+4. Featured testimonial (shadow card, vertical layout)
+5. Demo video
+6. What It Does (2x2 grid, Lucide icons)
+7. Testimonials (dark section, glassmorphic cards)
+8. How It Works (merged with Under the Hood — 4 alternating steps with video + technical notes)
+9. Who It's For (3-column cards, Lucide icons)
+10. CTA (blue gradient card)
+11. Footer
+
+### "What It Does" — 2x2 Grid Pattern
+```
+grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0
+```
+Each item: icon + title inline → description → tags. Separated by `border-b` on top row.
+
+### "How It Works" — Alternating Steps
+Steps alternate text-left/video-right and video-left/text-right. Each step includes:
+- Step badge (numbered circle in `bg-[#0058be]/20`)
+- Capability headline (white, semibold)
+- Benefit body (muted text)
+- Technical note (smaller, muted, with `border-l-2 border-[#0058be]/30 pl-4`)
+
+Step spacing: `mb-10 md:mb-14` between steps.
+
+### Stats Bar
+4-column grid at the bottom of "How It Works" section. Numbers in `text-[#5a9cf5]` extrabold, labels in muted text below.
+
+---
+
+## 6. Component Patterns
+
+### Shadow Cards (Testimonials)
+```
+rounded-2xl bg-white p-5 md:p-7
+shadow-[0_2px_20px_rgba(0,0,0,0.06)]
+border border-[#e8ecf4]/40
+```
+
+### Glassmorphic Cards (Dark Section)
+```
+rounded-2xl p-5 md:p-6
+backdrop-blur-xl
+border border-white/[0.08]
+shadow-[0_8px_32px_rgba(0,0,0,0.2)]
+background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)
+```
 
 ### Buttons
-- **Primary:** High-energy `primary` (#0058be) fill with `on_primary` (#ffffff) text. Use `lg` (0.5rem) rounding. No shadow; use a 2px inset highlight on the top edge for a "machined" look.
-- **Secondary:** Transparent background with a `Ghost Border` and `primary` text.
-- **Tertiary:** Text-only with an underline that appears on hover, utilizing the 3.5 (1.2rem) spacing for touch targets.
+- **Primary:** `rounded-full bg-[#0058be] hover:bg-[#004a9e] text-white font-medium px-8 h-12`
+- **Secondary/Outline:** `rounded-full bg-white text-[#191c1e] border border-[#e2e5ea] h-12`
+- **Ghost:** `rounded-full text-[#5f6368] hover:text-[#191c1e] hover:bg-[#f2f4f7]`
+- **Inverted (on blue):** `rounded-full bg-white text-[#0058be] hover:bg-blue-50 font-semibold`
 
-### Input Fields
-- **Styling:** Use `surface_container_lowest` as the fill.
-- **Interaction:** On focus, do not use a heavy border. Instead, shift the background color slightly to `primary_fixed` (#d8e2ff) or add a subtle 2px "Precision Blue" bottom-bar.
-
-### Cards & Lists
-- **The Divider Ban:** Strictly forbid 1px horizontal lines between list items. Use the **Spacing Scale** (specifically `spacing-4` or `1.4rem`) to create "White Space Dividers." 
-- **AI Insight Cards:** Use a soft gradient background (from `surface_container_lowest` to `primary_fixed_dim` at 10% opacity) to signify AI-generated content.
-
-### Floating Briefing (Custom Component)
-A signature "Curator" component that sits asymmetrically on the right side of the screen. Use a Glassmorphic background with `surface_container_highest` at low opacity to present key AI summaries.
+### Navigation
+```
+sticky top-0 z-50 bg-white/80 backdrop-blur-xl
+max-w-6xl mx-auto h-16
+```
 
 ---
 
-## 6. Do's and Don'ts
+## 7. Do's and Don'ts
 
 ### Do
-- **Do** use asymmetrical layouts where the left margin is wider than the right to mimic a modern publication.
-- **Do** use "Precision Blue" sparingly. It is a laser, not a paint bucket. Use it for the "one thing" you want the user to do.
-- **Do** lean into the `xl` (0.75rem) rounding for large containers to soften the "AI" clinical feel.
+- Use Lucide SVGs for all homepage icons
+- Keep section padding at `py-14 md:py-20` or less
+- Use `#4a4f57` for subtitle text (better contrast than `#5f6368`)
+- Put icon and title on the same line for feature lists
+- Use 2x2 grid for feature items when there are exactly 4
+- Use alternating left/right layout for step-by-step sections with visuals
 
 ### Don't
-- **Don't** use pure black (#000000). Always use `on_background` (#191c1e) for text to maintain the "Alabaster/Ether" softness.
-- **Don't** use standard 12-column grids for everything. Allow content to flow into "Editorial Columns" (600px–800px wide) for better readability.
-- **Don't** use 1px borders. If you feel you need a border, try adding more white space first.
+- Use PNG icons with baked-in backgrounds on the landing page
+- Use oversized decorative numbers (01, 02, 03...) — they add visual weight without information
+- Exceed `py-20 md:py-28` padding on any section
+- Use `text-[#5f6368]` for body/subtitle text (too low contrast) — use `#4a4f57`
+- Use pure black `#000000` for text
+- Create more than 3 levels of font weight per screen

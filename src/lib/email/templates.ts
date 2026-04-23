@@ -118,7 +118,7 @@ export function getAdminNotificationEmail(data: AccessRequestData) {
 
   return {
     to: SUPER_ADMIN_EMAIL,
-    subject: `New PMMSherpa Access Request: ${data.fullName}`,
+    subject: `New PMMSherpa Signup: ${data.fullName}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -132,8 +132,8 @@ export function getAdminNotificationEmail(data: AccessRequestData) {
             <div class="container">
               <div class="header">
                 <img src="${LOGO_URL}" alt="PMM Sherpa" width="48" height="48" style="border-radius: 10px;" />
-                <h1>New Access Request</h1>
-                <p>Someone wants to join PMM Sherpa</p>
+                <h1>New User Signup</h1>
+                <p>A new user has joined PMM Sherpa</p>
               </div>
               <div class="content">
                 <div class="field">
@@ -175,17 +175,7 @@ export function getAdminNotificationEmail(data: AccessRequestData) {
                   </div>
                 </div>
                 <div style="text-align: center; margin-top: 28px;">
-                  <p style="font-size: 14px; color: #6b7280; margin: 0 0 16px 0;">Click to approve or reject this user. They'll be unbanned and receive a welcome email automatically.</p>
-                  <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
-                    <tr>
-                      <td style="padding-right: 12px;">
-                        <a href="${APP_URL}/api/approve-user?token=${data.approvalToken}&action=approve" class="button button-success" style="display: inline-block; background: #0058be; color: white !important; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 15px;">✓ Approve</a>
-                      </td>
-                      <td>
-                        <a href="${APP_URL}/api/approve-user?token=${data.approvalToken}&action=reject" class="button button-outline" style="display: inline-block; background: white; color: #dc2626 !important; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 15px; border: 2px solid #e5e7eb;">✗ Reject</a>
-                      </td>
-                    </tr>
-                  </table>
+                  <p style="font-size: 14px; color: #16a34a; font-weight: 600; margin: 0;">Auto-approved — user can access chat immediately</p>
                 </div>
               </div>
               <div class="footer">
@@ -197,17 +187,13 @@ export function getAdminNotificationEmail(data: AccessRequestData) {
       </html>
     `,
     text: `
-New PMMSherpa Access Request
+New PMMSherpa Signup (Auto-Approved)
 
 Name: ${data.fullName}
 Email: ${data.email}
 ${data.phone ? `Phone: ${data.phone}\n` : ''}${data.profession ? `Profession: ${data.profession}\n` : ''}${data.company ? `Company: ${data.company}\n` : ''}${data.linkedinUrl ? `LinkedIn: ${data.linkedinUrl}\n` : ''}
 Use Cases:
 ${useCasesFormatted}
-
-APPROVE OR REJECT:
-Approve: ${APP_URL}/api/approve-user?token=${data.approvalToken}&action=approve
-Reject: ${APP_URL}/api/approve-user?token=${data.approvalToken}&action=reject
     `.trim()
   }
 }
