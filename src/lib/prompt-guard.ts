@@ -12,6 +12,7 @@ const EXTRACTION_PATTERNS = [
   /ignore\s+(all\s+)?previous\s+instructions/i,
   /ignore\s+(all\s+)?above\s+instructions/i,
   /disregard\s+(all\s+)?previous/i,
+  /neglect\s+(all\s+)?(former|previous|fixed|prior)\s+instructions/i,
   /forget\s+(all\s+)?previous/i,
   /override\s+(your\s+)?instructions/i,
   /bypass\s+(your\s+)?instructions/i,

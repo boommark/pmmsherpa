@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server'
 import { streamText } from 'ai'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { Resend } from 'resend'
+import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 import { getMonthlyLimitForTier } from '@/lib/constants'
 import { getModel, buildMessages, getModelDisplayName, getDbModelValue, MODEL_CONFIG, type ModelProvider } from '@/lib/llm/provider-factory'
 import { multiQueryRetrieve, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
@@ -14,6 +16,38 @@ import { pollUntilDone as pollLlamaParse } from '@/lib/llamaparse'
 import { scanInput, scanOutput, SAFE_RESPONSE, CANARY_TOKEN } from '@/lib/prompt-guard'
 import { initLogger } from 'braintrust'
 import { getPostHogClient } from '@/lib/posthog-server'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
+
+async function handleAbuseEvent(
+  userId: string,
+  email: string,
+  rawMessage: string,
+  patternMatched: string | null,
+  eventType: string
+) {
+  const [adminClient] = await Promise.all([createServiceClient()])
+  await Promise.all([
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (adminClient.from('abuse_events') as any).insert({
+      user_id: userId,
+      email,
+      event_type: eventType,
+      pattern_matched: patternMatched,
+      raw_message: rawMessage,
+    }),
+    resend.emails.send({
+      from: 'PMM Sherpa <support@pmmsherpa.com>',
+      to: SUPER_ADMIN_EMAIL,
+      subject: `[ABUSE ALERT] ${eventType} — ${email}`,
+      html: `<p><strong>Event:</strong> ${eventType}</p>
+<p><strong>User:</strong> ${email} (${userId})</p>
+<p><strong>Pattern matched:</strong> <code>${patternMatched ?? 'n/a'}</code></p>
+<p><strong>Message:</strong></p>
+<blockquote style="border-left:3px solid #e53e3e;padding:8px 16px;color:#555;margin:0">${rawMessage.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</blockquote>`,
+    }),
+  ])
+}
 
 const btLogger = initLogger({
   projectName: 'PMMSherpa',
@@ -92,6 +126,10 @@ export async function POST(request: NextRequest) {
     if (hasMessage) {
       const guardResult = scanInput(message)
       if (guardResult.blocked) {
+        // Fire-and-forget: log to abuse_events + alert admin
+        handleAbuseEvent(user.id, user.email ?? '', message, guardResult.matchedPattern, 'prompt_injection')
+          .catch(err => console.error('[PromptGuard] Abuse logging failed:', err))
+
         const encoder = new TextEncoder()
         const safeStream = new ReadableStream({
           start(controller) {
