@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useProfile, useSignOut } from '@/hooks/useSupabase'
 import { useChatStore } from '@/stores/chatStore'
@@ -15,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ModelSelector } from '@/components/chat/ModelSelector'
-import { LogOut, User, Settings, Menu, Mail } from 'lucide-react'
+import { LogOut, User, Settings, Menu, Mail, Zap } from 'lucide-react'
 
 export function Header() {
   const { profile } = useProfile()
@@ -24,10 +25,26 @@ export function Header() {
   const pathname = usePathname()
   const { currentModel, setCurrentModel, clearMessages, setConversationId } = useChatStore()
   const { toggleMobileSidebar } = useUIStore()
+  const [upgrading, setUpgrading] = useState(false)
 
   const handleSignOut = async () => {
     await signOut()
     window.location.href = '/login'
+  }
+
+  const handleUpgrade = async () => {
+    setUpgrading(true)
+    try {
+      const res = await fetch('/api/stripe/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID }),
+      })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+    } finally {
+      setUpgrading(false)
+    }
   }
 
   // Handle clicking the logo to start a new chat — single click, no scroll flash
@@ -96,6 +113,16 @@ export function Header() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+          {profile?.tier === 'free' && (
+            <DropdownMenuItem
+              onClick={handleUpgrade}
+              disabled={upgrading}
+              className="text-[#0058be] dark:text-[#a8c0f0] font-medium focus:text-[#0058be] dark:focus:text-[#a8c0f0]"
+            >
+              <Zap className="mr-2 h-4 w-4" />
+              {upgrading ? 'Redirecting…' : 'Upgrade to Starter — $9.99/mo'}
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem onClick={() => router.push('/settings')}>
             <User className="mr-2 h-4 w-4" />
             Profile
