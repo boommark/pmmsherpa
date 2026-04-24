@@ -40,6 +40,7 @@ interface ChatInputProps {
   disabled?: boolean
   conversationId?: string
   onOpenVoiceMode?: () => void
+  isLanding?: boolean
 }
 
 export interface ChatInputRef {
@@ -48,7 +49,7 @@ export interface ChatInputRef {
 }
 
 export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
-  function ChatInput({ onSend, disabled, conversationId, onOpenVoiceMode }, ref) {
+  function ChatInput({ onSend, disabled, conversationId, onOpenVoiceMode, isLanding }, ref) {
     const [input, setInput] = useState('')
     const [attachments, setAttachments] = useState<UploadedFile[]>([])
     const [partialTranscript, setPartialTranscript] = useState('')
@@ -313,7 +314,9 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const canSubmit = (input.trim() || attachments.some((a) => a.status === 'completed')) && !isUploading
 
     return (
-      <div className="sticky bottom-0 z-10 p-2 sm:p-3 md:p-4 lg:p-6 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-3 md:pb-4 lg:pb-6 bg-background/80 backdrop-blur-lg">
+      <div className={cn(
+        !isLanding && "sticky bottom-0 z-10 p-2 sm:p-3 md:p-4 lg:p-6 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-3 md:pb-4 lg:pb-6 bg-background/80 backdrop-blur-lg"
+      )}>
         <div className="w-full max-w-3xl mx-auto">
           {/* Glassmorphism container — no hard borders */}
           <div className="relative rounded-xl md:rounded-2xl bg-surface-container-lowest/80 dark:bg-surface-container/80 backdrop-blur-xl shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
@@ -324,7 +327,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               disabled={disabled}
             />
 
-            <div className="relative flex items-end gap-1.5 sm:gap-2 md:gap-2.5 p-1.5 sm:p-2 md:p-3">
+            <div className={cn("relative flex items-end gap-1.5 sm:gap-2 md:gap-2.5", isLanding ? "p-2 sm:p-3 md:p-4" : "p-1.5 sm:p-2 md:p-3")}>
               {/* File upload button */}
               <FileUpload
                 onFilesSelected={handleFilesSelected}
@@ -345,10 +348,15 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                     ? "Listening..."
                     : attachments.length > 0
                     ? "Add a message..."
-                    : "Ask about product marketing..."
+                    : "Ask about GTM..."
                 }
                 disabled={disabled || isRecording}
-                className="flex-1 min-h-[36px] sm:min-h-[40px] md:min-h-[44px] max-h-[120px] sm:max-h-[150px] md:max-h-[200px] resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-sm md:text-base placeholder:text-muted-foreground/50 disabled:opacity-50 py-2"
+                className={cn(
+                  "flex-1 resize-none bg-transparent border-0 focus:outline-none focus:ring-0 text-sm md:text-base placeholder:text-muted-foreground/50 disabled:opacity-50 py-2",
+                  isLanding
+                    ? "min-h-[52px] sm:min-h-[60px] md:min-h-[68px] max-h-[200px]"
+                    : "min-h-[36px] sm:min-h-[40px] md:min-h-[44px] max-h-[120px] sm:max-h-[150px] md:max-h-[200px]"
+                )}
                 rows={1}
               />
               {/* Voice mode and voice input hidden for now */}
@@ -378,7 +386,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
             </div>
           </div>
           <p className="text-xs text-muted-foreground/60 mt-2.5 md:mt-3 text-center hidden sm:block">
-            Attach files (PDF, PPT, DOC, XLS, images) for context. Paste URLs for analysis. Ask anything about product marketing.
+            Attach files (PDF, PPT, DOC, XLS, images) for context. Paste URLs for analysis.
           </p>
         </div>
       </div>
