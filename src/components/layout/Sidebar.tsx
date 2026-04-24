@@ -71,6 +71,23 @@ function SidebarContent({
   const { setPendingNewChat } = useChatStore()
   const { profile } = useProfile()
 
+  const [upgradingTier, setUpgradingTier] = useState(false)
+
+  const handleUpgradeToStarter = async () => {
+    setUpgradingTier(true)
+    try {
+      const res = await fetch('/api/stripe/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID }),
+      })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+    } finally {
+      setUpgradingTier(false)
+    }
+  }
+
   // Rename state
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
@@ -418,15 +435,15 @@ function SidebarContent({
                     style={{ width: `${Math.min(100, (profile.messages_used_this_period / FREE_TIER_MONTHLY_LIMIT) * 100)}%` }}
                   />
                 </div>
-                <Link href="/complete-profile" onClick={onNavigate}>
-                  <Button
-                    size="sm"
-                    className="w-full bg-gradient-to-r from-[#0058be] to-[#3b82f6] hover:from-[#004a9e] hover:to-[#2563eb] text-white shadow-none text-xs h-8 mt-1"
-                  >
-                    <ArrowUpCircle className="h-3.5 w-3.5 mr-1.5" />
-                    Upgrade to Starter
-                  </Button>
-                </Link>
+                <Button
+                  size="sm"
+                  onClick={handleUpgradeToStarter}
+                  disabled={upgradingTier}
+                  className="w-full bg-gradient-to-r from-[#0058be] to-[#3b82f6] hover:from-[#004a9e] hover:to-[#2563eb] text-white shadow-none text-xs h-8 mt-1"
+                >
+                  <ArrowUpCircle className="h-3.5 w-3.5 mr-1.5" />
+                  {upgradingTier ? 'Redirecting…' : 'Upgrade to Starter'}
+                </Button>
               </div>
             ) : (
               <div className="px-3">

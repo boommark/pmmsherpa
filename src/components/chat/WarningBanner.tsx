@@ -9,6 +9,22 @@ import { cn } from '@/lib/utils'
 export function WarningBanner() {
   const { messagesRemaining } = useChatStore()
   const [dismissed, setDismissed] = useState(false)
+  const [upgrading, setUpgrading] = useState(false)
+
+  const handleUpgrade = async () => {
+    setUpgrading(true)
+    try {
+      const res = await fetch('/api/stripe/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID }),
+      })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+    } finally {
+      setUpgrading(false)
+    }
+  }
 
   // Show when remaining is known, <= 3, and not dismissed this session
   const shouldShow = messagesRemaining !== null && messagesRemaining <= 3 && messagesRemaining > 0 && !dismissed
@@ -30,8 +46,14 @@ export function WarningBanner() {
         <span>{messagesRemaining} message{messagesRemaining !== 1 ? 's' : ''} remaining this month</span>
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        <Button asChild size="sm" variant="outline" className="h-7 text-xs border-amber-400 text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900">
-          <a href="/pricing">Upgrade</a>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleUpgrade}
+          disabled={upgrading}
+          className="h-7 text-xs border-amber-400 text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900"
+        >
+          {upgrading ? 'Redirecting…' : 'Upgrade'}
         </Button>
         <button
           onClick={() => setDismissed(true)}
