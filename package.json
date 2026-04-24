@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "eval:layer4": "tsx evals/harness/run_layer4.ts",
-    "eval:layer4:cheap": "tsx evals/harness/run_layer4.ts --skip-judge"
+    "eval:layer4:cheap": "tsx evals/harness/run_layer4.ts --skip-judge",
+    "eval:layer4:braintrust": "braintrust eval evals/braintrust/layer4.eval.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.56",
