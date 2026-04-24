@@ -631,8 +631,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           const llmModel = getModel(model)
 
           // Status: Generating response
-          const modelName = getModelDisplayName(model)
-          sendStatus(`Generating response with ${modelName}...`)
+          sendStatus(`Generating response...`)
 
           // Start streaming
           const startLLM = Date.now()
