@@ -68,6 +68,9 @@ data/user-analysis-*.md
 scripts/*.log
 .claude/
 
+# Eval run outputs
+evals/reports/
+
 # iCloud sync duplicates
 * 2.*
 * 3.*

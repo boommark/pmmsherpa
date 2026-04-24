@@ -1,7 +1,18 @@
 import type { NextConfig } from "next";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  serverExternalPackages: ['@marp-team/marp-cli', 'serve-index', 'batch'],
+  turbopack: {
+    rules: {
+      "*.{js,mjs,cjs}": {
+        condition: "foreign",
+        loaders: [{ loader: require.resolve("braintrust/webpack-loader") }],
+      },
+    },
+  },
   async rewrites() {
     return [
       {
