@@ -96,7 +96,7 @@ export default function LoginPage() {
               Welcome to PMM Sherpa
             </h1>
             <p className="text-muted-foreground text-sm">
-              Your expert product marketing advisor, powered by 38,000+ knowledge fragments
+              Thousands of real, battle-tested GTM principles from the world's best product marketing minds
             </p>
           </div>
 

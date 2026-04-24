@@ -364,7 +364,7 @@ export default function LandingPage() {
                   Draws from the playbooks that shaped the best GTM leaders in tech. PMMSherpa commits to a recommendation. You decide what to do with it.
                 </p>
                 <p className="text-sm text-[#5a6577] leading-relaxed border-l-2 border-[#0058be]/30 pl-4">
-                  Hybrid retrieval fuses 70% semantic similarity with 30% keyword precision across 38,000+ curated fragments in nine structured layers. Proven theory and real-world outcomes stay distinct.
+                  Hybrid retrieval fuses 70% semantic similarity with 30% keyword precision across thousands of curated GTM insights in nine structured layers. Proven theory and real-world outcomes stay distinct.
                 </p>
               </div>
             </div>
@@ -426,7 +426,7 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto mt-14 pt-10 border-t border-white/[0.08] grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
               <p className="text-2xl md:text-3xl font-extrabold text-[#5a9cf5]">38,000+</p>
-              <p className="text-xs text-[#6b7280] mt-1">Curated knowledge fragments</p>
+              <p className="text-xs text-[#6b7280] mt-1">Battle-tested GTM insights</p>
             </div>
             <div>
               <p className="text-2xl md:text-3xl font-extrabold text-[#5a9cf5]">9</p>
@@ -506,7 +506,7 @@ export default function LandingPage() {
                 PMMSherpa is what you check your thinking against before it matters.
               </p>
               <p className="mb-8 text-sm text-blue-300/80 max-w-lg mx-auto">
-                38,000+ knowledge fragments. 9 knowledge layers. 500+ companies. One conversation away.
+                Thousands of real, practical GTM principles. 9 knowledge layers. 500+ companies. One conversation away.
               </p>
               <Link href="/login">
                 <Button
