@@ -225,7 +225,7 @@ export default function CompleteProfilePage() {
                     <Zap className="h-4 w-4 text-[#0058be]" />
                     <span className="font-semibold text-sm">Starter</span>
                   </div>
-                  <p className="text-xs text-muted-foreground">Unlimited chats, all models</p>
+                  <p className="text-xs text-muted-foreground">200 msgs/month, all models</p>
                   <p className="text-lg font-bold mt-1">$9.99<span className="text-xs font-normal text-muted-foreground">/mo</span></p>
                 </button>
               </div>

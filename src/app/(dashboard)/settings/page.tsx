@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2, CheckCircle, Moon, Sun, Monitor, Upload, X, Mail, Shield } from 'lucide-react'
+import { Loader2, CheckCircle, Moon, Sun, Monitor, Upload, X, Mail, Shield, CreditCard } from 'lucide-react'
 
 // Apply theme to document and persist to localStorage
 function applyTheme(theme: 'light' | 'dark' | 'system') {
@@ -43,6 +43,7 @@ export default function SettingsPage() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [sendingEmails, setSendingEmails] = useState(false)
   const [emailResult, setEmailResult] = useState<{ success?: string; error?: string } | null>(null)
+  const [managingBilling, setManagingBilling] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
@@ -188,6 +189,17 @@ export default function SettingsPage() {
         .join('')
         .toUpperCase()
     : profile?.email?.[0]?.toUpperCase() || 'U'
+
+  const handleManageBilling = async () => {
+    setManagingBilling(true)
+    try {
+      const res = await fetch('/api/stripe/portal', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+    } finally {
+      setManagingBilling(false)
+    }
+  }
 
   // Send approval emails (admin only)
   const handleSendApprovalEmails = async () => {
@@ -459,6 +471,39 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Billing Section */}
+        {profile?.tier === 'starter' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Billing</CardTitle>
+              <CardDescription>
+                Manage your subscription and payment details
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">PMM Sherpa Starter</p>
+                  <p className="text-xs text-muted-foreground">$9.99 / month</p>
+                </div>
+                <span className="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded-full font-medium">Active</span>
+              </div>
+              <Button
+                variant="outline"
+                onClick={handleManageBilling}
+                disabled={managingBilling}
+              >
+                {managingBilling ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <CreditCard className="mr-2 h-4 w-4" />
+                )}
+                Manage Subscription
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Admin Section - Only visible to abhishekratna@gmail.com */}
         {isAdmin && (

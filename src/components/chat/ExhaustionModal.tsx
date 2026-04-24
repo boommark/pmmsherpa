@@ -27,7 +27,7 @@ export function ExhaustionModal() {
         </p>
         <div className="flex flex-col gap-3 mt-2">
           <Button asChild className="w-full bg-[#0058be] hover:bg-[#004a9e] text-white">
-            <a href="/pricing">Upgrade to Starter — $11.99/mo</a>
+            <a href="/pricing">Upgrade to Starter — $9.99/mo</a>
           </Button>
           <button
             onClick={() => setShowExhaustionModal(false)}
