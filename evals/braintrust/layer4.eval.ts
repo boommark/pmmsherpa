@@ -74,6 +74,12 @@ async function runSherpa(input: string): Promise<string> {
   const resp = await sherpaClient.messages.create({
     model: SHERPA_MODEL,
     max_tokens: 1200,
+    // temperature=0 for determinism across eval runs. Sherpa's prod /api/chat
+    // uses the model default (typically 1.0) because actual users benefit
+    // from output variety. Evals need reproducibility, so we pin this here
+    // only. Run-to-run score variance should now be near zero when the
+    // system prompt is unchanged.
+    temperature: 0,
     system: PMMSHERPA_SYSTEM_PROMPT,
     messages: [{ role: "user", content: input }],
   });
