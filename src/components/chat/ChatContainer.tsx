@@ -344,6 +344,12 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         finishStreaming(assistantMessageId)
       }
     } finally {
+      // Safety net: clear the message-level isStreaming flag no matter how
+      // the request ended (done event, error, stream closed without done,
+      // timeout, or unhandled throw). Otherwise the spinner inside
+      // MessageBubble (gated on message.isStreaming) stays visible forever.
+      // finishStreaming is idempotent in the store.
+      finishStreaming(assistantMessageId)
       setIsLoading(false)
       setStatusMessage(null)
       isStreamingRef.current = false
