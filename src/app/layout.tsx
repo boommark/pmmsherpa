@@ -11,12 +11,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://pmmsherpa.com"),
   title: {
-    default: "PMMSherpa - Your Product Marketing AI Assistant",
-    template: "%s | PMMSherpa",
+    default: "PMM Sherpa - Stop Guessing, Start Converting",
+    template: "%s | PMM Sherpa",
   },
   description:
-    "PMMSherpa is your AI-powered product marketing assistant. Get expert guidance on positioning, messaging, GTM strategy, competitive analysis, and more from 1,200+ PMM resources.",
+    "The AI Assistant for World Class GTM. Expert guidance on positioning, messaging, GTM strategy, competitive analysis, and more — powered by 38,000+ curated PMM insights.",
   keywords: [
     "product marketing",
     "PMM",
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     "AI assistant",
     "product marketing manager",
   ],
-  authors: [{ name: "PMMSherpa" }],
+  authors: [{ name: "PMM Sherpa" }],
   viewport: {
     width: "device-width",
     initialScale: 1,
@@ -49,17 +50,24 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.webmanifest',
   openGraph: {
-    title: "PMMSherpa - Your Product Marketing AI Assistant",
-    description:
-      "Get expert PMM guidance powered by AI. Positioning, messaging, GTM strategy, and more.",
+    title: "PMM Sherpa - Stop Guessing, Start Converting",
+    description: "The AI Assistant for World Class GTM.",
     type: "website",
     locale: "en_US",
+    images: [
+      {
+        url: "/pmmsherpa-logo-round.png",
+        width: 512,
+        height: 512,
+        alt: "PMM Sherpa",
+      },
+    ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "PMMSherpa - Your Product Marketing AI Assistant",
-    description:
-      "Get expert PMM guidance powered by AI. Positioning, messaging, GTM strategy, and more.",
+    card: "summary",
+    title: "PMM Sherpa - Stop Guessing, Start Converting",
+    description: "The AI Assistant for World Class GTM.",
+    images: ["/pmmsherpa-logo-round.png"],
   },
   robots: {
     index: true,
