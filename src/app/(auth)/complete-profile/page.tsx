@@ -40,6 +40,21 @@ export default function CompleteProfilePage() {
       }
       setUserEmail(user.email || '')
       setUserName(user.user_metadata?.full_name || user.user_metadata?.name || '')
+
+      // If the user cancelled out of Stripe but their profile is already complete,
+      // send them to settings where they can upgrade — don't strand them on an empty form.
+      const cancelled = new URLSearchParams(window.location.search).get('cancelled')
+      if (cancelled === 'true') {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('profile_completed')
+          .eq('id', user.id)
+          .single() as { data: { profile_completed: boolean } | null }
+        if (profile?.profile_completed) {
+          router.replace('/settings?upgrade=true')
+          return
+        }
+      }
     }
     loadUser()
   }, [supabase, router])

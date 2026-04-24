@@ -26,7 +26,8 @@ export async function POST(request: NextRequest) {
 
     let customerId = profile?.stripe_customer_id
 
-    // Create Stripe customer if needed
+    // Create Stripe customer if needed, and persist immediately so repeat
+    // visits reuse the same customer instead of creating orphans.
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email,
@@ -35,6 +36,11 @@ export async function POST(request: NextRequest) {
         },
       })
       customerId = customer.id
+
+      await supabase
+        .from('profiles')
+        .update({ stripe_customer_id: customerId } as never)
+        .eq('id', user.id)
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'

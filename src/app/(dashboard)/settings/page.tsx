@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2, CheckCircle, Moon, Sun, Monitor, Upload, X, Mail, Shield, CreditCard } from 'lucide-react'
+import { Loader2, CheckCircle, Moon, Sun, Monitor, Upload, X, Mail, Shield, CreditCard, Zap } from 'lucide-react'
 
 // Apply theme to document and persist to localStorage
 function applyTheme(theme: 'light' | 'dark' | 'system') {
@@ -44,6 +44,7 @@ export default function SettingsPage() {
   const [sendingEmails, setSendingEmails] = useState(false)
   const [emailResult, setEmailResult] = useState<{ success?: string; error?: string } | null>(null)
   const [managingBilling, setManagingBilling] = useState(false)
+  const [upgrading, setUpgrading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
 
@@ -198,6 +199,21 @@ export default function SettingsPage() {
       if (data.url) window.location.href = data.url
     } finally {
       setManagingBilling(false)
+    }
+  }
+
+  const handleUpgrade = async () => {
+    setUpgrading(true)
+    try {
+      const res = await fetch('/api/stripe/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID }),
+      })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+    } finally {
+      setUpgrading(false)
     }
   }
 
@@ -472,6 +488,39 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Upgrade card — free users only */}
+        {profile?.tier === 'free' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Upgrade to Starter</CardTitle>
+              <CardDescription>
+                Unlock 200 messages/month, all AI models, file uploads, and web research
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-[#f2f4f7] dark:bg-[#282b30]">
+                <div>
+                  <p className="text-sm font-semibold">PMM Sherpa Starter</p>
+                  <p className="text-xs text-muted-foreground">200 msgs/month · all models · file uploads</p>
+                </div>
+                <p className="text-lg font-bold">$9.99<span className="text-xs font-normal text-muted-foreground">/mo</span></p>
+              </div>
+              <Button
+                onClick={handleUpgrade}
+                disabled={upgrading}
+                className="w-full bg-[#0058be] hover:bg-[#004a9e] text-white"
+              >
+                {upgrading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Zap className="mr-2 h-4 w-4" />
+                )}
+                {upgrading ? 'Redirecting to payment…' : 'Upgrade to Starter — $9.99/mo'}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Billing Section */}
         {profile?.tier === 'starter' && (
