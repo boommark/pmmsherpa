@@ -39,6 +39,15 @@ export async function POST(request: NextRequest) {
     }
 
     const serviceClient = await createServiceClient()
+
+    // Check if profile was already completed — used to guard duplicate notification emails
+    const { data: existing } = await serviceClient
+      .from('profiles')
+      .select('profile_completed')
+      .eq('id', user.id)
+      .single() as { data: { profile_completed: boolean } | null }
+    const alreadyCompleted = existing?.profile_completed === true
+
     const { error: updateError } = await serviceClient
       .from('profiles')
       .update({
@@ -53,7 +62,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
     }
 
-    // Send notification email to admin about new user signup
+    // Send notification email to admin only on first-time profile completion
+    if (alreadyCompleted) return NextResponse.json({ success: true })
     const userName = user.user_metadata?.full_name || user.user_metadata?.name || 'Unknown'
     try {
       await getResend().emails.send({

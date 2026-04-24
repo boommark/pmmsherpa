@@ -31,7 +31,7 @@ import {
   Infinity,
   Mail,
 } from 'lucide-react'
-import { FREE_TIER_MONTHLY_LIMIT } from '@/lib/constants'
+import { FREE_TIER_MONTHLY_LIMIT, STARTER_TIER_MONTHLY_LIMIT } from '@/lib/constants'
 
 // Helper to group conversations by date
 function getDateGroup(date: Date): string {
@@ -433,8 +433,8 @@ function SidebarContent({
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#0058be]/10">
                   <Zap className="h-3.5 w-3.5 text-[#0058be]" />
                   <span className="text-xs font-semibold text-[#0058be] dark:text-[#a8c0f0]">Starter</span>
-                  <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-                    <Infinity className="h-3 w-3" /> Unlimited
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    {profile.messages_used_this_period ?? 0}/{STARTER_TIER_MONTHLY_LIMIT}
                   </span>
                 </div>
               </div>
