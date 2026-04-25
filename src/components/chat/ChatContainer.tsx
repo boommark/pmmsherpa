@@ -175,7 +175,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     if (artifactType) {
       isSubmittingRef.current = true
       setIsLoading(true)
-      setStatusMessage('Generating your artifact...')
+      // No setStatusMessage — the loading deck message provides the only UX feedback
 
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
@@ -189,11 +189,24 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       const loadingDeckMsg: ChatMessage = {
         id: deckMsgId,
         role: 'assistant',
-        content: '',
+        content: 'Searching 38K+ PMM knowledge chunks...',
         isStreaming: true,
         createdAt: new Date(),
       }
       addMessage(loadingDeckMsg)
+
+      // Cycle status messages so the user sees progress during the ~45s wait
+      const statusSteps = [
+        'Generating content with Claude...',
+        'Applying PMM frameworks...',
+        'Rendering slides...',
+      ]
+      let stepIdx = 0
+      const statusTimer = setInterval(() => {
+        if (stepIdx < statusSteps.length) {
+          updateMessage(deckMsgId, { content: statusSteps[stepIdx++] })
+        }
+      }, 12000)
 
       try {
         let activeConversationId = conversationId
@@ -262,6 +275,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         })
         toast.error(error instanceof Error ? error.message : 'Generation failed')
       } finally {
+        clearInterval(statusTimer)
         setIsLoading(false)
         setStatusMessage(null)
         isSubmittingRef.current = false

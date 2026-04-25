@@ -64,12 +64,12 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
     )
   }
 
-  // Loading state while deck is being generated
-  if (isStreaming && !message.content && !message.deck) {
+  // Loading state while deck is being generated (content holds the cycling status)
+  if (isStreaming && !message.deck) {
     return (
       <div className="px-4 py-3 flex items-center gap-2 text-muted-foreground text-sm">
-        <Loader2 className="h-4 w-4 animate-spin text-[#0058be]" />
-        <span>Generating artifact...</span>
+        <Loader2 className="h-4 w-4 animate-spin text-[#0058be] shrink-0" />
+        <span>{message.content || 'Generating artifact...'}</span>
       </div>
     )
   }
