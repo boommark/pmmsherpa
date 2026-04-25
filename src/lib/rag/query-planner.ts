@@ -70,8 +70,8 @@ Given the user's message and context, generate:
    - Incorporate relevant context from conversation history, URLs, or attachments
 
 2. **Web research decision** — Should we invoke Perplexity for synthesized research?
-   - YES when: current market data needed, recent events referenced, pricing/benchmarks requested, "latest"/"current"/"2026" trends asked about, competitive landscape analysis
-   - NO when: asking about frameworks/methodology, requesting deliverables/templates, career advice, reviewing their own work, conceptual questions the KB covers well
+   - YES when: current market data needed, recent events referenced, pricing/benchmarks requested, "latest"/"current"/"2026" trends asked about, competitive landscape analysis, OR creating any deliverable (positioning, battlecard, messaging, GTM plan) for a **specific named company or product** where knowing their current offerings, market position, or competitive context is required
+   - NO when: asking about frameworks/methodology, requesting generic deliverables without a specific company, career advice, reviewing their own work, conceptual questions the KB covers well
    - If YES, generate a query optimized for Perplexity that targets what the KB CANNOT provide
 
 3. **Web search decision** — Should we search the web and fetch specific pages?
@@ -186,10 +186,11 @@ export async function planQueries(input: QueryPlannerInput, userId?: string): Pr
     }
 
     // Fallback: explicit research requests should trigger Perplexity web research
-    // Catches "do research", "research this", "research on X", "research and then write"
+    // Catches "do research", "do some research", "do your research", "research on X", etc.
     const explicitResearchPatterns = [
-      /\b(?:do|run|conduct|perform)\s+(?:some\s+)?research\b/,
+      /\b(?:do|run|conduct|perform)\s+(?:some|your|the|more)?\s*research\b/,
       /\bresearch\s+(?:on|about|into|this|and)\b/,
+      /\b(?:look it up|find out|search online|research online)\b/,
     ]
     if (!plan.webResearch.needed && explicitResearchPatterns.some(p => p.test(msg))) {
       // Build a research query from conversation context — use the topic being discussed

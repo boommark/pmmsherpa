@@ -3,7 +3,7 @@ import { streamText } from 'ai'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
-import { getMonthlyLimitForTier } from '@/lib/constants'
+import { getMonthlyLimitForTier, getEffectiveTier } from '@/lib/constants'
 import { getModel, buildMessages, getModelDisplayName, getDbModelValue, MODEL_CONFIG, type ModelProvider } from '@/lib/llm/provider-factory'
 import { multiQueryRetrieve, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
 import { planQueries } from '@/lib/rag/query-planner'
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
       })
       .eq('id', user.id)
       .lt('period_start', currentMonthStartIso)
-      .select('tier, messages_used_this_period, period_start')
+      .select('tier, starter_access_until, messages_used_this_period, period_start')
       .maybeSingle()
 
     if (gateError) {
@@ -184,12 +184,12 @@ export async function POST(request: NextRequest) {
     let messagesUsed: number
 
     if (gateRow) {
-      tier = gateRow.tier
+      tier = getEffectiveTier(gateRow.tier, gateRow.starter_access_until)
       messagesUsed = gateRow.messages_used_this_period // 0 after reset
     } else {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: profileRow, error: profileError } = await (supabase.from('profiles') as any)
-        .select('tier, messages_used_this_period')
+        .select('tier, starter_access_until, messages_used_this_period')
         .eq('id', user.id)
         .single()
 
@@ -201,7 +201,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      tier = profileRow.tier
+      tier = getEffectiveTier(profileRow.tier, profileRow.starter_access_until)
       messagesUsed = profileRow.messages_used_this_period
     }
 
@@ -736,111 +736,124 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             )
           }
 
-          // Wait for the result to finalize to get usage stats
-          const finalResult = await result
-          const usage = await finalResult.usage
-
-          // Now save messages to database BEFORE closing the stream
+          // Finalize usage stats — wrapped so a SDK hiccup doesn't block the done event
+          let usage: { inputTokens?: number; outputTokens?: number } | undefined
           const latencyMs = Date.now() - startLLM
+          try {
+            const finalResult = await result
+            usage = await finalResult.usage
+          } catch (finalizeError) {
+            console.error('Error finalizing LLM result (usage stats unavailable):', finalizeError)
+          }
 
+          // Save messages — wrapped so a DB failure doesn't prevent the done event
           if (conversationId) {
-            console.log(`Saving messages to conversation ${conversationId}`)
+            try {
+              console.log(`Saving messages to conversation ${conversationId}`)
 
-            // Save user message
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { data: userMessageData, error: userMsgError } = await (supabase.from('messages') as any).insert({
-              conversation_id: conversationId,
-              role: 'user',
-              content: message || '[Attachments only]',
-              model: null,
-              citations: [],
-            }).select('id').single()
+              // Save user message
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const { data: userMessageData, error: userMsgError } = await (supabase.from('messages') as any).insert({
+                conversation_id: conversationId,
+                role: 'user',
+                content: message || '[Attachments only]',
+                model: null,
+                citations: [],
+              }).select('id').single()
 
-            if (userMsgError) {
-              console.error('Error saving user message:', userMsgError)
-            } else {
-              console.log('User message saved:', userMessageData?.id)
+              if (userMsgError) {
+                console.error('Error saving user message:', userMsgError)
+              } else {
+                console.log('User message saved:', userMessageData?.id)
+              }
+
+              // Save assistant message with citations and expanded research
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const { data: assistantMsgData, error: assistantMsgError } = await (supabase.from('messages') as any).insert({
+                conversation_id: conversationId,
+                role: 'assistant',
+                content: fullResponseText,
+                model: dbModel,
+                token_count: (usage?.inputTokens || 0) + (usage?.outputTokens || 0) || null,
+                latency_ms: latencyMs,
+                citations,
+                expanded_research: expandedResearchForDb,
+              }).select('id').single()
+
+              if (assistantMsgError) {
+                console.error('Error saving assistant message:', assistantMsgError)
+              } else {
+                console.log('Assistant message saved:', assistantMsgData?.id)
+              }
+
+              // Update conversation's updated_at timestamp
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              await (supabase.from('conversations') as any)
+                .update({ updated_at: new Date().toISOString() })
+                .eq('id', conversationId)
+            } catch (saveError) {
+              console.error('Error saving messages to DB (history will be incomplete on next turn):', saveError)
             }
-
-            // Save assistant message with citations and expanded research
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const { data: assistantMsgData, error: assistantMsgError } = await (supabase.from('messages') as any).insert({
-              conversation_id: conversationId,
-              role: 'assistant',
-              content: fullResponseText,
-              model: dbModel,
-              token_count: (usage?.inputTokens || 0) + (usage?.outputTokens || 0) || null,
-              latency_ms: latencyMs,
-              citations,
-              expanded_research: expandedResearchForDb,
-            }).select('id').single()
-
-            if (assistantMsgError) {
-              console.error('Error saving assistant message:', assistantMsgError)
-            } else {
-              console.log('Assistant message saved:', assistantMsgData?.id)
-            }
-
-            // Update conversation's updated_at timestamp
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await (supabase.from('conversations') as any)
-              .update({ updated_at: new Date().toISOString() })
-              .eq('id', conversationId)
           } else {
             console.log('No conversationId provided, skipping message save')
           }
 
-          // Log usage
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: usageError } = await (supabase.from('usage_logs') as any).insert({
-            user_id: user.id,
-            model: dbModel,
-            input_tokens: usage?.inputTokens || 0,
-            output_tokens: usage?.outputTokens || 0,
-            latency_ms: latencyMs,
-            endpoint: '/api/chat',
-          })
+          // Signal completion — sent before non-critical logging so the frontend
+          // always navigates to /chat/[id] even if analytics calls below fail.
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ type: 'done' })}\n\n`)
+          )
+          controller.close()
 
-          if (usageError) {
-            console.error('Error logging usage:', usageError)
+          // ── Non-critical post-stream operations ──────────────────────────────
+          // These run after the stream is closed. Any failure is logged but does
+          // not affect the user. Each is individually wrapped.
+
+          // Log usage
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: usageError } = await (supabase.from('usage_logs') as any).insert({
+              user_id: user.id,
+              model: dbModel,
+              input_tokens: usage?.inputTokens || 0,
+              output_tokens: usage?.outputTokens || 0,
+              latency_ms: latencyMs,
+              endpoint: '/api/chat',
+            })
+            if (usageError) console.error('Error logging usage:', usageError)
+          } catch (usageLogError) {
+            console.error('Usage log threw:', usageLogError)
           }
 
           // Monthly usage counter increment (Phase 1 — GATE-01)
-          // Runs ONLY after a successful LLM response (we're inside the SSE
-          // stream's try block, past the LLM call). Calls the atomic
-          // increment_messages_used(uuid) RPC from migration 016 — this is
-          // race-safe because the UPDATE inside the function reads-and-writes
-          // in a single Postgres statement with a row lock. A JS-side
-          // non-atomic update (read-then-write with a stale JS variable)
-          // would lose concurrent increments.
-          //
-          // Founders are excluded by the function's own WHERE clause
-          // (tier != 'founder'), so their counter never increments.
-          //
-          // The pre-LLM gate is the source of truth for blocking; a missed
-          // increment here at worst gives the user one free extra message
-          // (next request will still pass the gate because messagesUsed
-          // was not bumped). We log the error but do not fail the request.
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: counterError } = await (supabase.rpc as any)(
-            'increment_messages_used',
-            { p_user_id: user.id }
-          )
-          if (counterError) {
-            console.error('[UsageGate] increment_messages_used RPC failed:', counterError)
+          // Atomic RPC — race-safe. A missed increment at worst gives one free
+          // extra message; the pre-LLM gate remains the authoritative blocker.
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error: counterError } = await (supabase.rpc as any)(
+              'increment_messages_used',
+              { p_user_id: user.id }
+            )
+            if (counterError) console.error('[UsageGate] increment_messages_used RPC failed:', counterError)
+          } catch (counterThrow) {
+            console.error('[UsageGate] increment_messages_used threw:', counterThrow)
           }
 
           // Track LLM cost
           const llmService = dbModel === 'gemini' ? 'gemini' as const : 'claude' as const
-          trackCost({
-            userId: user.id,
-            service: llmService,
-            operation: 'chat',
-            inputTokens: usage?.inputTokens || 0,
-            outputTokens: usage?.outputTokens || 0,
-            conversationId: conversationId || null,
-            metadata: { model: dbModel },
-          })
+          try {
+            trackCost({
+              userId: user.id,
+              service: llmService,
+              operation: 'chat',
+              inputTokens: usage?.inputTokens || 0,
+              outputTokens: usage?.outputTokens || 0,
+              conversationId: conversationId || null,
+              metadata: { model: dbModel },
+            })
+          } catch (costError) {
+            console.error('trackCost threw:', costError)
+          }
 
           // Log to Braintrust for eval & observability
           try {
@@ -874,31 +887,29 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           }
 
           // Track completion in PostHog
-          const llmCostUsd = calculateCost(llmService, {
-            inputTokens: usage?.inputTokens || 0,
-            outputTokens: usage?.outputTokens || 0,
-          })
-          getPostHogClient().capture({
-            distinctId: user.id,
-            event: 'chat_message_completed',
-            properties: {
-              model,
-              input_tokens: usage?.inputTokens || 0,
-              output_tokens: usage?.outputTokens || 0,
-              total_tokens: (usage?.inputTokens || 0) + (usage?.outputTokens || 0),
-              latency_ms: latencyMs,
-              cost_usd: llmCostUsd,
-              rag_chunks_retrieved: chunks.length,
-              web_research_used: !!perplexityResult,
-              has_attachments: !!(hasAttachments),
-            },
-          })
-
-          // Signal completion
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ type: 'done' })}\n\n`)
-          )
-          controller.close()
+          try {
+            const llmCostUsd = calculateCost(llmService, {
+              inputTokens: usage?.inputTokens || 0,
+              outputTokens: usage?.outputTokens || 0,
+            })
+            getPostHogClient().capture({
+              distinctId: user.id,
+              event: 'chat_message_completed',
+              properties: {
+                model,
+                input_tokens: usage?.inputTokens || 0,
+                output_tokens: usage?.outputTokens || 0,
+                total_tokens: (usage?.inputTokens || 0) + (usage?.outputTokens || 0),
+                latency_ms: latencyMs,
+                cost_usd: llmCostUsd,
+                rag_chunks_retrieved: chunks.length,
+                web_research_used: !!perplexityResult,
+                has_attachments: !!(hasAttachments),
+              },
+            })
+          } catch (phError) {
+            console.error('PostHog capture threw:', phError)
+          }
         } catch (error) {
           console.error('Chat API streaming error:', error)
           controller.enqueue(
