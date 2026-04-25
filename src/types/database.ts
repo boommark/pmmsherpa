@@ -144,6 +144,20 @@ export interface SavedResponse {
   created_at: string;
 }
 
+export interface Deck {
+  id: string;
+  user_id: string;
+  conversation_id: string;
+  title: string;
+  artifact_type: string;
+  format: 'slide' | 'document';
+  markdown_content: string;
+  storage_path: string;
+  download_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ConversationAttachment {
   id: string;
   conversation_id: string | null;
@@ -197,6 +211,11 @@ export interface Database {
         Row: SavedResponse;
         Insert: Omit<SavedResponse, 'id' | 'created_at'>;
         Update: Partial<Omit<SavedResponse, 'id' | 'user_id' | 'message_id' | 'created_at'>>;
+      };
+      decks: {
+        Row: Deck;
+        Insert: Omit<Deck, 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<Deck, 'id' | 'user_id' | 'created_at'>>;
       };
     };
   };

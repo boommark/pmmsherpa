@@ -1,0 +1,447 @@
+/* ============================================================
+   PMM Sherpa — MARP Theme
+   "High-end strategy publication"
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ---------- Global slide reset ---------- */
+@import 'default';
+
+:root {
+  --color-primary:        #0058be;
+  --color-primary-light:  #2170e4;
+  --color-dark-accent:    #5a9cf5;
+  --color-text-primary:   #191c1e;
+  --color-text-body:      #3a3f47;
+  --color-text-secondary: #4a4f57;
+  --color-text-muted:     #5f6368;
+  --color-surface:        #f7f9fc;
+  --color-border:         #e8ecf4;
+  --color-white:          #ffffff;
+  --color-dark-bg-start:  #0a1628;
+  --color-dark-bg-end:    #0f1d35;
+  --color-dark-text:      #c8d0e0;
+  --color-accent-pill-bg: #d8e2ff;
+  --color-win-bg:         #d1fae5;
+  --color-win-text:       #065f46;
+  --color-risk-bg:        #fee2e2;
+  --color-risk-text:      #991b1b;
+
+}
+
+/* ============================================================
+   HEADER — thin accent stripe, no branding
+   ============================================================ */
+section > header {
+  position:   absolute;
+  top:        0;
+  left:       0;
+  right:      0;
+  height:     4px;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  font-size:  0;  /* hide MARP header directive text */
+  overflow:   hidden;
+  z-index:    10;
+}
+
+/* ============================================================
+   FOOTER — every slide
+   ============================================================ */
+section > footer {
+  position:      absolute;
+  bottom:        0;
+  left:          0;
+  right:         0;
+  height:        36px;
+  background:    var(--color-white);
+  border-top:    1px solid var(--color-border);
+  display:       flex;
+  align-items:   center;
+  justify-content: space-between;
+  padding:       0 48px;
+  box-sizing:    border-box;
+  font-size:     0.6rem;
+  color:         var(--color-text-muted);
+  letter-spacing: 0.02em;
+  z-index:       10;
+}
+
+/* Footer left: content from MARP footer directive (user-defined, e.g. "Confidential") */
+
+/* ============================================================
+   PAGINATION — built-in MARP page number
+   ============================================================ */
+section::after {
+  position:   absolute;
+  bottom:     10px;
+  right:      48px;
+  font-size:  0.6rem;
+  color:      var(--color-text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* Hide the old section::before page number (replaced by footer) */
+section[data-marpit-pagination]::before {
+  display: none;
+}
+
+/* ============================================================
+   DEFAULT SLIDE
+   ============================================================ */
+section {
+  width:            1280px;
+  height:           720px;
+  background:       var(--color-white);
+  color:            var(--color-text-body);
+  font-family:      'Inter', system-ui, -apple-system, sans-serif;
+  font-size:        0.9rem;
+  line-height:      1.5;
+  /* Top: 52px header + 14px gap; Bottom: 36px footer + 10px gap */
+  padding:          28px 48px 50px 48px;
+  box-sizing:       border-box;
+  position:         relative;
+  overflow:         hidden;
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+h1 {
+  font-size:      2rem;
+  font-weight:    800;
+  color:          var(--color-text-primary);
+  letter-spacing: -0.03em;
+  line-height:    1.1;
+  margin:         0 0 0.4rem 0;
+}
+
+h2 {
+  font-size:      1.25rem;
+  font-weight:    600;
+  color:          var(--color-primary);
+  letter-spacing: -0.01em;
+  margin:         0 0 0.5rem 0;
+}
+
+h3 {
+  font-size:      1rem;
+  font-weight:    600;
+  color:          var(--color-text-secondary);
+  margin:         0 0 0.35rem 0;
+}
+
+p {
+  color:     var(--color-text-body);
+  margin:    0 0 0.5rem 0;
+}
+
+strong {
+  color:       var(--color-text-primary);
+  font-weight: 700;
+}
+
+em {
+  color:      var(--color-primary);
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* ============================================================
+   BULLET POINTS
+   ============================================================ */
+ul {
+  list-style: none;
+  padding:    0;
+  margin:     0 0 1rem 0;
+}
+
+ul li {
+  position:     relative;
+  padding-left: 1.25rem;
+  margin-bottom: 0.3rem;
+  color:        var(--color-text-body);
+}
+
+ul li::before {
+  content:      '';
+  position:     absolute;
+  left:         0;
+  top:          0.55em;
+  width:        6px;
+  height:       6px;
+  background:   var(--color-primary);
+  border-radius: 50%;
+}
+
+ol {
+  padding-left: 1.5rem;
+  margin:       0 0 1rem 0;
+}
+
+ol li {
+  margin-bottom: 0.45rem;
+  color:         var(--color-text-body);
+}
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+table {
+  width:           100%;
+  border-collapse: collapse;
+  font-size:       0.85rem;
+  margin:          0.75rem 0;
+}
+
+thead tr {
+  background: var(--color-primary);
+  color:      var(--color-white);
+}
+
+thead th {
+  padding:        10px 14px;
+  font-weight:    600;
+  text-align:     left;
+  letter-spacing: 0.02em;
+  font-size:      0.8rem;
+  text-transform: uppercase;
+}
+
+tbody tr:nth-child(even) {
+  background: var(--color-surface);
+}
+
+tbody tr:nth-child(odd) {
+  background: var(--color-white);
+}
+
+tbody td {
+  padding:        9px 14px;
+  border-bottom:  1px solid var(--color-border);
+  vertical-align: top;
+}
+
+/* ============================================================
+   INLINE PILL / TAG
+   ============================================================ */
+code {
+  background:     var(--color-accent-pill-bg);
+  color:          var(--color-primary);
+  font-size:      0.65rem;
+  font-weight:    600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius:  4px;
+  padding:        2px 6px;
+  font-family:    'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ============================================================
+   BLOCKQUOTE (talk tracks / pull quotes)
+   ============================================================ */
+blockquote {
+  border-left:  3px solid var(--color-primary);
+  margin:       0.75rem 0;
+  padding:      0.5rem 1rem;
+  background:   var(--color-surface);
+  border-radius: 0 6px 6px 0;
+}
+
+blockquote p {
+  color:      var(--color-text-secondary);
+  font-style: italic;
+  margin:     0;
+}
+
+/* ============================================================
+   WIN / RISK BADGES
+   ============================================================ */
+.win-badge,
+mark.win {
+  display:        inline-block;
+  background:     var(--color-win-bg);
+  color:          var(--color-win-text);
+  font-size:      0.6rem;
+  font-weight:    700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius:  4px;
+  padding:        2px 7px;
+  vertical-align: middle;
+}
+
+.risk-badge,
+mark.risk {
+  display:        inline-block;
+  background:     var(--color-risk-bg);
+  color:          var(--color-risk-text);
+  font-size:      0.6rem;
+  font-weight:    700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius:  4px;
+  padding:        2px 7px;
+  vertical-align: middle;
+}
+
+/* ============================================================
+   HORIZONTAL RULE
+   ============================================================ */
+hr {
+  border:     none;
+  border-top: 1px solid var(--color-border);
+  margin:     0.75rem 0;
+}
+
+/* ============================================================
+   UTILITY: two-column layout
+   ============================================================ */
+.cols {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   2rem;
+}
+
+/* ============================================================
+   TITLE SLIDE  (class: title)
+   ============================================================ */
+section.title {
+  background: linear-gradient(145deg, var(--color-dark-bg-start) 0%, var(--color-dark-bg-end) 100%);
+  color:      var(--color-dark-text);
+  padding:    28px 72px 50px 72px;
+}
+
+/* Dark header stripe */
+section.title > header {
+  background: linear-gradient(90deg, rgba(90,156,245,0.6) 0%, rgba(90,156,245,0.3) 100%);
+}
+
+/* Dark footer */
+section.title > footer {
+  background: rgba(255, 255, 255, 0.04);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color:      #8e9199;
+}
+
+section.title > footer {
+  color: #8e9199;
+}
+
+section.title::after {
+  color: #8e9199;
+}
+
+/* Decorative top-right stripe */
+section.title > header + *::before,
+section.title > *:first-of-type::before {
+  display: none;
+}
+
+section.title h1 {
+  color:       var(--color-white);
+  font-size:   2.8rem;
+  line-height: 1.05;
+}
+
+section.title h2 {
+  color:          var(--color-dark-accent);
+  font-size:      1.1rem;
+  font-weight:    500;
+  letter-spacing: 0.01em;
+}
+
+section.title h3 {
+  color:       rgba(200, 208, 224, 0.7);
+  font-size:   0.85rem;
+  font-weight: 400;
+}
+
+section.title p {
+  color: var(--color-dark-text);
+}
+
+section.title code {
+  background: rgba(90, 156, 245, 0.18);
+  color:      var(--color-dark-accent);
+  border:     1px solid rgba(90, 156, 245, 0.3);
+}
+
+section.title ul li {
+  color: var(--color-dark-text);
+}
+
+section.title ul li::before {
+  background: var(--color-dark-accent);
+}
+
+/* ============================================================
+   ACCENT SLIDE  (class: accent)
+   ============================================================ */
+section.accent {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  color:      var(--color-white);
+}
+
+/* Accent header stripe */
+section.accent > header {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Blue footer on accent */
+section.accent > footer {
+  background: rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color:      rgba(255, 255, 255, 0.6);
+}
+
+section.accent > footer {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+section.accent::after {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+section.accent h1,
+section.accent h2,
+section.accent h3 {
+  color: var(--color-white);
+}
+
+section.accent p,
+section.accent li {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+section.accent ul li::before {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+section.accent code {
+  background: rgba(255, 255, 255, 0.2);
+  color:      var(--color-white);
+  border:     1px solid rgba(255, 255, 255, 0.3);
+}
+
+section.accent blockquote {
+  background:   rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+section.accent blockquote p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+section.accent strong {
+  color: var(--color-white);
+}
+
+/* ============================================================
+   COMPARE SLIDE  (class: compare)
+   ============================================================ */
+section.compare {
+  background:   var(--color-white);
+  border-left:  5px solid var(--color-primary);
+  padding-left: 55px;
+}

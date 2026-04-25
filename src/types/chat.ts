@@ -40,6 +40,14 @@ export interface ChatMessage {
   attachments?: ChatAttachment[]
   expandedResearch?: ExpandedResearch
   isResearching?: boolean
+  deck?: {
+    deckId: string
+    title: string
+    artifactType: string
+    format: 'slide' | 'document'
+    slideCount?: number
+    pageCount?: number
+  }
   createdAt: Date
 }
 

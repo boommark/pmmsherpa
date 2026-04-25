@@ -13,6 +13,7 @@ import type { Citation, ExpandedResearchDb } from '@/types/database'
 import { useVoiceOutput } from '@/hooks/useVoiceOutput'
 import { useProfile } from '@/hooks/useSupabase'
 import { WebSources } from './WebSources'
+import { DeckCard } from '@/components/artifacts/DeckCard'
 
 interface MessageBubbleProps {
   message: ChatMessage
@@ -34,6 +35,7 @@ function formatFileSize(bytes: number): string {
 }
 
 export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBubbleProps) {
+  // All hooks must be called unconditionally before any early returns
   const isUser = message.role === 'user'
   const isStreaming = message.isStreaming
   const [copied, setCopied] = useState(false)
@@ -45,6 +47,32 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
       toast.error(`Voice playback failed: ${error.message}`)
     }
   })
+
+  // Deck card rendering — after hooks to satisfy Rules of Hooks
+  if (message.deck) {
+    return (
+      <div className="px-4 py-2">
+        <DeckCard
+          deckId={message.deck.deckId}
+          title={message.deck.title}
+          artifactType={message.deck.artifactType}
+          format={message.deck.format}
+          slideCount={message.deck.slideCount}
+          pageCount={message.deck.pageCount}
+        />
+      </div>
+    )
+  }
+
+  // Loading state while deck is being generated
+  if (isStreaming && !message.content && !message.deck) {
+    return (
+      <div className="px-4 py-3 flex items-center gap-2 text-muted-foreground text-sm">
+        <Loader2 className="h-4 w-4 animate-spin text-[#0058be]" />
+        <span>Generating artifact...</span>
+      </div>
+    )
+  }
 
   const handleSpeak = () => {
     if (isPlaying) {

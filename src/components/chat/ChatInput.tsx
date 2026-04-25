@@ -2,15 +2,19 @@
 
 import { useState, useRef, useEffect, useImperativeHandle, forwardRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Send, Loader2, Mic, MicOff, Square, AudioLines } from 'lucide-react'
+import { Send, Loader2, Mic, MicOff, Square, AudioLines, LayoutTemplate, X } from 'lucide-react'
 import { FileUpload, type UploadedFile, getFileCategory } from './FileUpload'
 import { AttachmentPreview } from './AttachmentPreview'
 import { useChatStore } from '@/stores/chatStore'
 import { useVoiceInput } from '@/hooks/useVoiceInput'
+import { useProfile } from '@/hooks/useSupabase'
 import { createClient as createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import posthog from 'posthog-js'
+import { ArtifactTypeSelector } from '@/components/artifacts/ArtifactTypeSelector'
+import { ARTIFACT_CONFIGS, type ArtifactType } from '@/lib/artifacts/prompts/index'
+import { DECKS_UPGRADE_MESSAGE } from '@/lib/artifacts/gate'
 
 // Mime types we can read inline on the client (tiny files — just send the
 // text with the metadata and skip a server round-trip to storage).
@@ -36,7 +40,7 @@ async function readErrorMessage(res: Response, fallback: string): Promise<string
 }
 
 interface ChatInputProps {
-  onSend: (message: string, attachments?: UploadedFile[]) => void
+  onSend: (message: string, attachments?: UploadedFile[], artifactType?: ArtifactType) => void
   disabled?: boolean
   conversationId?: string
   onOpenVoiceMode?: () => void
@@ -53,11 +57,14 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const [input, setInput] = useState('')
     const [attachments, setAttachments] = useState<UploadedFile[]>([])
     const [partialTranscript, setPartialTranscript] = useState('')
+    const [selectedArtifactType, setSelectedArtifactType] = useState<ArtifactType | null>(null)
+    const [selectorOpen, setSelectorOpen] = useState(false)
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const {
       isLoading,
       abortStreaming
     } = useChatStore()
+    const { profile } = useProfile()
 
     // Voice input hook
     const { isRecording, isProcessing, startRecording, stopRecording } = useVoiceInput({
@@ -272,13 +279,19 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       const hasText = input.trim()
       const hasCompletedAttachments = attachments.some((a) => a.status === 'completed')
 
-      if ((hasText || hasCompletedAttachments) && !disabled) {
+      // When an artifact type is selected, allow sending even with empty text
+      if ((hasText || hasCompletedAttachments || selectedArtifactType) && !disabled) {
         const completedAttachments = attachments.filter((a) => a.status === 'completed')
-        onSend(input.trim(), completedAttachments.length > 0 ? completedAttachments : undefined)
+        onSend(
+          input.trim(),
+          completedAttachments.length > 0 ? completedAttachments : undefined,
+          selectedArtifactType ?? undefined
+        )
         setInput('')
         setAttachments([])
+        setSelectedArtifactType(null)
       }
-    }, [input, attachments, disabled, onSend])
+    }, [input, attachments, disabled, onSend, selectedArtifactType])
 
     // Handle pasting images from clipboard
     const handlePaste = useCallback((e: React.ClipboardEvent) => {
@@ -311,7 +324,16 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     }
 
     const isUploading = attachments.some((a) => a.status === 'uploading')
-    const canSubmit = (input.trim() || attachments.some((a) => a.status === 'completed')) && !isUploading
+    const canSubmit = (input.trim() || attachments.some((a) => a.status === 'completed') || !!selectedArtifactType) && !isUploading
+
+    const handleArtifactButtonClick = () => {
+      const isPaidUser = profile?.tier === 'starter' || profile?.tier === 'founder'
+      if (!isPaidUser) {
+        toast.error(DECKS_UPGRADE_MESSAGE)
+      } else {
+        setSelectorOpen(true)
+      }
+    }
 
     return (
       <div className={cn(
@@ -320,6 +342,24 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
         <div className="w-full max-w-3xl mx-auto">
           {/* Glassmorphism container — no hard borders */}
           <div className="relative rounded-xl md:rounded-2xl bg-surface-container-lowest/80 dark:bg-surface-container/80 backdrop-blur-xl shadow-[0_10px_40px_rgba(25,28,30,0.04)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
+            {/* Artifact type chip — shown above input row when a template is selected */}
+            {selectedArtifactType !== null && (
+              <div className="px-3 pt-2 flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#d8e2ff] text-[#0058be]">
+                  <LayoutTemplate className="h-3 w-3" />
+                  {ARTIFACT_CONFIGS[selectedArtifactType].displayName}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedArtifactType(null)}
+                    className="ml-0.5 hover:opacity-70"
+                    aria-label="Remove artifact selection"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              </div>
+            )}
+
             {/* Attachment previews */}
             <AttachmentPreview
               files={attachments}
@@ -335,6 +375,24 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                 maxFiles={5}
               />
 
+              {/* Artifact button */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleArtifactButtonClick}
+                disabled={disabled}
+                title="Generate artifact"
+                className={cn(
+                  "h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl shrink-0",
+                  selectedArtifactType
+                    ? "text-[#0058be] bg-[#d8e2ff] hover:bg-[#c5d4ff]"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <LayoutTemplate className="h-4 w-4" />
+              </Button>
+
               <textarea
                 ref={textareaRef}
                 value={input}
@@ -346,6 +404,8 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
                     ? partialTranscript
                     : isRecording
                     ? "Listening..."
+                    : selectedArtifactType
+                    ? ARTIFACT_CONFIGS[selectedArtifactType].placeholderHint
                     : attachments.length > 0
                     ? "Add a message..."
                     : "Ask about GTM..."
@@ -389,6 +449,14 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
             Attach files (PDF, PPT, DOC, XLS, images) for context. Paste URLs for analysis.
           </p>
         </div>
+
+        {/* Artifact type selector dialog */}
+        <ArtifactTypeSelector
+          open={selectorOpen}
+          onOpenChange={setSelectorOpen}
+          onSelect={setSelectedArtifactType}
+          userTier={profile?.tier ?? null}
+        />
       </div>
     )
   }

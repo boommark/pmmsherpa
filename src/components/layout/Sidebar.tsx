@@ -30,6 +30,7 @@ import {
   ArrowUpCircle,
   Infinity,
   Mail,
+  LayoutTemplate,
 } from 'lucide-react'
 import { FREE_TIER_MONTHLY_LIMIT, STARTER_TIER_MONTHLY_LIMIT } from '@/lib/constants'
 
@@ -193,6 +194,7 @@ function SidebarContent({
   const navItems = [
     { href: '/chat', icon: MessageSquare, label: 'New Chat', isNewChat: true },
     { href: '/history', icon: History, label: 'History' },
+    { href: '/decks', icon: LayoutTemplate, label: 'Decks' },
     { href: '/guides', icon: BookOpen, label: 'Guides', highlighted: true },
     { href: '/settings/preferences', icon: Settings, label: 'Settings' },
   ]
