@@ -675,7 +675,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                 <AnimatedOrb size="md" />
               </div>
               <h2 className="text-lg md:text-3xl font-extrabold tracking-tight" style={{ letterSpacing: '-0.02em' }}>
-                What are you working on?
+                What should we work on?
               </h2>
               <p className="text-xs md:text-base text-muted-foreground/70 max-w-lg mx-auto" style={{ letterSpacing: '0.01em' }}>
                 Grounded in real frameworks, war stories, and playbooks from thousands of real-world GTM leaders.
