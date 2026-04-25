@@ -41,3 +41,20 @@ export function getMonthlyLimitForTier(tier: string): number {
   if (tier === 'starter') return STARTER_TIER_MONTHLY_LIMIT
   return FREE_TIER_MONTHLY_LIMIT
 }
+
+// Referral system — migration 019
+// Every 3 completed referrals earns 30 days of Starter access, capped at 90 days
+// from the current date regardless of how many milestones have been granted.
+// After starter_access_until passes, the user reverts to their base tier lazily.
+export const REFERRAL_THRESHOLD = 3       // referrals needed per reward
+export const REFERRAL_REWARD_DAYS = 30    // days granted per milestone
+export const REFERRAL_MAX_ACCESS_DAYS = 90 // hard cap on referral-granted access
+export const REFERRAL_MAX_MILESTONES = REFERRAL_MAX_ACCESS_DAYS / REFERRAL_REWARD_DAYS // 3
+
+// Returns the effective tier for a user, accounting for time-boxed referral access.
+// Use this everywhere a tier check is needed — never read profiles.tier directly.
+export function getEffectiveTier(tier: string, starterAccessUntil: string | null | undefined): string {
+  if (tier === 'founder' || tier === 'starter') return tier
+  if (starterAccessUntil && new Date(starterAccessUntil) > new Date()) return 'starter'
+  return tier
+}

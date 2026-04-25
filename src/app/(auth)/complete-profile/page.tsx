@@ -92,6 +92,7 @@ export default function CompleteProfilePage() {
     setIsLoading(true)
 
     try {
+      const referralCode = typeof window !== 'undefined' ? localStorage.getItem('pmmsherpa_ref') : null
       const response = await fetch('/api/complete-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -99,6 +100,7 @@ export default function CompleteProfilePage() {
           linkedinUrl: formData.linkedinUrl,
           consentGiven: formData.consentGiven,
           termsAccepted: formData.termsAccepted,
+          ...(referralCode ? { referralCode } : {}),
         }),
       })
 
@@ -107,6 +109,9 @@ export default function CompleteProfilePage() {
       if (!response.ok) {
         throw new Error(data.error || 'Failed to complete profile')
       }
+
+      // Clear the referral code now that attribution is done
+      if (typeof window !== 'undefined') localStorage.removeItem('pmmsherpa_ref')
 
       posthog.capture('profile_completed', { plan: selectedPlan })
 

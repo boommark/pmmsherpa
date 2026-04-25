@@ -35,6 +35,13 @@ export default function SignupPage() {
   const router = useRouter()
   const supabase = createClient()
 
+  // Persist referral code so it survives OAuth redirects and email confirmation flows
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const ref = params.get('ref')
+    if (ref) localStorage.setItem('pmmsherpa_ref', ref)
+  }, [])
+
   const handleGoogleSignup = async () => {
     setError(null)
     setIsGoogleLoading(true)
