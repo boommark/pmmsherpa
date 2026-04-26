@@ -28,7 +28,6 @@ import { VoiceModeOverlay } from '@/components/voice/VoiceModeOverlay'
 import { useVoiceMode } from '@/hooks/useVoiceMode'
 import posthog from 'posthog-js'
 import { toast } from 'sonner'
-import type { ArtifactType } from '@/lib/artifacts/prompts/index'
 
 interface ChatContainerProps {
   conversationId?: string
@@ -165,110 +164,11 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     }
   }, [conversationId, dbMessages, messagesLoading, setMessages, setConversationId, hasInitialized, isLoading, messages])
 
-  const handleSendMessage = useCallback(async (content: string, attachments?: UploadedFile[], artifactType?: ArtifactType) => {
+  const handleSendMessage = useCallback(async (content: string, attachments?: UploadedFile[]) => {
     const hasContent = content.trim()
     const hasAttachments = attachments && attachments.length > 0
 
-    if ((!hasContent && !hasAttachments && !artifactType) || isLoading || isSubmittingRef.current) return
-
-    // ── Artifact generation flow ──────────────────────────────────────────
-    if (artifactType) {
-      isSubmittingRef.current = true
-      setIsLoading(true)
-      setStatusMessage('Generating your artifact...')
-
-      const userMessage: ChatMessage = {
-        id: `user-${Date.now()}`,
-        role: 'user',
-        content: content || `Generate ${artifactType.replace(/_/g, ' ')}`,
-        createdAt: new Date(),
-      }
-      addMessage(userMessage)
-
-      const deckMsgId = `deck-${Date.now()}`
-      const loadingDeckMsg: ChatMessage = {
-        id: deckMsgId,
-        role: 'assistant',
-        content: '',
-        isStreaming: true,
-        createdAt: new Date(),
-      }
-      addMessage(loadingDeckMsg)
-
-      try {
-        let activeConversationId = conversationId
-        let isNewConversation = false
-
-        if (!activeConversationId) {
-          const title = content.slice(0, 50) + (content.length > 50 ? '...' : '')
-          const newConv = await createConversation(title, currentModel)
-          if (newConv) {
-            activeConversationId = newConv.id
-            isNewConversation = true
-            setConversationId(newConv.id)
-          } else {
-            throw new Error('Failed to create conversation')
-          }
-        }
-
-        const response = await fetch('/api/generate-deck', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            artifactType,
-            conversationId: activeConversationId,
-            userContext: content,
-          }),
-        })
-
-        if (!response.ok) {
-          const errData = await response.json().catch(() => ({})) as { error?: string }
-          throw new Error(errData.error || 'Generation failed')
-        }
-
-        const result = await response.json() as {
-          deckId: string
-          title: string
-          artifactType: string
-          format: 'slide' | 'document'
-          slideCount?: number
-          pageCount?: number
-        }
-
-        updateMessage(deckMsgId, {
-          isStreaming: false,
-          deck: {
-            deckId: result.deckId,
-            title: result.title,
-            artifactType: result.artifactType,
-            format: result.format,
-            slideCount: result.slideCount,
-            pageCount: result.pageCount,
-          },
-        })
-
-        setStatusMessage(null)
-
-        if (isNewConversation && activeConversationId) {
-          isNavigatingToNewConversation.current = true
-          router.replace(`/chat/${activeConversationId}`)
-        }
-
-        posthog.capture('deck_generated', { artifactType, format: result.format })
-      } catch (error) {
-        updateMessage(deckMsgId, {
-          isStreaming: false,
-          content: error instanceof Error ? error.message : 'Generation failed. Please try again.',
-        })
-        toast.error(error instanceof Error ? error.message : 'Generation failed')
-      } finally {
-        setIsLoading(false)
-        setStatusMessage(null)
-        isSubmittingRef.current = false
-      }
-      return
-    }
-    // ── End artifact generation flow ──────────────────────────────────────
+    if ((!hasContent && !hasAttachments) || isLoading || isSubmittingRef.current) return
 
     isSubmittingRef.current = true
     setIsLoading(true)
