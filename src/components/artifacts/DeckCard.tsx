@@ -53,14 +53,11 @@ export function DeckCard({
   }
 
   const handleView = async () => {
-    const win = window.open('', '_blank')
     setViewLoading(true)
     try {
       const url = await getSignedUrl()
-      if (win) win.location.href = url
-      else window.open(url, '_blank')
+      window.open(url, '_blank')
     } catch (error) {
-      win?.close()
       toast.error(error instanceof Error ? error.message : 'Failed to open deck')
     } finally {
       setViewLoading(false)
@@ -68,15 +65,12 @@ export function DeckCard({
   }
 
   const handleSaveAsPdf = async () => {
-    const win = window.open('', '_blank')
     setPdfLoading(true)
     try {
       const url = await getSignedUrl()
-      const pdfUrl = url + (url.includes('?') ? '&' : '?') + 'print=1'
-      if (win) win.location.href = pdfUrl
-      else window.open(pdfUrl, '_blank')
+      // Append &print=1 — the renderer injects a print-trigger script for this
+      window.open(url + '&print=1', '_blank')
     } catch (error) {
-      win?.close()
       toast.error(error instanceof Error ? error.message : 'Failed to open deck')
     } finally {
       setPdfLoading(false)
