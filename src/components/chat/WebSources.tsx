@@ -4,6 +4,11 @@ import { useState } from 'react'
 import { Globe, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
 import type { ExpandedResearchDb } from '@/types/database'
 
+function safeHostname(url: string | null | undefined): string {
+  if (!url) return ''
+  try { return new URL(url).hostname.replace('www.', '') } catch { return '' }
+}
+
 interface WebSourcesProps {
   expandedResearch: ExpandedResearchDb
 }
@@ -12,7 +17,8 @@ export function WebSources({ expandedResearch }: WebSourcesProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const citations = expandedResearch.webCitations
 
-  if (!citations || citations.length === 0) return null
+  const validCitations = (citations || []).filter(c => c.url)
+  if (!validCitations.length) return null
 
   return (
     <div className="mt-3">
@@ -22,14 +28,14 @@ export function WebSources({ expandedResearch }: WebSourcesProps) {
         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0058be]/10 dark:bg-[#0058be]/15 text-[#0058be] dark:text-[#a8c0f0] text-xs font-medium hover:bg-[#0058be]/15 dark:hover:bg-[#0058be]/25 transition-colors"
       >
         <Globe className="h-3.5 w-3.5" />
-        <span>{citations.length} source{citations.length !== 1 ? 's' : ''}</span>
+        <span>{validCitations.length} source{validCitations.length !== 1 ? 's' : ''}</span>
         {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
       </button>
 
       {/* Expanded sources list */}
       {isExpanded && (
         <div className="mt-2 space-y-1.5 max-w-xl">
-          {citations.map((citation, i) => (
+          {validCitations.map((citation, i) => (
             <a
               key={i}
               href={citation.url}
@@ -40,7 +46,7 @@ export function WebSources({ expandedResearch }: WebSourcesProps) {
               {/* Favicon */}
               <div className="shrink-0 mt-0.5 w-5 h-5 rounded bg-muted flex items-center justify-center overflow-hidden">
                 <img
-                  src={`https://www.google.com/s2/favicons?domain=${new URL(citation.url).hostname}&sz=32`}
+                  src={`https://www.google.com/s2/favicons?domain=${safeHostname(citation.url)}&sz=32`}
                   alt=""
                   className="w-4 h-4"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
@@ -50,7 +56,7 @@ export function WebSources({ expandedResearch }: WebSourcesProps) {
               <div className="flex-1 min-w-0">
                 {/* Domain */}
                 <p className="text-[11px] text-muted-foreground truncate">
-                  {new URL(citation.url).hostname.replace('www.', '')}
+                  {safeHostname(citation.url)}
                 </p>
                 {/* Title */}
                 <p className="text-sm font-medium text-foreground leading-snug line-clamp-1 group-hover:text-[#0058be] transition-colors">

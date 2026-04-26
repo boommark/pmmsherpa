@@ -26,6 +26,25 @@ export function extractUrls(text: string): string[] {
   return [...new Set(all.map(url => url.replace(/[.,;:!?)]+$/, '')))]
 }
 
+async function scrapeWithJina(url: string): Promise<string | null> {
+  try {
+    const jinaUrl = `https://r.jina.ai/${url}`
+    const headers: Record<string, string> = { 'Accept': 'text/plain' }
+    const apiKey = process.env.JINA_API_KEY
+    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`
+    const response = await fetch(jinaUrl, {
+      headers,
+      signal: AbortSignal.timeout(15000),
+    })
+    if (!response.ok) return null
+    const text = await response.text()
+    return text || null
+  } catch (err) {
+    console.error(`Jina scrape failed for ${url}:`, err)
+    return null
+  }
+}
+
 async function scrapeWithFirecrawl(url: string): Promise<string | null> {
   const apiKey = process.env.FIRECRAWL_API_KEY
   if (!apiKey) {
@@ -73,12 +92,15 @@ export async function scrapeUrls(urls: string[], userId?: string): Promise<strin
 
   const results = await Promise.all(
     limited.map(async (url) => {
-      const content = await scrapeWithFirecrawl(url)
+      let content = await scrapeWithFirecrawl(url)
       if (content && userId) {
         trackCost({ userId, service: 'firecrawl', operation: 'url_scrape', units: 1, unitType: 'pages' })
       }
       if (!content) {
-        return `--- Scraped content from ${url} ---\n[Failed to fetch content from this URL. The page may be behind a login, blocking scrapers, or temporarily unavailable.]\n--- End of ${url} ---`
+        content = await scrapeWithJina(url)
+      }
+      if (!content) {
+        return `--- Scraped content from ${url} ---\n[SCRAPING BLOCKED: Both Firecrawl and Jina Reader failed to access this URL. The site almost certainly has bot protection or a login gate. INSTRUCTION FOR SHERPA: Explicitly tell the user that ${url} has bot blocking enabled and you could not read its content. Ask them to copy-paste the text from that page directly into the chat so you can analyze it.]\n--- End of ${url} ---`
       }
       const trimmed = content.length > perUrlBudget
         ? content.slice(0, perUrlBudget) + '\n...[content truncated]'

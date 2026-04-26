@@ -168,7 +168,7 @@ export function ExpandedResearch({ research }: ExpandedResearchProps) {
                               </p>
                             )}
                             <span className="text-[10px] sm:text-xs text-muted-foreground/70 truncate block mt-0.5">
-                              {new URL(citation.url).hostname}
+                              {citation.url ? (() => { try { return new URL(citation.url).hostname } catch { return '' } })() : ''}
                               {citation.date && ` • ${citation.date}`}
                             </span>
                           </div>
