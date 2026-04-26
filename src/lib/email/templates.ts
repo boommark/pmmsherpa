@@ -473,37 +473,40 @@ support@pmmsherpa.com`.trim()
 }
 
 // Onboarding email — sent automatically on first profile completion.
-// Two flavors: free (includes referral CTA + upgrade nudge) and starter (templates highlight).
+// Two flavors: free (upgrade nudge) and starter (full access confirmation).
+// Screenshots: upload to public/email/ — chat-home.png and guides.png
 export function getOnboardingEmail(data: { fullName: string; email: string; referralCode: string; tier: 'free' | 'starter' }) {
-  const firstName = data.fullName.split(' ')[0] || 'there'
   const referralLink = `${APP_URL}/signup?ref=${data.referralCode}`
   const isStarter = data.tier === 'starter'
 
-  const starterSection = isStarter ? `
-    <!-- Templates highlight for Starter -->
+  const CHAT_HOME_IMG = 'https://pmmsherpa.com/email/chat-home.png'
+  const GUIDES_IMG = 'https://pmmsherpa.com/email/guides.png'
+
+  const tierSection = isStarter ? `
+    <!-- Starter: full access confirmation -->
     <tr>
       <td style="padding: 0 40px 28px 40px;">
         <table width="100%" cellpadding="0" cellspacing="0" style="background: #f0f6ff; border-radius: 10px; border: 1px solid #cce0ff;">
           <tr>
             <td style="padding: 20px 24px;">
-              <p style="font-size: 13px; font-weight: 700; color: #0058be; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Starter — Unlocked</p>
-              <p style="font-size: 15px; line-height: 1.6; color: #1f2937; margin: 0 0 12px 0;">You have access to all 18 artifact templates. These turn a Sherpa conversation into a ready-to-ship deliverable — no formatting, no cleanup.</p>
-              <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 0;">Battle cards, launch decks, messaging frameworks, positioning statements, persona cards, ROI business cases, press releases, analyst briefings, and more. To use one: open any conversation, click the <strong>template icon</strong> in the chat bar, and pick the artifact you need.</p>
+              <p style="font-size: 13px; font-weight: 700; color: #0058be; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Starter — Active</p>
+              <p style="font-size: 15px; line-height: 1.6; color: #1f2937; margin: 0 0 10px 0;">200 messages per month. Every model — Claude Opus, Sonnet, Gemini. Live web research layered on top of the corpus for every response.</p>
+              <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 0;">Use voice to think out loud — it works especially well when you're working through a positioning problem or a launch brief with a lot of moving pieces. Hit the mic in the chat bar and talk through it. Sherpa does the structuring.</p>
             </td>
           </tr>
         </table>
       </td>
     </tr>
   ` : `
-    <!-- Upgrade nudge for free users -->
+    <!-- Free: upgrade nudge -->
     <tr>
       <td style="padding: 0 40px 28px 40px;">
         <table width="100%" cellpadding="0" cellspacing="0" style="background: #f9fafb; border-radius: 10px; border: 1px solid #e5e7eb;">
           <tr>
             <td style="padding: 20px 24px;">
               <p style="font-size: 13px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Starter — $9.99/month</p>
-              <p style="font-size: 15px; line-height: 1.6; color: #1f2937; margin: 0 0 12px 0;">When you're ready to go further, Starter gives you 18 artifact templates that turn any Sherpa conversation into a ready-to-ship deliverable.</p>
-              <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0 0 12px 0;">Battle cards, launch decks, messaging frameworks, positioning statements, persona cards — formatted and export-ready. Plus 200 messages per month and live web sources on every response.</p>
+              <p style="font-size: 15px; line-height: 1.6; color: #1f2937; margin: 0 0 10px 0;">Free gives you 10 messages a month. Starter removes the ceiling: 200 messages, every model, and live web research on every response.</p>
+              <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0 0 12px 0;">When you're deep on a positioning brief or a launch plan, you don't want to watch a counter. Upgrade when the 10 messages aren't enough.</p>
               <a href="${APP_URL}/settings" style="font-size: 14px; color: #0058be; font-weight: 600; text-decoration: none;">Upgrade to Starter →</a>
             </td>
           </tr>
@@ -519,8 +522,8 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
         <table width="100%" cellpadding="0" cellspacing="0" style="background: #f0f6ff; border-radius: 10px; border: 1px solid #cce0ff;">
           <tr>
             <td style="padding: 20px 24px;">
-              <p style="font-size: 13px; font-weight: 700; color: #0058be; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Refer 3 PMMs → Get a free month of Starter</p>
-              <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 0 0 14px 0;">Know other product marketers who'd benefit from this? Share your link. Every time three people sign up and complete their profile, you earn 30 days of Starter access — including all 18 templates. Up to 90 days total.</p>
+              <p style="font-size: 13px; font-weight: 700; color: #0058be; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Refer 3 PMMs, earn a free month of Starter</p>
+              <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 0 0 14px 0;">Know product marketers who are stuck on the same problems? Share your link. Every 3 people who sign up and complete their profile earns you 30 days of Starter — 200 messages, all models, live web research. Up to 90 days total.</p>
               <table cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="background: #ffffff; border: 1px solid #cce0ff; border-radius: 8px; padding: 10px 16px;">
@@ -568,10 +571,25 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
                 <!-- Opening -->
                 <tr>
                   <td style="padding: 0 40px 24px 40px;">
-                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">Hi ${firstName},</p>
+                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">Hi,</p>
                     <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">You're in. Welcome to PMM Sherpa.</p>
-                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">Sherpa is built on 38,000+ pieces of real PMM knowledge — books, practitioner AMAs, PMA content, podcast episodes, and strategic playbooks. Ask it anything from positioning to pricing to launch planning, and it draws on what the best GTM leaders have actually done.</p>
-                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0;">Here's where it can help you right now.</p>
+                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">Most conversations with generic AI start from zero. You explain your product, describe your market, establish context — and then hope the output isn't too shallow to use. Sherpa starts from a different place.</p>
+                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0;">It's built on 38,000+ pieces of real PMM knowledge: April Dunford on positioning, Andy Raskin on strategic narrative, Elena Verna on PLG, 532 Sharebird AMAs from product marketers at Salesforce, Figma, Gong, Atlassian, and hundreds more. That knowledge is in every response — not cited at you, but woven into the advice.</p>
+                  </td>
+                </tr>
+                <!-- Chat home screenshot -->
+                <tr>
+                  <td style="padding: 0 40px 28px 40px;">
+                    <a href="${APP_URL}/chat" style="display: block; text-decoration: none;">
+                      <img src="${CHAT_HOME_IMG}" alt="PMM Sherpa chat" width="520" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 88, 190, 0.12); display: block;" />
+                    </a>
+                  </td>
+                </tr>
+                <!-- Voice section -->
+                <tr>
+                  <td style="padding: 0 40px 24px 40px;">
+                    <p style="font-size: 15px; font-weight: 700; color: #1f2937; margin: 0 0 10px 0;">Think out loud — Sherpa structures it</p>
+                    <p style="font-size: 15px; line-height: 1.7; color: #374151; margin: 0;">The fastest way to use Sherpa is voice. Hit the mic in the chat bar and talk through the positioning problem you keep deferring, the battle card your sales team ignores, the launch brief with twelve open questions. You think out loud. Sherpa surfaces the relevant framework, the practitioner who's solved it, and a starting point you can actually use.</p>
                   </td>
                 </tr>
                 <!-- 7 GTM Areas -->
@@ -581,11 +599,11 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
                     <table width="100%" cellpadding="0" cellspacing="0">
                       ${gtmAreas.map(area => `
                       <tr>
-                        <td style="padding: 6px 0; border-bottom: 1px solid #f3f4f6;">
+                        <td style="padding: 7px 0; border-bottom: 1px solid #f3f4f6;">
                           <table cellpadding="0" cellspacing="0">
                             <tr>
-                              <td style="width: 8px; padding-right: 10px; padding-top: 2px;">
-                                <div style="width: 6px; height: 6px; background: #0058be; border-radius: 50%;"></div>
+                              <td style="width: 16px; padding-top: 3px; vertical-align: top;">
+                                <div style="width: 6px; height: 6px; background: #0058be; border-radius: 50%; margin-top: 1px;"></div>
                               </td>
                               <td style="font-size: 14px; color: #374151; line-height: 1.5;">${area}</td>
                             </tr>
@@ -595,21 +613,19 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
                     </table>
                   </td>
                 </tr>
-                <!-- Guides -->
+                <!-- Guides section with screenshot -->
                 <tr>
-                  <td style="padding: 0 40px 24px 40px;">
-                    <p style="font-size: 15px; font-weight: 700; color: #1f2937; margin: 0 0 10px 0;">Get up to speed fast</p>
-                    <p style="font-size: 15px; line-height: 1.7; color: #374151; margin: 0 0 12px 0;">The <a href="${APP_URL}/guides" style="color: #0058be; text-decoration: none; font-weight: 600;">Guides section</a> has 21 ready-to-use prompts across all 7 areas. Each one comes with tips on how to get the most out of it. It's the fastest way to go from "where do I start" to a real deliverable in your first session.</p>
+                  <td style="padding: 0 40px 12px 40px;">
+                    <p style="font-size: 15px; font-weight: 700; color: #1f2937; margin: 0 0 10px 0;">The fastest start: Guides</p>
+                    <p style="font-size: 15px; line-height: 1.7; color: #374151; margin: 0 0 16px 0;">The <a href="${APP_URL}/guides" style="color: #0058be; text-decoration: none; font-weight: 600;">Guides section</a> has 21 ready-to-use prompts across all 7 areas, each with instructions on how to give Sherpa the right context. Use one on a real problem from this week.</p>
+                    <a href="${APP_URL}/guides" style="display: block; text-decoration: none;">
+                      <img src="${GUIDES_IMG}" alt="PMM Sherpa guides" width="520" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 88, 190, 0.12); display: block;" />
+                    </a>
                   </td>
                 </tr>
-                <!-- Personalization -->
-                <tr>
-                  <td style="padding: 0 40px 24px 40px;">
-                    <p style="font-size: 15px; font-weight: 700; color: #1f2937; margin: 0 0 10px 0;">Make it yours</p>
-                    <p style="font-size: 15px; line-height: 1.7; color: #374151; margin: 0;">Sherpa has a dark mode and a light mode — switch in <a href="${APP_URL}/settings" style="color: #0058be; text-decoration: none;">Settings</a>. Use voice input to think out loud and let Sherpa structure your ideas. Upload a PDF, deck, or spreadsheet and ask Sherpa to work with what's already in your head.</p>
-                  </td>
-                </tr>
-                ${isStarter ? starterSection : starterSection}
+                <!-- Spacer -->
+                <tr><td style="padding: 16px 0;"></td></tr>
+                ${tierSection}
                 ${referralSection}
                 <!-- CTA -->
                 <tr>
@@ -639,27 +655,26 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
     </html>
   `
 
-  const text = `Hi ${firstName},
+  const text = `Hi,
 
 You're in. Welcome to PMM Sherpa.
 
-Sherpa is built on 38,000+ pieces of real PMM knowledge — books, practitioner AMAs, PMA content, podcast episodes, and strategic playbooks.
+Most conversations with generic AI start from zero. Sherpa starts from 38,000+ pieces of real PMM knowledge — April Dunford on positioning, Andy Raskin on narrative, Elena Verna on PLG, 532 Sharebird AMAs from PMMs at Salesforce, Figma, Gong, Atlassian, and hundreds more.
+
+The fastest way to use it: voice. Hit the mic in the chat bar and talk through the problem. You think out loud. Sherpa structures it.
 
 7 areas covered:
 ${gtmAreas.map(a => `- ${a}`).join('\n')}
 
-Get up to speed fast:
-The Guides section (${APP_URL}/guides) has 21 ready-to-use prompts across all 7 areas.
-
-Make it yours:
-Switch between dark and light mode in Settings. Use voice input. Upload files and work with your own context.
+The Guides section has 21 ready-to-use prompts across all 7 areas. Start there:
+${APP_URL}/guides
 
 ${isStarter
-  ? `Starter is active: You have access to all 18 artifact templates. Click the template icon in the chat bar to generate a ready-to-ship deliverable.`
-  : `Upgrade to Starter ($9.99/mo) for 18 artifact templates, 200 messages/month, and live web sources: ${APP_URL}/settings`
+  ? `Starter is active: 200 messages/month, every model, live web research on every response.`
+  : `Free gives you 10 messages a month. Starter ($9.99/mo) removes the ceiling: 200 messages, every model, live web research: ${APP_URL}/settings`
 }
 
-Refer 3 PMMs, get a free month of Starter (including all templates):
+Refer 3 PMMs, earn a free month of Starter (200 messages, all models, live web research):
 ${referralLink}
 
 ${APP_URL}/chat
@@ -672,7 +687,7 @@ support@pmmsherpa.com`.trim()
 }
 
 // Referral reward email — sent when a user crosses a 3-referral milestone.
-// Tells them exactly what they unlocked, when it expires, and how to use templates.
+// Tells them what they unlocked, when it was activated, and when it expires.
 export function getReferralRewardEmail(data: {
   fullName: string
   email: string
@@ -680,7 +695,6 @@ export function getReferralRewardEmail(data: {
   unlockedAt: string
   accessUntil: string
 }) {
-  const firstName = data.fullName.split(' ')[0] || 'there'
   const milestone = Math.floor(data.referralCount / 3)
 
   const fmt = (iso: string) =>
@@ -688,14 +702,6 @@ export function getReferralRewardEmail(data: {
 
   const unlockedFormatted = fmt(data.unlockedAt)
   const accessUntilFormatted = fmt(data.accessUntil)
-
-  const templatesList = [
-    'Battle Card Deck', 'Battle Card One-Pager', 'Launch Deck', 'Messaging Framework',
-    'Positioning Statement', 'Persona Card', 'GTM Plan One-Pager', 'Sales Play Deck',
-    'Competitive Landscape', 'Analyst Briefing', 'Win/Loss Readout', 'QBR PMM Update',
-    'Research Readout', 'ROI / Business Case', 'Feature Brief', 'Customer Reference Brief',
-    'Press Release / Working Backwards FYI', 'Market Segmentation',
-  ]
 
   const html = `
     <!DOCTYPE html>
@@ -718,8 +724,9 @@ export function getReferralRewardEmail(data: {
                 <!-- Opening -->
                 <tr>
                   <td style="padding: 0 40px 24px 40px;">
-                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">Hi ${firstName},</p>
-                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">${data.referralCount} people have signed up with your referral link. That's milestone ${milestone} — which means you just earned a free month of Starter.</p>
+                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">Hi,</p>
+                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">${data.referralCount} people have signed up with your link. That's milestone ${milestone}.</p>
+                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0;">You just earned 30 days of Starter access. It's active now.</p>
                   </td>
                 </tr>
                 <!-- Access details -->
@@ -755,30 +762,61 @@ export function getReferralRewardEmail(data: {
                     </table>
                   </td>
                 </tr>
-                <!-- What's included -->
+                <!-- What Starter gives -->
                 <tr>
                   <td style="padding: 0 40px 24px 40px;">
-                    <p style="font-size: 15px; font-weight: 700; color: #1f2937; margin: 0 0 12px 0;">What's included — all 18 artifact templates:</p>
+                    <p style="font-size: 15px; font-weight: 700; color: #1f2937; margin: 0 0 12px 0;">What you now have:</p>
                     <table width="100%" cellpadding="0" cellspacing="0">
-                      ${templatesList.map((t, i) => i % 2 === 0 ? `
                       <tr>
-                        <td style="padding: 4px 8px 4px 0; width: 50%; font-size: 13px; color: #374151;">&#8226; ${t}</td>
-                        <td style="padding: 4px 0; width: 50%; font-size: 13px; color: #374151;">${templatesList[i+1] ? `&#8226; ${templatesList[i+1]}` : ''}</td>
-                      </tr>` : '').join('')}
+                        <td style="padding: 7px 0; border-bottom: 1px solid #f3f4f6;">
+                          <table cellpadding="0" cellspacing="0"><tr>
+                            <td style="width: 16px; padding-top: 3px; vertical-align: top;"><div style="width: 6px; height: 6px; background: #0058be; border-radius: 50%; margin-top: 1px;"></div></td>
+                            <td style="font-size: 14px; color: #374151; line-height: 1.5;"><strong>200 messages per month</strong> — no more watching the counter mid-project</td>
+                          </tr></table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 7px 0; border-bottom: 1px solid #f3f4f6;">
+                          <table cellpadding="0" cellspacing="0"><tr>
+                            <td style="width: 16px; padding-top: 3px; vertical-align: top;"><div style="width: 6px; height: 6px; background: #0058be; border-radius: 50%; margin-top: 1px;"></div></td>
+                            <td style="font-size: 14px; color: #374151; line-height: 1.5;"><strong>Every model</strong> — Claude Opus, Sonnet, and Gemini, switch per task</td>
+                          </tr></table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 7px 0;">
+                          <table cellpadding="0" cellspacing="0"><tr>
+                            <td style="width: 16px; padding-top: 3px; vertical-align: top;"><div style="width: 6px; height: 6px; background: #0058be; border-radius: 50%; margin-top: 1px;"></div></td>
+                            <td style="font-size: 14px; color: #374151; line-height: 1.5;"><strong>Live web research</strong> — current competitor moves, recent pricing shifts, live market context layered on top of the corpus</td>
+                          </tr></table>
+                        </td>
+                      </tr>
                     </table>
-                    <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 14px 0 0 0;">To use a template: open any conversation in Sherpa, click the <strong>template icon</strong> in the chat bar, pick the artifact you need, and Sherpa generates a formatted, export-ready deliverable from your conversation context.</p>
+                    <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 14px 0 0 0;">The corpus doesn't change by tier — 38,000+ chunks are always there. Starter just removes the limits that would otherwise break your flow mid-project.</p>
                   </td>
                 </tr>
-                <!-- Referral progress note -->
+                <!-- Voice reminder -->
                 <tr>
                   <td style="padding: 0 40px 24px 40px;">
-                    <p style="font-size: 14px; line-height: 1.7; color: #6b7280; margin: 0;">Every 3 referrals earns another 30 days, up to 90 days total. Keep sharing your link — each new signup counts.</p>
+                    <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 0;">While you have full access: try voice. Hit the mic in the chat bar and talk through a positioning problem or a launch brief. Thinking out loud is faster than typing, and Sherpa structures what comes out. It's the feature that changes how people actually use the tool.</p>
+                  </td>
+                </tr>
+                <!-- Referral progress -->
+                <tr>
+                  <td style="padding: 0 40px 24px 40px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background: #f9fafb; border-radius: 10px; border: 1px solid #e5e7eb;">
+                      <tr>
+                        <td style="padding: 16px 20px;">
+                          <p style="font-size: 14px; line-height: 1.7; color: #6b7280; margin: 0;">Every 3 referrals earns another 30 days, up to 90 days total. ${data.referralCount < 6 ? `${6 - data.referralCount} more signups gets you milestone 2.` : data.referralCount < 9 ? `${9 - data.referralCount} more gets you milestone 3 — the maximum.` : `You've reached the maximum. Thank you for sharing Sherpa.`}</p>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
                 <!-- CTA -->
                 <tr>
                   <td align="center" style="padding: 0 40px 32px 40px;">
-                    <a href="${APP_URL}/chat" style="display: inline-block; background-color: #0058be; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">Try a template now →</a>
+                    <a href="${APP_URL}/chat" style="display: inline-block; background-color: #0058be; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">Go to PMM Sherpa →</a>
                   </td>
                 </tr>
                 <!-- Sign off -->
@@ -803,17 +841,21 @@ export function getReferralRewardEmail(data: {
     </html>
   `
 
-  const text = `Hi ${firstName},
+  const text = `Hi,
 
-${data.referralCount} people have signed up with your referral link. That's milestone ${milestone} — you just earned a free month of Starter.
+${data.referralCount} people have signed up with your link. That's milestone ${milestone}. You just earned 30 days of Starter access — active now.
 
 Unlocked: ${unlockedFormatted}
 Starter access until: ${accessUntilFormatted}
 
-All 18 artifact templates are now available. To use one: open any conversation, click the template icon in the chat bar.
+What you now have:
+- 200 messages per month
+- Every model: Claude Opus, Sonnet, Gemini
+- Live web research on every response
 
-Templates included:
-${templatesList.map(t => `- ${t}`).join('\n')}
+The corpus (38,000+ chunks) is always there regardless of tier. Starter removes the limits.
+
+While you have full access: try voice. Hit the mic in the chat bar and talk through a positioning problem. Sherpa structures what comes out.
 
 Every 3 referrals earns another 30 days, up to 90 days total.
 
@@ -825,7 +867,7 @@ support@pmmsherpa.com`.trim()
 
   return {
     to: data.email,
-    subject: `You earned a free month of Starter — ${accessUntilFormatted}`,
+    subject: `You earned 30 days of Starter — active until ${accessUntilFormatted}`,
     html,
     text,
   }
