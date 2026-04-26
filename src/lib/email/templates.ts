@@ -489,9 +489,8 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
         <table width="100%" cellpadding="0" cellspacing="0" style="background: #f0f6ff; border-radius: 10px; border: 1px solid #cce0ff;">
           <tr>
             <td style="padding: 20px 24px;">
-              <p style="font-size: 13px; font-weight: 700; color: #0058be; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Starter — Active</p>
-              <p style="font-size: 15px; line-height: 1.6; color: #1f2937; margin: 0 0 10px 0;">200 messages per month. Every model — Claude Opus, Sonnet, Gemini. Live web research layered on top of the corpus for every response.</p>
-              <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 0;">Use voice to think out loud — it works especially well when you're working through a positioning problem or a launch brief with a lot of moving pieces. Hit the mic in the chat bar and talk through it. Sherpa does the structuring.</p>
+              <p style="font-size: 13px; font-weight: 700; color: #0058be; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Starter: Active</p>
+              <p style="font-size: 15px; line-height: 1.6; color: #1f2937; margin: 0;">200 messages per month. Every model: Claude Opus, Sonnet, Gemini. Live web research layered on top of the corpus for every response.</p>
             </td>
           </tr>
         </table>
@@ -504,9 +503,9 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
         <table width="100%" cellpadding="0" cellspacing="0" style="background: #f9fafb; border-radius: 10px; border: 1px solid #e5e7eb;">
           <tr>
             <td style="padding: 20px 24px;">
-              <p style="font-size: 13px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Starter — $9.99/month</p>
+              <p style="font-size: 13px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Starter: $9.99/month</p>
               <p style="font-size: 15px; line-height: 1.6; color: #1f2937; margin: 0 0 10px 0;">Free gives you 10 messages a month. Starter removes the ceiling: 200 messages, every model, and live web research on every response.</p>
-              <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0 0 12px 0;">When you're deep on a positioning brief or a launch plan, you don't want to watch a counter. Upgrade when the 10 messages aren't enough.</p>
+              <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0 0 12px 0;">When you're deep on a positioning brief or a launch plan, you don't want to watch a counter. Upgrade when you're ready.</p>
               <a href="${APP_URL}/settings" style="font-size: 14px; color: #0058be; font-weight: 600; text-decoration: none;">Upgrade to Starter →</a>
             </td>
           </tr>
@@ -523,7 +522,7 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
           <tr>
             <td style="padding: 20px 24px;">
               <p style="font-size: 13px; font-weight: 700; color: #0058be; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Refer 3 PMMs, earn a free month of Starter</p>
-              <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 0 0 14px 0;">Know product marketers who are stuck on the same problems? Share your link. Every 3 people who sign up and complete their profile earns you 30 days of Starter — 200 messages, all models, live web research. Up to 90 days total.</p>
+              <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 0 0 14px 0;">Know product marketers who are stuck on the same problems? Share your link. Every 3 people who sign up earns you 30 days of Starter access (200 messages, all models, live web research). Up to 90 days total.</p>
               <table cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="background: #ffffff; border: 1px solid #cce0ff; border-radius: 8px; padding: 10px 16px;">
@@ -539,13 +538,13 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
   `
 
   const gtmAreas = [
-    'GTM Strategy — go-to-market planning and sequencing',
-    'Positioning — differentiation and messaging hierarchy',
-    'Launches — launch briefs, GTM readiness, expansion',
-    'Pricing — strategy, tier design, competitive benchmarking',
-    'Sales Enablement — battle cards, talk tracks, objection handling',
-    'Asset Audits — landing pages, decks, messaging review',
-    'Career Growth — interview prep, promotion narratives, strategy',
+    'GTM Strategy: go-to-market planning and sequencing',
+    'Positioning: differentiation and messaging hierarchy',
+    'Launches: launch briefs, GTM readiness, expansion',
+    'Pricing: strategy, tier design, competitive benchmarking',
+    'Sales Enablement: battle cards, talk tracks, objection handling',
+    'Asset Audits: landing pages, decks, messaging review',
+    'Career Growth: interview prep, promotion narratives, strategy',
   ]
 
   const subject = isStarter ? 'Welcome to PMM Sherpa Starter' : 'Welcome to PMM Sherpa'
@@ -573,8 +572,8 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
                   <td style="padding: 0 40px 24px 40px;">
                     <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">Hi,</p>
                     <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">You're in. Welcome to PMM Sherpa.</p>
-                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">Most conversations with generic AI start from zero. You explain your product, describe your market, establish context — and then hope the output isn't too shallow to use. Sherpa starts from a different place.</p>
-                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0;">It's built on 38,000+ pieces of real PMM knowledge: April Dunford on positioning, Andy Raskin on strategic narrative, Elena Verna on PLG, 532 Sharebird AMAs from product marketers at Salesforce, Figma, Gong, Atlassian, and hundreds more. That knowledge is in every response — not cited at you, but woven into the advice.</p>
+                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">Most conversations with generic AI start from zero. You explain your product, describe your market, establish context, then hope the output isn't too shallow to use. Sherpa starts from a different place.</p>
+                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0;">It's built on 38,000+ pieces of real PMM knowledge, distilled from the frameworks that hold up in the field, the practitioners who've solved these problems at real companies, and the strategic conversations that separate what sounds smart from what actually works. That knowledge shapes every response.</p>
                   </td>
                 </tr>
                 <!-- Chat home screenshot -->
@@ -585,11 +584,11 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
                     </a>
                   </td>
                 </tr>
-                <!-- Voice section -->
+                <!-- Advisory layer section -->
                 <tr>
                   <td style="padding: 0 40px 24px 40px;">
-                    <p style="font-size: 15px; font-weight: 700; color: #1f2937; margin: 0 0 10px 0;">Think out loud — Sherpa structures it</p>
-                    <p style="font-size: 15px; line-height: 1.7; color: #374151; margin: 0;">The fastest way to use Sherpa is voice. Hit the mic in the chat bar and talk through the positioning problem you keep deferring, the battle card your sales team ignores, the launch brief with twelve open questions. You think out loud. Sherpa surfaces the relevant framework, the practitioner who's solved it, and a starting point you can actually use.</p>
+                    <p style="font-size: 15px; font-weight: 700; color: #1f2937; margin: 0 0 10px 0;">An expert thinking alongside you</p>
+                    <p style="font-size: 15px; line-height: 1.7; color: #374151; margin: 0;">When you describe a positioning problem, Sherpa doesn't retrieve documents. It reasons through the problem the way a senior PMM would: identifying what's actually at stake, connecting the right framework to your specific context, flagging the question you haven't asked yet. That's the layer that makes it different from search.</p>
                   </td>
                 </tr>
                 <!-- 7 GTM Areas -->
@@ -659,9 +658,9 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
 
 You're in. Welcome to PMM Sherpa.
 
-Most conversations with generic AI start from zero. Sherpa starts from 38,000+ pieces of real PMM knowledge — April Dunford on positioning, Andy Raskin on narrative, Elena Verna on PLG, 532 Sharebird AMAs from PMMs at Salesforce, Figma, Gong, Atlassian, and hundreds more.
+Most conversations with generic AI start from zero. Sherpa starts from 38,000+ pieces of real PMM knowledge, distilled from the frameworks that hold up in the field, the practitioners who've solved these problems at real companies, and the strategic conversations that separate what sounds smart from what actually works.
 
-The fastest way to use it: voice. Hit the mic in the chat bar and talk through the problem. You think out loud. Sherpa structures it.
+When you describe a positioning problem, Sherpa doesn't retrieve documents. It reasons through it the way a senior PMM would: what's actually at stake, which framework fits, what you haven't asked yet.
 
 7 areas covered:
 ${gtmAreas.map(a => `- ${a}`).join('\n')}
