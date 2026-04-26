@@ -422,7 +422,7 @@ export function getCelebratoryWelcomeEmail(data: { fullName: string; email: stri
 
                       <!-- Sign off -->
                       <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 32px 0 4px 0;">With gratitude,</p>
-                      <p style="font-size: 16px; color: #1f2937; margin: 0 0 4px 0;"><strong>Abhishek</strong></p>
+                      <p style="font-size: 16px; color: #1f2937; margin: 0 0 4px 0;"><strong>Dona</strong></p>
                       <p style="font-size: 14px; color: #6b7280; margin: 0;"><a href="mailto:support@pmmsherpa.com" style="color: #6b7280; text-decoration: none;">support@pmmsherpa.com</a></p>
                     </td>
                   </tr>
@@ -467,7 +467,7 @@ I want you to be successful. That's not a line, it's the whole reason this exist
 Try it now → ${APP_URL}/chat
 
 With gratitude,
-Abhishek
+Dona
 support@pmmsherpa.com`.trim()
   }
 }
@@ -636,7 +636,7 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
                 <tr>
                   <td style="padding: 0 40px 32px 40px;">
                     <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 4px 0;">With gratitude,</p>
-                    <p style="font-size: 16px; color: #1f2937; margin: 0 0 4px 0;"><strong>Abhishek</strong></p>
+                    <p style="font-size: 16px; color: #1f2937; margin: 0 0 4px 0;"><strong>Dona</strong></p>
                     <p style="font-size: 14px; color: #6b7280; margin: 0;"><a href="mailto:support@pmmsherpa.com" style="color: #6b7280; text-decoration: none;">support@pmmsherpa.com</a></p>
                   </td>
                 </tr>
@@ -679,7 +679,7 @@ ${referralLink}
 ${APP_URL}/chat
 
 With gratitude,
-Abhishek
+Dona
 support@pmmsherpa.com`.trim()
 
   return { to: data.email, subject, html, text }
@@ -822,7 +822,7 @@ export function getReferralRewardEmail(data: {
                 <tr>
                   <td style="padding: 0 40px 32px 40px;">
                     <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 4px 0;">With gratitude,</p>
-                    <p style="font-size: 16px; color: #1f2937; margin: 0 0 4px 0;"><strong>Abhishek</strong></p>
+                    <p style="font-size: 16px; color: #1f2937; margin: 0 0 4px 0;"><strong>Dona</strong></p>
                     <p style="font-size: 14px; color: #6b7280; margin: 0;"><a href="mailto:support@pmmsherpa.com" style="color: #6b7280; text-decoration: none;">support@pmmsherpa.com</a></p>
                   </td>
                 </tr>
@@ -861,7 +861,7 @@ Every 3 referrals earns another 30 days, up to 90 days total.
 ${APP_URL}/chat
 
 With gratitude,
-Abhishek
+Dona
 support@pmmsherpa.com`.trim()
 
   return {

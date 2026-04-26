@@ -167,6 +167,20 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // --- Add to Resend audience (General) ---
+    try {
+      const nameParts = userFullName.trim().split(' ')
+      await getResend().contacts.create({
+        audienceId: '9a13ec93-4d2c-422c-9576-e4f74bead02b',
+        email: userEmail,
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+        unsubscribed: false,
+      })
+    } catch (e) {
+      console.error('[Resend] Failed to add contact to audience:', e)
+    }
+
     // --- Onboarding email to new user ---
     try {
       const userTier = (existing?.tier as 'free' | 'starter') || 'free'
