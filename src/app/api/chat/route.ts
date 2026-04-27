@@ -482,7 +482,7 @@ export async function POST(request: NextRequest) {
           const startRetrieval = Date.now()
 
           // Run RAG, Perplexity, and Brave Search in parallel
-          const ragPromise = multiQueryRetrieve(queryPlan.ragQueries, 10, user.id)
+          const ragPromise = multiQueryRetrieve(queryPlan.ragQueries, 10, user.id, queryPlan.intent)
           const perplexityPromise = queryPlan.webResearch.needed && queryPlan.webResearch.query
             ? conductResearch(
                 queryPlan.webResearch.query,

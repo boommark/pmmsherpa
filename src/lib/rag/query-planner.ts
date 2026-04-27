@@ -32,21 +32,27 @@ interface QueryPlannerInput {
   attachmentContext?: string
 }
 
-const QUERY_PLANNER_PROMPT = `You are the query planner for PMMSherpa, an AI product marketing advisor backed by a curated knowledge base.
+const QUERY_PLANNER_PROMPT = `You are the query planner for PMMSherpa, an AI advisor backed by a curated knowledge base spanning product marketing, product management, sales, communication, and presentations.
 
 ## Your Knowledge Base
-Three source types, each serving a different purpose:
+Four source types, each serving a different purpose:
 
-**Books:** Foundational theory and craft expertise covering positioning, GTM strategy, customer insight, communication craft, persuasion, marketing fundamentals, PMM-specific methodology, and leadership.
+**PMM Books:** Foundational theory covering positioning, GTM strategy, customer insight, messaging, launch, competitive intelligence, pricing, and marketing fundamentals. (e.g., Obviously Awesome, Loved, Play Bigger, Crossing the Chasm)
+
+**PM Books:** Product strategy and management frameworks — discovery, prioritization, roadmapping, product-led growth, and building product teams. (e.g., Inspired, Continuous Discovery Habits, Escaping the Build Trap)
+
+**Sales Books:** Revenue generation, pipeline building, objection handling, deal strategy, and sales enablement. (e.g., New Sales Simplified, 100M Offers, Sales Pitch)
+
+**Communication & Presentation Books:** Negotiation, influence, persuasion, storytelling, executive communication, stakeholder management, and presentation craft. (e.g., Never Split the Difference, Resonate, Storytelling with Data, Crucial Conversations, Illuminate)
 
 **Practitioner AMAs:** Real-world war stories from PMM leaders at major tech companies. Covers: messaging, launches, GTM, sales enablement, competitive positioning, pricing, stakeholder management, team building, career growth, AI in PMM. These are opinionated, specific, and contextual.
 
 **Industry Articles:** How-to guides, templates, case studies, thought leadership, expert interviews, career advice, emerging trends. Includes case studies from real companies and step-by-step tactical playbooks.
 
 ## What the Knowledge Base is Strong On
-- Frameworks, methodology, and mental models
+- Frameworks, methodology, and mental models (PMM, PM, sales, communication)
 - Practitioner war stories and "how I actually did it"
-- Craft knowledge (writing, storytelling, negotiation, persuasion)
+- Craft knowledge (writing, storytelling, negotiation, persuasion, presentations)
 - Strategic thinking and organizational dynamics
 - Templates, structures, and deliverable formats
 - Career guidance and team building
@@ -64,7 +70,7 @@ Given the user's message and context, generate:
 
 1. **2-3 RAG queries** — Each should target a DIFFERENT dimension of knowledge that would be useful:
    - Don't generate near-duplicate queries
-   - Don't just rephrase the user's message — extract the underlying PMM concepts
+   - Don't just rephrase the user's message — extract the underlying concepts (PMM, PM, sales, communication, presentations)
    - Target different knowledge types when relevant (e.g., one for frameworks, one for practitioner experience, one for tactical how-to)
    - Strip away conversational fluff ("can you help me with", "I was wondering about")
    - Incorporate relevant context from conversation history, URLs, or attachments

@@ -1,7 +1,8 @@
 import { createServiceClient } from '@/lib/supabase/server'
 import { generateEmbedding, expandQuery } from './embeddings'
 import type { RetrievedChunk, RetrievalResult } from '@/types/chat'
-import type { Citation } from '@/types/database'
+import type { Citation, SourceType } from '@/types/database'
+import type { QueryPlan } from './query-planner'
 
 interface HybridSearchParams {
   query: string
@@ -51,7 +52,7 @@ export async function retrieveContext({
     section_title: string | null
     question: string | null
     document_title: string
-    source_type: 'book' | 'blog' | 'ama' | 'blog_external' | 'book_pm' | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai'
+    source_type: SourceType
     author: string | null
     speaker_role: string | null
     url: string | null
@@ -75,6 +76,23 @@ export async function retrieveContext({
   return { chunks, totalTokens: Math.round(totalTokens) }
 }
 
+// Intent → source-type score adjustments (applied after retrieval, before final ranking)
+const INTENT_BOOSTS: Record<QueryPlan['intent'], Partial<Record<SourceType, number>>> = {
+  guidance:      { book: 0.05, book_pm: 0.05, book_communication: 0.04, book_presentations: 0.04, book_sales: 0.03 },
+  deliverable:   { ama: 0.08, blog: 0.05, book_sales: 0.04 },
+  review:        { ama: 0.08, book: 0.04, book_pm: 0.03 },
+  career:        { ama: 0.10, book_pm: 0.04 },
+  general:       {},
+}
+
+function applyIntentBoost(chunks: RetrievedChunk[], intent: QueryPlan['intent']): RetrievedChunk[] {
+  const boosts = INTENT_BOOSTS[intent] ?? {}
+  if (Object.keys(boosts).length === 0) return chunks
+  return chunks
+    .map(c => ({ ...c, similarity: c.similarity + (boosts[c.sourceType as SourceType] ?? 0) }))
+    .sort((a, b) => b.similarity - a.similarity)
+}
+
 /**
  * Multi-query retrieval: runs N parallel hybrid searches, deduplicates by chunk ID,
  * and returns the top chunks sorted by highest score.
@@ -82,7 +100,8 @@ export async function retrieveContext({
 export async function multiQueryRetrieve(
   queries: string[],
   topK: number = 10,
-  userId?: string
+  userId?: string,
+  intent?: QueryPlan['intent']
 ): Promise<RetrievalResult> {
   const startTime = Date.now()
 
@@ -107,10 +126,10 @@ export async function multiQueryRetrieve(
     }
   }
 
-  // Sort by score descending and take top K
-  const chunks = Array.from(chunkMap.values())
-    .sort((a, b) => b.similarity - a.similarity)
-    .slice(0, topK)
+  // Apply intent boost then sort and take top K
+  const allChunks = Array.from(chunkMap.values())
+  const boosted = intent ? applyIntentBoost(allChunks, intent) : allChunks.sort((a, b) => b.similarity - a.similarity)
+  const chunks = boosted.slice(0, topK)
 
   const totalTokens = chunks.reduce((sum, c) => sum + (c.content.split(' ').length * 1.3), 0)
   const elapsed = Date.now() - startTime
@@ -131,6 +150,9 @@ export function formatContextForPrompt(chunks: RetrievedChunk[]): string {
   // Group by source type
   const books = chunks.filter((c) => c.sourceType === 'book')
   const booksPm = chunks.filter((c) => c.sourceType === 'book_pm')
+  const booksSales = chunks.filter((c) => c.sourceType === 'book_sales')
+  const booksPresentations = chunks.filter((c) => c.sourceType === 'book_presentations')
+  const booksCommunication = chunks.filter((c) => c.sourceType === 'book_communication')
   const podcastsPm = chunks.filter((c) => c.sourceType === 'podcast_pm')
   const podcastsPmm = chunks.filter((c) => c.sourceType === 'podcast_pmm')
   const podcastsAi = chunks.filter((c) => c.sourceType === 'podcast_ai')
@@ -159,6 +181,36 @@ export function formatContextForPrompt(chunks: RetrievedChunk[]): string {
       })
       .join('\n\n---\n\n')
     sections.push(`### Product Strategy\n${formatted}`)
+  }
+
+  if (booksSales.length > 0) {
+    const formatted = booksSales
+      .map((chunk) => {
+        const info = formatSourceInfo(chunk)
+        return `[Source ${sourceIdx++}] ${info}\n${chunk.content}`
+      })
+      .join('\n\n---\n\n')
+    sections.push(`### Sales & Revenue\n${formatted}`)
+  }
+
+  if (booksPresentations.length > 0) {
+    const formatted = booksPresentations
+      .map((chunk) => {
+        const info = formatSourceInfo(chunk)
+        return `[Source ${sourceIdx++}] ${info}\n${chunk.content}`
+      })
+      .join('\n\n---\n\n')
+    sections.push(`### Presentations & Storytelling\n${formatted}`)
+  }
+
+  if (booksCommunication.length > 0) {
+    const formatted = booksCommunication
+      .map((chunk) => {
+        const info = formatSourceInfo(chunk)
+        return `[Source ${sourceIdx++}] ${info}\n${chunk.content}`
+      })
+      .join('\n\n---\n\n')
+    sections.push(`### Communication & Influence\n${formatted}`)
   }
 
   if (podcastsPm.length > 0) {
@@ -296,7 +348,7 @@ export async function semanticSearch(
     section_title: string | null
     question: string | null
     document_title: string
-    source_type: 'book' | 'blog' | 'ama' | 'blog_external' | 'book_pm' | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai'
+    source_type: SourceType
     author: string | null
     speaker_role: string | null
     url: string | null

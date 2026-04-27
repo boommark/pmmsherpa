@@ -81,9 +81,14 @@ export interface Message {
   created_at: string;
 }
 
+export type SourceType =
+  | 'book' | 'blog' | 'ama' | 'blog_external'
+  | 'book_pm' | 'book_sales' | 'book_presentations' | 'book_communication'
+  | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai' | 'substack';
+
 export interface Citation {
   source: string;
-  source_type: 'book' | 'blog' | 'ama' | 'blog_external' | 'book_pm' | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai';
+  source_type: SourceType;
   author: string | null;
   url: string | null;
   page_number: number | null;
@@ -95,7 +100,7 @@ export interface Citation {
 export interface Document {
   id: string;
   title: string;
-  source_type: 'book' | 'blog' | 'ama' | 'blog_external' | 'book_pm' | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai';
+  source_type: SourceType;
   source_file: string;
   author: string | null;
   url: string | null;
@@ -141,6 +146,26 @@ export interface SavedResponse {
   message_id: string;
   note: string | null;
   tags: string[];
+  created_at: string;
+}
+
+export type ArtifactType =
+  | 'battle_card_deck' | 'battle_card_onepager' | 'sales_play' | 'launch_deck'
+  | 'competitive_landscape' | 'win_loss_readout' | 'analyst_briefing' | 'market_segmentation'
+  | 'qbr_pmm_update' | 'research_readout' | 'messaging_framework' | 'persona_card'
+  | 'positioning_statement' | 'feature_brief' | 'roi_business_case' | 'gtm_plan_onepager'
+  | 'customer_reference' | 'press_release_fyi';
+
+export interface Deck {
+  id: string;
+  user_id: string;
+  conversation_id: string | null;
+  title: string;
+  artifact_type: ArtifactType;
+  format: 'slide' | 'document';
+  markdown_content: string;
+  storage_path: string | null;
+  download_count: number;
   created_at: string;
 }
 

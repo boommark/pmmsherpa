@@ -29,56 +29,114 @@ from ingest_documents import get_supabase_client, get_openai_client, insert_docu
 KINDLE_BASE = Path("/Users/abhishekratna/Documents/Antigravity Projects/kindle_scraper/output")
 
 NEW_BOOKS = [
-    # PM Books → source_type: book_pm
+    # PM Books → book_pm
     {
-        "file": KINDLE_BASE / "PM Books" / "CONTINUOUS_DISCOVERY_HABITS.md",
-        "title": "Continuous Discovery Habits",
-        "author": "Teresa Torres",
-        "source_type": "book_pm",
-        "tags": ["pm-book", "customer-discovery", "product-discovery"],
-    },
-    {
-        "file": KINDLE_BASE / "PM Books" / "Escaping_the_Build_Trap_How_Effective_Product_Management_Creates_Real_Value.md",
-        "title": "Escaping the Build Trap",
-        "author": "Melissa Perri",
-        "source_type": "book_pm",
-        "tags": ["pm-book", "product-management", "product-strategy"],
-    },
-    {
-        "file": KINDLE_BASE / "PM Books" / "The_Innovators_Dilemma_Clay_Christensen.md",
-        "title": "The Innovator's Dilemma",
-        "author": "Clayton Christensen",
-        "source_type": "book_pm",
-        "tags": ["pm-book", "innovation", "disruption"],
-    },
-    {
-        "file": KINDLE_BASE / "PM Books" / "Transformed_Marty_Cagan.md",
-        "title": "Transformed",
+        "file": KINDLE_BASE / "PM Books" / "Empowered_Marty_Cagan.md",
+        "title": "Empowered",
         "author": "Marty Cagan",
         "source_type": "book_pm",
-        "tags": ["pm-book", "product-management", "product-operating-model"],
-    },
-    # PMM Books → source_type: book
-    {
-        "file": KINDLE_BASE / "PMM Books" / "ALL_MARKETERS_ARETTARS.md",
-        "title": "All Marketers Are Liars",
-        "author": "Seth Godin",
-        "source_type": "book",
-        "tags": ["pmm-book", "storytelling", "marketing-authenticity"],
+        "tags": ["pm-book", "product-management", "product-teams"],
     },
     {
-        "file": KINDLE_BASE / "PMM Books" / "New_Sales_Simplified_THE_ESSENTIAL_HANDBOOK_FOR_PROSPECTING.md",
-        "title": "New Sales Simplified",
-        "author": "Mike Weinberg",
-        "source_type": "book",
-        "tags": ["pmm-book", "sales", "prospecting"],
+        "file": KINDLE_BASE / "PM Books" / "Masters of Scale - Reid Hoffman.md",
+        "title": "Masters of Scale",
+        "author": "Reid Hoffman",
+        "source_type": "book_pm",
+        "tags": ["pm-book", "entrepreneurship", "growth", "scaling"],
+    },
+    # Communication Books → book_communication
+    {
+        "file": KINDLE_BASE / "Communication Books" / "CONTAGIOUS_Why_Things_Catch_On_JONAH_BERGER.md",
+        "title": "Contagious: Why Things Catch On",
+        "author": "Jonah Berger",
+        "source_type": "book_communication",
+        "tags": ["communication-book", "virality", "word-of-mouth", "marketing"],
     },
     {
-        "file": KINDLE_BASE / "PMM Books" / "Ogilvy_on_Advertising.md",
-        "title": "Ogilvy on Advertising",
-        "author": "David Ogilvy",
-        "source_type": "book",
-        "tags": ["pmm-book", "advertising", "copywriting"],
+        "file": KINDLE_BASE / "Communication Books" / "Crack_the_CSuite_Code.md",
+        "title": "Crack the C-Suite Code",
+        "author": "Natalie Marcotullio",
+        "source_type": "book_communication",
+        "tags": ["communication-book", "executive-communication", "leadership", "career"],
+    },
+    {
+        "file": KINDLE_BASE / "Communication Books" / "Elements of Persuaion.md",
+        "title": "Elements of Persuasion",
+        "author": "Richard Maxwell",
+        "source_type": "book_communication",
+        "tags": ["communication-book", "persuasion", "storytelling"],
+    },
+    {
+        "file": KINDLE_BASE / "Communication Books" / "FIERCE_CONVERSATIONS_Achieving_Success_at_Work__in_Life.md",
+        "title": "Fierce Conversations",
+        "author": "Susan Scott",
+        "source_type": "book_communication",
+        "tags": ["communication-book", "difficult-conversations", "leadership"],
+    },
+    {
+        "file": KINDLE_BASE / "Communication Books" / "Getting_to_Yes_Roger_Ury.md",
+        "title": "Getting to Yes",
+        "author": "Roger Fisher and William Ury",
+        "source_type": "book_communication",
+        "tags": ["communication-book", "negotiation", "conflict-resolution"],
+    },
+    {
+        "file": KINDLE_BASE / "Communication Books" / "How to become a people magnet.md",
+        "title": "How to Become a People Magnet",
+        "author": "Marc Reklau",
+        "source_type": "book_communication",
+        "tags": ["communication-book", "interpersonal-skills", "influence"],
+    },
+    {
+        "file": KINDLE_BASE / "Communication Books" / "Thanks_for_the_Feedback_Douglas_Stone.md",
+        "title": "Thanks for the Feedback",
+        "author": "Douglas Stone",
+        "source_type": "book_communication",
+        "tags": ["communication-book", "feedback", "learning", "growth"],
+    },
+    {
+        "file": KINDLE_BASE / "Communication Books" / "The_Coaching_Habit_Say_Less_Ask_More.md",
+        "title": "The Coaching Habit",
+        "author": "Michael Bungay Stanier",
+        "source_type": "book_communication",
+        "tags": ["communication-book", "coaching", "leadership", "management"],
+    },
+    # Presentations Books → book_presentations
+    {
+        "file": KINDLE_BASE / "Presentations" / "Resonate-Nancy-Duarte.md",
+        "title": "Resonate",
+        "author": "Nancy Duarte",
+        "source_type": "book_presentations",
+        "tags": ["presentations-book", "storytelling", "presentations", "persuasion"],
+    },
+    {
+        "file": KINDLE_BASE / "Presentations" / "ILLUMINATE_Ignite_Change_Through_Speeches_Stories.md",
+        "title": "Illuminate",
+        "author": "Nancy Duarte and Patti Sanchez",
+        "source_type": "book_presentations",
+        "tags": ["presentations-book", "change-communication", "leadership", "storytelling"],
+    },
+    {
+        "file": KINDLE_BASE / "Presentations" / "cole_nussbaumer_knaflic_storytelling_with.md",
+        "title": "Storytelling with Data",
+        "author": "Cole Nussbaumer Knaflic",
+        "source_type": "book_presentations",
+        "tags": ["presentations-book", "data-visualization", "storytelling", "charts"],
+    },
+    {
+        "file": KINDLE_BASE / "Presentations" / "HOW_TO_DELIVER_A_TEDta_Secrets_of_the_Worlds.md",
+        "title": "How to Deliver a TED Talk",
+        "author": "Jeremey Donovan",
+        "source_type": "book_presentations",
+        "tags": ["presentations-book", "public-speaking", "ted-talk", "presentations"],
+    },
+    # Sales Books → book_sales
+    {
+        "file": KINDLE_BASE / "Sales" / "100Moffers.md",
+        "title": "100M Offers",
+        "author": "Alex Hormozi",
+        "source_type": "book_sales",
+        "tags": ["sales-book", "offers", "pricing", "revenue"],
     },
 ]
 
