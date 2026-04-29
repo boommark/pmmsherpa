@@ -16,6 +16,9 @@ import { pollUntilDone as pollLlamaParse } from '@/lib/llamaparse'
 import { scanInput, scanOutput, SAFE_RESPONSE, CANARY_TOKEN } from '@/lib/prompt-guard'
 import { initLogger } from 'braintrust'
 import { getPostHogClient } from '@/lib/posthog-server'
+import { startActiveObservation, setActiveTraceIO } from '@langfuse/tracing'
+import { LangfuseOtelSpanAttributes } from '@langfuse/core'
+import { getActiveTraceId } from '@/lib/observability/trace'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -257,6 +260,26 @@ export async function POST(request: NextRequest) {
             encoder.encode(`data: ${JSON.stringify({ type: 'status', message: status })}\n\n`)
           )
         }
+
+        await startActiveObservation('sherpa.chat.request', async (span) => {
+          const traceInput = { message, model, hasAttachments: !!hasAttachments }
+          span.update({
+            input: traceInput,
+            metadata: {
+              userId: user.id,
+              sessionId: conversationId,
+              surface: 'web',
+              endpoint: '/api/chat',
+            },
+          })
+          // Populate trace-level fields (input/output/name/userId/sessionId)
+          setActiveTraceIO({ input: traceInput })
+          span.otelSpan.setAttribute(LangfuseOtelSpanAttributes.TRACE_NAME, 'sherpa.chat.request')
+          span.otelSpan.setAttribute(LangfuseOtelSpanAttributes.TRACE_USER_ID, user.id)
+          span.otelSpan.setAttribute(LangfuseOtelSpanAttributes.TRACE_TAGS, ['surface:web'])
+          if (conversationId) {
+            span.otelSpan.setAttribute(LangfuseOtelSpanAttributes.TRACE_SESSION_ID, conversationId)
+          }
 
         try {
           // ========================================
@@ -680,6 +703,14 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
                 output_config: { effort: 'medium' },
               },
             },
+            experimental_telemetry: {
+              isEnabled: true,
+              functionId: 'chat.streamText',
+              metadata: {
+                model: dbModel,
+                userId: user.id,
+              },
+            },
           })
 
           // Send citations (both RAG and web citations)
@@ -800,8 +831,12 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
 
           // Signal completion — sent before non-critical logging so the frontend
           // always navigates to /chat/[id] even if analytics calls below fail.
+          // trace_id lets support correlate user reports → Langfuse trace.
+          const traceId = getActiveTraceId()
+          span.update({ output: fullResponseText })
+          setActiveTraceIO({ input: traceInput, output: fullResponseText })
           controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ type: 'done' })}\n\n`)
+            encoder.encode(`data: ${JSON.stringify({ type: 'done', trace_id: traceId })}\n\n`)
           )
           controller.close()
 
@@ -917,6 +952,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           )
           controller.close()
         }
+        })
       },
     })
 

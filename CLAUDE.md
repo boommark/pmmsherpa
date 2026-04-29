@@ -95,6 +95,9 @@ GOOGLE_API_KEY                      # Gemini models
 OPENAI_API_KEY                      # Embeddings (+ optional TTS)
 RESEND_API_KEY                      # Transactional email
 PERPLEXITY_API_KEY                  # Web research (quick research mode)
+LANGFUSE_PUBLIC_KEY                 # Langfuse tracing (project: PMMSherpa-MCP, US region)
+LANGFUSE_SECRET_KEY                 # Langfuse tracing
+LANGFUSE_BASEURL                    # https://us.cloud.langfuse.com
 NEXT_PUBLIC_APP_URL                 # https://pmmsherpa.com (prod) / https://staging.pmmsherpa.com (staging)
 ```
 
@@ -206,6 +209,16 @@ npm run lint
 ```
 
 ---
+
+## Observability (Phase 1, MCP plan)
+
+- **Langfuse** is the system of record for LLM/RAG traces across all surfaces (web UI + MCP server). Project: `PMMSherpa-MCP` (US region). Dashboard: https://us.cloud.langfuse.com
+- **Surface tagging convention**: every trace MUST set a `surface:*` tag via `LangfuseOtelSpanAttributes.TRACE_TAGS`. UI route uses `surface:web`. MCP server uses `surface:mcp`. Use the Langfuse tag filter to view traffic per surface; don't split into separate projects.
+- `instrumentation.ts` registers OTel + Langfuse on Vercel boot. Don't remove the Braintrust `initLogger` — Braintrust is reserved for offline evals (Layer 4 voice scorer), Langfuse for runtime tracing. They coexist.
+- `/api/chat` is wrapped in `startActiveObservation('sherpa.chat.request', ...)`. The active span gets `input`, `metadata` (userId, sessionId), and `output` set on it. Trace-level fields (name, userId, sessionId, tags, input, output) are populated via `setActiveTraceIO()` + `LangfuseOtelSpanAttributes` on `span.otelSpan`.
+- The SSE `done` event includes `trace_id` (the OTel/Langfuse trace ID). Surface this to support so user reports can be correlated to a specific trace.
+- AI SDK calls (`streamText` etc.) auto-trace via `experimental_telemetry: { isEnabled: true }`.
+- Silent-failure signals live in `src/lib/observability/signals.ts` (skeleton — wired in Phase 3).
 
 ## Known Issues & Hard-Won Lessons
 
