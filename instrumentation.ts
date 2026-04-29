@@ -10,6 +10,11 @@ export async function register() {
 
   registerOTel({
     serviceName: "pmmsherpa",
-    spanProcessors: [new LangfuseSpanProcessor()],
+    spanProcessors: [
+      // Vercel serverless: lambdas freeze before the default batched flush
+      // fires, dropping spans. Immediate export trades a small per-call
+      // latency cost for guaranteed delivery.
+      new LangfuseSpanProcessor({ exportMode: "immediate" }),
+    ],
   });
 }
