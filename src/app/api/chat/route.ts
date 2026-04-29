@@ -18,6 +18,8 @@ import { initLogger } from 'braintrust'
 import { getPostHogClient } from '@/lib/posthog-server'
 import { startActiveObservation, setActiveTraceIO } from '@langfuse/tracing'
 import { LangfuseOtelSpanAttributes } from '@langfuse/core'
+import { waitUntil } from '@vercel/functions'
+import { langfuseSpanProcessor } from '../../../../instrumentation'
 import { getActiveTraceId } from '@/lib/observability/trace'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -953,6 +955,10 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           controller.close()
         }
         })
+        // Vercel: keep the lambda alive until the Langfuse OTLP export
+        // request actually completes. Without this, the lambda freezes
+        // before the HTTP request to Langfuse finishes and traces are lost.
+        waitUntil(langfuseSpanProcessor.forceFlush())
       },
     })
 
