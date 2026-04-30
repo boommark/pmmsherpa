@@ -19,7 +19,7 @@ import { getPostHogClient } from '@/lib/posthog-server'
 import { startActiveObservation, setActiveTraceIO } from '@langfuse/tracing'
 import { LangfuseOtelSpanAttributes } from '@langfuse/core'
 import { waitUntil } from '@vercel/functions'
-import { langfuseSpanProcessor } from '../../../../instrumentation'
+import { langfuseSpanProcessor } from '@/instrumentation'
 import { getActiveTraceId } from '@/lib/observability/trace'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
