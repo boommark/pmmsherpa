@@ -10,6 +10,8 @@ import { runTransportTests } from './transport.test'
 import { runSearchCorpusTests } from './search-corpus.test'
 import { runOAuthTests } from './oauth.test'
 import { runTracingTests } from './tracing.test'
+import { runQuerySherpaTests } from './query-sherpa.test'
+import { runValidateArtifactTests } from './validate-artifact.test'
 import { deleteAllTestUsers, BASE_URL } from './helpers'
 
 async function ensureServerUp() {
@@ -41,6 +43,14 @@ async function main() {
     }),
     await runTracingTests().catch((e) => {
       console.error('tracing tests crashed:', e)
+      return null
+    }),
+    await runQuerySherpaTests().catch((e) => {
+      console.error('query_pmm_sherpa tests crashed:', e)
+      return null
+    }),
+    await runValidateArtifactTests().catch((e) => {
+      console.error('validate_artifact tests crashed:', e)
       return null
     }),
   ]
