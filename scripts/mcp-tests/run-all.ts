@@ -1,17 +1,19 @@
 /**
- * Orchestrator: runs all MCP test files sequentially and reports
- * pass/fail counts. Cleans up test users at the end.
+ * Orchestrator: runs MCP transport / OAuth / tracing integration tests
+ * against a live dev server. Reports pass/fail counts and cleans up
+ * test users at the end.
+ *
+ * Tool-handler tests (search_corpus, ask_sherpa, get_feedback,
+ * draft_artifact) live in src/lib/mcp/__tests__/ and run via Vitest:
+ *   npx vitest run
  *
  * Usage:
  *   ./node_modules/.bin/tsx scripts/mcp-tests/run-all.ts
  */
 
 import { runTransportTests } from './transport.test'
-import { runSearchCorpusTests } from './search-corpus.test'
 import { runOAuthTests } from './oauth.test'
 import { runTracingTests } from './tracing.test'
-import { runQuerySherpaTests } from './query-sherpa.test'
-import { runValidateArtifactTests } from './validate-artifact.test'
 import { deleteAllTestUsers, BASE_URL } from './helpers'
 
 async function ensureServerUp() {
@@ -33,24 +35,12 @@ async function main() {
       console.error('transport tests crashed:', e)
       return null
     }),
-    await runSearchCorpusTests().catch((e) => {
-      console.error('search_corpus tests crashed:', e)
-      return null
-    }),
     await runOAuthTests().catch((e) => {
       console.error('oauth tests crashed:', e)
       return null
     }),
     await runTracingTests().catch((e) => {
       console.error('tracing tests crashed:', e)
-      return null
-    }),
-    await runQuerySherpaTests().catch((e) => {
-      console.error('query_pmm_sherpa tests crashed:', e)
-      return null
-    }),
-    await runValidateArtifactTests().catch((e) => {
-      console.error('validate_artifact tests crashed:', e)
       return null
     }),
   ]

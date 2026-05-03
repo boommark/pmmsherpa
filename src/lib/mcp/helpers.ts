@@ -3,14 +3,14 @@
  *
  * `runSherpaChat` wraps the same RAG → system prompt → LLM pipeline used
  * by /api/chat, but in a non-streaming form suitable for MCP tool
- * invocations. Both query_pmm_sherpa and validate_artifact wrap this.
+ * invocations. Both ask_sherpa and get_feedback wrap this.
  *
  * Differences from /api/chat:
  *   - Uses `generateText` (not `streamText`)
  *   - No URL scraping, no Perplexity, no Brave Search, no attachments
  *   - Hardcoded to Claude Sonnet 4.6 for v1 (model param accepted but ignored
  *     by callers)
- *   - Optional intent override (validate_artifact forces `review`)
+ *   - Optional intent override (get_feedback forces `review`)
  *   - Optional system prompt suffix appended to the dynamic part
  */
 
@@ -29,7 +29,7 @@ export interface RunSherpaChatInput {
   message: string
   userId: string
   conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>
-  /** Appended to the dynamic system prompt part — used by validate_artifact. */
+  /** Appended to the dynamic system prompt part — used by get_feedback. */
   customSystemPromptSuffix?: string
   /** Force a specific intent (skips planner intent for retrieval boosts). */
   intentOverride?: QueryPlan['intent']
@@ -192,7 +192,7 @@ export function parseCritiqueMarkdown(text: string): {
 
 /**
  * Extract unique principle "sources" from citations — used to populate
- * `principles_cited` for validate_artifact. Falls back to author when
+ * `principles_cited` for get_feedback. Falls back to author when
  * present, else the document title.
  */
 export function uniquePrinciplesFromCitations(citations: Citation[]): string[] {

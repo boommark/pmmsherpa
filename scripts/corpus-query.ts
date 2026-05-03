@@ -1,11 +1,11 @@
 /**
  * Corpus research helper. Calls the same RAG → LLM pipeline as MCP's
- * query_pmm_sherpa tool to fetch best-practices answers grounded in the
+ * ask_sherpa tool to fetch best-practices answers grounded in the
  * PMM Sherpa knowledge corpus.
  *
  * Used for template research: e.g. "what makes a strong positioning
  * statement?" — the synthesized answer + citations drive the structure
- * of generate_artifact templates so they reflect canon, not training-data
+ * of draft_artifact templates so they reflect canon, not training-data
  * generic.
  *
  * Usage:

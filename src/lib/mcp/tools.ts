@@ -16,6 +16,7 @@ import { startMcpObservation } from './tracing'
 import { runSherpaChat, parseCritiqueMarkdown, uniquePrinciplesFromCitations } from './helpers'
 import { checkUsageGate, incrementUsage } from '@/lib/usage-gate'
 import { createServiceClient } from '@/lib/supabase/server'
+import { getTemplate, listArtifactTypes } from './artifact-templates'
 
 /* ------------------------------------------------------------------ */
 /*  Tool result types                                                  */
@@ -66,9 +67,24 @@ export interface Tool {
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /* ------------------------------------------------------------------ */
-/*  Tool: search_corpus  (Build Agent C — left unchanged here)         */
+/*  Tool: search_corpus  (DEPRECATED from public surface)              */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Deprecated from public MCP surface 2026-05. Folded into `ask_sherpa`
+ * internals (corpus retrieval is automatic on every query). Code retained
+ * for potential future use as a power-user lookup tool; not exposed via
+ * `tools/list`. Other modules may still import `searchCorpusTool` directly
+ * for internal scripts/tests, so the export stays.
+ *
+ * Retrieval-architecture note: this tool calls `retrieveContext` (single
+ * hybrid search, raw chunks) — appropriate for a lookup-only tool with no
+ * LLM synthesis. The web UI (`/api/chat`) and MCP `ask_sherpa` (via
+ * `runSherpaChat`) both use `multiQueryRetrieve`, which runs N parallel
+ * `retrieveContext` calls + dedupe + intent boost. So `multiQueryRetrieve`
+ * is the canonical "smart" path; `retrieveContext` is the underlying
+ * primitive. Both surfaces share the smart path — no real divergence.
+ */
 export const searchCorpusTool: Tool = {
   name: 'search_corpus',
   description:
@@ -120,9 +136,9 @@ export const searchCorpusTool: Tool = {
         isError: true,
       }
     }
-    if (query.length > 2000) {
+    if (query.length > 1000) {
       return {
-        content: [{ type: 'text', text: 'Query too long (max 2000 chars)' }],
+        content: [{ type: 'text', text: 'Query too long (max 1000 chars).' }],
         isError: true,
       }
     }
@@ -183,13 +199,13 @@ export const searchCorpusTool: Tool = {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Tool: query_pmm_sherpa                                             */
+/*  Tool: ask_sherpa                                                   */
 /* ------------------------------------------------------------------ */
 
-export const queryPmmSherpaTool: Tool = {
-  name: 'query_pmm_sherpa',
+export const askSherpaTool: Tool = {
+  name: 'ask_sherpa',
   description:
-    'Ask PMM Sherpa a strategic product-marketing question. Returns a synthesized answer with citations from the knowledge base and the full Layer-4 voice system prompt.',
+    'Ask Sherpa a strategic product-marketing question. Corpus-grounded answer with citations and the full Sherpa voice. Use this as the default for any conversational PMM query.',
   inputSchema: {
     type: 'object',
     required: ['query'],
@@ -205,11 +221,11 @@ export const queryPmmSherpaTool: Tool = {
   },
   handler: async (args, ctx) => {
     return startMcpObservation(
-      'mcp.tool.query_pmm_sherpa',
+      'mcp.tool.ask_sherpa',
       {
         userId: ctx.auth.userId,
         sessionId: ctx.session.id,
-        toolName: 'query_pmm_sherpa',
+        toolName: 'ask_sherpa',
         input: args,
       },
       async (span) => {
@@ -287,7 +303,7 @@ export const queryPmmSherpaTool: Tool = {
               }
             }
           } catch (err) {
-            console.warn('[query_pmm_sherpa] Failed to load conversation history:', err)
+            console.warn('[ask_sherpa] Failed to load conversation history:', err)
             // Non-fatal — proceed with empty history.
           }
         }
@@ -301,7 +317,7 @@ export const queryPmmSherpaTool: Tool = {
             conversationHistory,
           })
         } catch (err) {
-          console.error('[query_pmm_sherpa] runSherpaChat threw:', err)
+          console.error('[ask_sherpa] runSherpaChat threw:', err)
           return {
             content: [
               {
@@ -340,7 +356,7 @@ export const queryPmmSherpaTool: Tool = {
 
         // ---- Increment usage (fire-and-forget — do not block on failure) ----
         incrementUsage(ctx.auth.userId).catch((err) =>
-          console.error('[query_pmm_sherpa] incrementUsage failed:', err),
+          console.error('[ask_sherpa] incrementUsage failed:', err),
         )
 
         span.update({
@@ -384,55 +400,270 @@ export const queryPmmSherpaTool: Tool = {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Tool: validate_artifact                                            */
+/*  Tool: draft_artifact                                               */
 /* ------------------------------------------------------------------ */
 
-export const validateArtifactTool: Tool = {
-  name: 'validate_artifact',
+export const draftArtifactTool: Tool = {
+  name: 'draft_artifact',
   description:
-    'Review a PMM artifact (positioning, messaging, launch plan, or other) and surface gaps, inconsistencies, and missed PMM principles. Returns narrative critique + structured gaps + recommendations.',
+    'Produce a structured PMM deliverable from a template (positioning statement, messaging framework, launch plan, sales pitch deck, ICP, buyer persona, battlecard, blog brief, landing page copy, pricing page copy, and 30 others). Use when the user wants Sherpa to *create* a specific named artifact, not just answer a question. Required: `artifact_type` matching one of the 39 supported types.',
   inputSchema: {
     type: 'object',
-    required: ['artifact_text', 'artifact_type'],
+    required: ['artifact_type'],
     properties: {
-      artifact_text: { type: 'string', minLength: 1, maxLength: 20000 },
       artifact_type: {
         type: 'string',
-        enum: ['positioning', 'messaging', 'launch_plan', 'other'],
+        enum: listArtifactTypes(),
+        description:
+          'Snake_case artifact identifier. Must match one of the 39 supported types (e.g. "positioning_statement", "messaging_framework", "battlecard").',
       },
-      context: { type: 'string', maxLength: 2000 },
+      context: {
+        type: 'object',
+        description:
+          'Free-shape context fields the LLM should weave into the draft (product, company, audience, prior_drafts, competitors, etc.). Passed to the model as JSON.',
+        additionalProperties: true,
+      },
+      notes: {
+        type: 'string',
+        maxLength: 2000,
+        description: 'Optional free-text guidance, constraints, or tone instructions.',
+      },
     },
   },
   handler: async (args, ctx) => {
     return startMcpObservation(
-      'mcp.tool.validate_artifact',
+      'mcp.tool.draft_artifact',
       {
         userId: ctx.auth.userId,
         sessionId: ctx.session.id,
-        toolName: 'validate_artifact',
+        toolName: 'draft_artifact',
         input: args,
       },
       async (span) => {
         // ---- Validate input ----
-        const artifactText = typeof args.artifact_text === 'string' ? args.artifact_text : ''
-        if (artifactText.trim().length < 1) {
+        const artifactType = typeof args.artifact_type === 'string' ? args.artifact_type : ''
+        if (!artifactType) {
           return {
-            content: [{ type: 'text', text: 'artifact_text is required.' }],
+            content: [{ type: 'text', text: '`artifact_type` is required.' }],
+            isError: true,
+            structuredContent: {
+              error: 'missing_artifact_type',
+              valid_types: listArtifactTypes(),
+            },
+          }
+        }
+
+        const template = getTemplate(artifactType)
+        if (!template) {
+          const validTypes = listArtifactTypes()
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Unknown artifact_type "${artifactType}". Valid types: ${validTypes.join(', ')}.`,
+              },
+            ],
+            isError: true,
+            structuredContent: {
+              error: 'unknown_artifact_type',
+              provided: artifactType,
+              valid_types: validTypes,
+            },
+          }
+        }
+
+        const notes = typeof args.notes === 'string' ? args.notes : undefined
+        if (notes && notes.length > 2000) {
+          return {
+            content: [{ type: 'text', text: 'notes too long (max 2000 chars).' }],
             isError: true,
           }
         }
-        if (artifactText.length > 20000) {
+
+        // Context is a free-shape object; serialize for the prompt.
+        const contextObj =
+          args.context && typeof args.context === 'object' && !Array.isArray(args.context)
+            ? (args.context as Record<string, unknown>)
+            : undefined
+        let contextJson: string | undefined
+        if (contextObj) {
+          try {
+            contextJson = JSON.stringify(contextObj, null, 2)
+          } catch {
+            contextJson = undefined
+          }
+        }
+
+        // ---- Usage gate ----
+        const gate = await checkUsageGate(ctx.auth.userId)
+        if (!gate.allowed) {
           return {
-            content: [{ type: 'text', text: 'artifact_text too long (max 20000 chars).' }],
+            content: [
+              {
+                type: 'text',
+                text: gate.errorMessage ?? 'Monthly message limit reached. Try again next month.',
+              },
+            ],
+            isError: true,
+            structuredContent: {
+              error: 'message_limit_exceeded',
+              tier: gate.tier,
+              used: gate.used,
+              limit: gate.limit,
+              reset_at: gate.resetAt,
+            },
+          }
+        }
+
+        // ---- Build user-facing message: skeleton + context + notes ----
+        // The skeleton is the canonical fill-in scaffold; we ask the model to
+        // produce the final artifact by replacing every bracketed inline prompt
+        // with concrete content drawn from context + corpus + notes.
+        const userMessage =
+          `Draft a ${template.title}.\n\n` +
+          `Use the following Markdown skeleton as the structural scaffold. ` +
+          `Replace every bracketed inline prompt (e.g. "[ ... ]") with concrete content. ` +
+          `Keep the section headings exactly as written; do not rename, reorder, or skip sections.\n\n` +
+          `Skeleton:\n"""\n${template.skeleton}\n"""\n` +
+          (contextJson ? `\nContext (JSON):\n\`\`\`json\n${contextJson}\n\`\`\`\n` : '') +
+          (notes ? `\nAdditional notes from the user:\n${notes}\n` : '') +
+          `\nGround claims in the corpus where relevant; cite sources inline. ` +
+          `Output ONLY the completed Markdown artifact — no preamble, no closing remarks.`
+
+        // ---- Run RAG + LLM with template's systemPromptFragment ----
+        let result
+        try {
+          result = await runSherpaChat({
+            message: userMessage,
+            userId: ctx.auth.userId,
+            customSystemPromptSuffix: template.systemPromptFragment,
+          })
+        } catch (err) {
+          console.error('[draft_artifact] runSherpaChat threw:', err)
+          return {
+            content: [
+              {
+                type: 'text',
+                text: 'I hit an unexpected error drafting that artifact. Try again in a moment.',
+              },
+            ],
             isError: true,
           }
         }
-        const allowedTypes = ['positioning', 'messaging', 'launch_plan', 'other'] as const
-        type ArtifactType = (typeof allowedTypes)[number]
-        const rawType = typeof args.artifact_type === 'string' ? args.artifact_type : 'other'
-        const artifactType: ArtifactType = (allowedTypes as readonly string[]).includes(rawType)
-          ? (rawType as ArtifactType)
-          : 'other'
+
+        // Empty-corpus path — still produce a friendly message; skip increment.
+        if (result.chunks.length === 0) {
+          const emptyText =
+            "I couldn't find PMM principles in my corpus to ground this artifact. Try giving more context about the product, audience, or constraints."
+          span.update({
+            output: emptyText,
+            metadata: {
+              empty_corpus: true,
+              artifact_type: artifactType,
+            },
+          })
+          return {
+            content: [{ type: 'text', text: emptyText }],
+            isError: false,
+            structuredContent: {
+              artifact_text: '',
+              artifact_type: artifactType,
+              citations: [],
+              usage: result.usage,
+              empty_corpus: true,
+            },
+          }
+        }
+
+        // ---- Increment usage (fire-and-forget) ----
+        incrementUsage(ctx.auth.userId).catch((err) =>
+          console.error('[draft_artifact] incrementUsage failed:', err),
+        )
+
+        span.update({
+          output: result.text,
+          metadata: {
+            artifact_type: artifactType,
+            chunk_count: result.chunks.length,
+            citation_count: result.citations.length,
+            input_tokens: result.usage.inputTokens,
+            output_tokens: result.usage.outputTokens,
+          },
+        })
+
+        return {
+          content: [{ type: 'text', text: result.text }],
+          structuredContent: {
+            artifact_text: result.text,
+            artifact_type: artifactType,
+            citations: result.citations,
+            usage: result.usage,
+          },
+        }
+      },
+    )
+  },
+}
+
+/* ------------------------------------------------------------------ */
+/*  Tool: get_feedback                                                 */
+/* ------------------------------------------------------------------ */
+
+export const getFeedbackTool: Tool = {
+  name: 'get_feedback',
+  description:
+    'Critique a draft artifact, URL content, file content, or pasted text against PMM principles. Returns structured gaps + recommendations + principles cited. Use when the user wants Sherpa to *evaluate* something they have in hand.',
+  inputSchema: {
+    type: 'object',
+    required: ['content'],
+    properties: {
+      content: {
+        type: 'string',
+        minLength: 1,
+        maxLength: 50000,
+        description:
+          'The text to critique. URL/file extraction happens host-side; this tool receives the extracted text.',
+      },
+      kind: {
+        type: 'string',
+        description:
+          'Free-text hint about what kind of artifact this is (e.g. "positioning statement", "competitor landing page", "resume bullet"). Optional.',
+      },
+      context: {
+        type: 'string',
+        maxLength: 2000,
+        description: 'Optional context about goals, audience, or constraints.',
+      },
+    },
+  },
+  handler: async (args, ctx) => {
+    return startMcpObservation(
+      'mcp.tool.get_feedback',
+      {
+        userId: ctx.auth.userId,
+        sessionId: ctx.session.id,
+        toolName: 'get_feedback',
+        input: args,
+      },
+      async (span) => {
+        // ---- Validate input ----
+        const content = typeof args.content === 'string' ? args.content : ''
+        if (content.trim().length < 1) {
+          return {
+            content: [{ type: 'text', text: '`content` is required.' }],
+            isError: true,
+          }
+        }
+        if (content.length > 50000) {
+          return {
+            content: [{ type: 'text', text: '`content` too long (max 50000 chars).' }],
+            isError: true,
+          }
+        }
+
+        const kind = typeof args.kind === 'string' && args.kind.trim().length > 0
+          ? args.kind.trim()
+          : undefined
 
         const context = typeof args.context === 'string' ? args.context : undefined
         if (context && context.length > 2000) {
@@ -464,9 +695,10 @@ export const validateArtifactTool: Tool = {
         }
 
         // ---- Build critique prompt ----
+        const kindLabel = kind ?? 'artifact'
         const critiquePrompt =
-          `Review the following ${artifactType} artifact against PMM principles. Focus on: gaps, weaknesses, opportunities to strengthen. Use grounded references from the corpus when relevant.\n\n` +
-          `Artifact:\n"""\n${artifactText}\n"""\n` +
+          `Review the following ${kindLabel} against PMM principles. Focus on: gaps, weaknesses, opportunities to strengthen. Use grounded references from the corpus when relevant.\n\n` +
+          `Content:\n"""\n${content}\n"""\n` +
           (context ? `\nUser-supplied context:\n${context}\n` : '') +
           `\nReturn your review in this exact format:\n\n` +
           `## Overall Assessment\n[2-3 sentences]\n\n` +
@@ -484,7 +716,7 @@ export const validateArtifactTool: Tool = {
               'You are reviewing a PMM artifact. Be specific, grounded, and constructive.',
           })
         } catch (err) {
-          console.error('[validate_artifact] runSherpaChat threw:', err)
+          console.error('[get_feedback] runSherpaChat threw:', err)
           return {
             content: [
               {
@@ -504,7 +736,7 @@ export const validateArtifactTool: Tool = {
             output: emptyText,
             metadata: {
               empty_corpus: true,
-              artifact_type: artifactType,
+              kind: kindLabel,
             },
           })
           return {
@@ -526,13 +758,13 @@ export const validateArtifactTool: Tool = {
 
         // ---- Increment usage (fire-and-forget) ----
         incrementUsage(ctx.auth.userId).catch((err) =>
-          console.error('[validate_artifact] incrementUsage failed:', err),
+          console.error('[get_feedback] incrementUsage failed:', err),
         )
 
         span.update({
           output: result.text,
           metadata: {
-            artifact_type: artifactType,
+            kind: kindLabel,
             gap_count: gaps.length,
             recommendation_count: recommendations.length,
             principle_count: principlesCited.length,
@@ -561,10 +793,13 @@ export const validateArtifactTool: Tool = {
 /*  Registry                                                           */
 /* ------------------------------------------------------------------ */
 
+// NOTE: `searchCorpusTool` is intentionally NOT registered here — it was
+// deprecated from the public MCP surface 2026-05 (see comment block above
+// the export). Only the three tools below appear in `tools/list`.
 export const tools: Record<string, Tool> = {
-  [searchCorpusTool.name]: searchCorpusTool,
-  [queryPmmSherpaTool.name]: queryPmmSherpaTool,
-  [validateArtifactTool.name]: validateArtifactTool,
+  [askSherpaTool.name]: askSherpaTool,
+  [draftArtifactTool.name]: draftArtifactTool,
+  [getFeedbackTool.name]: getFeedbackTool,
 }
 
 /** tools/list response format expected by MCP clients. */

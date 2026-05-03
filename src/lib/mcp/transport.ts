@@ -179,7 +179,7 @@ export function buildError(
  * or text/event-stream (one or more `data:` frames). For Phase 1 we
  * always return single-shot application/json to keep route logic
  * simple — these helpers exist for forward compatibility when we
- * add streaming tools (e.g. progressive query_pmm_sherpa).
+ * add streaming tools (e.g. progressive ask_sherpa).
  */
 export function encodeSseFrame(envelope: JsonRpcMessage | JsonRpcMessage[]): string {
   return `data: ${JSON.stringify(envelope)}\n\n`
