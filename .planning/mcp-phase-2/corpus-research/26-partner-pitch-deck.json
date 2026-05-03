@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 1117ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS partner pitch deck structure and key components for recruiting channel partners (resellers, SIs, ISVs)","Framework for articulating partner value proposition in a pitch deck, focusing on margin, lead generation, and differentiation","Common failure modes and best practices for B2B SaaS partner recruitment pitch decks"]
+[MultiQuery] 3 queries → 17 unique chunks → top 10 returned (468ms)
+{
+  "query": "What's a B2B SaaS partner pitch deck — used to recruit new partners (resellers, SIs, ISVs, channel)? Different from customer pitch — partner cares about: their customer outcomes, deal economics, enablement model, go-to-market support, deal protection. Structure: market opportunity, joint customer story, partner value prop (margin / lead-gen / differentiation), enablement / co-sell motion, success criteria, ask. Failure modes: customer-pitch repurposed for partners, no economics, vague enablement, no joint customer profile?",
+  "text": "## The partner pitch deck is a different animal\n\nMost companies build their first partner pitch by reskinning the customer deck. The logos stay the same, the product screenshots stay the same, the \"why us\" section stays the same. Then they wonder why partners don't convert. The problem is structural: a customer pitch answers \"will this solve my problem?\" A partner pitch answers \"will this help me make money and look good to my customers?\" Completely different question.\n\nHere's what a tight partner pitch deck looks like, and where each section earns its place.\n\n---\n\n## The structure that works\n\n**1. Market opportunity (their lens, not yours)**\nOpen with the market *they* serve, not your TAM. A regional SI doesn't care that your category is a $12B market. They care that 60% of their mid-market clients are asking about this problem and they have no answer. Frame the gap in their world.\n\n**2. The joint customer profile**\nThis is the section most decks skip entirely. Who is the customer you're going to win together? Be specific: industry, size, tech stack, buying trigger. This tells the partner whether their pipeline actually maps to your ICP. If it doesn't, better to know in slide 4 than after six months of no deals.\n\n**3. Partner value proposition**\nThree lanes, treated separately:\n\n- **Economics.** Margin structure, deal registration, co-sell splits. Specifics, not ranges.\n- **Lead generation.** Are you bringing them net-new opportunities, or just asking them to resell your existing pipeline?\n- **Differentiation.** What does adding your product do for *their* positioning with customers?\n\n**4. Enablement model**\nVague enablement is the most common failure mode after the economics slide. \"We'll provide training and support\" means nothing. What they need to see: certification path, time-to-first-deal, co-sell motion (will your AE be on the call?), and what happens when a deal gets complicated. Show the scaffolding.\n\n**5. Deal protection**\nChannel conflict is the unspoken objection in every partner conversation. They've been burned before. Address it directly: how do you handle registration, what's the conflict resolution process, how do you protect margin on renewals. The partner who doesn't ask about this is thinking about it anyway.\n\n**6. Joint customer story**\nOne real story, told as a partnership narrative. Not \"customer X uses our product.\" More like: \"Partner Y brought us into a mid-market manufacturer, co-sold the deal in 90 days, expanded to three sites in year two.\" The partner needs to see themselves in the story, not just your logo.\n\n**7. The ask and success criteria**\nWhat does a successful first 90 days look like? One co-sold deal? Three certified reps? A joint pipeline review? Specificity here signals you've done this before and you're not going to disappear after the contract is signed.\n\n---\n\n## The failure modes, diagnosed\n\n**Customer pitch repurposed for partners.** The tell is slide two: \"our customers love us.\" Partners don't care yet. They need to know their customers will love them for bringing you in.\n\n**No economics.** If the margin structure isn't in the deck, partners assume it's bad. Silence reads as evasion.\n\n**Vague enablement.** \"Robust partner portal\" is not a plan. Partners have been promised portals before. What they want to know is: how long until my first rep can close a deal without your help?\n\n**No joint customer profile.** Without this, the partner can't self-qualify. You'll get a lot of \"sounds interesting, let's stay in touch\" and very little pipeline.\n\nThe underlying principle worth internalizing: partners are evaluating you the same way a CFO evaluates a vendor. Predictable return, manageable risk, clear support model. The deck that speaks that language converts. The one that leads with your product vision doesn't.\n\nWhich section is the hardest to nail for your specific partner type?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": "Joel Klettke",
+      "url": "https://www.amazon.com/s?k=Punchy",
+      "page_number": 70,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Obviously+Awesome+%282nd+Edition%29+April+Dunford",
+      "page_number": 116,
+      "section_title": null
+    },
+    {
+      "source_type": "book_pm",
+      "author": "Richard Banfield",
+      "url": "https://www.amazon.com/s?k=Product+Leadership+How+Top+Product+Managers+Launch+Awesome+Products+and+Build+Successful+Teams+Richard+Banfield",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Elay Cohen",
+      "url": "https://www.productmarketingalliance.com/product-marketing-playbook-for-sales-enablement/",
+      "page_number": null,
+      "section_title": "Enable your teams with micro-pitches"
+    },
+    {
+      "source_type": "book",
+      "author": "Maja Voje",
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 291,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Jeff Foley",
+      "url": "https://www.productmarketingalliance.com/building-a-rock-solid-gtm-plan/",
+      "page_number": null,
+      "section_title": "The value proposition"
+    },
+    {
+      "source_type": "book",
+      "author": "Gabriel Weinberg and Justin Mares",
+      "url": "https://www.amazon.com/s?k=Traction",
+      "page_number": 130,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 135,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Maja Voje",
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 287,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Gabriel Weinberg and Justin Mares",
+      "url": "https://www.amazon.com/s?k=Traction",
+      "page_number": 124,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 4507,
+    "outputTokens": 904
+  }
+}

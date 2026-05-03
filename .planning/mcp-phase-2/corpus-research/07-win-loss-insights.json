@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 1016ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["Structure of B2B SaaS win/loss insights summary","Interview methodology for B2B SaaS win/loss analysis","How win/loss insights inform positioning, battlecards, and product roadmap"]
+[MultiQuery] 3 queries → 17 unique chunks → top 10 returned (1775ms)
+{
+  "query": "How is a B2B SaaS win/loss insights summary structured? What's the interview methodology, the deliverable format (themes vs. quotes vs. recommendations), and how does it feed positioning, battlecards, and product roadmap? What are the most common win/loss research failure modes — selection bias, confirmation bias, asking the wrong questions?",
+  "text": "## What a Win/Loss Program Actually Looks Like End-to-End\n\nMost win/loss programs underdeliver not because the research is bad, but because the structure is wrong from the start. Here's how to build one that actually moves the needle.\n\n---\n\n## The Interview Methodology\n\nThe foundation is getting the right sample. You want 20+ interviews minimum before you can trust a pattern, and you need to stratify them: wins and losses, different deal sizes, different personas (champion vs. economic buyer vs. IT), different stages of loss (early ghosting vs. late-stage competitive loss). A deal lost at discovery tells you something completely different than one lost after a three-month POC.\n\n**Who conducts the interviews matters enormously.** Buyers tell third parties things they'll never tell your team. The economic buyer who said \"we went with the other vendor\" in your CRM actually means \"your champion couldn't get internal buy-in and we weren't confident in your roadmap.\" You only hear that from someone with no stake in the relationship. If you're running interviews in-house, acknowledge that you're getting a filtered version of the truth.\n\nThe interview guide should follow the buyer's journey, not your sales stages. Start with: what triggered the evaluation? Who was involved? How did they find you? What alternatives did they consider? Where did momentum slow? What ultimately drove the decision? The best question is often the last one: \"What would you tell a colleague considering your vendor?\" That's where the real story lives.\n\n---\n\n## The Deliverable Format\n\nA good win/loss summary has three layers, and most programs only deliver one.\n\n**Layer 1: The numbers.** Win rate by segment, persona, deal size, region, competitor. This tells you where you're healthy and where you're bleeding. If you're winning 60% of deals under $50K and 25% of deals over $200K, that's a strategic signal, not a sales execution problem.\n\n**Layer 2: The themes.** Synthesized patterns across interviews. Not \"buyer X said pricing was high\" but \"price-to-value perception breaks down in mid-market deals where the economic buyer isn't involved until late stage.\" Four to six themes per cycle, ranked by frequency and deal impact.\n\n**Layer 3: Verbatim quotes.** This is the layer most programs undervalue. A single buyer quote, specific and unfiltered, does more to change sales behavior than a dozen slide decks. \"We went with them because their team made us feel like they'd done this exact implementation fifty times before\" is worth more than any battlecard.\n\n---\n\n## How It Feeds Positioning, Battlecards, and Roadmap\n\n**Positioning:** Win/loss tells you which of your claimed differentiators actually landed in the room. If you're positioning on ease of implementation but buyers who chose you cite \"team confidence\" and buyers who left cite \"unclear migration path,\" your positioning is pointing at the wrong thing. The gap between what you say and what buyers remember is your real positioning problem.\n\n**Battlecards:** Build them in buyer language, not product language. The best battlecards are organized around the competitor's trap: what objection does Competitor X plant in the buyer's mind, and what's your reframe? Win/loss gives you the actual objection, verbatim. That's the only way to write a battlecard that sales will actually use.\n\n**Roadmap:** Win/loss is your earliest signal on product gaps that are costing revenue. The distinction worth making: is this a product gap or a messaging gap? If buyers who left say \"they had feature X and you didn't,\" that's a product signal. If buyers who stayed say \"we almost left because we didn't know you had feature X,\" that's a messaging gap. Same symptom, completely different fix.\n\n---\n\n## The Failure Modes\n\n**Selection bias** is the most common and the most invisible. Your CRM captures the deals you know about. It misses the deals where you were never seriously considered, the deals where your champion left before it got logged, the deals that stalled and never formally closed. If you're only interviewing buyers who made it to a formal decision, you're missing the early-stage losses that often represent your biggest volume problem.\n\n**Confirmation bias** shows up in who you interview and what you ask. Teams running win/loss in-house tend to interview the wins more than the losses (easier access, warmer relationships) and ask questions that invite validation rather than challenge. \"Did our messaging resonate?\" versus \"Where did you get confused or lose confidence in us?\" The second question is harder to ask and ten times more valuable.\n\n**Asking the wrong questions** usually means asking about features and pricing when you should be asking about process and confidence. Buyers rarely lose deals because of a feature gap. They lose them because the champion couldn't build internal consensus, because the procurement process surfaced a risk concern nobody addressed, because the competitor's implementation story was more credible. Win/loss interviews that focus on product attributes miss the organizational dynamics that actually drive decisions.\n\n---\n\nThe stat worth sitting with: programs running more than two years see win-rate improvements jump to 84%. The insight compounds. Which means the biggest risk isn't running a bad program. It's waiting another quarter to start one.",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog",
+      "author": "Willem Maas",
+      "url": "https://www.productmarketingalliance.com/selecting-a-win-loss-analysis-service/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/picking-a-win-loss-program-to-meet-your-goals/",
+      "page_number": null,
+      "section_title": "Where are you positioned on the win/loss lifecycle?"
+    },
+    {
+      "source_type": "ama",
+      "author": "Divya Mulanjur",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Anaud Ganpaul",
+      "url": "https://www.productmarketingalliance.com/the-science-of-product-marketing/",
+      "page_number": null,
+      "section_title": "Competitive and win/loss"
+    },
+    {
+      "source_type": "blog",
+      "author": "Bill Emmett",
+      "url": "https://www.productmarketingalliance.com/differentiating-your-message-with-world-class-competitive-intelligence/",
+      "page_number": null,
+      "section_title": "Step two: Drive better win/loss mechanisms"
+    },
+    {
+      "source_type": "blog",
+      "author": "Brady Tengberg",
+      "url": "https://www.productmarketingalliance.com/fuel-revenue-growth-through-win-loss-analysis/",
+      "page_number": null,
+      "section_title": "How win-loss analysis drives revenue growth"
+    },
+    {
+      "source_type": "blog",
+      "author": "Bailey Haslam",
+      "url": "https://www.productmarketingalliance.com/win-loss-analysis-isnt-a-priority-but-it-should-be/",
+      "page_number": null,
+      "section_title": "Prioritizing win-loss analysis makes your job easier"
+    },
+    {
+      "source_type": "blog",
+      "author": "Bailey Haslam",
+      "url": "https://www.productmarketingalliance.com/win-loss-analysis-isnt-a-priority-but-it-should-be/",
+      "page_number": null,
+      "section_title": "You're interviewing buyers yourself"
+    },
+    {
+      "source_type": "blog",
+      "author": "Willem Maas",
+      "url": "https://www.productmarketingalliance.com/selecting-a-win-loss-analysis-service/",
+      "page_number": null,
+      "section_title": "What is a win/loss analysis service?"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "Win/loss analysis"
+    }
+  ],
+  "usage": {
+    "inputTokens": 4260,
+    "outputTokens": 1161
+  }
+}

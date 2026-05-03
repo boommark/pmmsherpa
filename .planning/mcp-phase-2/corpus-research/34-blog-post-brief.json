@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[QueryPlanner] Flash Lite responded in 1321ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["Framework for creating a blog post brief for B2B SaaS content marketing, including title testing, target reader persona, search intent analysis, evidence sourcing strategies, and voice/tone guidelines.","Best practices for B2B SaaS content marketing: how to define target reader personas and map search intent for blog posts.","Tactical guide to structuring a blog post outline for B2B SaaS, incorporating evidence sourcing and defining voice and tone."]
+[MultiQuery] 3 queries → 15 unique chunks → top 10 returned (461ms)
+{
+  "query": "How to write a blog post brief for B2B SaaS content marketing — title testing, target reader, search intent, evidence sourcing, voice and structural outline",
+  "text": "## Start with the job the brief actually does\n\nA brief isn't a creative document. It's a contract between the strategist who knows why this piece exists and the writer who has to execute it. The best briefs answer every question a good writer would ask before typing a single word, so they never have to interrupt the work to ask it.\n\nHere's how to build one that does that job well.\n\n---\n\n## Title and search intent: the foundation everything else rests on\n\nBefore anything else, lock the angle. Most briefs start with a working title, but the title is actually the output of a more important decision: **what is this reader trying to do right now?**\n\nSearch intent breaks into four types. Informational (\"what is X\"), navigational (\"find Y\"), commercial (\"best tools for Z\"), and transactional (\"buy X now\"). For B2B SaaS content, most of your high-value targets live in informational and commercial. Knowing which one you're serving changes the entire structure of the piece.\n\nFor title testing, run two or three working variants before you pick one:\n\n- **Informational angle:** \"What is [concept] and why does it matter for [persona]?\"\n- **Commercial angle:** \"The [N] best ways to [achieve outcome] in [context]\"\n- **Provocative angle:** \"[Common belief] is wrong. Here's what actually works.\"\n\nTest variants using a quick gut-check against the search query you're targeting. The winning title should contain the keyword naturally and signal the reader's reward clearly. Not clever. Clear.\n\n---\n\n## Target reader: one person, not a segment\n\nThe brief should name a specific reader, not a category. Not \"B2B marketers.\" Something like: **a demand gen manager at a 200-person SaaS company who runs a two-person team and is being asked to do more with less this quarter.**\n\nThat specificity does two things. It tells the writer whose voice to respect (no condescension, no over-explaining basics). And it surfaces the emotional context. What is this person worried about? What would make them feel smart for reading this? What would make them bounce?\n\nIn complex B2B buying, you're often writing for multiple personas across a single deal. An influencer like a developer has completely different motivations than an economic buyer in finance. **A single piece of content can't serve both well.** The brief should pick one primary reader and, if relevant, note a secondary reader the piece might reach.\n\n---\n\n## Evidence sourcing: specificity is the credibility signal\n\nGeneric claims kill B2B content. \"Companies that use [category] see better results\" is noise. The brief should specify what evidence the writer needs to find or include:\n\n- **Named statistics** with source and recency (data older than 2 years needs a flag)\n- **Customer proof points** (a quote, a result, a use case, even anonymized)\n- **Competitor or category context** (what are others in this space saying? where's the gap?)\n- **Expert POV** (an internal SME, a customer interview, a third-party analyst)\n\nThe brief should tell the writer which evidence is mandatory versus optional. \"Must include at least one customer example\" versus \"nice to have: analyst data on market size.\"\n\n---\n\n## Voice and tone: the brief's most-skipped section\n\nMost briefs skip this entirely, and then editors spend hours fixing tone after the fact. **Include three to five sentences that describe how this piece should sound**, not just \"professional\" or \"conversational.\"\n\nBetter: \"Write like a smart colleague explaining this over Slack. No jargon for jargon's sake. Short paragraphs. Use 'you' throughout. Assume the reader has tried the obvious stuff and it didn't work.\"\n\nIf you have a style guide, link it. If you don't, include one example of a piece that nails the voice you want.\n\n---\n\n## Structural outline: the skeleton, not the script\n\nThe outline section should give the writer a clear architecture without scripting every sentence. Think of it as the frame of a house: the writer knows where the rooms go, but they furnish them.\n\nA solid structure for a B2B SaaS informational piece:\n\n- **Hook:** The problem or tension that makes this reader care right now\n- **Context:** Why this matters, what's changed, or what most people get wrong\n- **Core content:** Three to five sections, each with a clear heading and one-line summary of the argument\n- **Proof:** Where the evidence lands (case study, stat, example)\n- **Close:** The specific takeaway or next step, not a generic \"in conclusion\"\n\nThe brief should also note the target word count range, the CTA (what do we want them to do after reading?), and any internal links to include.\n\n---\n\nWhich part of this is breaking down for you right now: the research and intent side, the writing and voice side, or getting writers to actually follow the brief?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": "Joel Klettke",
+      "url": "https://www.amazon.com/s?k=Punchy",
+      "page_number": 5,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/b2b-marketing-guide/",
+      "page_number": null,
+      "section_title": "**SEO**"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/best-b2b-saas-maketing-agencies-and-consultants-for-product-led-growth",
+      "page_number": null,
+      "section_title": "Key Takeaways"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/b2b-marketing-guide/",
+      "page_number": null,
+      "section_title": "How does content marketing help B2B?"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/b2b-marketing-guide/",
+      "page_number": null,
+      "section_title": "**Content Marketing**"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "Crafting a robust B2B messaging framework"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/understanding-your-sales-prospect-the-complexity-of-the-buyers-journey/",
+      "page_number": null,
+      "section_title": "Building B2B buyer personas"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "Both start with a persona"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "How to create a B2B messaging strategy: A step-by-step process"
+    }
+  ],
+  "usage": {
+    "inputTokens": 4124,
+    "outputTokens": 1103
+  }
+}

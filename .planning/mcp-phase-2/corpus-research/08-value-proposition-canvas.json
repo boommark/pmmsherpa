@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[QueryPlanner] Flash Lite responded in 1116ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["Strategyzer Value Proposition Canvas components customer profile value map","Hormozi Value Equation dream outcome likelihood time effort","Common Value Proposition Canvas failure modes features as gain creators pains not-having-product vague jobs"]
+[MultiQuery] 3 queries → 15 unique chunks → top 10 returned (1490ms)
+{
+  "query": "What is the Strategyzer Value Proposition Canvas — the 6 components on customer profile and value map sides? How does Hormozi's Value Equation (dream outcome, likelihood, time, effort) complement it? What are common failure modes — listing features as gain creators, conflating pains with not-having-the-product, vague jobs?",
+  "text": "## The Value Proposition Canvas: Both Sides\n\nThe canvas splits into two halves that have to fit together. Get the mapping wrong and you've built a beautiful internal document that doesn't connect to anything real.\n\n**Customer Profile (right side):** Three components.\n\n- **Jobs:** What the customer is trying to accomplish, functional, social, and emotional. \"Manage my team's projects\" is functional. \"Look competent in front of my CEO\" is social/emotional. Both drive decisions.\n- **Pains:** Frustrations, risks, and obstacles that get in the way of doing the job. Not the absence of your product. The actual friction that exists today.\n- **Gains:** Desired outcomes and benefits beyond just completing the job. Positive emotions, status, ambition. Critically, gains are not simply the opposite of pains.\n\n**Value Map (left side):** Three matching components.\n\n- **Products and Services:** What you're actually offering.\n- **Pain Relievers:** How your offering reduces specific pains. One-to-one mapping to the pains list.\n- **Gain Creators:** How your offering produces the gains customers want. Again, mapped explicitly to the gains list.\n\nFit happens when the left side maps to the right side. Draw the lines. Where there are no lines, you have gaps.\n\n---\n\n## How Hormozi's Value Equation Fills a Blind Spot\n\nThe canvas tells you *what* to map. The Value Equation tells you *how much* the mapping is worth to the buyer.\n\nFour variables determine perceived value:\n\n- **Dream Outcome:** The result the buyer actually wants (not the feature you ship)\n- **Perceived Likelihood of Achievement:** Will they believe it works? Do they trust you to deliver?\n- **Time to Result:** How long before they feel the win?\n- **Effort and Sacrifice:** What do they have to give up or endure to get there?\n\nThe equation: value goes up when outcome and likelihood go up. Value goes up when time and effort go down.\n\nHere's where it complements the canvas directly. The canvas identifies *which* gains matter. The Value Equation tells you *why some gains feel worth more than others*. Two products can map to the same gain, but if one delivers it in a week with no friction and the other takes six months of painful implementation, the buyer's perceived value is completely different. That's why \"reduces anxiety\" lands differently for a pill versus a meditation practice, same dream outcome, wildly different time and effort variables.\n\n---\n\n## The Three Failure Modes Worth Knowing\n\n**Listing features as gain creators.** \"Real-time dashboard\" is not a gain creator. \"You walk into the Monday standup already knowing what broke over the weekend\" is a gain creator. The test: can you draw a line from this item to a specific gain on the customer profile? If the line goes to a feature on your roadmap instead of an outcome in the customer's life, you've slipped into feature listing.\n\n**Conflating pains with not-having-the-product.** \"Lack of a unified platform\" is not a pain. That's a solution description in disguise. The real pain underneath it is something like \"I spend 45 minutes before every board meeting reconciling numbers from three different tools and I'm still not confident they're right.\" That's a pain. The distinction matters because if you define pains as the absence of your solution, you'll never surface the emotional and situational texture that makes messaging resonate.\n\n**Vague jobs.** \"Manage operations more efficiently\" is not a job. It's a category. The job needs to be specific enough that you can imagine watching someone do it. \"Prioritize which support tickets get escalated before the VP of Customer Success sees the queue\" is a job. Vague jobs produce vague value propositions. And vague value propositions get ignored.\n\n---\n\nThe question worth sitting with: on your customer profile, are your pains describing friction that exists *today in the world*, or are they describing a world where your product doesn't exist yet? Those are very different documents.",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Jobs+To+Be+Done+Playbook",
+      "page_number": 108,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 339,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Jobs+To+Be+Done+Playbook",
+      "page_number": 231,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Jobs+To+Be+Done+Playbook",
+      "page_number": 109,
+      "section_title": null
+    },
+    {
+      "source_type": "book_pm",
+      "author": null,
+      "url": null,
+      "page_number": 170,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Punchy",
+      "page_number": 23,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Jobs+To+Be+Done+Playbook",
+      "page_number": 107,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "podcast_pmm",
+      "author": "Product Marketing Alliance",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "Alex Hormozi",
+      "url": null,
+      "page_number": 70,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 4472,
+    "outputTokens": 910
+  }
+}

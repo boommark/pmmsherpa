@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[QueryPlanner] Flash Lite responded in 1058ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS objection handling framework and best practices","Structure and content of a sales objection handling document for B2B SaaS","Common failure modes in B2B SaaS objection handling and how to avoid them"]
+[MultiQuery] 3 queries → 14 unique chunks → top 10 returned (426ms)
+{
+  "query": "What's in a B2B SaaS objection handling doc? Common objections (too expensive, we already have X, not the right time, decision-maker isn't here, security concerns, integration concerns) and structured rebuttals using labeling, calibrated questions, social proof. How is it organized — by objection category, by stage of deal? Failure modes: defensive responses, agreeing too quickly, ignoring the real concern under the stated objection?",
+  "text": "## What Goes Into a Strong Objection Handling Doc\n\nThe best ones aren't organized by objection type. They're organized by **deal stage**, because the same objection means something completely different depending on when it surfaces.\n\n\"We already have X\" in a discovery call is a positioning challenge. \"We already have X\" in a final negotiation is a stall tactic. Same words, different intervention required.\n\n---\n\n## Structure That Actually Works\n\n**Stage-based organization as the primary axis**, with objection categories nested underneath:\n\n- **Early pipeline** (discovery, first demo): Mostly positioning and category objections. \"We do this with spreadsheets.\" \"Our current vendor handles this.\"\n- **Mid-funnel** (technical review, security review, procurement): Integration concerns, security/compliance, implementation risk. These are real blockers, not smoke.\n- **Late-stage** (negotiation, legal, final approval): Price, timing, missing decision-maker. These are often stalls. Treat them differently.\n\nWithin each objection, the doc needs four elements:\n\n1. **The stated objection** (verbatim, how buyers actually say it)\n2. **The real concern underneath** (what they're actually worried about)\n3. **The response sequence** (label, question, proof point)\n4. **The escalation path** (what to do if the rebuttal doesn't land)\n\n---\n\n## The Response Sequence Worth Using\n\nThe labeling-then-calibrated-question pattern is underused in most sales orgs. It sounds like this for a price objection:\n\n*\"It sounds like budget is a real constraint right now. What would it need to look like to make this work for your team?\"*\n\nThat sequence does three things: it acknowledges without agreeing, it invites the buyer to problem-solve with you, and it surfaces whether price is the real issue or a proxy for something else (lack of internal buy-in, competing priorities, fear of deployment failure).\n\n**Social proof belongs at the proof-point layer**, not the opening. Drop it after you've acknowledged the concern, not before. \"Three of our customers in your space had the same concern. Here's what their rollout looked like\" lands differently than leading with it defensively.\n\n---\n\n## The Failure Modes\n\nThe most common one isn't defensive responses. It's **answering the stated objection instead of the real one**.\n\n\"Your price is too high\" almost never means the money doesn't exist. It usually means: the value isn't clear yet, the internal champion doesn't have enough ammunition to justify it upstairs, or there's a competing priority eating the budget. A rebuttal that defends your pricing model misses all three.\n\nThe second failure mode: **agreeing too quickly to get past discomfort**. \"Totally understand, let me see what I can do on price\" teaches buyers that objections are a negotiating lever. The doc should explicitly flag which objections should never be immediately accommodated.\n\nThe third is structural: **the doc gets built once and never updated**. The best objection handling docs are living documents. They get updated after every significant deal, especially losses. The pattern from one of the better PMM practitioners worth knowing: build the first version collaboratively with sales and product, then update it live after customer calls. That version becomes canonical because it reflects what buyers actually say, not what we assume they say.\n\n---\n\n## The Security and Integration Objections Deserve Their Own Section\n\nThese two are different from the others because they're often **legitimate blockers, not stalls**. The response framework shifts from \"reframe and advance\" to \"diagnose and route.\"\n\nFor security: the doc should map your certifications, your security review process, and your standard timeline. Buyers overestimate how long security reviews take. Specificity on timeline (\"our security review typically takes three weeks with one stakeholder\") defuses anxiety better than any reassurance.\n\nFor integration: same principle. Name the integrations. Name the implementation timeline. The fear of deployment failure is one of the most common unspoken objections in B2B SaaS, and it rarely gets addressed directly.\n\n---\n\nThe question worth sitting with as you build this: which objections in your doc are actually positioning failures in disguise? If \"we already have X\" shows up constantly, that might mean your differentiation story isn't landing before the sales conversation starts.",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 129,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/sales-assets-choose-your-weapon/",
+      "page_number": null,
+      "section_title": "Handling objections"
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 127,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "Prevalent pitfalls"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/all-you-need-to-know-about-battlecards/",
+      "page_number": null,
+      "section_title": "Handling objections"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/what-marketers-can-learn-from-sales-conversations/",
+      "page_number": null,
+      "section_title": "Objections and objection handling"
+    },
+    {
+      "source_type": "blog",
+      "author": "Matt Heng",
+      "url": "https://www.productmarketingalliance.com/five-actionable-strategies-for-collaborating-more-effectively-with-sales-teams/",
+      "page_number": null,
+      "section_title": "Objection handling"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/the-role-of-non-technical-product-marketers-in-enabling-sales-teams/",
+      "page_number": null,
+      "section_title": "Real-life example"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "How to avoid B2B messaging mistakes"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "What about a B2B SaaS sales funnel?"
+    }
+  ],
+  "usage": {
+    "inputTokens": 2138,
+    "outputTokens": 967
+  }
+}

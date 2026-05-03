@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[QueryPlanner] Flash Lite responded in 1040ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS landing page structure and key elements","Best practices for B2B SaaS landing page copy and conversion optimization","Common mistakes and failure modes in B2B SaaS landing page design and copy"]
+[MultiQuery] 3 queries → 14 unique chunks → top 10 returned (461ms)
+{
+  "query": "B2B SaaS landing page copy structure — hero headline, value proposition, proof, CTA, conversion best practices, common landing page failure modes",
+  "text": "# The Anatomy of a B2B SaaS Landing Page That Actually Converts\n\nMost B2B SaaS landing pages fail the same way: they describe the product instead of solving the problem. The visitor lands, reads a headline about \"the leading AI-powered platform for X,\" and leaves. Not because the product is bad. Because the page never answered the question every visitor asks in the first three seconds: *what's in it for me?*\n\nHere's how to build a page that answers that question before they can ask it.\n\n---\n\n## The Hero: One Job, Three Seconds\n\nYour headline has one job. Make the visitor feel understood.\n\nThe strongest headlines lead with a specific, tangible outcome. Not \"Streamline your workflow\" but \"Close your books in two days, not two weeks.\" The difference is a picture the reader can see in their head. Specificity creates believability. Vague promises create skepticism.\n\n**The structure that works:**\n\n- **Headline:** The outcome they want (specific, benefit-first)\n- **Subheadline:** Who it's for and how it delivers that outcome\n- **Hero CTA:** One action, low commitment, above the fold\n\nThe subheadline is where most teams waste the opportunity. It becomes a feature list. Instead, use it to reduce the perceived leap. \"For finance teams at mid-market SaaS companies\" does more work than \"Our powerful suite of financial tools.\"\n\nOne more thing on the hero. Friction-reducing language belongs here, not buried in the footer. \"No credit card required\" or \"Free for 14 days\" removes the mental tax of commitment before the visitor has even scrolled. That one line can move conversion rates measurably.\n\n---\n\n## The Value Proposition: Map Benefits to Pain, Not Features to Specs\n\nBelow the hero, you have one goal: prove you understand the problem better than anyone else.\n\nThe pattern that works is contrast. Show the before state, then the after. \"Your team is spending 12 hours a week on manual reconciliation. Ours spend two.\" The contrast creates the value proposition without you having to assert it. The reader does the math themselves, and it lands harder.\n\n**Common failure mode here:** leading with three feature columns instead of three pain points. Your buyer doesn't wake up thinking about integrations. They wake up thinking about the problem those integrations solve. Start there.\n\n---\n\n## Proof: Specificity Over Volume\n\nOne highly specific testimonial beats five generic ones. \"We reduced churn by 23% in 90 days\" from a named VP at a recognizable company carries more weight than five stars and \"Great product!\"\n\n**What trust signals actually work above the fold:**\n\n- Customer logos from recognizable companies in the buyer's industry\n- Specific outcome metrics tied to real customers\n- User counts or growth signals (\"Trusted by 4,000+ finance teams\")\n\nThe logos serve a second purpose beyond trust. They signal who the product is *for*. If your target buyer sees three companies they recognize and respect, they self-identify. \"If it works for them, it works for me.\"\n\n---\n\n## The CTA: One Action, Always\n\nThe single most consistent conversion killer is choice. Two CTAs above the fold split attention and reduce both. Pick the action that moves the buyer to the next stage of *their* journey, not yours.\n\nFor most B2B SaaS, that's either a free trial or a demo request. The choice between them depends on your product's time-to-value. If a new user can reach an \"aha moment\" in under 30 minutes, free trial. If they need a guided walkthrough to see value, demo.\n\nWhatever you choose: one CTA, big, high contrast, repeated at the bottom of every major section.\n\n---\n\n## The Most Common Failure Modes\n\nThese show up constantly, even at well-funded companies:\n\n- **Generic headline:** \"The all-in-one platform for modern teams\" could describe 500 products\n- **Feature-first structure:** Leading with what the product does instead of what the buyer gets\n- **Proof without specificity:** Logos with no outcomes, testimonials with no numbers\n- **CTA friction:** \"Request a demo\" with a 10-field form underneath it\n- **Message mismatch:** The ad promised one thing, the landing page says something different. The visitor feels deceived and bounces before they read a word\n\nThat last one is underrated. Message continuity from ad to landing page to onboarding is a conversion lever most teams ignore entirely.\n\n---\n\nWhat's the primary action you want visitors to take? That answer shapes everything about which of these to prioritize first.",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": "Robert W. Bly",
+      "url": "https://www.amazon.com/s?k=The+Copywriters+Handbook",
+      "page_number": 240,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/b2b-ppc/",
+      "page_number": null,
+      "section_title": "**6. Landing Page Optimization for B2B Conversions**"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/6-seo-secrets-typeform",
+      "page_number": null,
+      "section_title": "Common SaaS SEO Mistakes to Avoid"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/a-beginners-guide-to-customer-acquisition/",
+      "page_number": null,
+      "section_title": "Landing Page Best Practices"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/blog-b2b-saas-copywriting-persuasion",
+      "page_number": null,
+      "section_title": "B2B SaaS Copywriting: The Art of Persuasion Above the Fold"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "SaaS conversion optimization is different — how?"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/blog-b2b-saas-copywriting-persuasion",
+      "page_number": null,
+      "section_title": "Key Takeaways"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "Prevalent pitfalls"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/b2b-customer-acquisition-strategy-guide",
+      "page_number": null,
+      "section_title": "Your step-by-step guide to a B2B customer acquisition strategy for your SaaS"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Mark Schaefer",
+      "url": "https://businessesgrow.com/2020/12/09/job-seeker-website/",
+      "page_number": null,
+      "section_title": "Common mistakes in the job seeker website"
+    }
+  ],
+  "usage": {
+    "inputTokens": 3307,
+    "outputTokens": 1035
+  }
+}

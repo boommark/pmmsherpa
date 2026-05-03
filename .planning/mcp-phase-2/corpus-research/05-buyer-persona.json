@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 1200ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B buyer persona frameworks for product marketing","Distinguishing B2B buyer roles: champion, decision-maker, end-user, economic buyer","Common pitfalls in B2B persona development: fictional details, demographic focus, neglecting jobs-to-be-done"]
+[MultiQuery] 3 queries → 16 unique chunks → top 10 returned (808ms)
+{
+  "query": "What makes a strong B2B buyer persona for product marketing? What's the difference between a champion, decision-maker, end-user, and economic buyer persona? What are the most common persona failure modes — fictional details, demographic-only, missing jobs-to-be-done?",
+  "text": "## The real job of a persona\n\nMost persona work fails before it starts because the team confuses a persona with a profile. A profile describes who someone is. A persona explains what they're trying to accomplish, what they're afraid of, and what would make them say yes. Demographic details (age, title, industry) are table stakes. The insight lives in the motivation layer.\n\nSo before getting into the taxonomy, the question worth sitting with: are you building personas to understand buyers, or to have a slide deck that looks like you understand buyers? The answer shapes everything.\n\n---\n\n## The four roles, and why only one really drives your deal\n\nIn most B2B purchases, four distinct roles show up. They're not always four different people, but they have four different jobs.\n\n- **The economic buyer** controls budget and has final approval. They care about business outcomes, risk, and ROI. They're often not in the room until late.\n- **The champion** is the person actually running the evaluation. They build the shortlist, run the demos, and make the recommendation. This is your most important persona by far.\n- **The end user** will live with the product daily. They can't approve the deal, but they can kill it. If they hate the product during a proof of concept, the champion looks bad.\n- **The technical evaluator** (IT, security, legal) doesn't pick winners, but they veto losers. Their job is to find reasons to say no.\n\nHere's the pattern that matters: **your positioning needs to win the champion.** Everyone else needs objection handling. The champion already understands the other stakeholders' concerns and is factoring them in when they evaluate you. You don't need five separate positioning statements. You need one position that resonates for the champion, plus clear answers to the objections each other role will raise.\n\n---\n\n## The three persona failure modes\n\n**Fictional detail inflation.** The persona has a name, a stock photo, a favorite podcast, and a weekend hobby. None of it connects to buying behavior. The team spent two hours debating whether \"Sarah\" drives a Subaru and zero hours on what makes her recommend a vendor to her CFO.\n\n**Demographic-only construction.** Title, company size, industry. This describes the account, not the person. Two VPs of Engineering at similar companies can have completely different buying triggers based on their team's current pain, their board's priorities, and what failure looks like for them personally.\n\n**Missing jobs-to-be-done.** This is the biggest one. A strong persona answers three questions: What is this person trying to accomplish in their role? What does success look like for them specifically? What are they afraid will go wrong? Without those answers, you're writing messaging that describes your product instead of messaging that speaks to their situation.\n\n---\n\n## What a strong champion persona actually contains\n\nThink about what a great sales rep knows about their best buyer. They know the trigger that made the person start looking. They know what the internal approval process looks like. They know which objections will come from IT and how the champion will pre-handle them. They know what \"safe choice\" means to this person.\n\nA strong persona captures exactly that:\n\n- The trigger event that starts the buying process\n- The criteria they use to build a shortlist\n- The internal objections they have to manage upward\n- What a win looks like for them personally (not just for the company)\n\nThe champion persona is the foundation. Get that right, and the objection handling for every other role becomes much more tractable.\n\nWhich role is most unclear in your current deal motion: the champion, or who the economic buyer actually is?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "Both start with a persona"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/account-based-marketing/",
+      "page_number": null,
+      "section_title": "Map 4–7 Key Roles Per Account"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/understanding-your-sales-prospect-the-complexity-of-the-buyers-journey/",
+      "page_number": null,
+      "section_title": "Building B2B buyer personas"
+    },
+    {
+      "source_type": "book_sales",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 66,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": null,
+      "page_number": 59,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/b2c-product-marketing-strategies-boost-growth/",
+      "page_number": null,
+      "section_title": "Develop detailed buyer personas"
+    },
+    {
+      "source_type": "blog",
+      "author": "Bryony Pearce",
+      "url": "https://www.productmarketingalliance.com/your-guide-to-personas/",
+      "page_number": null,
+      "section_title": "The difference between user and buyer personas"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "2. Go beyond your target audience"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/getting-your-fundamentals-right/",
+      "page_number": null,
+      "section_title": "2. Defining your ideal customer profile (ICP) and personas"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/thinking-about-a-product-marketing-role-in-health-tech-heres-what-you-need-to-know/",
+      "page_number": null,
+      "section_title": "Speak to the whole buying group – not just one stakeholder"
+    }
+  ],
+  "usage": {
+    "inputTokens": 3614,
+    "outputTokens": 796
+  }
+}

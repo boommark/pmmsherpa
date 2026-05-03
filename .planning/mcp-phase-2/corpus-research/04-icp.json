@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 2850ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["Define Ideal Customer Profile (ICP) for B2B SaaS, including firmographic, psychographic, and behavioral signals for identifying best-fit accounts.","Methods for excluding bad-fit customer segments in B2B SaaS.","Distinguish between TAM, SAM, SOM, and ICP, and explain the relationship between ICP and buyer persona in B2B SaaS."]
+[MultiQuery] 3 queries → 16 unique chunks → top 10 returned (1294ms)
+{
+  "query": "What defines an ICP for B2B SaaS? What firmographic, psychographic, and behavioral signals identify best-fit accounts? How do you exclude bad-fit segments? What's the difference between TAM, SAM, SOM, and ICP, and how does ICP relate to buyer persona?",
+  "text": "## The ICP Question Is Really Three Questions\n\nMost teams treat ICP as a targeting exercise. It's actually a prioritization philosophy. The difference matters because a targeting exercise gives you a list. A prioritization philosophy gives you a decision-making framework you can use every week, across messaging, roadmap, sales qualification, and content.\n\nSo let's work through the layers.\n\n---\n\n## Firmographic, Psychographic, and Behavioral Signals\n\n**Firmographics** are the easy part: industry vertical, company size (headcount and revenue), geography, tech stack, funding stage, growth trajectory. These are table stakes. Every ICP has them.\n\n**Psychographics** are where it gets interesting. What does this company believe? Are they early adopters or fast followers? Do they buy on ROI proof or strategic vision? Have they tried to solve this problem before and failed? That last one is a particularly strong signal. A company that has already invested in a category, experienced the pain of a bad solution, and is now actively searching again? That's a buyer with urgency, budget precedent, and organizational will. Much easier to close than someone you're convincing from scratch.\n\n**Behavioral signals** are the most predictive and the most underused. Think about: hiring patterns (are they growing the team that uses your product?), content consumption (are they reading about the problem you solve?), competitive displacement (did they just churn from a rival?), and product usage signals if you have a PLG motion. A company that's actively hiring data engineers while you sell a data pipeline tool isn't just a good fit. They're in-market.\n\n---\n\n## Excluding Bad-Fit Segments\n\nThis is the part most teams skip, and it's where real ICP discipline lives.\n\nBad-fit accounts share a pattern: they close slowly, ask for discounts, require heavy customization, generate support load disproportionate to their revenue, and never become references. The exercise worth doing is pulling your five worst customers and asking: what did they have in common? Then build explicit exclusion criteria.\n\nCommon exclusion signals in B2B SaaS: company too early (no budget, no process, no champion), company too large (your product becomes a rounding error in their stack), wrong buying motion (they need enterprise procurement cycles and you're PLG), or misaligned success metrics (they're measuring something your product doesn't move).\n\nThe best-fit customer buys quickly, doesn't ask for a discount, intuitively understands the value, and requests features you were already planning to build anyway. That last detail is the tell. When a customer's feature requests feel like product validation rather than scope creep, you've found your ICP.\n\n---\n\n## TAM, SAM, SOM, and ICP: The Funnel\n\nThese four concepts live at different altitudes, and conflating them is a common GTM mistake.\n\n- **TAM** (Total Addressable Market): everyone who could theoretically buy this category of solution\n- **SAM** (Serviceable Addressable Market): the slice of TAM you can realistically reach with your current go-to-market motion\n- **SOM** (Serviceable Obtainable Market): the slice of SAM you can realistically win given your current resources and competitive position\n- **ICP**: the accounts within SOM that generate the highest lifetime value, lowest acquisition cost, and strongest product-market fit\n\nICP isn't a market sizing concept. It's a quality filter. You use TAM/SAM/SOM to understand the opportunity. You use ICP to decide where to spend Monday morning.\n\n---\n\n## ICP vs. Buyer Persona\n\nThese two are often used interchangeably. They're not the same thing, and mixing them up creates real GTM confusion.\n\n**ICP is an account-level concept.** It describes the company: what kind of organization is most likely to succeed with your product, buy it, renew it, and expand it.\n\n**Buyer persona is a people-level concept.** It describes the humans inside that account: their role, their goals, their objections, their preferred information sources, and their decision-making authority.\n\nA single ICP account often has multiple buyer personas involved in the purchase. Think about a typical SaaS deal: the champion (usually a manager or director who feels the pain), the economic buyer (VP or C-suite who controls budget), and the blocker (IT or legal who can kill the deal). Same ICP account, three very different personas requiring three very different messages.\n\nThe practical implication: build your ICP first, then build personas for each of the key roles inside that ICP. Personas without an ICP anchor tend to become generic archetypes. ICP without personas leaves your sales team without the human intelligence they need to navigate the actual deal.\n\n---\n\nWhich signal type is giving you the most trouble right now: identifying the right firmographic filters, or figuring out how to operationalize behavioral signals in your actual pipeline?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog",
+      "author": "Samantha Rideout",
+      "url": "https://www.productmarketingalliance.com/6-steps-to-define-your-ideal-customer-profile-2/",
+      "page_number": null,
+      "section_title": "2. From TAM to ICP: The funnel approach"
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 291,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/b2b-marketing-guide/",
+      "page_number": null,
+      "section_title": "**Know Your Ideal Customer (ICP)**"
+    },
+    {
+      "source_type": "ama",
+      "author": "Sharon Markowitz",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/how-to-determine-your-ideal-customer-profile/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": null,
+      "page_number": 67,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/how-target-audience-icp-and-personas-guide-product-marketing-strategies/",
+      "page_number": null,
+      "section_title": "Layer 2: ICP – whoshouldbuy?"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/how-product-marketing-skills-can-future-proof-your-content-career/",
+      "page_number": null,
+      "section_title": "Develop your ideal customer profile"
+    },
+    {
+      "source_type": "blog",
+      "author": "Devon O'Rourke",
+      "url": "https://www.productmarketingalliance.com/how-to-build-an-effective-repeatable-go-to-market-process/",
+      "page_number": null,
+      "section_title": "Ideal customer profile and persona development"
+    },
+    {
+      "source_type": "podcast_pm",
+      "author": "Lenny Rachitsky",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 3993,
+    "outputTokens": 1098
+  }
+}

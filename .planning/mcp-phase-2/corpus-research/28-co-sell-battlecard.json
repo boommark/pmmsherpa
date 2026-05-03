@@ -1,0 +1,147 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 824ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["co-sell battlecard framework for B2B SaaS partnerships","elements of a successful joint value proposition for co-sell motions","common failure modes in co-sell battlecards for B2B SaaS"]
+[MultiQuery] 3 queries → 17 unique chunks → top 10 returned (1066ms)
+{
+  "query": "What's a co-sell battlecard for B2B SaaS partner GTM (e.g., AWS-with-Datadog, Salesforce-with-Slack)? Sections: joint customer profile, joint value prop / wedge, top competitors-of-the-joint-solution, talk track for partner reps, deal-reg / co-sell motion, escalation. Failure modes: solo-product battlecard reused for co-sell, no joint wedge, no partner economics, missing co-sell motion?",
+  "text": "# Co-Sell Battlecard: B2B SaaS Partner GTM\n\nA co-sell battlecard is a joint sales tool built for the *combined* motion, not either product alone. Its job: give a partner rep (AWS, Salesforce, whoever) everything they need to qualify, pitch, and progress a deal where your product and theirs win together. The failure modes you listed are real and common. This template is built to avoid all four.\n\n---\n\n## Joint Customer Profile\n\n**Who this deal is for (be ruthless here):**\n\n- Company size and cloud maturity where both products create compounding value\n- The buyer persona who owns *both* problems (e.g., VP Engineering who owns observability AND cloud spend)\n- The trigger event that makes both solutions urgent at once (migration, audit, scale event, M&A)\n\n**Negative profile:** Accounts where only one product fits. A co-sell motion on a bad-fit joint customer wastes both reps' time and poisons the partnership.\n\n---\n\n## Joint Value Prop / Wedge\n\nThis is where most co-sell cards break down. The wedge isn't \"Datadog monitors AWS infrastructure.\" That's a product description. The wedge is the outcome the customer *can't get* from either vendor alone.\n\n**Structure it this way:**\n\n> *\"[Customer type] running [scenario] on [Partner platform] can now [specific outcome] without [the painful tradeoff they've accepted until now].\"*\n\nThe joint value prop has to articulate what no alternative solution delivers. If your wedge is something a competitor can say with a different partner, it's not a wedge. It's a feature.\n\n**Test it:** Could the customer achieve this outcome by buying just your product? Just the partner's? If yes to either, sharpen the wedge.\n\n---\n\n## Top Competitors of the Joint Solution\n\nNot your competitors. Not the partner's competitors. The competitors of the *combined* motion.\n\nThree categories worth mapping:\n\n- **Integrated alternatives** (a single vendor who bundles what you two do together)\n- **DIY / build-it-yourself** (the customer's internal team + open source)\n- **Do nothing / delay** (often the real competitor in complex joint deals)\n\nFor each: one line on why the joint solution wins, one line on the honest risk. Partner reps lose credibility fast if they don't acknowledge the tradeoffs.\n\n---\n\n## Talk Track for Partner Reps\n\nWrite this for someone who knows their platform cold but knows your product at a 30% depth. Two modes:\n\n**Discovery (3 questions to qualify the joint opportunity):**\n\n1. \"Are you seeing [specific pain point] now that you're running at [scale threshold]?\"\n2. \"Who owns [the problem your product solves] on their team?\"\n3. \"Have they tried to solve this with [common DIY approach]?\"\n\n**Pitch (60-second co-sell narrative):**\n\nSet up the customer's world, name the specific gap the joint solution closes, land on the outcome. No product feature lists. The B2B buying decision at this level is collaborative across multiple stakeholders. The talk track has to work for the economic buyer, not just the technical evaluator.\n\n**One rule:** The partner rep should be able to say this without a slide deck in front of them.\n\n---\n\n## Deal-Reg / Co-Sell Motion\n\nThis is the section most battlecards skip entirely. It's also the section that determines whether the partnership generates revenue or just generates meetings.\n\n**Cover explicitly:**\n\n- How to register a co-sell opportunity (the actual system: ACE, Salesforce Partner Community, whatever the partner uses)\n- What qualifies a deal for co-sell vs. referral vs. resell\n- Timeline expectations: how fast does each side respond to a registered deal?\n- **Partner economics:** What does the partner rep's comp look like on a co-sell win? If they don't know how they get paid, they won't prioritize it. This is non-negotiable to include.\n- Rules of engagement: who owns the customer relationship, who leads the commercial conversation\n\nNo partner economics section means the battlecard dies in a drawer.\n\n---\n\n## Escalation\n\nTwo paths, clearly labeled:\n\n**Technical escalation:** When the customer has an integration question, a POC blocker, or a security review. Who do you call, what's the SLA, what do you need to bring to that call?\n\n**Commercial escalation:** When a deal is stuck, needs exec alignment, or has competitive pressure. Who are the named contacts on both sides? What's the threshold for pulling in field leadership?\n\nInclude actual names and Slack handles if the partnership is mature enough. \"Contact your partner manager\" is not an escalation path.\n\n---\n\n## The Four Failure Modes, Addressed\n\n| Failure Mode | What This Card Does Instead |\n|---|---|\n| Solo-product battlecard reused | Every section is joint-first. The wedge, the ICP, the competitors all require both products to be true |\n| No joint wedge | Dedicated section with a test to validate the wedge is genuinely joint |\n| No partner economics | Explicit comp and deal-reg mechanics in the co-sell motion section |\n| Missing co-sell motion | Full deal-reg workflow, rules of engagement, and escalation paths included |\n\n---\n\nThe hardest part of building this card isn't the content. It's getting both companies' PMM and partner teams to agree on the wedge before you write anything else. That alignment conversation is where the real GTM work happens. Which section is giving you the most friction right now?",
+  "intent": "deliverable",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog",
+      "author": "Jeff Foley",
+      "url": "https://www.productmarketingalliance.com/building-a-rock-solid-gtm-plan/",
+      "page_number": null,
+      "section_title": "The value proposition"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/sales-sells-but-whos-buying/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/your-ultimate-guide-to-creating-a-value-proposition/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/one-simple-rule-for-better-messaging/",
+      "page_number": null,
+      "section_title": "Value propositions: The big win"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/the-4-ps-of-marketing-and-the-marketing-mix/",
+      "page_number": null,
+      "section_title": "B2B marketing vs B2C applications"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "B2B vs. B2C dynamics"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "What about a B2B SaaS sales funnel?"
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 154,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "Prevalent pitfalls"
+    },
+    {
+      "source_type": "book_pm",
+      "author": "Richard Banfield",
+      "url": "https://www.amazon.com/s?k=Product+Leadership+How+Top+Product+Managers+Launch+Awesome+Products+and+Build+Successful+Teams+Richard+Banfield",
+      "page_number": null,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 2545,
+    "outputTokens": 1262
+  }
+}
+es-what-you-need-to-know/",
+      "page_number": null,
+      "section_title": "Ways to move a deal forward"
+    },
+    {
+      "source_type": "book",
+      "author": "Joel Klettke",
+      "url": "https://www.amazon.com/s?k=Punchy",
+      "page_number": 70,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/the-4-ps-of-marketing-and-the-marketing-mix/",
+      "page_number": null,
+      "section_title": "B2B marketing vs B2C applications"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "B2B vs. B2C dynamics"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/b2c-marketing-guide/",
+      "page_number": null,
+      "section_title": "**2. Develop Compelling Value Propositions**"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "What about a B2B SaaS sales funnel?"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/simplifying-product-exploration-with-interactive-demos/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Jim Kalbach",
+      "url": "https://www.amazon.com/s?k=The+Jobs+To+Be+Done+Playbook",
+      "page_number": 110,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 2779,
+    "outputTokens": 1704
+  }
+}

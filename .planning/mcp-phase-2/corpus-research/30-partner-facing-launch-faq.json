@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[QueryPlanner] Flash Lite responded in 1454ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["Frameworks for developing partner enablement FAQs for product launches","Common questions partner sales teams ask about new product launches and GTM strategies","Strategies for addressing channel conflict concerns during product launches from a partner perspective"]
+[MultiQuery] 3 queries → 18 unique chunks → top 10 returned (639ms)
+{
+  "query": "What questions do partner reps ask at launch? Partner enablement FAQ structure, channel conflict questions, deal registration questions",
+  "text": "Partner reps live in a different world than your direct sales team. They're juggling multiple vendor lines, their commission structure is different from yours, and their first question at any launch isn't \"what does this do?\" It's \"what's in it for me, and how do I avoid getting burned?\"\n\nHere's the FAQ structure that actually covers what they ask.\n\n---\n\n## \"What's in it for me?\" (The WIIFM Block)\n\nThese come first because if you don't answer them, nothing else lands.\n\n- **What's my margin/commission on this, and how does it compare to your other products?**\n- **Is there a launch incentive, SPIFF, or co-op marketing fund attached to this?**\n- **Will you invest in joint demand gen, or am I expected to self-fund pipeline?**\n- **What's the partner tier requirement to sell this? Do I qualify today?**\n\nThe honest version of this block: partners are small businesses. They allocate selling time the way you allocate budget. If the economics aren't clear in the first five minutes of your enablement session, they mentally move on.\n\n---\n\n## \"How do I sell it?\" (The Readiness Block)\n\n- **Who's the ideal customer profile, and how do I identify them in my existing book?**\n- **What's the elevator pitch I can use with a prospect who's never heard of you?**\n- **What objections will I hit, and what do I say?**\n- **Is there a demo environment I can access without calling your SE team?**\n- **What proof points exist? Do you have a customer I can reference in my region or vertical?**\n\nThe localization question matters more than most PMMs expect. A partner selling into German retail doesn't want a case study from a US fintech. Build at least one regionally relevant proof point before launch if you can.\n\n---\n\n## Channel Conflict (The \"Will I Get Burned?\" Block)\n\nThis is where trust lives or dies.\n\n- **If my customer is already in your CRM, what happens when I register the deal?**\n- **What's your direct team's territory? Where does it overlap with mine?**\n- **If your AE is already talking to my prospect, who owns the deal?**\n- **What happens if I bring you a net-new logo and you later assign a direct rep to that account?**\n\nThe underlying fear: \"I'll do the work, you'll take the credit.\" Address this directly in your enablement, not buried in a partner portal PDF. Name the conflict scenario, explain the resolution process, and tell them who to call when it happens. Ambiguity here kills partner engagement faster than anything else.\n\n---\n\n## Deal Registration (The \"How Do I Protect Myself?\" Block)\n\n- **How do I register a deal, and how long does approval take?**\n- **What's the registration window? How long is protection valid?**\n- **What happens if I register a deal and the customer goes direct?**\n- **Is there a discount differential for registered vs. unregistered deals?**\n- **Can I register an early-stage opportunity, or does the customer need to be actively evaluating?**\n\nOne pattern worth building into your materials: a simple flowchart showing the deal registration lifecycle from submission to approval to expiration. Partners ask these questions because the process is opaque. A one-page visual eliminates 80% of the confusion.\n\n---\n\n## Post-Sale (The \"What Happens After I Close?\" Block)\n\n- **Who handles implementation, me or you?**\n- **If the customer has a support issue, do they call me or your support team?**\n- **How do I get credit for renewals and expansions?**\n- **Is there a customer success resource assigned, or is that on me?**\n\nWhich of these blocks is most underdeveloped in your current partner materials?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "podcast_pmm",
+      "author": "Product Marketing Alliance",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Amanda Groves",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/how-to-lead-a-cross-functional-product-go-to-market-strategy/",
+      "page_number": null,
+      "section_title": "Hold enablement sessions with customer-facing teams"
+    },
+    {
+      "source_type": "ama",
+      "author": "Shana Iles",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Andrew Kaplan",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Janani Nagarajan",
+      "url": "https://www.productmarketingalliance.com/accelerating-your-routes-to-market/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Jesse Lopez",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "April Rassa",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Sharon Markowitz",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Stephanie Kelman",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 5614,
+    "outputTokens": 865
+  }
+}

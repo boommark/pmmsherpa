@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[QueryPlanner] Flash Lite responded in 822ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS demo script structure best practices","Integrating product demos into a sales pitch framework","Common pitfalls and failure modes in B2B SaaS demos"]
+[MultiQuery] 3 queries → 17 unique chunks → top 10 returned (464ms)
+{
+  "query": "What's the structure of a strong B2B SaaS demo script? Big Bang Opening, Macro-to-Micro, Tell-Show-Tell, the seven sins (the doc dump, demoing every feature, no narrative, no business outcome, no audience customization, no verbal callouts, ending with 'any questions?'). How does the demo fit inside a sales pitch — proof step, not a feature tour. Failure modes: feature-list demos, no business outcome, no story?",
+  "text": "## The Demo Has One Job\n\nShow the buyer that the future state is real. Not possible, not theoretically achievable with enough configuration. Real, and specifically real for them. Everything else is noise.\n\nSo before you touch structure, get that straight. The demo is proof, not presentation. It lives inside the pitch as the moment where your narrative stops being words and becomes evidence.\n\n---\n\n## Where the Demo Lives in the Pitch\n\nThe sales pitch has a shape: **Insight, Problem, Solution, Differentiated Value, Proof, The Ask.** The demo belongs at the Differentiated Value / Proof step, not at the beginning. Most teams get this wrong by opening with \"let me show you the product.\" That's backwards.\n\nYou earn the demo. You earn it by first getting the buyer to say, out loud, \"yes, that's my problem.\" Then the demo doesn't explain your product. It confirms your solution.\n\nThink about what happens when you skip the setup and jump straight to screen-sharing. The buyer has no frame. Every feature looks like a feature. Nothing lands as a solution because they haven't articulated the problem yet.\n\n---\n\n## The Structure That Works\n\n**Big Bang Opening.** Start with the moment of maximum impact. Not the login screen. Not \"so here's the dashboard.\" The single thing that would make a skeptical buyer lean forward. You have maybe 90 seconds before attention starts drifting. Use them.\n\n**Macro-to-Micro.** Show the route to the result first, the fewest possible clicks. Prove it works. Then, as the buyer asks questions, peel back layers. The senior stakeholder in the room often only needs the macro view to be convinced. Don't make them sit through micro detail they didn't ask for.\n\n**Tell-Show-Tell.** Set up what you're about to show (\"here's the problem this solves\"), show it, then call out what just happened (\"notice that the system did X automatically, which is what normally takes your team three days\"). The verbal callout is where most reps fail. They show something powerful and then just... move on. The callout makes the value explicit.\n\n---\n\n## The Seven Failure Modes\n\n- **The doc dump.** Sharing everything because you're not sure what matters to this buyer\n- **Demoing every feature.** Completeness theater. Exhausts the buyer and buries your best capabilities\n- **No narrative.** A feature tour with no story. The buyer can't see themselves in it\n- **No business outcome.** Showing what the product does, not what changes for the buyer's world\n- **No audience customization.** The same demo for the CFO and the ops manager. They care about completely different things\n- **No verbal callouts.** Showing something powerful, then just clicking to the next screen\n- **Ending with \"any questions?\"** Passive close. You've just handed control to silence\n\n---\n\n## The Storytelling Formula That Fixes Most of This\n\nReal-world problem, spoken out loud. Social proof from someone who looks like this buyer. Then show exactly how they solved it. When a cybersecurity team ran this formula across their demo library, demo-to-close rates jumped 25% in three months. The reps stopped dumping features and started narrating outcomes. Confidence went up. Deal velocity followed.\n\nThe formula works because it answers the question every buyer is silently asking: **\"Has someone like me done this before, and did it actually work?\"**\n\n---\n\n## The Deeper Principle\n\nBuyers don't buy products. They buy a version of the future where their problem is gone. The demo's job is to make that future visible, specific, and credible.\n\nSo the question worth sitting with: in your current demo, at what moment does the buyer stop watching a product and start seeing their own life?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": "Steli Efti",
+      "url": "https://www.amazon.com/s?k=Product+Demos+that+Sell",
+      "page_number": 33,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 31,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 78,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/how-to-improve-sales-team-training-sessions/",
+      "page_number": null,
+      "section_title": "Tips for hosting live demos"
+    },
+    {
+      "source_type": "blog",
+      "author": "Michael Robin Hansen",
+      "url": "https://www.productmarketingalliance.com/scripted-demos-are-killing-your-deals-heres-how-to-do-better/",
+      "page_number": null,
+      "section_title": "Build a storytelling framework"
+    },
+    {
+      "source_type": "blog",
+      "author": "Michael Robin Hansen",
+      "url": "https://www.productmarketingalliance.com/scripted-demos-are-killing-your-deals-heres-how-to-do-better/",
+      "page_number": null,
+      "section_title": "How to keep demos structured yet authentic"
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 116,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Maja Voje",
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 291,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 129,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/state-of-b2b-saas-2025-report",
+      "page_number": null,
+      "section_title": "3. The Self-Service Gap"
+    }
+  ],
+  "usage": {
+    "inputTokens": 3542,
+    "outputTokens": 848
+  }
+}

@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 965ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["elements of a B2B SaaS sales battlecard structure and content","best practices for sales battlecard format and delivery (PDF vs. dynamic)","common failure modes and pitfalls in sales battlecard creation and usage"]
+[MultiQuery] 3 queries → 13 unique chunks → top 10 returned (453ms)
+{
+  "query": "What's in a strong B2B SaaS sales battlecard? Per-competitor sections: their pitch, their strengths, their weaknesses, our wedge / how-we-win, traps to avoid, landmines / objection-handling, customer-proof / case-evidence, do-not-say list. Format: one page or two? Standalone PDF vs. Klue/Crayon dynamic? What are the failure modes — feature-comparison soup, attacking competitor not differentiating ours, stale info, leaking to competitor?",
+  "text": "You've mapped the anatomy pretty well already. Let me pressure-test the structure and add the failure mode thinking, because that's where most battlecards die.\n\n## The Sections That Actually Matter\n\nYour list is solid. A few calibrations on what earns its weight:\n\n**Their pitch (verbatim):** Start with the competitor's own words. \"AI-powered revenue intelligence\" or whatever they're saying on their homepage this quarter. Reps need to recognize the pitch when they hear it, not a paraphrase.\n\n**Strengths and how to defend:** This section gets skipped or softened. Don't let it. Reps who know where the competitor is genuinely strong handle those moments better than reps who are blindsided.\n\n**Trap-setting questions:** The most underrated section. These aren't objection handlers. They're questions the rep asks the *prospect* to seed doubt before the competitor even comes up. \"How does your current vendor handle X when Y happens?\" The prospect answers their own objection.\n\n**Do-not-say list:** Underused and powerful. \"Don't call them legacy.\" \"Don't bring up the acquisition.\" Gives reps guardrails without a lecture.\n\n**Customer proof:** One or two specific wins, with the deal context. \"Replaced Competitor X at a 400-person fintech, after a bake-off, on price and implementation speed.\" Specificity is everything here.\n\n---\n\n## One Page or Two\n\nOne page. Always. The battlecard that lives in a drawer because it's three pages helped nobody.\n\nThe constraint forces the right editorial decisions. If you can't fit it on one page (or one clean screen in Klue/Crayon), you haven't finished editing. Think of it like designing on a 5x7 notecard: the format itself is the discipline.\n\n---\n\n## Standalone PDF vs. Dynamic Platform\n\nThis is a real tradeoff. PDFs are shareable, printable, and easy to produce. They're also instantly stale. A competitor rebrands, drops pricing, or gets acquired, and your PDF is now a liability.\n\nDynamic platforms (Klue, Crayon, Battlecard.io) solve the staleness problem and add usage analytics: which cards are getting pulled, which competitors are coming up most in deals. That data feeds your next iteration.\n\nThe practical answer: **if your competitive landscape moves fast, the platform pays for itself.** If you have three stable competitors and a small sales team, a well-maintained PDF with a quarterly refresh cadence is fine. Don't buy infrastructure for a problem you don't have.\n\n---\n\n## The Failure Modes Worth Worrying About\n\n**Feature-comparison soup.** The most common failure. A table of checkmarks that shows you have 47 features and they have 43 is not a battlecard. It's a spreadsheet with a logo on it. Reps can't use it in a live call, and it invites the buyer to start scoring you on criteria you didn't choose.\n\n**Attacking the competitor instead of differentiating you.** There's a version of competitive selling that's basically \"here's why they're bad.\" That's not a position. Your rep should be able to finish the call with the buyer feeling excited about *you*, not just skeptical about them. The wedge should always point back to your value.\n\n**Stale information.** A battlecard with last year's pricing or a feature the competitor shipped six months ago is worse than no battlecard. It signals to the buyer that your rep isn't current. Build a refresh trigger: competitor pricing page changes, new G2 reviews, any major announcement. The platforms automate this. PDFs require discipline.\n\n**Leaking to the competitor.** It happens. Reps share decks, prospects forward things, people change jobs. The mitigation isn't paranoia, it's calibration: don't put anything in a battlecard you wouldn't want the competitor to see. Trap-setting questions are fine. Specific internal win/loss data with customer names? Keep that in a separate internal document.\n\n---\n\nThe question worth sitting with before you build: which failure mode is your current sales team most at risk for? That tells you where to put the editorial energy first.",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/use-battlecards-to-increase-sales-performance-and-lead-conversion/",
+      "page_number": null,
+      "section_title": "What makes an effective battlecard?"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/all-you-need-to-know-about-battlecards/",
+      "page_number": null,
+      "section_title": "Tips for creating sales battlecards"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/use-battlecards-to-increase-sales-performance-and-lead-conversion/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/all-you-need-to-know-about-battlecards/",
+      "page_number": null,
+      "section_title": "What to include in a sales battlecard"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/use-battlecards-to-increase-sales-performance-and-lead-conversion/",
+      "page_number": null,
+      "section_title": "Using battlecards in the sales process"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/sales-assets-choose-your-weapon/",
+      "page_number": null,
+      "section_title": "What is a battlecard?"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/all-you-need-to-know-about-battlecards/",
+      "page_number": null,
+      "section_title": "What is a battlecard?"
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Punchy",
+      "page_number": 70,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "What about a B2B SaaS sales funnel?"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/b2b-customer-acquisition-strategy-guide",
+      "page_number": null,
+      "section_title": "Your step-by-step guide to a B2B customer acquisition strategy for your SaaS"
+    }
+  ],
+  "usage": {
+    "inputTokens": 2785,
+    "outputTokens": 940
+  }
+}

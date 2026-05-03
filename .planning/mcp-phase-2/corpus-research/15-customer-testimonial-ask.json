@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 991ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS testimonial request email structure and best practices","Tactics for securing customer testimonials in B2B SaaS","Common pitfalls and failure modes when requesting customer testimonials"]
+[MultiQuery] 3 queries → 16 unique chunks → top 10 returned (580ms)
+{
+  "query": "How do you ask a B2B SaaS customer for a testimonial or quote? Email/Slack/in-person ask structure: relationship-grounded opening, specific business outcome, what you'll use it for, time commitment, easy-yes pre-drafted quote option, gratitude. What are the failure modes — generic asks, too-long emails, no draft for them to react to, asking too soon in the relationship?",
+  "text": "## The ask that actually works\n\nMost testimonial requests fail before the customer even finishes reading them. The failure isn't the relationship or the product. It's the ask itself: generic, effortful, and timed wrong.\n\nHere's the structure that works, whether you're sending an email, a Slack message, or setting up a 10-minute call.\n\n---\n\n## The anatomy of a good ask\n\n**Lead with their specific outcome, not your need.** \"You mentioned on our last call that you cut reporting time by 40%\" lands differently than \"We're building out our customer story library.\" One is about them. The other is about you.\n\n**Be explicit about what you'll use it for.** \"A short quote for our sales deck and website\" sets expectations. Customers get nervous when they don't know where their words will end up.\n\n**Name the time commitment.** \"Five minutes, max\" is a green light. Vague requests feel like a trap.\n\n**Pre-draft the quote for them.** This is the single highest-leverage move in the whole process. Something like: \"Here's a starting point you can edit however you'd like: *'[Company] helped us reduce X by Y, which meant Z for our team.'*\" Most customers will accept it with minor tweaks. You've done the hard work. They just approve it.\n\n**Close with a simple yes/no.** \"Does that work?\" or \"Happy to adjust the draft if it doesn't quite fit.\" Easy exit, low pressure.\n\n---\n\n## The failure modes worth knowing\n\n**Generic asks.** \"Would you be willing to share a testimonial?\" The customer has no idea what to say, so they say nothing or punt it forever.\n\n**Too long.** If the email takes more than 45 seconds to read, you've already lost them. Cut everything that doesn't serve the ask.\n\n**No draft.** Asking someone to write from scratch is asking for a favor that feels like work. A pre-drafted quote flips the cognitive load entirely.\n\n**Asking too soon.** The right moment is right after a specific win, not at a quarterly check-in or renewal call. When they've just told you something worked, that's the window. It closes fast.\n\n**Asking the wrong person.** The champion loves you. But the quote needs to come from someone with a title that resonates with your buyer. Think about who your prospect will actually recognize and respect.\n\n---\n\n## The timing question\n\nSocial proof earns its weight when it comes from people who look like your buyer, not just people who like your product. A quote from a VP of Finance at a 200-person SaaS company hits differently than a glowing review from someone your prospect can't map themselves onto.\n\nWhich customer outcome, right now, would make your ideal prospect say \"that's exactly my problem\"? Start there.",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog",
+      "author": "Diana Morris",
+      "url": "https://www.productmarketingalliance.com/how-to-use-storytelling-to-connect-with-b2b-clients-and-build-brand-loyalty/",
+      "page_number": null,
+      "section_title": "2. Use customer testimonials"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/all-you-need-to-know-about-battlecards/",
+      "page_number": null,
+      "section_title": "Third-party validation"
+    },
+    {
+      "source_type": "blog",
+      "author": "Aratrika Rath",
+      "url": "https://www.productmarketingalliance.com/6-best-practices-for-creating-engaging-case-studies/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/how-brand-messaging-changes-b2c-b2b/",
+      "page_number": null,
+      "section_title": "B2B example: Salesforce"
+    },
+    {
+      "source_type": "book_pm",
+      "author": null,
+      "url": null,
+      "page_number": 291,
+      "section_title": null
+    },
+    {
+      "source_type": "podcast_pmm",
+      "author": "Product Marketing Alliance",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Sonduren Fanarredha",
+      "url": "https://www.productmarketingalliance.com/turn-product-marketing-into-a-strategic-and-competitive-powerhouse/",
+      "page_number": null,
+      "section_title": "Earning validation through reviews"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/b2b-customer-acquisition-strategy-guide",
+      "page_number": null,
+      "section_title": "Your step-by-step guide to a B2B customer acquisition strategy for your SaaS"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/how-brand-messaging-changes-b2c-b2b/",
+      "page_number": null,
+      "section_title": "B2B example: HubSpot"
+    },
+    {
+      "source_type": "blog",
+      "author": "Asya Bashina",
+      "url": "https://www.productmarketingalliance.com/what-is-a-case-study/",
+      "page_number": null,
+      "section_title": "Tips for startups to get case studies"
+    }
+  ],
+  "usage": {
+    "inputTokens": 2635,
+    "outputTokens": 630
+  }
+}

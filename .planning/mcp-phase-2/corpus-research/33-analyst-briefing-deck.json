@@ -1,0 +1,89 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[QueryPlanner] Flash Lite responded in 1629ms
+[QueryPlanner] Generated 3 RAG queries, web research: YES, web search: NO
+[QueryPlanner] Queries: ["Analyst briefing deck structure for Gartner and Forrester","Best practices for category positioning in industry analyst briefings","Strategies to influence Gartner Magic Quadrant and Forrester Wave evaluations"]
+[QueryPlanner] Perplexity query: "Gartner Forrester analyst briefing best practices deck structure category positioning Magic Quadrant Wave influence"
+[MultiQuery] 3 queries → 15 unique chunks → top 10 returned (887ms)
+{
+  "query": "Analyst briefing deck structure for industry analysts Gartner Forrester — vendor briefing format, category positioning for analysts, Magic Quadrant influence",
+  "text": "## What analysts actually need from you\n\nHere's the tension most vendors don't resolve: analysts have talked to your top five competitors this month. They're not looking for your story. They're looking for evidence that contradicts or confirms the mental model they've already built about your category. Your briefing deck is a correction opportunity, not a presentation.\n\nThat reframe changes everything about how you structure the content.\n\n---\n\n## The three briefing types, and why they're different\n\n**Quarterly business update.** This is relationship maintenance. Lead with momentum: revenue growth, NRR, customer count above a meaningful ARR threshold. Analysts will estimate these numbers anyway based on market signals. Give them the real ones under NDA, or they'll publish the wrong story. Follow with two or three competitive wins: who you displaced, what the incumbent was, why the buyer chose you. Close with a focused roadmap preview.\n\n**Product update briefing.** Use this before a major launch to get analyst reactions before you go public, and occasionally to bring new analysts up to speed on your full offering. Structure it around use cases and customer outcomes, not feature lists. If you have beta customers with early results, lead with them. Analysts quote proof points in their research. Give them quotable ones.\n\n**Evaluation briefing (MQ, Wave, MarketScape).** This is the one that most vendors get wrong. The evaluation criteria exist before you walk in. Your job is to make it effortless for the analyst to check their boxes. Title each slide with the exact agenda item from their evaluation guide. They have a checklist. Leave breadcrumbs. The vendors who stray from the requested structure almost always run out of time and miss critical criteria.\n\n---\n\n## What anchors every briefing, regardless of type\n\nTwo things analysts are always looking for:\n\n**Differentiation with proof.** Not \"we're the only platform that does X.\" That's a claim. What they want is: \"We're the only platform that does X, and here are three customers who used it to achieve Y result.\" The proof point is what moves from their notes into their published research.\n\n**Category clarity.** If there's no Wave or MQ for your space yet, you have more influence than you think. The pattern that works is to define the problem before you define your solution. Teach the analyst how to measure value in your category, introduce evaluation criteria that incumbents weren't built to satisfy, and you shift from competing in their mental model to shaping it. Drift did this with conversational marketing. Gainsight did it with customer success platforms. The category definition is the position.\n\n---\n\n## A structural note on narrative coherence\n\nEvery slide in your deck should connect back to a single positioning spine: what you are, who you serve, what you uniquely solve, and why now. Analysts talk to many vendors. The ones who remember you are the ones whose story had a clear through-line, not the ones with the most features on a comparison slide.\n\nOne practical test: read just your slide titles in sequence. Do they tell a coherent story? If they read like a table of contents for a product manual, rebuild the narrative layer before you add any content.\n\n---\n\nWhat type of briefing are you preparing, and do you have a specific evaluation (MQ, Wave, or other) in scope? That'll shape which of these angles is most worth developing further.",
+  "intent": "deliverable",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "ama",
+      "author": "Jackie Palmer",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/product-marketing-strategies-for-analyst-relations-2/",
+      "page_number": null,
+      "section_title": "The Gartner Magic Quadrant"
+    },
+    {
+      "source_type": "ama",
+      "author": "Michele Nieberding",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Michele Nieberding",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Elizabeth Grossenbacher",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "April Rassa",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Sam Melnick",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Raymond Hwang",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Jackie Palmer",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/what-is-analyst-relations-best-practices-and-key-metrics/",
+      "page_number": null,
+      "section_title": "The components of a good analyst briefing deck"
+    }
+  ],
+  "usage": {
+    "inputTokens": 5468,
+    "outputTokens": 737
+  }
+}

@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[QueryPlanner] Flash Lite responded in 952ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["structure of executive keynote vision category creation talk","story spine framework for executive presentations","common failure modes executive keynotes vision talks"]
+[MultiQuery] 3 queries → 18 unique chunks → top 10 returned (632ms)
+{
+  "query": "What's the structure of an executive keynote (CEO/CMO at a conference, customer event, all-hands)? It's a vision/category-creation talk, not a product pitch. Big Idea, story spine, market shift, audience-as-hero, S.T.A.R. moment, single CTA. Time: 18-30 min typically. Failure modes: feature-pitching disguised as keynote, exec-as-hero, multiple Big Ideas, weak opening, no rehearsal?",
+  "text": "## The Shape of a Vision Keynote\n\nThe best category-creation talks share a specific contour. Not a list of topics. A shape. It builds, it peaks, it lands. Here's what that looks like across 18-30 minutes.\n\n---\n\n## The Story Spine (in order)\n\n**1. The World Has Changed (3-5 min)**\nOpen with the market shift, not your company. Something undeniable is happening in the world. Name it. Make the audience nod before you've asked anything of them. \"Seven years ago, X was the only option. Today, that assumption is breaking.\" You're not the protagonist here. The shift is.\n\n**2. The Old Way Is Broken (2-3 min)**\nShow the cost of staying put. This is where you earn emotional buy-in. The from/to journey starts here: name what people are doing now, then name the pain they're absorbing because of it. Be specific. A customer story works better than a stat.\n\n**3. Introduce the New Category (3-5 min)**\nNot your product. The new way of thinking. The thing that didn't have a name before you named it. \"We call this X.\" The category exists whether your company does or not. You're just the one who saw it first. This is the Big Idea: one sentence, plain language, memorable.\n\n**4. The Audience as Hero (2-3 min)**\nHere's the turn most executives miss. The audience isn't watching your journey. They're deciding whether to take their own. Reframe: \"The companies who navigate this shift will define the next decade. That's you. That's why you're in this room.\" Hand them the protagonist role explicitly.\n\n**5. The S.T.A.R. Moment (3-5 min)**\nSomething They'll Always Remember. One demo, one customer story, one visual, one number so specific it sticks. Not a feature list. One thing. Salesforce used a \"no software\" logo. Apple used a pocket. Pick yours and protect it. Everything else in the talk is setup for this moment.\n\n**6. The Vision (3-5 min)**\nPaint the world once the category matures. Not your roadmap. The destination. What does a company look like in five years if they made this shift? What does the industry look like? Make it vivid enough that the audience can picture themselves in it.\n\n**7. Single CTA (1-2 min)**\nOne ask. Not five. Not \"visit our booth, download our report, talk to your AE, sign up for beta, follow us on LinkedIn.\" One. The CTA should feel like the natural next step in the journey you just described, not a commercial stapled to the end.\n\n---\n\n## The Failure Modes (and why they're so common)\n\n**Feature-pitching disguised as keynote.** This happens when product owns the slide deck. Every \"vision\" slide drifts back to capabilities. The fix: write the narrative first, in prose, before a single slide exists. If the written narrative holds together without product mentions, the talk is probably a vision talk.\n\n**Exec-as-hero.** \"We built this. We saw the future. We solved it.\" The audience stops listening. They're not in the story. The structural fix is to introduce the market shift before you introduce the company. The shift is the inciting incident, not your founding moment.\n\n**Multiple Big Ideas.** Three category claims in one talk means zero category claims land. One talk, one idea. The test: can someone who attended summarize your Big Idea in one sentence the next morning? If not, you had too many.\n\n**Weak opening.** The most common opener is \"Thank you for being here, I'm excited to share...\" That's thirty seconds of lost trust. Open with the market shift. First sentence, no warm-up. The audience decides in sixty seconds whether this is worth their attention.\n\n**No rehearsal.** Vision talks live and die on delivery. The written narrative technique matters here: write the full talk in prose first, iterate until it's logical and emotionally coherent, then build slides from it. The talk should work without the slides. If it doesn't, the structure isn't there yet.\n\n---\n\n## The One Thing That Separates Good from Great\n\nThe best vision keynotes don't sell a product. They sell a belief. The audience leaves thinking \"the world is changing and I need to be on the right side of it.\" Your company is the guide. The audience is the hero. The category is the destination.\n\nWhich part of this structure is giving you the most trouble right now?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book_presentations",
+      "author": "Nancy Duarte",
+      "url": "https://www.amazon.com/s?k=Resonate+Nancy+Duarte",
+      "page_number": 113,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Al Ramadan, Dave Peterson, Christopher Lochhead, Kevin Maney",
+      "url": "https://www.amazon.com/s?k=Play+Bigger",
+      "page_number": 86,
+      "section_title": null
+    },
+    {
+      "source_type": "book_pm",
+      "author": "Marty Cagan",
+      "url": "https://www.amazon.com/s?k=Empowered+Marty+Cagan",
+      "page_number": 82,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Al Ramadan, Dave Peterson, Christopher Lochhead, Kevin Maney",
+      "url": "https://www.amazon.com/s?k=Play+Bigger",
+      "page_number": 118,
+      "section_title": null
+    },
+    {
+      "source_type": "book_presentations",
+      "author": "Nancy Duarte",
+      "url": "https://www.amazon.com/s?k=Resonate+Nancy+Duarte",
+      "page_number": 17,
+      "section_title": null
+    },
+    {
+      "source_type": "book_presentations",
+      "author": "Nancy Duarte",
+      "url": "https://www.amazon.com/s?k=Resonate+Nancy+Duarte",
+      "page_number": 114,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Al Ramadan, Dave Peterson, Christopher Lochhead, Kevin Maney",
+      "url": "https://www.amazon.com/s?k=Play+Bigger",
+      "page_number": 88,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Al Ramadan, Dave Peterson, Christopher Lochhead, Kevin Maney",
+      "url": "https://www.amazon.com/s?k=Play+Bigger",
+      "page_number": 87,
+      "section_title": null
+    },
+    {
+      "source_type": "book_pm",
+      "author": "Marty Cagan",
+      "url": "https://www.amazon.com/s?k=Empowered+Marty+Cagan",
+      "page_number": 194,
+      "section_title": null
+    },
+    {
+      "source_type": "book_presentations",
+      "author": "Nancy Duarte",
+      "url": "https://www.amazon.com/s?k=Resonate+Nancy+Duarte",
+      "page_number": 15,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 4657,
+    "outputTokens": 1029
+  }
+}

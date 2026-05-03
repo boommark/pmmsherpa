@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[QueryPlanner] Flash Lite responded in 1138ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS webinar deck structure best practices","How to integrate product demos effectively into B2B SaaS webinars","Common pitfalls and failure modes in B2B SaaS webinars and how to avoid them"]
+[MultiQuery] 3 queries → 17 unique chunks → top 10 returned (775ms)
+{
+  "query": "B2B SaaS webinar deck structure — opening hook, attention curve, demo integration, Q&A, conversion to demo / trial, common webinar failure modes",
+  "text": "Webinars fail in a predictable place: the middle. The hook lands, the Q&A is fine, but somewhere between minute 8 and minute 35, the audience quietly tabs away. Structure is what keeps them.\n\n## The Opening Hook (Minutes 0-3)\n\nDon't open with housekeeping. Don't open with your company logo and a slide that says \"About Us.\" Open with the problem, stated as sharply as possible.\n\nThe pattern that works: **a specific, uncomfortable truth your audience recognizes from their own week.** \"Seven out of ten sales reps say they lose deals they should have won. Not to a competitor. To no decision.\" That's a hook. \"Today we're going to talk about sales enablement\" is not.\n\nFrom there, give them a reason to stay. Tease the payoff explicitly: \"By the end of this, you'll have a framework you can use in your next pipeline review.\" Concrete and time-bound.\n\n## The Attention Curve\n\nAttention doesn't decline linearly. It drops hard around minute 8-10, recovers slightly if you give them something new, then falls again around minute 25. Design for this.\n\nThe structure that fights it:\n\n- **0-3 min:** Hook and credibility\n- **3-12 min:** The problem, framed in their language (not yours)\n- **12-25 min:** The insight or methodology, with the demo woven in\n- **25-35 min:** Proof (customer story, data, before/after)\n- **35-45 min:** Q&A and CTA\n\n**Pattern interrupt at minute 10.** A poll, a provocative question, a surprising stat. Something that forces re-engagement before they're gone.\n\n---\n\n## Demo Integration\n\nThis is where most webinars break. The demo gets bolted on at minute 30 like an afterthought, after the audience has already decided whether they care.\n\nThe stronger approach: **demo as proof, not as tour.** You've spent 12 minutes establishing the problem. Now the demo answers one question: \"What does solving it actually look like?\"\n\nShow one workflow. Not a feature parade. One complete scenario that mirrors the problem you just described. The framing matters: \"Here's what this looks like for a team of 20 reps who used to spend 3 hours a week on this.\" Then show it. Then stop.\n\nThe worst demo failure mode is showing everything. Pick the moment that creates the \"oh, that's it\" reaction, and build the demo around that moment.\n\n---\n\n## Q&A That Converts\n\nMost Q&A is passive. Someone asks a question, you answer it, nothing happens. The conversion-oriented Q&A is slightly different.\n\n**Seed 2-3 questions in advance** with your champion or a colleague. Not softballs. Questions that let you address the real objections: implementation complexity, pricing anxiety, \"how is this different from what we already have.\" The questions your buyers are afraid to ask publicly.\n\nThen close Q&A with a direct transition: \"A few of you have asked about seeing this in your specific environment. Here's how to do that.\" Not a soft \"feel free to reach out.\" A specific next step.\n\n---\n\n## Conversion to Demo / Trial\n\nThe CTA needs to appear three times: at the end of the main content (before Q&A), during Q&A, and in the follow-up email. Most people only do it once, at the very end, when half the audience has already left.\n\nThe framing that works better than \"book a demo\": **reduce the perceived cost of the next step.** \"This is a 25-minute conversation, not a sales pitch. We'll look at your specific workflow and tell you honestly whether this fits.\" That's a lower bar than \"schedule a demo.\"\n\nInteractive leave-behinds are worth considering here. A recorded demo the buyer can navigate themselves, share with their team, and revisit at 11pm when they're actually making the decision. Upland Software saw 3x improvement in deal velocity using exactly this approach. The async demo does the work your live webinar can't.\n\n---\n\n## Common Failure Modes\n\n- **Opening with the agenda slide.** Kills momentum before it starts.\n- **The 45-minute monologue.** No interaction, no polls, no questions. The audience becomes an audience, not a room.\n- **Demo as feature tour.** No narrative thread. Buyers can't picture themselves in it.\n- **Weak CTA.** \"Check out our website\" is not a next step.\n- **No follow-up sequence.** The webinar ends and nothing happens. The conversion window is 24-48 hours. Most teams miss it entirely.\n\nThe single biggest upgrade most teams can make: **treat the webinar as the beginning of a conversation, not the conversation itself.** The live event is the hook. The follow-up is where deals actually move.",
+  "intent": "deliverable",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/framework-personalize-buyer-journey-interactive-demos/",
+      "page_number": null,
+      "section_title": "4. Use interactive demos as sales leave-behinds"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "Webinars and workshops"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/the-most-effective-sales-assets-and-the-tools-to-optimize-them/",
+      "page_number": null,
+      "section_title": "Product demos"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/leading-co-marketing-efforts-with-partners/",
+      "page_number": null,
+      "section_title": "Webinars and live demos"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/how-to-improve-sales-team-training-sessions/",
+      "page_number": null,
+      "section_title": "Tips for hosting live demos"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "Prevalent pitfalls"
+    },
+    {
+      "source_type": "book",
+      "author": "Steli Efti",
+      "url": "https://www.amazon.com/s?k=Product+Demos+that+Sell",
+      "page_number": 35,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Myra Ahmed",
+      "url": "https://www.productmarketingalliance.com/conversion-copywriting-transform-your-prospects-into-fully-fledged-customers/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "How to avoid B2B messaging mistakes"
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 129,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 2801,
+    "outputTokens": 1108
+  }
+}

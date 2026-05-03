@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 1060ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS partner enablement one-pager structure and key components for partner reps","Best practices for creating concise and actionable sales enablement collateral for channel partners","Common pitfalls and failure modes in partner enablement content for B2B SaaS"]
+[MultiQuery] 3 queries → 16 unique chunks → top 10 returned (489ms)
+{
+  "query": "What's in a B2B SaaS partner enablement one-pager — for partner reps to skim before customer calls? Sections: what we are (one line), who buys (ideal joint customer), top 3 use cases, top 3 differentiators, qualifying questions, escalation contacts, deal registration link. Failure modes: marketing-team flyer repurposed for partner reps, no qualifying questions, no escalation, no joint use cases?",
+  "text": "Here's a clean template you can adapt. The structure is built for a 30-second skim before a call, not a read-through.\n\n---\n\n# Partner Quick Reference: [Your Product Name]\n**For partner reps | Updated [Month Year]**\n\n---\n\n## What We Are\n[One sentence. What it does, for whom, and the outcome it drives. Example: \"Cloud spend management platform that helps mid-market ops teams cut AWS waste by 20-40% without slowing engineering.\"]\n\n---\n\n## Ideal Joint Customer\n**Company profile:** [Industry, size, tech stack signal]\n**Champion:** [Title, their pain, what they're measured on]\n**Economic buyer:** [Title, what they care about]\n**Disqualifier:** [One line on who's a bad fit, saves everyone time]\n\n---\n\n## Top 3 Use Cases\n1. **[Use case name]:** [One sentence. Customer problem + what they do with your product.]\n2. **[Use case name]:** [One sentence.]\n3. **[Use case name]:** [One sentence.]\n\n---\n\n## Top 3 Differentiators\n*(What to say when the customer asks \"why not [competitor]?\")*\n\n1. **[Differentiator]:** [One sentence. Specific, not \"best-in-class.\"]\n2. **[Differentiator]:** [One sentence.]\n3. **[Differentiator]:** [One sentence.]\n\n---\n\n## Qualifying Questions\nAsk these before looping in your [Company] contact:\n\n- [Question that surfaces the core pain]\n- [Question that confirms budget or authority]\n- [Question that reveals fit or disqualifies]\n- [Question that surfaces competitive context]\n\n---\n\n## Escalation Contacts\n| Situation | Who to contact | How |\n|---|---|---|\n| Technical questions / demo support | [Name or role] | [Slack / email] |\n| Deal structuring / pricing | [Name or role] | [Slack / email] |\n| Customer escalation | [Name or role] | [Slack / email] |\n\n---\n\n## Deal Registration\n[Button or direct link]\nRegister within [X days] of first customer conversation to protect your deal.\n\n---\n\n*Questions? [Partner Slack channel or alias]*\n\n---\n\n## The failure modes you named, and why they bite\n\n**Marketing flyer repurposed for partners.** The content is written for a prospect who needs to be persuaded. A partner rep needs to be equipped. Different job. The flyer says \"we're the leading platform for...\" The partner rep needs to know \"here's what to listen for, here's what to say, here's who to call.\" Persuasion copy in a prep doc creates confusion at exactly the wrong moment.\n\n**No qualifying questions.** This is the most expensive omission. Without them, partner reps bring you into deals that aren't real, or worse, never bring you in at all because they're not sure if it fits. Qualifying questions are the mechanism that turns a passive partner into an active pipeline source.\n\n**No escalation path.** When a partner rep hits a question they can't answer and has no clear next step, the deal stalls. The research on partner selling is consistent on this: friction in the escalation path is where joint opportunities quietly die. Make it embarrassingly easy to reach the right person.\n\n**No joint use cases.** A use case that doesn't include the partner's service or context reads as \"sell our product for us.\" Joint use cases show the partner rep where their value-add lands alongside yours. That's the framing that makes them want to bring you in.\n\nWhat's the product and partner type you're building this for? The qualifying questions section in particular needs to be specific to your actual buyer to be useful.",
+  "intent": "deliverable",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog",
+      "author": "Devon O'Rourke",
+      "url": "https://www.productmarketingalliance.com/how-to-build-an-effective-repeatable-go-to-market-process/",
+      "page_number": null,
+      "section_title": "Sales enablement, audience communication, and case studies"
+    },
+    {
+      "source_type": "ama",
+      "author": "Amey Kanade",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/the-most-effective-sales-assets-and-the-tools-to-optimize-them/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Jesse Lopez",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/how-to-create-product-collateral/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Bryony Pearce",
+      "url": "https://www.productmarketingalliance.com/your-guide-to-sales-enablement/",
+      "page_number": null,
+      "section_title": "Sales enablement assets"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "Prevalent pitfalls"
+    },
+    {
+      "source_type": "podcast_pmm",
+      "author": "Product Marketing Alliance",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Stefano Perrotta",
+      "url": "https://www.productmarketingalliance.com/how-aircall-aligns-pmm-and-sales-enablement-for-revenue-impact/",
+      "page_number": null,
+      "section_title": "Why is sales enablement so challenging?"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/common-barriers-when-launching-a-product-and-how-to-overcome-them/",
+      "page_number": null,
+      "section_title": "Lack of in-house knowledge/training"
+    }
+  ],
+  "usage": {
+    "inputTokens": 4408,
+    "outputTokens": 852
+  }
+}

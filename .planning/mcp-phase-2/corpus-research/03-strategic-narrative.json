@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[QueryPlanner] Flash Lite responded in 1371ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["Andy Raskin strategic narrative framework components and application to B2B SaaS","Relationship between strategic narrative sales pitch and category creation in B2B SaaS","Failure modes of strategic narratives in B2B SaaS category creation"]
+[MultiQuery] 3 queries → 16 unique chunks → top 10 returned (1647ms)
+{
+  "query": "What is a strategic narrative for B2B SaaS in the Andy Raskin sense? What is the relationship between strategic narrative, sales pitch, and category creation? What are the components — old game/new game, promised land, stakes, named enemy — and the failure modes?",
+  "text": "Strategic narrative, in the sense practitioners use it, is a specific claim about the world: something has changed, the old way of winning no longer works, and there's a new game being played whether your buyer joins it or not. The company then positions itself as the guide who helps buyers win that new game.\n\nIt's not a tagline. It's not a mission statement. It's a story about a shift in the buyer's world that makes the status quo dangerous.\n\n---\n\n## The Core Architecture\n\nThe structure has five load-bearing pieces, and they have to connect in sequence or the whole thing collapses:\n\n**1. The shift.** Something in the world has changed. Not \"the market is evolving\" (useless) but a specific, named, undeniable thing. HubSpot's shift was: buyers stopped answering cold calls and started Googling instead. That's concrete. Buyers nod before you've even named your product.\n\n**2. The stakes.** What happens to companies that ignore the shift? The tragedy narrative works here. Not \"you'll miss out on growth\" but \"the companies that keep doing outbound will watch their pipeline dry up while competitors who adapted are eating their lunch.\" Stakes create urgency without manufactured pressure.\n\n**3. The promised land.** Where does the hero (your buyer) end up if they win the new game? This is a vision of their transformed world, not a description of your product. \"A world where marketing generates inbound demand without cold interruption\" is a promised land. \"Our platform has 47 features\" is not.\n\n**4. The obstacles.** What stands between the buyer and the promised land? This is where you surface the problems your product solves, but framed as the buyer's journey, not your feature list. The obstacles make the promised land feel earned, not handed over.\n\n**5. Your role.** You're the guide, not the hero. Yoda, not Luke. The buyer is trying to win the new game. You're the one who's mapped the terrain.\n\n---\n\n## How It Relates to Sales Pitch and Category Creation\n\nThese three things are often conflated. They're actually distinct, and the confusion causes real damage.\n\n**Strategic narrative is the movement.** It's the story that unites all your audiences: buyers, employees, investors, press. HubSpot's inbound narrative was the movement. It predated any specific feature, survived multiple product pivots, and outlasted the category label \"marketing automation.\"\n\n**Sales pitch is the buyer-specific application.** The sales pitch answers one question: \"Why choose us over the alternatives you could choose today?\" It's oriented in the present, not the future. A good sales pitch borrows the strategic narrative's framing to set up the competitive context, then teaches the buyer how to evaluate options. The toilet salesperson story captures this exactly: you're not walking through features, you're helping the buyer understand which category of solution fits their situation, then making a confident recommendation.\n\n**Category creation is a potential outcome, not a strategy.** Think about what it actually takes: Slack didn't just name a category, it needed a genuine industry shift, competitors to follow, and years of consistent execution. Most companies that try to \"create a category\" end up in no-man's land, too weird for buyers to evaluate and too underfunded to educate the market. Redrawing lines around an existing category is almost always faster and cheaper. The strategic narrative can power a movement without requiring category creation.\n\n---\n\n## The Failure Modes Worth Knowing\n\n**The shift is fake.** \"AI is transforming everything\" is not a shift. It's a weather report. The shift has to be specific enough that buyers recognize their own experience in it. If they don't nod in the first thirty seconds, you've lost them.\n\n**The promised land is your product.** \"A world where you use our platform\" is not a promised land. The buyer doesn't want your product. They want the outcome your product enables. Keep the promised land in their world, not yours.\n\n**The narrative is horizontal when the sale is vertical.** This is a real tension. A broad narrative that appeals to everyone tends to win no one, because pragmatist buyers (the majority of the market) buy from specialists, not generalists. The bowling pin strategy exists for exactly this reason: own one vertical deeply, use that credibility to expand. Your narrative may be horizontal but your sales motion almost certainly needs to be vertical.\n\n**The story is all vision, no evidence.** Vision without proof is just aspiration. Category creation requires evidence outside your own company that the shift is real: analyst reports, customer case studies, third-party data. \"Selling a vision requires telling a story in which your product plays just a part\" and that story needs receipts.\n\n---\n\nThe question that usually separates a working strategic narrative from a dead one: can your buyer finish the sentence \"The world has changed because...\" with something they already believe? If you're introducing them to the shift rather than confirming it, you're doing education, not narrative. Education is expensive. Confirmation is free.",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 291,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 225,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Loved+Rethinking+Product+Marketing",
+      "page_number": 173,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 38,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 25,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 16,
+      "section_title": null
+    },
+    {
+      "source_type": "podcast_pmm",
+      "author": "Lenny Rachitsky",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 339,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/effective-industry-marketing-strategies-for-enterprise-saas/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Geoffrey A. Moore",
+      "url": null,
+      "page_number": 62,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 4998,
+    "outputTokens": 1113
+  }
+}

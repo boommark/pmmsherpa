@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 962ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["Elements of a strong B2B SaaS launch announcement blog post structure and content","Best practices for tone and length in B2B SaaS product launch announcements","Common pitfalls and failure modes in B2B SaaS launch announcement blog posts"]
+[MultiQuery] 3 queries → 16 unique chunks → top 10 returned (546ms)
+{
+  "query": "What makes a strong B2B SaaS launch announcement blog post? Structure (hook / context / what's new / value / CTA), tone, length, SEO considerations? What are the most common launch-post failure modes — feature-list openings, jargon, missing 'why now', no clear CTA?",
+  "text": "## The reader doesn't care what you built\n\nThey care what changes for them. That's the whole game with a launch post, and most of them fail in the first two sentences because they open with the product instead of the problem.\n\nHere's the structure that actually works:\n\n**Hook:** Start with the pain, the moment of friction, the thing your reader has lived through. \"You've spent three hours reconciling two spreadsheets that should have talked to each other automatically.\" That's a hook. \"Today we're excited to announce...\" is not.\n\n**Context:** One short paragraph on why this problem matters now. The \"why now\" is chronically missing from launch posts, and it's the thing that makes a reader feel like they're reading news instead of a press release. Market shift, regulatory change, customer behavior change. Pick one and name it specifically.\n\n**What's new:** This is where features live, but they don't live alone. Every capability gets a \"so that\" attached. \"Real-time anomaly detection, so your team catches revenue leakage before the quarter closes.\" Feature plus outcome, always paired.\n\n**Value:** Zoom out. What does the world look like for your customer six months from now if this works? This is the aspirational layer. Zendesk doesn't just help you close tickets faster, they help you \"solve any issue.\" The vision statement earns its place here, not at the top.\n\n**CTA:** One action. Not three. \"Start your free trial\" or \"See it in a demo\" or \"Read the case study.\" Pick the one that matches where your buyer is in their journey and commit to it.\n\n---\n\n## Tone and length\n\nAim for 600-900 words. Long enough to land the value story, short enough that a busy VP reads the whole thing on a Tuesday morning. The tone should match how your best customer talks about their job, not how your product team talks about the roadmap.\n\nTest this: read a sentence aloud. If it sounds like a press release, rewrite it. If it sounds like something a smart colleague would say over Slack, keep it.\n\n---\n\n## The SEO angle\n\nYour H1 and first 150 words do the heavy lifting. The keyword your buyer types when they're searching for a solution to the problem you solve should appear naturally in both. Not stuffed. Naturally. The post also needs a meta description that reads like a human wrote it, an internal link to your product page, and a canonical URL that won't create duplication issues if you syndicate.\n\nOne underused move: structure the \"what's new\" section with H2 subheadings that match the specific use-case queries your buyers search. \"How to automate payroll reconciliation\" as a subheading beats \"Feature 1: Reconciliation Engine.\"\n\n---\n\n## The failure modes worth watching for\n\n**Feature-list opening.** \"We're thrilled to announce five new capabilities...\" is the single most common way to lose a reader in the first sentence. You're writing for someone who has seventeen tabs open. Give them a reason to care before you give them a list.\n\n**Jargon without translation.** \"Our AI-powered, multi-tenant, event-driven architecture\" means nothing to a VP of Finance. Name the outcome, then optionally explain the mechanism. Never the reverse.\n\n**Missing \"why now.\"** A launch post without a \"why now\" reads like a changelog. The strongest posts connect the release to something happening in the world, in the industry, or in the customer's life that makes this the right moment.\n\n**No clear CTA.** Ending with \"Learn more about our platform\" after 800 words of building desire is like asking someone on a date and then not suggesting a restaurant. The post built momentum. The CTA spends it. One specific next step, placed at the end and optionally repeated mid-post for long-form content.\n\n**No customer voice.** A quote, a case study snippet, a single data point from a real user transforms a marketing announcement into social proof. Even one sentence from a beta customer changes the trust level of the entire post.\n\n---\n\nThe rolling thunder principle applies here too: the launch post isn't the finish line, it's the anchor. Every blog post, social cut, and email that follows should link back to it and extend one specific angle deeper. The post that does the most work is the one that keeps earning traffic six months after the party's over.\n\nWhat's the product you're launching? I can be more specific about the hook and \"why now\" if I know what problem you're solving.",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Punchy",
+      "page_number": 70,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Pocket+Guide+to+Product+Launches",
+      "page_number": 22,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Pocket+Guide+to+Product+Launches",
+      "page_number": 93,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/6-seo-secrets-typeform",
+      "page_number": null,
+      "section_title": "Common SaaS SEO Mistakes to Avoid"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Kyle Poyar",
+      "url": "https://kylepoyar.substack.com/p/how-to-write-a-saas-homepage",
+      "page_number": null,
+      "section_title": "Continue reading this post for free, courtesy of Kyle Poyar."
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "Prevalent pitfalls"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/b2b-customer-acquisition-strategy-guide",
+      "page_number": null,
+      "section_title": "Your step-by-step guide to a B2B customer acquisition strategy for your SaaS"
+    },
+    {
+      "source_type": "podcast_pmm",
+      "author": "Product Marketing Alliance",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/customer-acquisition-strategies",
+      "page_number": null,
+      "section_title": "Ultimate Guide to Customer Acquisition Strategies for B2B SaaS"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 4200,
+    "outputTokens": 1005
+  }
+}

@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[QueryPlanner] Flash Lite responded in 1080ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS competitive comparison matrix framework buyer criteria vs feature list","customer-facing competitive comparison page vs internal feature comparison differences","common failure modes in B2B SaaS competitive comparison matrices buyer relevance legal exposure"]
+[MultiQuery] 3 queries → 15 unique chunks → top 10 returned (526ms)
+{
+  "query": "What is a B2B SaaS competitive comparison matrix (the 'us-vs-them' grid for landing pages, sales decks, RFPs)? How are dimensions chosen — buyer-criteria not feature-list? What's the difference between a customer-facing comparison page and an internal feature-comparison? Failure modes: gotcha tables, dimensions only we win on, feature soup with no buyer relevance, copying their feature list, legal exposure?",
+  "text": "## What the grid actually is\n\nA competitive comparison matrix is a structured table that lets a buyer answer one question without calling your sales rep: \"Why you and not them?\" It shows up in three places with slightly different jobs: the public comparison page (SEO, self-serve buyers), the sales deck (live conversation anchor), and the RFP response (formal justification document). Same underlying logic, different levels of candor and detail.\n\nThe grid format works because buyers are already doing this comparison in their heads. You're just giving them your version before a competitor does.\n\n---\n\n## Choosing dimensions: buyer criteria, not your feature list\n\nHere's the failure most teams fall into. They open a spreadsheet, list every feature they've built, check which ones the competitor lacks, and call it a matrix. That's a feature inventory dressed up as a comparison. It doesn't help the buyer decide anything.\n\nThe right starting point is a different question: **what does this buyer actually use to justify a decision internally?** Not what impresses them in a demo. What they put in the email to their CFO.\n\nThree sources that actually work:\n\n- **Win/loss interviews.** What criteria did the buyer use when they were evaluating? What did they tell their boss they were comparing?\n- **Review sites.** G2, TrustRadius, Capterra. Filter for reviews that describe what was *missing* in competing products. Those gaps are buyer-language criteria, not vendor-language features.\n- **Lost deals.** The RFP questions they asked. The objections that killed the deal. Reverse-engineer the evaluation criteria from the actual buying process.\n\nThe output should be 5-8 dimensions that map to real buying decisions. \"Free trial availability,\" \"time to first value,\" \"quality of customer support,\" and \"pricing transparency\" often matter more than feature counts. The test: could a buyer use this row to explain their decision to a skeptical colleague?\n\n---\n\n## Customer-facing vs. internal: fundamentally different documents\n\n**The public comparison page** is a trust-building document, not a sales tool. Its job is to help the self-serve buyer who Googled \"[your product] vs. [competitor]\" feel confident they're making a defensible choice. It needs to be honest enough to be credible. Cherry-picked tables where you win every single row signal that the page is propaganda, and sophisticated buyers know it. One or two rows where you acknowledge a competitor strength (then reframe why it matters less for your ICP) actually builds more trust than a perfect sweep.\n\n**The internal battlecard** is a completely different animal. It's for your sales rep who has 90 seconds before a call to remember the three things that win against this specific competitor. It can be more aggressive, more selective, and include context a public page can't carry: \"They always bring up X feature in the demo. Here's how to reframe it.\" The audience is a trained rep, not a skeptical buyer.\n\nMixing these up is a common failure. Internal logic on a public page reads as defensive. Public-page softness in a battlecard leaves reps unprepared.\n\n---\n\n## The failure modes, named clearly\n\n**Gotcha tables.** Dimensions chosen specifically because you win every single one. Buyers see through this instantly, and it destroys the credibility of every true claim on the page.\n\n**Dimensions only you win on.** Related but distinct: picking criteria so narrow they're essentially product-specific (\"Does it support our proprietary import format?\"). The buyer can't generalize these to their actual decision.\n\n**Feature soup with no buyer relevance.** A 40-row table of API endpoints, export formats, and authentication methods. Only 3% of tech buyers can articulate the differences between products they've already seen demos for. A long feature list doesn't reduce confusion. It creates it.\n\n**Copying their feature list.** If you're structuring your comparison around the competitor's marketing categories, you're letting them define the evaluation criteria. You're playing on their field. The goal is to shift the criteria to where your differentiation lives.\n\n**Legal exposure.** This one is real and underestimated. Claiming a competitor \"doesn't support\" a feature when they do, even in beta, creates defamation and false advertising risk. Performance claims need to be verifiable. \"3x faster\" requires a reproducible methodology you can defend. \"Best-in-class support\" is puffery and probably fine. \"Competitor X has a 48-hour response SLA\" is a factual claim that needs a source. Run anything with specific competitor claims past legal before publishing.\n\n---\n\nThe underlying principle that ties all of this together: **the comparison matrix is a positioning tool, not a feature audit.** Its job is to make your differentiation legible to a buyer who's comparing you against a credible alternative. Every dimension choice, every format decision, every word in the table should serve that job. If it doesn't help the buyer decide, cut it.\n\nWhich of these failure modes is closest to what you're actually wrestling with right now?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 58,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/the-most-effective-sales-assets-and-the-tools-to-optimize-them/",
+      "page_number": null,
+      "section_title": "Product comparison charts"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/all-you-need-to-know-about-battlecards/",
+      "page_number": null,
+      "section_title": "Key differentiators"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "2. Performance features"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/sales-assets-choose-your-weapon/",
+      "page_number": null,
+      "section_title": "Key differentiators"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/competitive-positioning-in-the-age-of-chatgpt/",
+      "page_number": null,
+      "section_title": "2. Direct comparison prompts"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Kyle Poyar",
+      "url": "https://kylepoyar.substack.com/p/the-state-of-b2b-contracts",
+      "page_number": null,
+      "section_title": "The state of B2B contracts in 2024"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "The B2B buyer’s struggle with technical products"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/state-of-b2b-saas-2025-report",
+      "page_number": null,
+      "section_title": "The Eight Critical Growth Blockers in B2B SaaS"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/state-of-b2b-saas-2025-report",
+      "page_number": null,
+      "section_title": "3. The Self-Service Gap"
+    }
+  ],
+  "usage": {
+    "inputTokens": 2394,
+    "outputTokens": 1114
+  }
+}

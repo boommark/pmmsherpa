@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[QueryPlanner] Flash Lite responded in 1191ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS ad copy frameworks for LinkedIn and Google Ads","Messaging angles and value propositions for B2B SaaS LinkedIn and Google ads","A/B testing strategies and common failure modes for B2B SaaS digital advertising"]
+[MultiQuery] 3 queries → 18 unique chunks → top 10 returned (961ms)
+{
+  "query": "B2B SaaS ad copy variants for LinkedIn and Google ads — headline frameworks, message angles, A/B test design, variant generation, common ad failure modes",
+  "text": "## Where B2B SaaS Ads Break Down\n\nMost B2B SaaS ads fail before anyone clicks. The headline is either feature soup (\"Automate your workflow with AI-powered integrations\") or category description (\"The platform for modern revenue teams\"). Neither answers the question the buyer is actually asking: *why should I stop scrolling right now?*\n\nThe good news: LinkedIn and Google have different jobs, and once you treat them that way, the copy problem gets a lot cleaner.\n\n---\n\n## LinkedIn vs. Google: Different Buyer Moments\n\n**LinkedIn** is interruption. The buyer wasn't looking for you. Your ad has to earn attention in a feed full of thought leadership and job announcements. The copy needs to create a felt problem before it offers a solution.\n\n**Google** is intent. The buyer typed something. Your job is to match their frame, then sharpen it. They're comparing you to 3 other tabs. Specificity wins.\n\nThis distinction drives everything below.\n\n---\n\n## Headline Frameworks\n\n**LinkedIn (interrupt and resonate):**\n\n- **The pain naming frame:** \"Still building reports manually in Excel?\" Calls out the behavior, creates mild shame, earns the click.\n- **The outcome contrast frame:** \"From 3-week implementations to 3 days.\" Before/after without explaining how. Curiosity does the work.\n- **The peer credibility frame:** \"How [Persona] at [Company Size] cut churn by 40%.\" Social proof baked into the headline itself.\n\n**Google (match and differentiate):**\n\n- **The category claim:** Match the search term, then add a differentiator. \"Project Management Software · Free Forever · No Per-Seat Pricing.\" The differentiator is the comma after the category.\n- **The number frame:** \"Onboard Customers 60% Faster · Rated #1 by G2.\" Specific claims beat adjectives every time.\n- **The objection pre-empt:** \"No Implementation Fees · No Long-Term Contracts.\" Address the friction before they find it on your competitor's page.\n\n---\n\n## Message Angles Worth Testing\n\nThese are the five angles that consistently move B2B buyers. Pick two for your first test, not five.\n\n- **Speed to value:** How fast does the buyer see ROI? \"Live in one day\" beats \"quick setup.\"\n- **Risk removal:** What's the cost of trying you? Free trial, no credit card, 30-day out clause.\n- **Peer proof:** Who like them is already using you? Logo recognition or persona match (\"Used by 500+ RevOps teams\").\n- **Problem specificity:** Name the exact pain. \"Tired of chasing approvals across 6 Slack threads?\" beats \"streamline approvals.\"\n- **Outcome specificity:** Name the exact result. \"$2.3M recovered in year one\" beats \"increase revenue.\"\n\n---\n\n## A/B Test Design\n\nThe mistake most teams make: testing too many variables at once, then not knowing what moved the needle.\n\nA clean test structure:\n\n- **One variable per test.** Headline vs. headline. Same image, same CTA, same audience.\n- **Minimum 300-500 conversions per variant** before calling it. Underpowered tests produce false confidence.\n- **Test angles before words.** Don't A/B \"Automate your pipeline\" vs. \"Automate your pipeline today.\" Test pain-led vs. outcome-led. The angle question is bigger than the word choice question.\n\nA practical sequence: start with the message angle (which resonates?), then lock the angle and test the headline format, then optimize the CTA. Three test cycles, each building on the last.\n\n---\n\n## Common Failure Modes\n\n**The \"we\" problem.** \"We help teams collaborate faster.\" Nobody cares about you yet. Flip it: \"Your team ships 30% faster. Here's how.\"\n\n**Feature as benefit.** \"Real-time dashboards with AI insights\" is a feature. \"Know which deals are at risk before your Monday call\" is a benefit. Buyers buy outcomes, not capabilities.\n\n**Audience mismatch on LinkedIn.** Broad targeting kills B2B LinkedIn campaigns faster than bad copy. If your ICP is \"Director of Operations at 200-500 person SaaS companies,\" your targeting should be that specific. Broad audiences produce cheap clicks from the wrong people.\n\n**Ignoring the landing page handoff.** The ad creates a promise. The landing page has to fulfill it. If your ad says \"Cut reporting time by 50%\" and the landing page opens with \"Welcome to [Product], the all-in-one platform,\" you've broken the scent trail. The click is wasted.\n\n---\n\nWhich of these angles is closest to your current gap: the headline frameworks, the test structure, or the message angles? Happy to generate actual copy variants if you share your product and ICP.",
+  "intent": "deliverable",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "What is B2B messaging?"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "Embracing opportunities"
+    },
+    {
+      "source_type": "blog",
+      "author": "Andy Beohar",
+      "url": "https://www.productmarketingalliance.com/6-effective-strategies-for-high-converting-product-landing-pages/",
+      "page_number": null,
+      "section_title": "Strategy six: A/B testing and iteration"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "Crafting a robust B2B messaging framework"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "Why invest in a B2B messaging strategy?"
+    },
+    {
+      "source_type": "podcast_ai",
+      "author": "Lenny Rachitsky",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/b2b-marketing-guide/",
+      "page_number": null,
+      "section_title": "**Paid Ads**"
+    },
+    {
+      "source_type": "book",
+      "author": "Gabriel Weinberg and Justin Mares",
+      "url": "https://www.amazon.com/s?k=Traction",
+      "page_number": 33,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/b2b-marketing-guide/",
+      "page_number": null,
+      "section_title": "How do you do B2B marketing?"
+    }
+  ],
+  "usage": {
+    "inputTokens": 3366,
+    "outputTokens": 1109
+  }
+}

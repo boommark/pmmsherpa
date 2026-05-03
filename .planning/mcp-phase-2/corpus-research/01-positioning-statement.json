@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 1038ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS positioning statement essential sections and effectiveness","Common positioning failure modes and how to avoid them in B2B SaaS","Dunford's framework for B2B SaaS positioning statement structure"]
+[MultiQuery] 3 queries → 16 unique chunks → top 10 returned (1825ms)
+{
+  "query": "What are the essential sections of a strong B2B SaaS positioning statement, and what makes each section work? What are the most common positioning failure modes, and how should a positioning statement be structured to avoid them? Reference Dunford's framework if relevant.",
+  "text": "## The anatomy of a strong B2B SaaS positioning statement\n\nMost positioning statements fail before they're written. The team sits down, debates language for two hours, and produces something that sounds like a mission statement dressed up as a market claim. The problem isn't the words. It's that they skipped the thinking that makes words mean something.\n\nHere's the structure that actually holds together, and why each piece matters.\n\n---\n\n## The six components (and what makes each one work)\n\n**Competitive alternatives.** Start here, not with your product. What would your buyer actually do if you didn't exist? Not your named competitors, but the real alternatives: spreadsheets, an internal build, doing nothing, a category-adjacent tool. This forces honesty. Your differentiation is only meaningful relative to something.\n\n**Unique attributes.** The features or capabilities you have that the alternatives genuinely don't. Not \"better\" or \"faster.\" Specific, demonstrable, defensible. If a competitor can say the same thing in six months, it's not a differentiator, it's a roadmap item.\n\n**Value (the \"so what\").** This is where most teams get lazy. They list attributes and stop. The value is what those attributes *enable* for the customer: the outcome they care about, the risk they avoid, the number that moves. The attribute is \"real-time anomaly detection.\" The value is \"your team catches fraud before the transaction settles.\" One is a feature. The other is a reason to buy.\n\n**Target customer.** Not a demographic. A psychographic and situational description of the customer for whom your value is most urgent. The more specific, the more the right buyer feels seen. Vague personas produce vague messaging. \"Mid-market ops leaders who've outgrown spreadsheets and can't justify enterprise pricing\" is a target. \"Operations professionals\" is not.\n\n**Market category.** The context you place yourself in shapes every expectation the buyer brings. Call yourself a \"data warehouse\" and they compare you on price per query. Call yourself a \"revenue intelligence platform\" and they evaluate you on pipeline impact. Category choice is a strategic decision, not a labeling exercise.\n\n**Relevant trends (optional but often powerful).** What's happening in the world that makes your solution newly urgent? AI adoption pressure, regulatory change, a market shift. This gives the positioning temporal relevance. It answers \"why now.\"\n\n---\n\n## The most common failure modes\n\n**Positioning from the inside out.** The team describes what they built instead of what the buyer needs. The result is attribute soup: a list of features with no clear answer to \"so what does this change for me?\" The positioning compass points toward the audience's state of mind, not the product team's pride.\n\n**Category confusion.** Choosing a category that's too broad (\"enterprise software\") or too competitive (\"CRM\") puts you in a fight you can't win. The bowling pin approach works here: own a specific segment where you're unambiguously the best choice, then expand from that beachhead. Trying to win all of B2B SaaS on day one is how you end up with messaging that resonates with no one.\n\n**Generic differentiation.** \"Easy to use,\" \"enterprise-grade security,\" \"best-in-class support.\" Every competitor says this. If your differentiators can be lifted and pasted onto a competitor's website without anyone noticing, they're not differentiators. They're table stakes dressed up as advantages.\n\n**Ignoring the multi-stakeholder reality.** In B2B SaaS, the buyer who signs the contract, the user who lives in the product daily, and the economic approver who looks at ROI are often three different people with three different anxieties. A positioning statement that only speaks to one of them will collapse somewhere in the deal cycle. Strong positioning identifies which stakeholder it's primarily serving and makes that explicit.\n\n**Conflating positioning with messaging.** Positioning is the internal strategic document. Messaging is how you translate it for different audiences and channels. Teams that write positioning as if it's a tagline end up with something too surface-level to guide anything. The positioning statement should be detailed enough to make decisions from, not short enough to fit on a slide.\n\n---\n\n## The structure that avoids all of this\n\nOne clean test: can you fill in this sentence with specifics, not generalities?\n\n*For [specific target customer] who [specific urgent problem or situation], [product name] is the [market category] that [unique value delivered], unlike [real competitive alternatives] which [the gap they leave].*\n\nIf you can't complete it with concrete, defensible language, the thinking isn't done yet. The sentence isn't the positioning. It's the proof that the positioning exists.\n\nWhich of the six components is hardest for your current product to nail?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "Prevalent pitfalls"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "How to avoid B2B messaging mistakes"
+    },
+    {
+      "source_type": "book_sales",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 129,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Crossing+the+Chasm+Geoffrey+Moore",
+      "page_number": 142,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/7-habits-of-highly-effective-marketers",
+      "page_number": null,
+      "section_title": "What If I’m already stuck in bad positioning?"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "What is B2B messaging?"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/how-brand-messaging-changes-b2c-b2b/",
+      "page_number": null,
+      "section_title": "B2B example: Salesforce"
+    },
+    {
+      "source_type": "blog",
+      "author": "Nire Adetimehin",
+      "url": "https://www.productmarketingalliance.com/how-to-stay-customer-centric-in-competitive-saas-markets/",
+      "page_number": null,
+      "section_title": "3. Serve the user, not just the buyer"
+    },
+    {
+      "source_type": "substack",
+      "author": "April Dunford",
+      "url": "https://aprildunford.substack.com/p/why-positioning-fails-to-make-the",
+      "page_number": null,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 2408,
+    "outputTokens": 1061
+  }
+}

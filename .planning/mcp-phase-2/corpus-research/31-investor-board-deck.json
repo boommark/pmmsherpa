@@ -1,0 +1,89 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[QueryPlanner] Flash Lite responded in 2739ms
+[QueryPlanner] Generated 3 RAG queries, web research: YES, web search: NO
+[QueryPlanner] Queries: ["Investor pitch deck structure B2B SaaS frameworks","Key performance indicators KPIs for B2B SaaS investor decks","Defensibility strategies for B2B SaaS companies in investor pitches"]
+[QueryPlanner] Perplexity query: "B2B SaaS investor pitch deck slide order KPIs defensibility board update vs fundraising deck differences"
+[MultiQuery] 3 queries → 18 unique chunks → top 10 returned (709ms)
+{
+  "query": "Investor pitch deck structure for B2B SaaS — slide order, KPIs, defensibility, board update vs fundraising deck differences",
+  "text": "## Two decks, two jobs\n\nBefore getting into slide order: the board update deck and the fundraising deck are fundamentally different documents, and conflating them is one of the most common mistakes founders make. A board deck is a management tool. A fundraising deck is a sales pitch. Same company, completely different structure.\n\nStart with the fundraising deck, since that's where the craft lives.\n\n---\n\n## The fundraising deck: slide order\n\nThe goal is to move an investor from skepticism to conviction. That means you're not presenting a company tour. You're building a case.\n\n**The setup (slides 1-4):** Problem, market insight, and why now. This is the most underinvested section in most decks. The strongest pitches open with a genuine insight about the market that the investor probably hasn't heard framed that way before. Not \"the market is large.\" An actual point of view on why something is broken and why the timing is right. Think of it as the thesis you're asking them to believe before you show them anything about your product.\n\n**The solution and proof (slides 5-8):** Product, differentiation, traction. Notice the order: differentiation before traction. Most founders flip this. But investors need to understand *why* you win before they can properly interpret your numbers. Show the product briefly, then go deep on what makes you different from the obvious alternatives, including doing nothing.\n\n**The business (slides 9-12):** Business model, unit economics, go-to-market motion, competitive landscape. This is where the KPIs live (more on those below).\n\n**The ask (slides 13-15):** Team, use of funds, the ask itself. Team goes here, not at the start. You've already built conviction in the opportunity. Now show them who's going to execute it.\n\n---\n\n## The KPIs that actually matter\n\nFor Series A and beyond, investors are pattern-matching on a handful of numbers. Get these clean and visible.\n\n- **ARR and growth rate** (month-over-month for early stage, YoY for later)\n- **Net Revenue Retention**: the single most important signal of product-market fit in B2B SaaS. Anything above 120% is a real conversation starter.\n- **CAC payback period**: under 18 months for SMB, under 24 for enterprise\n- **Gross margin**: software margins should be 70-80%+; if you're below that, explain why\n- **Logo churn rate**: separate from revenue churn, and investors will ask\n\nOne principle worth internalizing: before-and-after metrics from real customers land harder than product screenshots. \"Customer X reduced support costs by 40% in 90 days\" does more work than any feature slide.\n\n---\n\n## Defensibility: what investors actually want to hear\n\nThis is where most decks go thin. \"We have a head start\" is not a moat. The defensibility story needs to answer a specific question: *what gets harder to replicate the longer you're in market?*\n\nThe patterns that hold up in B2B SaaS: proprietary data that compounds, network effects between users or buyers, deep workflow integration that creates switching costs, and domain expertise that becomes a trust asset over time. The \"Bloomberg of SaaS\" pattern is a real one: when you accumulate enough customer data to offer benchmarking and comparative insight, that becomes genuinely hard to replicate.\n\nPick one or two and go specific. Vague claims about \"network effects\" without explaining the mechanism will get challenged in the Q&A.\n\n---\n\n## Board update vs. fundraising deck\n\nThe board deck assumes context. It leads with variance: what happened vs. what you said would happen, and why. The structure is roughly: key metrics dashboard, highlights and lowlights, functional updates (product, sales, marketing, finance), risks and decisions needed, and next quarter plan.\n\nThe fundraising deck assumes no context and has to earn belief from scratch. It leads with insight and builds to conviction.\n\n**The practical difference:** In a board deck, you can write \"CAC increased 15% in Q2\" and the board will engage with it. In a fundraising deck, that same fact needs framing, context, and a forward-looking narrative or it kills momentum.\n\nWhich stage are you pitching? The KPI emphasis shifts meaningfully between seed, Series A, and growth.",
+  "intent": "deliverable",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/chartmogul-ai-and-the-future-of-saas-growth",
+      "page_number": null,
+      "section_title": "**Moats, Benchmarks, and the Bloomberg of SaaS**"
+    },
+    {
+      "source_type": "blog",
+      "author": "Myra Ahmed",
+      "url": "https://www.productmarketingalliance.com/conversion-copywriting-transform-your-prospects-into-fully-fledged-customers/",
+      "page_number": null,
+      "section_title": "Your prospects feel overwhelmed by the work to get buy-in for your SaaS"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/managing-engineering-stakeholders/",
+      "page_number": null,
+      "section_title": "Why B2B engineers dismiss marketing"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "Conclusion"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "Sales enablement decks"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/developer-marketing/the-ultimate-saas-metrics-cheat-sheet/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/developer-marketing/the-ultimate-saas-metrics-cheat-sheet/",
+      "page_number": null,
+      "section_title": "SaaS financial health metrics"
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 50,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 25,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 163,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 3584,
+    "outputTokens": 973
+  }
+}

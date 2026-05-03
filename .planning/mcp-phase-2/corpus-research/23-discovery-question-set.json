@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[QueryPlanner] Flash Lite responded in 1518ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS discovery question frameworks to uncover customer pain points and aspirations","Effective sales discovery questioning techniques for B2B SaaS, avoiding feature pitching and leading questions","Alternative qualification frameworks to BANT for B2B SaaS sales, such as MEDDIC and PACTT, and how to implement them in discovery calls"]
+[MultiQuery] 3 queries → 15 unique chunks → top 10 returned (492ms)
+{
+  "query": "What's a strong B2B SaaS discovery question set? Categories: pain (current state, what's not working, what they've tried), aspiration (what good looks like), buying process (who, when, what triggers, what blocks), competitive context, qualification (BANT alternatives — MEDDIC, PACTT). Calibrated questions that surface real concerns vs. polite-only answers. Failure modes: feature-pitching as questions, leading questions, BANT-style interrogation, no curiosity?",
+  "text": "## The Setup That Makes or Breaks Discovery\n\nMost discovery fails before the first question lands. The rep walks in with a list and starts interrogating. The prospect answers politely and reveals nothing. You get a call summary that says \"they're evaluating solutions\" and a deal that stalls in month three.\n\nThe fix isn't better questions. It's a better frame. Think of it like a doctor's intake: you share enough credibility upfront that the prospect actually wants to be examined. \"We work with ops leaders at Series B companies who've hit a specific wall around X. I want to understand if that's what you're facing, or if it's something different.\" Now they're oriented. Now they'll tell you the truth.\n\n---\n\n## Pain: Current State and What's Not Working\n\nThe goal here is to surface the real problem, not the presenting symptom. Open wide, then narrow.\n\n- \"Walk me through how you're handling [process] today, end to end.\"\n- \"Where does that process break down most often?\"\n- \"What have you tried to fix it? What happened?\"\n\nThat last question is the one most reps skip. **What they've tried and why it failed** tells you more than any other data point. It surfaces prior investment, internal politics, and whether the problem is actually solvable. It also signals whether you're competing against a real incumbent or against inertia.\n\nThe pattern to watch for: if they've tried nothing, the pain isn't real enough to buy against. If they've tried three things and failed, you've got urgency.\n\n---\n\n## Aspiration: What Good Looks Like\n\nThis is where you find the emotional fuel for the deal.\n\n- \"If this was working the way you wanted it to, what would be different six months from now?\"\n- \"How would you know it was working? What would you measure?\"\n- \"Who else would notice? What would change for them?\"\n\nThe third question matters more than it looks. **Deals die when the buyer can't explain the value to someone else.** If they can't answer \"who would notice,\" they don't have internal consensus yet. That's a flag, not a close signal.\n\n---\n\n## Buying Process: Who, When, What Triggers, What Blocks\n\nThe failure mode here is BANT interrogation: \"What's your budget? Who's the decision maker? When do you need to decide?\" It's a procurement checklist, not a conversation.\n\nBetter framing:\n\n- \"How have you bought tools like this in the past? What made that process smooth or painful?\"\n- \"Who else is going to have opinions about this? What do they care about that might be different from what you care about?\"\n- \"What would have to be true for this to get approved? What would kill it?\"\n\nThat last question is the one most reps are afraid to ask. It's also the one that tells you whether you're in a real deal. **The consensus problem in complex B2B sales is almost always about stakeholders who haven't been surfaced yet.** Get them on the table early.\n\n---\n\n## Competitive Context\n\nDon't ask \"who else are you looking at?\" You'll get a list of names and nothing useful.\n\n- \"What does your current solution do well that you'd want to keep?\"\n- \"What's the bar you're using to evaluate options? Where did that bar come from?\"\n- \"Have you seen anything so far that impressed you? What made it stand out?\"\n\nThe second question is the one that surfaces the real competitive frame. Sometimes the bar came from a board member who saw a demo. Sometimes it came from a competitor's benchmark report. **Knowing where the evaluation criteria originated tells you who actually owns the decision.**\n\n---\n\n## Qualification: Beyond BANT\n\nMEDDIC and PACTT both push in the right direction: metrics, economic buyer, decision criteria, decision process, identified pain, champion. The questions that operationalize this:\n\n- \"What does success look like in numbers? What metric moves if this works?\"\n- \"Who's going to sponsor this internally? Have you talked to them yet?\"\n- \"What's the trigger that made this a priority now, versus six months ago?\"\n- \"What happens if you don't solve this by end of Q?\"\n\nThat last one is the implication question that separates genuine urgency from \"we're exploring.\" If the answer is \"honestly, not much,\" you're in a long sales cycle with low conviction. If the answer is \"we miss our growth target,\" you have a deal.\n\n---\n\n## The Failure Modes, Named\n\n**Feature-pitching as questions:** \"Have you considered that our automation engine could handle that?\" isn't a question. It's a pitch with a question mark. Real discovery questions don't contain the answer.\n\n**Leading questions:** \"You'd agree that manual processes are a problem, right?\" You're not learning anything. You're just getting agreement.\n\n**BANT interrogation:** Budget, authority, need, timeline in sequence feels like a qualifying call, not a conversation. Prospects feel processed, not heard.\n\n**No curiosity:** The biggest one. When a rep hears a pain and immediately pivots to the solution, they've signaled they weren't really listening. The probe-and-camp instinct, staying in the problem longer than feels comfortable, is what separates discovery that builds trust from discovery that just collects data.\n\nWhich of these failure modes shows up most in your team's calls right now?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": "Maja Voje",
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 291,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Gabriel Weinberg and Justin Mares",
+      "url": "https://www.amazon.com/s?k=Traction",
+      "page_number": 133,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Steli Efti",
+      "url": "https://www.amazon.com/s?k=Product+Demos+that+Sell",
+      "page_number": 15,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "Mike Weinberg",
+      "url": "https://www.amazon.com/s?k=New+Sales+Simplified+Mike+Weinberg",
+      "page_number": 144,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "Mike Weinberg",
+      "url": "https://www.amazon.com/s?k=New+Sales+Simplified+Mike+Weinberg",
+      "page_number": 141,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Geoffrey A. Moore",
+      "url": "https://www.amazon.com/s?k=Crossing+the+Chasm+Geoffrey+Moore",
+      "page_number": 154,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Matt Heng",
+      "url": "https://www.productmarketingalliance.com/five-actionable-strategies-for-collaborating-more-effectively-with-sales-teams/",
+      "page_number": null,
+      "section_title": "Discovery"
+    },
+    {
+      "source_type": "book",
+      "author": "Joel Klettke",
+      "url": "https://www.amazon.com/s?k=Punchy",
+      "page_number": 36,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Geoffrey A. Moore",
+      "url": "https://www.amazon.com/s?k=Crossing+the+Chasm+Geoffrey+Moore",
+      "page_number": 155,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Joel Klettke",
+      "url": "https://www.amazon.com/s?k=Punchy",
+      "page_number": 37,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 4332,
+    "outputTokens": 1201
+  }
+}

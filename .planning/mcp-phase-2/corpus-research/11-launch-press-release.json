@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[QueryPlanner] Flash Lite responded in 1066ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["structure of a B2B SaaS press release AP style inverted pyramid","common press release failure modes for B2B SaaS","best practices for executive and customer quotes in B2B SaaS press releases"]
+[MultiQuery] 3 queries → 15 unique chunks → {
+  "query": "What is th{
+  "query": "What is the structure of a B2B SaaS press release? Dateline, headline, subhead, lede paragraph (who/what/why/when), supporting detail, executive quote, customer quote, boilerplate, contact. What are the modern press release failure modes — too long, no real news, marketing-copy headlines, missing quotes, vague boilerplate? How does the AP style and inverted pyramid apply?",
+  "text": "## The Anatomy of a B2B SaaS Press Release\n\nThe structure hasn't changed much in 30 years. What's changed is how few companies follow it correctly.\n\n**The core skeleton, in order:**\n\n- **Dateline.** City, STATE, Month DD, YYYY. \"SAN FRANCISCO, June 10, 2025.\"\n- **Headline.** One line. News, not marketing copy.\n- **Subhead.** One line. The detail the headline couldn't hold.\n- **Lede paragraph.** Who did what, why it matters, when it happened. Every essential fact lives here.\n- **Supporting paragraphs.** Context, mechanics, market framing. Descending importance.\n- **Executive quote.** Vision and significance. Not a restatement of the lede.\n- **Customer or partner quote.** Third-party validation. Real specificity.\n- **Boilerplate.** Two to three sentences. What the company does, for whom, and one credibility anchor.\n- **Contact block.** Name, email, phone. That's it.\n\n---\n\n## The Inverted Pyramid and Why It Still Runs Everything\n\nAP style is built on one principle: **the most important information goes first, least important last.** Editors cut from the bottom. Journalists skim from the top. Readers decide in the first sentence whether to continue.\n\nThis matters more now than it did in 1995. A journalist getting 200 pitches a day reads your headline and your lede. If those two things don't answer \"so what?\", the rest doesn't get read.\n\nThe inverted pyramid also disciplines your thinking. If you can't write a lede that captures the whole story in three sentences, you probably don't have a clear story yet.\n\n---\n\n## The Modern Failure Modes\n\nMost B2B SaaS press releases fail in one of five ways.\n\n**Marketing-copy headlines.** \"Acme Revolutionizes the Future of Customer Engagement with Groundbreaking AI Platform.\" That's not news. That's a banner ad. A real headline names the specific thing that happened: \"Acme Raises $40M Series B to Expand AI-Powered Support Automation into Europe.\"\n\n**No real news.** The \"announcement\" is a minor product update, a rebranded feature, or an award nobody outside the company cares about. If a journalist can't answer \"why today?\", there's no story. The question to ask before drafting: **would a trade reporter at a relevant vertical publication find this independently interesting?**\n\n**Vague boilerplate.** \"Acme is a leading provider of innovative solutions that help companies achieve their goals.\" This tells a journalist nothing. Boilerplate should answer: what does the product do, who uses it, and what's one proof point of scale or credibility (customers, ARR range, notable backers)?\n\n**Missing or useless quotes.** Two failure modes here. First, no quotes at all. Second, quotes that restate the lede in slightly different words: \"We're thrilled to announce this exciting new capability.\" Quotes exist to add perspective a straight news paragraph can't. The exec quote should explain *why this matters strategically*. The customer quote should describe a **specific outcome**, not generic satisfaction.\n\n**Too long.** One page. 400 to 500 words. If your press release runs past 600 words, you've included something a journalist didn't need. Supporting detail goes in the fact sheet or the media kit, not the release itself.\n\n---\n\n## The Craft Details That Separate Good from Forgettable\n\nAP style specifics worth internalizing:\n\n- **Spell out numbers one through nine.** Use numerals for 10 and above.\n- **No Oxford comma** in AP style (though this one's debated in practice).\n- **Titles before names** are capitalized; titles after names are lowercase. \"Chief Marketing Officer Jane Smith\" vs. \"Jane Smith, chief marketing officer.\"\n- **Dates:** \"June 10\" not \"June 10th.\"\n- **Percent:** Write \"10%\" not \"10 percent\" in AP's current style.\n\nThe thing most SaaS companies miss: **specificity is credibility.** \"Customers have seen 30% faster ticket resolution\" beats \"customers report significant productivity gains\" every time. Vague claims signal that you don't have real data. Real data signals that you have real customers with real results.\n\nThe boilerplate problem also connects to something deeper: if you can't write two tight sentences about what your company does and for whom, your positioning work isn't done yet. The press release exposes that gap quickly.",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog_external",
+      "author": "Kyle Poyar",
+      "url": "https://kylepoyar.substack.com/p/the-state-of-b2b-contracts",
+      "page_number": null,
+      "section_title": "Key stats on B2B software contracts"
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Crossing+the+Chasm+Geoffrey+Moore",
+      "page_number": 77,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 129,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/how-brand-messaging-changes-b2c-b2b/",
+      "page_number": null,
+      "section_title": "B2B example: Salesforce"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/blog-b2b-saas-copywriting-persuasion",
+      "page_number": null,
+      "section_title": "B2B SaaS Copywriting: The Art of Persuasion Above the Fold"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/b2b-customer-acquisition-strategy-guide",
+      "page_number": null,
+      "section_title": "Your step-by-step guide to a B2B customer acquisition strategy for your SaaS"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Kyle Poyar",
+      "url": "https://kylepoyar.substack.com/p/how-to-write-a-saas-homepage",
+      "page_number": null,
+      "section_title": "Continue reading this post for free, courtesy of Kyle Poyar."
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/go-to-market-saas-in-emerging-markets/",
+      "page_number": null,
+      "section_title": "2. Message for real people"
+    }
+  ],
+  "usage": {
+    "inputTokens": 3797,
+    "outputTokens": 1050
+  }
+}

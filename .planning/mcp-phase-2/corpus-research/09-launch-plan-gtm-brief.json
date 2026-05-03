@@ -1,0 +1,100 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[QueryPlanner] Flash Lite responded in 1265ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["Framework for B2B SaaS launch plan components and best practices","Product launch tiering strategies (T1, T2, T3) and their implications","Rolling thunder launch pattern methodology and application in B2B SaaS"]
+[MultiQuery] 3 queries → 1{
+  "query": "What makes a strong B2B SaaS l{
+  "query": "What makes a strong B2B SaaS launch plan / GTM brief? What are launch tiers (T1/T2/T3), the rolling thunder pattern, and the RACI for cross-functional alignment? What decisions must be locked before launch — channels, pricing, sales enablement, success metrics — and what are the top launch failure modes (no champion in sales, no readiness gate, all-channel scattershot)?",
+  "text": "## The anatomy of a strong launch plan\n\nMost launch plans fail before launch day. Not because the product is weak or the messaging is off, but because the plan was really a list of activities dressed up as a strategy. A strong GTM brief does something different: it forces alignment on decisions that are genuinely hard to reverse once you're in market.\n\nHere's what that looks like in practice.\n\n---\n\n## Launch tiers: scaling effort to impact\n\nThe core insight behind tiering is simple. If you treat every release like the iPhone, the market stops believing you when something actually matters. Buyer fatigue is real, and so is internal fatigue.\n\nA practical four-tier model:\n\n- **Tier 1:** Platform-level shift. Full GTM: PR, exec sponsorship, customer event, original video, analyst outreach. One or two per quarter, maximum.\n- **Tier 2:** Strategic differentiator or competitive feature. Email, social, sales assets, in-app announcement, a blog post with teeth.\n- **Tier 3:** Quality-of-life improvement. Release notes, a tooltip, a mention in the newsletter. Customers notice the absence, not the presence.\n- **Tier 4:** Bug fixes, pixel changes. Internal Slack post. Help doc update if needed.\n\nA useful scoring approach: ask seven yes/no questions about the feature (Does it solve a new buyer pain point? Does it do something competitors can't? Does it change customer workflows?). Count the trues. Six or seven points lands in Tier 1. Two or three lands in Tier 3. The scoring removes the politics from the conversation, which is half the value.\n\n---\n\n## Rolling thunder: the pattern most teams miss\n\nA single launch moment is a spike. Rolling thunder is how you build a wave.\n\nThe pattern: start with a controlled preview to your most engaged customers or a press embargo two to three weeks out. Launch day is the peak, but it's not the end. Week two is a deep-dive webinar. Week three is a customer story or case study. Week four is a paid amplification push on the content that performed.\n\nThe logic is that different buyers are in different stages of awareness at different times. Your early adopters need the announcement. Your skeptics need the proof. Your late majority needs the social validation. Rolling thunder serves all three, sequentially, with the same core story.\n\n---\n\n## The RACI that actually works\n\nCross-functional launch failure almost always traces back to one of two things: everyone thought someone else owned a decision, or one function had veto power no one acknowledged.\n\nA clean RACI for a Tier 1 launch:\n\n- **PMM:** Accountable for positioning, messaging, channel plan, and launch brief. Responsible for sales enablement content.\n- **Product:** Responsible for feature readiness and internal demo. Consulted on messaging accuracy.\n- **Sales/CS:** Responsible for customer communication and pipeline timing. Consulted on objection handling.\n- **Comms/PR:** Responsible for press coordination. Informed on messaging, not authors of it.\n- **Demand gen:** Responsible for paid and email execution. Consulted on channel mix.\n\nThe critical rule: PMM is accountable for the launch, not just the messaging. If you don't own the brief, you don't own the outcome.\n\n---\n\n## Decisions that must be locked before you go\n\nThese are the ones that kill launches when they slip:\n\n- **Pricing and packaging.** If sales doesn't know what to quote, they'll either avoid the conversation or make it up.\n- **Readiness gate.** A hard date where sales, CS, and support certify they can handle the volume. Without this, you're launching to customers your own team can't serve.\n- **Success metrics.** Awareness? Pipeline? Adoption? Expansion? Pick one primary metric before launch. \"We'll measure everything\" means you'll learn nothing.\n- **Channel prioritization.** Scattershot channel execution (email AND social AND PR AND events AND in-app all at equal priority) splits attention and dilutes signal. Rank them.\n\n---\n\n## The failure modes worth memorizing\n\n**No champion in sales.** PMM launches, sales shrugs. This happens when sales wasn't involved in positioning and doesn't believe the story. The fix is co-creation, not a training session after the fact.\n\n**No readiness gate.** The feature ships, the announcement goes out, and support gets flooded with questions no one prepared for. The launch \"worked\" and created a trust problem simultaneously.\n\n**All-channel scattershot.** Trying to be everywhere at once with a Tier 2 budget. The result is thin coverage everywhere and impact nowhere. One strong channel beats five mediocre ones.\n\n**Treating launch day as the finish line.** The announcement is the starting gun. The teams that win treat the two weeks after launch as the actual launch.\n\nWhich of these feels like the biggest live risk in your current environment?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Pocket+Guide+to+Product+Launches",
+      "page_number": 24,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Pocket+Guide+to+Product+Launches",
+      "page_number": 23,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Anna Wiggins",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/6-best-practices-to-balance-launches-and-adoption/",
+      "page_number": null,
+      "section_title": "1. Tier your launches🎯"
+    },
+    {
+      "source_type": "ama",
+      "author": "Amanda Groves",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "Product launch tiers"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/b2b-customer-acquisition-strategy-guide",
+      "page_number": null,
+      "section_title": "Your step-by-step guide to a B2B customer acquisition strategy for your SaaS"
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Crossing+the+Chasm+Geoffrey+Moore",
+      "page_number": 154,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/b2b-marketing-guide/",
+      "page_number": null,
+      "section_title": "**How To Build a B2B Marketing Strategy From Scratch**"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 3656,
+    "outputTokens": 1108
+  }
+}
+type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/b2b-customer-acquisition-strategy-guide",
+      "page_number": null,
+      "section_title": "Your step-by-step guide to a B2B customer acquisition strategy for your SaaS"
+    }
+  ],
+  "usage": {
+    "inputTokens": 3635,
+    "outputTokens": 1264
+  }
+}

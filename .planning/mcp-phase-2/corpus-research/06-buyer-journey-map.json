@@ -1,0 +1,147 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[QueryPlanner] Flash Lite responded in 5075ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS buyer journey stages, signals, content needs, and emotions","Distinction between buyer journey, customer journey, and sales funnel (TOFU/MOFU/BOFU)","Common failure modes in B2B SaaS buyer journey mapping"]
+[MultiQuery] 3 queries → 16 unique chunks → top 10 returned (783ms)
+{
+  "query": "What are the stages of a B2B SaaS buyer journey? What's the difference between buyer journey, customer journey, and sales funnel (TOFU/MOFU/BOFU)? What signals, content needs, and emotions characterize each stage, and what are the most common journey-mapping failure modes?",
+  "text": "# The B2B SaaS Buyer Journey: A Complete Map\n\nLet's start with the confusion, because it's real and it matters. Most teams use \"buyer journey,\" \"customer journey,\" and \"sales funnel\" interchangeably. They're not the same thing. Getting them mixed up is actually one of the most common reasons GTM strategies underperform.\n\n---\n\n## The Three Frameworks, Clarified\n\n**The buyer journey** is the buyer's experience. It's what happens in their head and their organization from the moment they sense a problem to the moment they sign a contract. It's buyer-centric. It doesn't care about your pipeline stages.\n\n**The customer journey** is longer. It starts where the buyer journey ends. Onboarding, adoption, expansion, advocacy. The moment the contract is signed, you're no longer dealing with a buyer. You're dealing with a customer. Different psychology, different content, different team.\n\n**The sales funnel (TOFU/MOFU/BOFU)** is your internal lens. It's how you categorize where prospects sit relative to your pipeline. It maps loosely to the buyer journey but it's company-centric, not buyer-centric. The buyer doesn't know they're in your funnel. They're just trying to solve a problem.\n\nThink of it this way: the buyer journey is the territory. The sales funnel is your map of it. Maps are useful. But they're not the territory.\n\n---\n\n## The B2B SaaS Buyer Journey, Stage by Stage\n\n### Stage 1: Status Quo / Latent Problem (Pre-Awareness)\n\nThe buyer has a problem they haven't named yet. Something is slower, more expensive, or more fragile than it should be. But they haven't connected that friction to a category of solution.\n\n**Signals:** Low search intent. No active evaluation. Pain shows up in team complaints, missed targets, or workarounds.\n\n**Emotional state:** Mild frustration, not urgency. They're tolerating the problem.\n\n**Content that works:** Thought leadership that names the problem before offering a solution. Provocative benchmarks. \"Is your team spending 30% of their week on X?\" That's provocation-based selling in content form. You're not pitching. You're making the invisible visible.\n\n**TOFU** maps here. Wide net, low intent.\n\n---\n\n### Stage 2: Problem Recognition (Awareness)\n\nSomething tips them over. A missed target, a board question, a competitor move. The problem becomes a priority.\n\n**Signals:** Generic search queries. \"How to improve X.\" \"Best practices for Y.\" They're educating themselves, not evaluating vendors.\n\n**Emotional state:** Urgency, sometimes anxiety. They need to show their organization they're handling it.\n\n**Content that works:** Problem-framing content. Category explainers. ROI calculators that quantify the cost of inaction. Your job is to be the most helpful voice in the room, not the most promotional one.\n\n---\n\n### Stage 3: Solution Exploration (Consideration)\n\nThey know they need something. Now they're figuring out what kind of something. This is where categories get defined in the buyer's mind.\n\n**Signals:** Comparison searches. \"X vs. Y.\" \"Best [category] software.\" G2 and Capterra visits. Peer conversations.\n\n**Emotional state:** Overwhelmed. There are too many options and the differences aren't clear.\n\n**Content that works:** Clear positioning. Differentiated messaging that answers \"why you over the category.\" Battlecards for your sales team. Case studies that match their specific context (industry, company size, use case). Analyst reports if you're in them.\n\n**MOFU** maps here. They're engaged. They're comparing.\n\n---\n\n### Stage 4: Vendor Evaluation (Decision)\n\nThey've shortlisted. Now they're trying to de-risk the choice. In B2B SaaS, this is where the consensus problem hits hardest: the procurement lead, the finance manager, the department head, and the actual end user all have different criteria. \n\n**Signals:** Demo requests. Pricing page visits. Legal and security reviews. References requested.\n\n**Emotional state:** Risk aversion. Nobody wants to be the person who chose the wrong vendor. Fear of a bad decision often outweighs excitement about a good one.\n\n**Content that works:** Security and compliance documentation. ROI models. Customer references who match their profile. Implementation guides that reduce perceived switching cost. This is where sales enablement earns its keep.\n\n**BOFU** maps here.\n\n---\n\n### Stage 5: Purchase and Handoff\n\nThe contract is signed. The buyer journey ends. The customer journey begins.\n\nThis transition is where most companies drop the ball. The buyer was sold a vision. The user gets handed to a CS rep who's never heard of that vision. The emotional whiplash is real.\n\n**The critical insight:** What you promise in stages 2-4 becomes the benchmark against which your customer judges every interaction in stages 5 and beyond. Messaging continuity across this handoff isn't a nice-to-have. It's the difference between expansion and churn.\n\n---\n\n## The Most Common Journey-Mapping Failure Modes\n\n**1. Mapping your funnel, not their journey.** Teams build journey maps that perfectly mirror their internal pipeline stages. Those stages exist for CRM hygiene, not for buyer psychology. The result is content that serves your process, not their decision.\n\n**2. Optimizing for the buyer, ignoring the user.** In B2B SaaS, the person who signs the contract and the person who uses the product daily are often different people. Most companies optimize entirely for the economic buyer. That closes deals but tanks adoption. The user controls whether your product actually gets used.\n\n**3. Treating the journey as linear.** 83% of a typical B2B purchasing decision happens before a buyer speaks with a sales rep (Gartner). One stakeholder downloads an e-book. Another attends a webinar two months later. A third Googles you the night before the board meeting. The journey is non-linear and multi-threaded. Your content strategy needs to match that reality.\n\n**4. Stopping at the signature.** The customer journey is where retention, expansion, and advocacy live. If your journey map ends at \"closed/won,\" you're mapping half the business.\n\n---\n\nThe single most clarifying question for any journey-mapping exercise: whose journey are you actually mapping? The economic buyer's? The end user's? The champion's? Each of those is a different map, and conflating them is usually where the confusion starts.",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Crossing+the+Chasm+Geoffrey+Moore",
+      "page_number": 154,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/how-marketing-funnels-work/",
+      "page_number": null,
+      "section_title": "Sales Funnel vs Marketing Funnel"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "Understanding the buyer's journey"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "What about a B2B SaaS sales funnel?"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "B2B vs. B2C dynamics"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "What is B2B messaging?"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/a-beginners-guide-to-customer-acquisition/",
+      "page_number": null,
+      "section_title": "What is the customer acquisition funnel?"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/b2b-marketing-guide/",
+      "page_number": null,
+      "section_title": "**How B2B Marketing Works Today**"
+    },
+    {
+      "source_type": "blog",
+      "author": "Nire Adetimehin",
+      "url": "https://www.productmarketingalliance.com/how-to-stay-customer-centric-in-competitive-saas-markets/",
+      "page_number": null,
+      "section_title": "3. Serve the user, not just the buyer"
+    }
+  ],
+  "usage": {
+    "inputTokens": 3,
+    "outputTokens": 1491
+  }
+}
+ng-funnels-work/",
+      "page_number": null,
+      "section_title": "Sales Funnel vs Marketing Funnel"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "Understanding the buyer's journey"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "What about a B2B SaaS sales funnel?"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "B2B vs. B2C dynamics"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "What is B2B messaging?"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/a-beginners-guide-to-customer-acquisition/",
+      "page_number": null,
+      "section_title": "What is the customer acquisition funnel?"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Neil Patel",
+      "url": "https://neilpatel.com/blog/b2b-marketing-guide/",
+      "page_number": null,
+      "section_title": "**How B2B Marketing Works Today**"
+    },
+    {
+      "source_type": "blog",
+      "author": "Nire Adetimehin",
+      "url": "https://www.productmarketingalliance.com/how-to-stay-customer-centric-in-competitive-saas-markets/",
+      "page_number": null,
+      "section_title": "3. Serve the user, not just the buyer"
+    }
+  ],
+  "usage": {
+    "inputTokens": 2842,
+    "outputTokens": 1842
+  }
+}

@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[QueryPlanner] Flash Lite responded in 1052ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS sales pitch deck structure frameworks","Dunford's 8-step storyboard for sales pitches and its application","Distinguishing between sales pitch decks, strategic narratives, and product demos"]
+[MultiQuery] 3 queries → 17 unique chunks → top 10 returned (833ms)
+{
+  "query": "What's the structure of a winning B2B SaaS sales pitch deck? Dunford's 8-step storyboard (insight, old game, new game, promised land, obstacles, features, proof, ask). How is it different from a strategic narrative or product demo? What are the highest-leverage slides — the insight, the wedge, the demo flow, the ask. Failure modes: feature-list pitches, no insight, generic discovery, demo-too-early, weak ask?",
+  "text": "## The structure that actually works\n\nMost B2B SaaS pitch decks are built backwards. They open with \"About Us,\" parade the logo slide, walk through features, and close with pricing. The buyer sits there wondering: why does this matter to me, and why you instead of the three other vendors I'm seeing this week?\n\nThe pitch structure that works flips this entirely. It starts with what you know about the buyer's world, not what you want to sell them.\n\n---\n\n## The 8-step storyboard\n\n**Step 1: The Insight.** Your unique point of view on the market. Not \"companies struggle with X.\" Something the buyer hasn't fully articulated yet. This is the highest-leverage slide in the deck. If you nail it, the buyer leans in. If you miss it, you're just another vendor.\n\n**Step 2: The Alternatives.** Walk through what options exist today, including doing nothing. This is also where discovery lives. You're painting the market landscape while learning where they currently sit.\n\n**Step 3: The Perfect World.** Based on the insight and the alternatives, what would a perfect solution look like? Get the buyer nodding before you show your product. This is the setup for everything that follows.\n\n**Step 4: The Introduction.** Now you introduce your product and the category you compete in. Notice this is step four. You've earned the right to talk about yourself.\n\n**Step 5: The Value.** Your differentiated value, tied directly to what makes the perfect solution. Features appear here, but only the ones that enable differentiated value. Not a feature tour. A value argument.\n\n**Step 6: The Proof.** Case studies, logos, awards. Credibility after the value argument, not before it.\n\n**Step 7: Objections.** Handle the unspoken ones explicitly. The ones the buyer is thinking but won't say. \"You're probably wondering whether this works at your scale.\" Get ahead of them.\n\n**Step 8: The Ask.** A specific next step. Not \"let us know if you have questions.\" A clear, low-friction action that moves the deal forward.\n\n---\n\n## How this differs from a product demo or strategic narrative\n\nA **product demo** is about showing capability. It answers \"can it do X?\" The 8-step structure answers \"should we buy this?\" Those are different questions, and buyers need both answered. The demo belongs inside Step 5, not as the entire meeting.\n\nA **strategic narrative** (think investor pitch, keynote, company vision) is oriented toward the future. Where the market is going, why now, what the world looks like in five years. Powerful for fundraising and brand. The sales pitch is oriented in the present: \"Why choose us over the alternatives you could choose today?\" Different question, different structure.\n\nThe critical difference: the sales pitch has to accommodate discovery. The strategic narrative is a monologue. A great sales pitch is a conversation with a deliberate structure underneath it.\n\n---\n\n## The highest-leverage slides\n\n**The Insight slide** is the wedge. This is where you either differentiate or blend in. A weak insight (\"companies need to move faster\") is something every competitor says. A strong insight is specific, counterintuitive, and rooted in something you've seen that buyers haven't fully connected yet. If you can make a VP of Engineering say \"huh, I hadn't thought about it that way,\" you've won the first five minutes.\n\n**The Perfect World slide** is underrated. It's the moment where the buyer agrees on evaluation criteria before you show your product. Done well, you've essentially written the RFP criteria in your favor before the demo starts.\n\n**The demo itself** should show your best thing first. Not the login screen. Not account setup. The moment of highest differentiated value, as early in the demo as possible. Most demos bury the best part.\n\n**The Ask** fails more often than any other step. \"We'll send over some materials\" is not an ask. The ask should be specific: \"Can we schedule a technical deep-dive with your team next week?\" Low friction, clear, moves the deal.\n\n---\n\n## The failure modes\n\n**Feature-list pitches.** The product walkthrough that shows everything in order of the menu structure. Buyers can't translate features into business value on their own. Your job is to do that translation for them.\n\n**No insight.** Opening with \"companies are struggling with data silos\" is not an insight. It's a problem statement your three closest competitors use word-for-word. The insight has to be something you specifically know that reframes how the buyer thinks about their situation.\n\n**Generic discovery.** Treating the Alternatives step as a checkbox (\"so, what are you using today?\") instead of a real conversation. The discovery conversation is where you learn which alternative they're closest to, which shapes how you position your differentiated value in Step 5.\n\n**Demo too early.** Jumping to the product before the buyer understands why the alternatives fall short. When you demo too early, every feature lands as \"interesting\" rather than \"that's exactly what we need.\" The setup earns the demo.\n\n**Weak ask.** Ending with \"any questions?\" or \"we'll follow up.\" The buyer leaves without a clear next step, and momentum dies. The ask is a sales decision, not an afterthought. What's the one action that moves this deal forward? Ask for that, specifically.\n\n---\n\nThe pattern across all the failure modes: they're all about selling before the buyer is ready to buy. The 8-step structure is fundamentally about teaching the buyer how to make a confident decision, and then showing them why you're the right answer once they know how to evaluate it.\n\nWhich step is your current deck weakest on?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 144,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 142,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 47,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 140,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 77,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Obviously+Awesome+%282nd+Edition%29+April+Dunford",
+      "page_number": 116,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 135,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 38,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 31,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 41,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 4211,
+    "outputTokens": 1274
+  }
+}

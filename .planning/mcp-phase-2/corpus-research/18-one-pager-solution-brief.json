@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[QueryPlanner] Flash Lite responded in 1076ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS solution brief structure and essential components","Best practices for writing compelling headlines and problem statements in B2B SaaS marketing collateral","Strategies for incorporating customer proof and clear calls to action in sales enablement documents"]
+[MultiQuery] 3 queries → 18 unique chunks → top 10 returned (752ms)
+{
+  "query": "What's in a B2B SaaS one-pager / solution brief? Sections — headline, problem, solution, key benefits (3), how it works, customer proof, pricing teaser or CTA. Audience: prospect, distributed asynchronously, often by sales rep. Failure modes: feature soup, missing the customer's problem, no proof, no clear next step, too dense, dual-purpose drift (sales tool AND marketing flyer)?",
+  "text": "## What Goes in a B2B SaaS One-Pager\n\nYou've already named the failure modes, which means you know the real challenge: this isn't a writing problem, it's a discipline problem. Every section you listed is correct. The hard part is keeping each one honest.\n\nHere's how each section earns its place, and where it typically goes wrong.\n\n---\n\n## The Sections, Done Right\n\n**Headline.** One job: stop the right person and make them feel seen. Not your product name. Not a category claim. The prospect's situation, named precisely. \"Finally, forecasting your team will actually trust\" beats \"AI-powered revenue intelligence platform\" every time. The test: could a competitor run this headline? If yes, rewrite it.\n\n**Problem.** Two or three sentences max. Name the pain in the language the buyer uses internally, not the language your product team uses. The BDF pattern is useful here: what does the buyer believe, what do they feel, what are they doing today that isn't working? If you're writing \"organizations struggle to achieve visibility into...\" you've already lost them. Write what they say in Slack at 4pm on a Thursday.\n\n**Solution.** One paragraph. What you do, for whom, and what changes as a result. Not how it works. Not the architecture. The outcome. \"X helps [persona] do [thing] so they can [result]\" is a fine skeleton to start from.\n\n**Key Benefits (3).** Three is the right number. One is a claim. Two is a comparison. Three feels complete. Four becomes inventory. Each benefit needs a verb and a result, not an adjective and a noun. \"Reduce forecast errors by 40%\" beats \"Accurate forecasting.\" Pick the three that matter to this buyer, not the three that are easiest to write.\n\n**How It Works.** The section most one-pagers either skip or over-explain. Three steps, maximum. Enough to make the solution feel credible and real, not enough to replace a demo. Think: \"Connect your data sources, set your parameters, get a live dashboard in 48 hours.\" Concrete. Sequential. Fast.\n\n**Customer Proof.** The single most skipped section, and the single highest-leverage one. One strong quote from a named customer in a recognizable role beats a logo wall every time. If you have a number (\"reduced onboarding time by 60%\"), put it in the quote or directly adjacent. The sales rep distributing this async needs something the prospect can forward to their boss. Give them that.\n\n**CTA.** One action. Not three. \"Book a 20-minute demo\" or \"Start your free trial.\" The failure mode here is the hedge: \"Learn more, request a demo, or contact us.\" That's not a CTA, it's a shrug.\n\n---\n\n## The Failure Mode Worth Dwelling On\n\nYou named dual-purpose drift, and it deserves more attention than the others. The one-pager that tries to be both a leave-behind and a campaign asset ends up being neither. A sales-distributed async doc has one job: give the prospect enough to say yes to the next conversation. It doesn't need to explain your entire product. It doesn't need to serve SEO. It doesn't need to make the CEO proud at a trade show.\n\nThe question that clarifies everything: what does the sales rep need the prospect to *do* after reading this? Answer that first. Build backward from there.",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 144,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Robert W. Bly",
+      "url": "https://www.amazon.com/s?k=The+Copywriters+Handbook",
+      "page_number": 310,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Joel Klettke",
+      "url": "https://www.amazon.com/s?k=Punchy",
+      "page_number": 5,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Joel Klettke",
+      "url": "https://www.amazon.com/s?k=Punchy",
+      "page_number": 6,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Bryony Pearce",
+      "url": "https://www.productmarketingalliance.com/your-guide-to-sales-enablement/",
+      "page_number": null,
+      "section_title": "Sales enablement assets"
+    },
+    {
+      "source_type": "blog",
+      "author": "Al Sargent",
+      "url": "https://www.productmarketingalliance.com/to-succeed-in-product-marketing-do-less/",
+      "page_number": null,
+      "section_title": "Sales Enablement"
+    },
+    {
+      "source_type": "book_sales",
+      "author": "Mike Weinberg",
+      "url": "https://www.amazon.com/s?k=New+Sales+Simplified+Mike+Weinberg",
+      "page_number": 105,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/the-most-effective-sales-assets-and-the-tools-to-optimize-them/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/thinking-about-a-product-marketing-role-in-health-tech-heres-what-you-need-to-know/",
+      "page_number": null,
+      "section_title": "Ways to move a deal forward"
+    },
+    {
+      "source_type": "blog",
+      "author": "Rachel Nulman-Schapiro",
+      "url": "https://www.productmarketingalliance.com/how-to-deliver-a-killer-demo-and-train-your-sales-teams-to-do-the-same/",
+      "page_number": null,
+      "section_title": "Tips for sales enablement"
+    }
+  ],
+  "usage": {
+    "inputTokens": 4071,
+    "outputTokens": 768
+  }
+}

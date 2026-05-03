@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[QueryPlanner] Flash Lite responded in 1233ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["framework for developing joint value propositions for co-marketing partnerships","elements of a strong joint solution brief for co-marketing, focusing on customer outcomes","structure and content of partner co-sell collateral for co-marketing initiatives"]
+[MultiQuery] 3 queries → 17 unique chunks → top 10 returned (1022ms)
+{
+  "query": "What makes a strong joint solution brief for partner co-marketing? Joint value proposition, joint customer outcomes, partner co-sell collateral structure",
+  "text": "## The brief that actually moves deals\n\nMost joint solution briefs fail for the same reason: they read like a press release about the partnership instead of a sales tool for the buyer. Two logos at the top, a paragraph about each company's capabilities, and a vague promise to \"deliver better outcomes together.\" The seller doesn't know what to say. The buyer doesn't know why they should care.\n\nThe ones that work start from a completely different place.\n\n## Lead with the problem, not the partners\n\nYour joint value proposition lives or dies on specificity. Not \"together we help enterprises modernize their data infrastructure\" but \"when your Salesforce data and your data warehouse fall out of sync, your RevOps team is making decisions on stale numbers. Here's how we fix that in 30 days.\"\n\nThe buyer needs to see their problem named before they'll read another word. So the structure that works:\n\n- **The trigger:** The specific situation that makes this brief relevant\n- **The gap:** What's broken or missing without this solution\n- **The combined answer:** What only the two of you can do together that neither can do alone\n\nThat last part is the test. If either partner could say the same thing solo, you don't have a joint value proposition yet. You have two value propositions stapled together.\n\n---\n\n## Joint customer outcomes over features\n\nThis is where solutions marketing discipline pays off. The brief isn't describing what the products do. It's describing what the customer's world looks like after.\n\nThink about the difference between \"integrated data pipeline with real-time sync\" versus \"your sales team sees accurate pipeline every morning without waiting for IT.\" Same capability, completely different register.\n\nThree outcomes is the right number. More than three and you're building a feature list again. For each outcome, ask: is this measurable? Is this something the buyer's boss cares about? If yes to both, it belongs.\n\n---\n\n## The co-sell structure that enables the field\n\nHere's where most briefs stop too early. They nail the customer-facing story but leave the sellers without a roadmap.\n\nA brief that actually enables co-selling needs a second layer:\n\n- **The \"better together\" proof point.** One real customer story (even anonymized) showing the joint motion working. Sellers need a story to tell, not just a slide to show.\n- **Who leads the conversation.** When Partner A is in the deal, what do they say to bring Partner B in? What's the handoff language? Ambiguity here kills co-sell momentum.\n- **The qualifying question.** One question the seller can ask to know this solution is relevant. \"Do you currently have X problem?\" If yes, the brief is relevant. If no, move on.\n\nThe partnership framework worth applying here: define mutual value, align on timeline and audience, then build the enablement assets that match the sales motion. The brief is the customer-facing output of that alignment, not a substitute for it.\n\n---\n\n## The one thing most teams skip\n\nThe internal seller brief. Same content, different audience. Your brief for the customer should have a companion document (even a one-pager) that tells your own sellers: here's the signal that makes this relevant, here's the story to tell, here's who to call at the partner when it's time to bring them in.\n\nWhich part of this is the biggest gap right now: the joint value prop itself, the outcome framing, or the co-sell enablement structure?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": "Maja Voje",
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 287,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Maja Voje",
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 286,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/technical-writer-to-product-marketing-manager/",
+      "page_number": null,
+      "section_title": "Partner marketing and collaboration"
+    },
+    {
+      "source_type": "book",
+      "author": "Martina Lauchengco",
+      "url": "https://www.amazon.com/s?k=Loved+Rethinking+Product+Marketing",
+      "page_number": 78,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/what-is-solutions-marketing/",
+      "page_number": null,
+      "section_title": "1. Building stronger customer relationships"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/leading-co-marketing-efforts-with-partners/",
+      "page_number": null,
+      "section_title": "Considerations and tips for successful co-marketing"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/what-is-solutions-marketing/",
+      "page_number": null,
+      "section_title": "Conclusion"
+    },
+    {
+      "source_type": "blog",
+      "author": "Kiran Khanna",
+      "url": "https://www.productmarketingalliance.com/lead-effective-and-contextual-gtm/",
+      "page_number": null,
+      "section_title": "Speak less, show more"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/what-is-solutions-marketing/",
+      "page_number": null,
+      "section_title": "Defining solutions marketing"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/leading-co-marketing-efforts-with-partners/",
+      "page_number": null,
+      "section_title": "Partner marketing: A strategic approach to growth"
+    }
+  ],
+  "usage": {
+    "inputTokens": 2368,
+    "outputTokens": 754
+  }
+}

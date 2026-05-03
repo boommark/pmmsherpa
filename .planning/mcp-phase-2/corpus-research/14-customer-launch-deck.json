@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 1009ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS customer launch event keynote deck structure and content best practices","Key differences between a product launch event deck and a sales pitch deck for B2B SaaS","Common failure modes and pitfalls in B2B SaaS customer-facing launch presentations"]
+[MultiQuery] 3 queries → 17 unique chunks → top 10 returned (524ms)
+{
+  "query": "What's in a B2B SaaS customer-facing launch event deck (virtual or in-person keynote)? Audience: customers + prospects. Structure: opening hook, market shift / why now, what we're launching, demo / proof, customer story, what's next, CTA. How is it different from a sales pitch deck — it's storytelling not selling. Failure modes: too feature-heavy, no narrative arc, missing emotional beat, no clear CTA, too long?",
+  "text": "## The DNA of a Launch Event Deck\n\nA sales pitch deck answers \"why us?\" A launch event deck answers \"why now?\" That single shift changes everything about structure, tone, and what you put on each slide.\n\nThe audience at a launch event already chose you, or is seriously considering it. They're not evaluating features. They're deciding whether to believe in your direction. So the job isn't to sell. It's to make them feel like they're watching the future arrive.\n\n---\n\n## Slide-by-Slide Breakdown\n\n**Opening hook (1-2 slides)**\nDon't open with your logo or an agenda slide. Open with a provocation. A stat that reframes their world. A question they haven't thought to ask. The best hooks create a tiny moment of discomfort: *wait, is that true about my situation?* That tension is what pulls them forward.\n\n**Market shift / why now (3-4 slides)**\nThis is the heart of the deck, and most teams underinvest here. You're not explaining your product. You're explaining why the world changed in a way that makes your product inevitable. Think of it as a tectonic shift narrative: something moved, the old approach no longer works, and a new category of solution is now possible. The \"why now\" section does the emotional work. Everything after it is just proof.\n\n**What we're launching (2-3 slides)**\nName it, frame it, and connect it back to the shift you just described. One clear headline per launch item. Not a feature list. The question each slide should answer: *what does this make possible that wasn't possible before?*\n\n**Demo or proof moment (variable)**\nLive demos at events carry real risk. The safer version: a tight, narrated video that shows the thing working beautifully, edited to 90 seconds max. The demo should show the emotional experience of using it, not the technical depth. Customers want to feel the relief, not understand the architecture.\n\n**Customer story (1-2 slides)**\nNot a logo slide. Not a quote slide. A before/after story with a real human at the center. \"Acme was spending 14 hours a week on X. Now it takes 20 minutes.\" Specificity is credibility. The customer story is where skeptics in the audience convert.\n\n**What's next (1-2 slides)**\nThis is the slide that makes customers feel like insiders. You're not promising vaporware. You're showing that you have a direction, that you're thinking beyond today's release. It builds trust and creates anticipation. Keep it directional, not committal.\n\n**CTA (1 slide)**\nOne action. Not three. The event CTA is almost never \"buy now.\" It's usually: start a trial, join a beta, book a session with your CSM, attend the breakout. Pick the one that moves the most people the most meaningful step forward.\n\n---\n\n## How It Differs from a Sales Pitch\n\nThe sales pitch is a conversation. The launch deck is a performance. Different physics entirely.\n\nA sales pitch adapts in real time based on discovery. A launch deck has to work for a room of 500 people with different contexts and needs. That means the narrative has to be universal enough to resonate broadly, but specific enough to feel relevant.\n\nThe other big difference: **emotional arc**. A sales pitch earns trust through relevance. A launch event earns trust through vision. You want people leaving the room feeling something. Inspired. Validated. Excited to tell a colleague. That emotional residue is what drives post-event action.\n\n---\n\n## The Five Failure Modes\n\n**Too feature-heavy.** Features are evidence, not story. When every slide is a capability list, the narrative collapses and the audience checks their phones. The fix: for every feature, ask \"what does this change about how someone's day feels?\"\n\n**No narrative arc.** A deck without a through-line is just a slide collection. The market shift in act one should make the launch in act two feel inevitable. If the connection isn't obvious, the launch feels arbitrary.\n\n**Missing emotional beat.** Usually this means no customer story, or a customer story that's too abstract. Real people with real problems create the moment where the audience sees themselves in the narrative.\n\n**No clear CTA.** \"Learn more at our website\" is not a CTA. It's a shrug. The CTA should be specific, low-friction, and tied to the energy in the room.\n\n**Too long.** For a virtual keynote, 25-30 minutes is the ceiling before attention fragments. In-person you get maybe 40. Every slide that doesn't advance the narrative is a slide that erodes trust.\n\nThe through-line worth keeping in mind: launch event decks are the one asset where you get to tell the whole story, with emotion, in sequence, to an audience that chose to show up. That's a rare gift. The teams that treat it as a product demo waste it. The teams that treat it as a moment in a larger narrative tend to build something people remember.",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Crossing+the+Chasm+Geoffrey+Moore",
+      "page_number": 154,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "Mike Weinberg",
+      "url": null,
+      "page_number": 160,
+      "section_title": null
+    },
+    {
+      "source_type": "podcast_pmm",
+      "author": "Product Marketing Alliance",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 129,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=MisUnderstood+PMM",
+      "page_number": 49,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 41,
+      "section_title": null
+    },
+    {
+      "source_type": "podcast_pmm",
+      "author": "Product Marketing Alliance",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 25,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Sean Lauer",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Ashley Faus",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 5089,
+    "outputTokens": 1126
+  }
+}

@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[QueryPlanner] Flash Lite responded in 1157ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS sales pitch script structure and key components","Techniques for engaging B2B SaaS sales prospects during a pitch presentation","Common failure modes in B2B SaaS sales pitches and how to avoid them"]
+[MultiQuery] 3 queries → 16 unique chunks → top 10 returned (414ms)
+{
+  "query": "What is a B2B SaaS sales talk track / pitch script? Verbal flow for delivering the pitch deck — opening, transitions, slide-by-slide what-to-say, calibrated questions to drive engagement, handling pauses, asking for the next step. How does it pair with a deck (artifact 19)? Failure modes: monologue, reading slides, no questions, weak transitions, missing the close?",
+  "text": "# The B2B SaaS Sales Talk Track\n\nA talk track is the spoken layer that lives underneath your deck. The deck is the visual argument. The talk track is the human argument. They're not the same thing, and confusing them is where most pitches die.\n\nThink of it this way: your slides are the skeleton. The talk track is what makes it breathe.\n\n---\n\n## How It Pairs with the Deck\n\nThe deck controls *what* you show. The talk track controls *when* you show it, *how* you frame it, and *what you listen for* in response.\n\nThe fatal mistake is treating the deck as a script. Slides are prompts for conversation, not teleprompters. A good talk track actually tells you when to *stop* the deck entirely and just talk.\n\n**The pairing rule:** Every slide has three things in the talk track.\n\n- The *bridge in* (what you say before you advance)\n- The *frame* (one sentence that orients the prospect before they read)\n- The *question out* (what you ask before you move on)\n\n---\n\n## The Verbal Flow: Slide by Slide\n\n**Opening (before slide 1)**\n\nDon't start with your company. Start with their world.\n\n*\"Before I walk you through anything, I want to make sure I've got this right. You mentioned [their problem]. Is that still the biggest thing on your plate right now, or has something shifted?\"*\n\nThis does two things: it signals you listened, and it gives you permission to adapt the pitch in real time.\n\n**The Insight Slide**\n\nThis is your provocation. The goal isn't agreement, it's a raised eyebrow.\n\n*\"Most [their role] we talk to are dealing with [X pattern]. Does that resonate with what you're seeing?\"*\n\nPause. Actually wait. The silence after a good insight question is where deals start.\n\n**The Market/Problem Slide**\n\nNarrate the world they're living in. Then name the cost of staying there.\n\n*\"What we hear from teams like yours is that [problem] isn't just annoying, it's costing [specific outcome]. Does that match your experience?\"*\n\n**The Solution Introduction**\n\nDon't demo yet. Frame first.\n\n*\"What we built is [one sentence, plain language]. Not [what they might confuse you with]. Specifically [what makes you different].\"*\n\n**The Value/Demo Slide**\n\nThis is where the positioning framework earns its money. Lead with the outcome, then show the feature that delivers it.\n\n*\"Let me show you what this looks like for a team like yours...\"*\n\n**Proof Slide**\n\nMatch the proof to the person in the room. A VP of Sales gets a VP of Sales story. An IT leader gets an IT leader story.\n\n*\"This is [company similar to theirs]. Here's what they were dealing with before...\"*\n\n**Objections (unspoken)**\n\nName the fear before they do.\n\n*\"The thing we hear most at this stage is [fear of deployment/switching cost/buy-in]. Here's how we handle that...\"*\n\n**The Close**\n\nAsk for a specific next step. Not \"any questions?\" That's not a close, it's a surrender.\n\n*\"Based on what you've shared today, the logical next step would be [X]. Does that make sense to you?\"*\n\n---\n\n## Calibrated Questions That Drive Engagement\n\nScatter these throughout. Never more than one per slide.\n\n- *\"Is that consistent with what you're seeing?\"* (confirms the problem)\n- *\"What's the cost of that for your team right now?\"* (surfaces pain)\n- *\"How are you handling that today?\"* (exposes the alternative)\n- *\"Who else would need to be part of this conversation?\"* (maps the buying committee)\n- *\"What would need to be true for this to be a priority this quarter?\"* (tests urgency)\n\n---\n\n## The Failure Modes\n\n**Monologue.** You talked for 40 minutes. They nodded. You have no idea if they're interested or just polite. Questions aren't interruptions. They're how you know you're still in a conversation.\n\n**Reading slides.** If your prospect can read faster than you talk (they can), you've already lost them. The talk track should add information the slide doesn't contain.\n\n**No questions.** A pitch with zero questions is a presentation. Presentations don't close deals. The B2B buying process involves multiple stakeholders reaching consensus, which means you need to *surface* their concerns, not just address the ones you predicted.\n\n**Weak transitions.** \"Okay, so the next slide is...\" kills momentum. A good transition connects the previous insight to the next one. *\"So that's the problem. Here's what we decided to do about it.\"*\n\n**Missing the close.** Ending with \"So, any questions?\" is the most common and most expensive mistake in B2B SaaS sales. The ask should be specific, low-friction, and framed as the logical next step, not a favor.\n\n---\n\nThe talk track isn't a script you memorize. It's a map you internalize. The best reps know it cold enough to abandon it the moment the prospect says something more interesting than what's on the next slide.\n\nWhich part of the flow do you want to build out first: the opening, the proof section, or the close?",
+  "intent": "guidance",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "book",
+      "author": "Maja Voje",
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 291,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 129,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Joel Klettke",
+      "url": "https://www.amazon.com/s?k=Punchy",
+      "page_number": 70,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Geoffrey A. Moore",
+      "url": "https://www.amazon.com/s?k=Crossing+the+Chasm+Geoffrey+Moore",
+      "page_number": 154,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Gabriel Weinberg and Justin Mares",
+      "url": "https://www.amazon.com/s?k=Traction",
+      "page_number": 132,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Obviously+Awesome+%282nd+Edition%29+April+Dunford",
+      "page_number": 117,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 135,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Stevie Langford",
+      "url": "https://www.productmarketingalliance.com/what-is-b2b-messaging/",
+      "page_number": null,
+      "section_title": "Prevalent pitfalls"
+    },
+    {
+      "source_type": "book_sales",
+      "author": "April Dunford",
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 123,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "What about a B2B SaaS sales funnel?"
+    }
+  ],
+  "usage": {
+    "inputTokens": 3456,
+    "outputTokens": 1221
+  }
+}

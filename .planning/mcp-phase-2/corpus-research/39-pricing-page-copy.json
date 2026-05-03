@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 1206ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS pricing page best practices for tier naming and value proposition headlines","Common pitfalls and failure modes of B2B SaaS pricing pages and how to avoid them","Frameworks for determining feature gating and willingness to pay in B2B SaaS pricing models"]
+[MultiQuery] 3 queries → 14 unique chunks → top 10 returned (468ms)
+{
+  "query": "B2B SaaS pricing page copy — tier naming, Good Better Best, per-tier headline value statements, feature gating, FAQ structure, common pricing page failure modes, willingness to pay",
+  "text": "Pricing pages are where positioning either pays off or falls apart. Most SaaS companies treat the page as a feature inventory. The ones that convert treat it as a closing argument.\n\n## Tier Naming\n\nSkip the generic (Starter, Pro, Enterprise) unless you have a compelling reason to stay generic. The better approach: name tiers after the customer's **identity or job**, not your product's capability level.\n\n\"Solo\", \"Team\", \"Scale\" tells the buyer where they belong. \"Basic\", \"Advanced\", \"Enterprise\" tells them how much they're paying. The first creates self-selection. The second creates friction.\n\nOne pattern worth knowing: the middle tier should feel like the obvious choice before the buyer even reads it. Name it something that signals \"this is what serious companies use.\"\n\n---\n\n## Per-Tier Headline Value Statements\n\nOne sentence, one outcome, per tier. Not a feature list. Not a tagline. A statement of what changes for the buyer at this tier.\n\n- Tier 1: \"Everything you need to get your first 100 customers\"\n- Tier 2: \"Built for teams that need to move fast without breaking things\"\n- Tier 3: \"For orgs where security, compliance, and scale aren't optional\"\n\nThe test: can your buyer read the headline and immediately know if this tier is for them? If they have to read the feature list to figure that out, the headline failed.\n\n---\n\n## Feature Gating Logic\n\nHere's where most teams get it wrong. They gate features based on **cost to deliver**, not **value to the buyer**. The result: buyers can't understand why certain things are locked, and the page feels arbitrary.\n\nGate on value signals, not cost signals. The question to ask: \"What feature, when a customer uses it, signals they're ready to pay more?\" That's your gate.\n\nIntegrations, advanced analytics, SSO, audit logs, and custom roles are classic enterprise gates because they signal organizational complexity, not just usage volume. Gating on \"more of the same thing\" (more seats, more storage) is fine for volume pricing but doesn't create the perceived tier jump you need.\n\n---\n\n## Willingness to Pay\n\nYou can't set prices by looking at competitors. You can use competitors to anchor expectations, but willingness to pay comes from your buyers, not your rivals.\n\nTwo methods worth knowing: the Van Westendorp sensitivity model (four questions that triangulate acceptable price ranges) and the Gabor-Granger method (direct price testing at set points). Both are survey-based, both are faster than A/B testing, and both give you something A/B testing doesn't: the reasoning behind the number.\n\nThe insight that tends to surprise people: **72% of innovation failures trace back to pricing and monetization problems**, not product problems. The product was fine. The price was wrong.\n\n---\n\n## FAQ Structure\n\nMost pricing page FAQs answer the wrong questions. They answer \"how does billing work?\" when buyers are actually asking \"is this safe to buy?\"\n\nStructure your FAQ around **objections**, not logistics:\n\n- \"What happens to my data if I cancel?\" (fear of lock-in)\n- \"Can I change plans later?\" (fear of commitment)\n- \"Do I need a credit card to start?\" (friction reduction)\n- \"What counts as a 'user'?\" (value metric clarity)\n\nThe last one matters more than people think. If your value metric (what you charge per) isn't intuitive, buyers will hesitate even if the price is right. The Segment example is instructive: charging per API call worked for developers but confused everyone else. The better metric was active users because it mapped to outcomes, not technical events.\n\n---\n\n## Common Failure Modes\n\n**Too many tiers.** Four or more tiers creates comparison paralysis. Three is the number. One is gospel, two is contrast, three is a complete picture.\n\n**No anchor.** Without a high-priced option, buyers anchor on your mid-tier as expensive. The enterprise tier doesn't need to convert. It needs to make the middle tier feel reasonable.\n\n**Feature parity across tiers.** If every tier has \"everything in the previous tier plus...\", buyers spend time calculating delta value instead of identifying the right fit.\n\n**Hiding the price.** \"Contact us\" for every tier signals you don't trust your own pricing. Use it for enterprise customization, not as a default. Buyers who can't see a price often leave.\n\n**Value-based pricing and feature-differentiated bundles consistently outperform flat-rate models** in long-run SaaS benchmarks, often by 30% or more in expansion revenue. The pricing page is where that structure becomes visible to the buyer. If the page doesn't communicate why the tiers are different (not just what's in them), you're leaving that expansion revenue on the table.\n\nWhat's your current tier structure, and where's the friction point you're trying to solve?",
+  "intent": "deliverable",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "B2B pricing and plans"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/messaging-your-ai-pricing-model/",
+      "page_number": null,
+      "section_title": "A brief history of software pricing models"
+    },
+    {
+      "source_type": "blog",
+      "author": "Ella Berylo",
+      "url": "https://www.productmarketingalliance.com/what-pricing-model-should-you-choose-in-2026/",
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Kyle Poyar",
+      "url": "https://kylepoyar.substack.com/p/the-state-of-usage-based-pricing",
+      "page_number": null,
+      "section_title": "**Common pitfalls of usage-based pricing**"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/build-high-converting-pricing-page",
+      "page_number": null,
+      "section_title": "**Why This Framework Works**"
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/how-to-build-a-product-led-pricing-page",
+      "page_number": null,
+      "section_title": "How to Build the Right SaaS Pricing Page"
+    },
+    {
+      "source_type": "book",
+      "author": "Maja Voje",
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 163,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Madhavan Ramanujam",
+      "url": "https://www.amazon.com/s?k=Monetizing+Innovation+Madhavan+Ramanujam",
+      "page_number": 243,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": "Maja Voje",
+      "url": "https://www.amazon.com/s?k=The+Go+To+Market+Strategist",
+      "page_number": 169,
+      "section_title": null
+    },
+    {
+      "source_type": "blog_external",
+      "author": "Wes Bush",
+      "url": "https://productled.com/blog/blog-b2b-saas-copywriting-persuasion",
+      "page_number": null,
+      "section_title": "B2B SaaS Copywriting: The Art of Persuasion Above the Fold"
+    }
+  ],
+  "usage": {
+    "inputTokens": 3491,
+    "outputTokens": 1097
+  }
+}

@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 1198ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["Framework for structuring a quarterly business review (QBR) deck for B2B SaaS customer success","Best practices for demonstrating value delivered in B2B SaaS customer success QBRs","Techniques for building an expansion narrative and retention storytelling in customer success presentations"]
+[MultiQuery] 3 queries → 18 unique chunks → top 10 returned (873ms)
+{
+  "query": "Quarterly business review deck for B2B SaaS customer success — value delivered, executive sponsor alignment, expansion narrative, retention storytelling",
+  "text": "Here's a QBR deck structure built for the specific job you're describing: proving value to an executive sponsor, making retention feel inevitable, and opening the door to expansion without it feeling like a pitch.\n\n---\n\n## Slide 1: The Moment That Matters\n\n**Opening slide. One headline, one number, one emotion.**\n\nDon't open with your company logo and a agenda slide. Open with their world.\n\n> *\"Since [Month], [Customer] has [specific outcome]: [number]. Here's how we got here, and where we go next.\"*\n\nThis is the oxytocin trigger. The story starts with them as the hero, not you as the vendor.\n\n---\n\n## Slide 2: Where You Started\n\n**The villain slide. Make the pain real before you claim the win.**\n\n- What problem were they solving when they signed?\n- What was the status quo costing them (time, errors, revenue, headcount)?\n- One quote from the original discovery or onboarding call\n\nThis matters because executive sponsors often weren't in the room when the deal was signed. You're giving them the origin story so the transformation lands harder.\n\n---\n\n## Slide 3: What We Delivered\n\n**Outcomes, not activities. Three metrics maximum.**\n\nPick the numbers that connect to *their* business goals, not your product's feature set. \"Reduced manual processing time by 40%\" lands. \"Completed 14 onboarding sessions\" doesn't.\n\nStructure each metric as: **[Result] + [What it means for them]**\n\n> *\"Case resolution time down 32%. That's 6 hours per week back to your team.\"*\n\n---\n\n## Slide 4: Your Team's Journey\n\n**The adoption curve, told as a story.**\n\nShow usage over time as a narrative arc, not a flat chart. Label the inflection points: first power user, first cross-team expansion, first moment of self-sufficiency. This is where retention storytelling lives. The buyer sees momentum, not dependency.\n\n---\n\n## Slide 5: What Your Champions Are Saying\n\n**Three quotes. No more.**\n\nOne from a day-to-day user (emotional, specific). One from a manager (efficiency, team impact). One from a stakeholder close to the exec sponsor (strategic framing).\n\nThe three-story pattern here is deliberate: pain story, impact story, competitive-context story. Together they answer the question every executive sponsor is quietly asking: *\"Was this the right call?\"*\n\n---\n\n## Slide 6: The Roadmap Ahead\n\n**This is your expansion slide. Don't let it look like one.**\n\nFrame it as: *\"Here's where customers at your stage typically go next, and why.\"*\n\nShow a maturity model or adoption journey. Mark where they are today. Show what unlocks at the next stage, in their outcomes language, not your product feature language.\n\nThe expansion narrative works best when it feels like natural progression, not upsell. You're the trusted adviser showing them the path, not the vendor pushing the next SKU.\n\n---\n\n## Slide 7: Our Commitment\n\n**What you're bringing to the next 90 days.**\n\nTwo or three specific commitments. Named owners. Tied to their stated priorities from earlier in the deck.\n\nThis closes the loop: you opened with their world, you proved value, and now you're signaling you're still invested. Executive sponsors remember this slide because it's the one that answers \"what do I get for renewing?\"\n\n---\n\n## Slide 8: The Ask\n\n**One ask. Make it easy to say yes.**\n\nWhether it's renewal, expansion, a reference conversation, or an executive alignment call, name it directly. Vague closes get vague answers.\n\n---\n\n## A Few Notes on Delivery\n\n**Build the deck for the exec sponsor, not the champion.** Your day-to-day contact knows the story. The exec sponsor is reading it cold in a 20-minute window. Every slide should answer their question: *\"So what?\"*\n\n**Bring one number they haven't seen before.** Something from your data that surprises them in a good way. It signals you're paying attention at a level they didn't expect.\n\n**The retention story and the expansion story are the same story.** Customers who feel seen expand. The deck that proves value is the deck that earns the next conversation.\n\nWhich part of this are you building first: the value proof slides or the expansion narrative?",
+  "intent": "deliverable",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "ama",
+      "author": "Emi Hofmeister",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "April Rassa",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Alina Fu",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "JJ Xia",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Aratrika Rath",
+      "url": "https://www.productmarketingalliance.com/6-best-practices-for-creating-engaging-case-studies/",
+      "page_number": null,
+      "section_title": "5. Lean on storytelling"
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": null,
+      "page_number": null,
+      "section_title": "Frameworks that create rhythm and alignment"
+    },
+    {
+      "source_type": "blog",
+      "author": "Stuti Dutt",
+      "url": "https://www.productmarketingalliance.com/showcase-roi-product-marketing/",
+      "page_number": null,
+      "section_title": "Quarterly Business Reviews (QBRs)"
+    },
+    {
+      "source_type": "ama",
+      "author": "Jon Rooney",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Ben Geller",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "podcast_pmm",
+      "author": "Product Marketing Alliance",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 6322,
+    "outputTokens": 990
+  }
+}

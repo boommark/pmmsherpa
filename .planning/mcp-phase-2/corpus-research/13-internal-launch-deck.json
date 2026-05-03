@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 1333ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS internal launch deck structure and content for employee kickoff","Change management psychology for internal communication and employee buy-in","Common failure modes in internal product launch communications and how to avoid them"]
+[MultiQuery] 3 queries → 18 unique chunks → top 10 returned (755ms)
+{
+  "query": "What's in a B2B SaaS internal launch deck (employee-facing, kickoff, all-hands)? Outline: context, what we're launching, why we're winning, sales motion, role-by-role asks (sales/CS/support/marketing/product), success metrics, timeline, FAQ pointer. How is change-comm psychology applied — making employees torchbearers, not passive recipients? Failure modes: marketing pitch deck repurposed for internal use, no clear ask, no role-specific actions?",
+  "text": "## The Internal Launch Deck That Actually Works\n\nMost internal launch decks are just the external pitch deck with a different cover slide. That's the first failure mode, and it poisons everything downstream. Your sales team doesn't need to be convinced the product is great. They need to know what to say on Thursday's call.\n\nHere's the structure that works, and the psychology behind why it works.\n\n---\n\n## Section by Section\n\n**1. Context: Why Now**\nTwo or three slides. Market signal, customer pain you've been hearing, competitive pressure, or strategic bet. This isn't a market sizing exercise. It's the answer to \"why are we doing this right now?\" Employees who understand the *why* become advocates. Employees who don't become skeptics.\n\n**2. What We're Launching**\nCrisp product description, one demo or screenshot, the core use case. Resist the urge to show every feature. Show the job it does.\n\n**3. Why We're Winning**\nYour differentiated position, not a feature list. What does this do that nothing else does, for whom, and why does that matter? This is the section your sales team will actually memorize. Make it memorable.\n\n**4. The Sales Motion**\nICP, qualification signals, deal stage where this gets introduced, objection handling on the top two or three objections. If you have a new pricing model or packaging change, explain it here. Don't bury it in the FAQ.\n\n**5. Role-by-Role Asks**\nThis is the section most decks skip entirely. It's the most important one.\n\n- **Sales:** Pitch language, qualification questions, battlecard pointer, who to loop in on complex deals\n- **CS:** Expansion trigger signals, how to introduce this to existing customers, escalation path for edge cases\n- **Support:** Known limitations, what's in scope vs. not, where to route tickets\n- **Marketing:** Campaign timing, content going live, social amplification asks, embargo dates\n- **Product:** Feedback loop, where to log what you're hearing, roadmap communication protocol\n\nEach role gets one slide. One clear ask. Specific enough that someone reading it at 8am before a customer call knows exactly what to do.\n\n**6. Success Metrics**\nNot activity metrics. Outcome metrics. Pipeline influenced, feature adoption rate, competitive win rate on deals where this came up. The distinction matters because it signals to the whole company that you're measuring whether the launch *worked*, not whether the launch *happened*.\n\n**7. Timeline**\nA visual. Embargo lift, external announcement, sales enablement live, first campaign wave, 30/60/90 check-in dates. One slide. People need to see where they are in the sequence.\n\n**8. FAQ Pointer**\nDon't put the FAQ in the deck. Link to it. A living document beats a static slide every time, and it signals that someone owns the answers and will keep them current.\n\n---\n\n## The Change-Comm Psychology\n\nHere's the real question: why do employees become passive recipients instead of torchbearers?\n\nBecause they were informed, not involved. There's a meaningful difference between \"here's what's launching\" and \"here's what's launching, and here's the specific thing your team does to make it succeed.\" The second version gives people agency. Agency creates ownership. Ownership creates advocacy.\n\nA few techniques that actually shift the dynamic:\n\n- **Involve early.** Even a 10-person preview with key reps or CS leads two weeks before the all-hands creates a cohort of insiders who feel invested. They become your internal champions before the deck hits the full company.\n- **Use customer voice.** A 90-second customer clip in the deck saying \"this solves the problem I've had for three years\" does more than five slides of positioning. It reminds everyone why the work matters.\n- **Celebrate the small wins publicly.** First deal where the new product was part of the conversation. First CS expansion triggered by the feature. Make it visible. People repeat behavior that gets recognized.\n\nThe psychological safety angle matters too. Employees who feel safe to say \"I don't understand this yet\" or \"I don't know how to pitch this\" will ask. Employees who don't feel safe will nod and wing it. Build in a live Q&A. Create a Slack channel for questions. Make confusion acceptable.\n\n---\n\n## The Three Failure Modes\n\n**The repurposed pitch deck.** Investor and external buyer language in an internal deck. \"We're disrupting the $40B market\" means nothing to a support rep trying to answer a ticket. Rewrite for the audience.\n\n**No clear ask.** The deck ends with a \"questions?\" slide and everyone walks out unsure what they're supposed to do differently tomorrow. Every section needs a specific action attached to a specific role.\n\n**No role-specific actions.** Treating the whole company as one audience. A CS manager and an SDR have completely different jobs to do after a launch. The deck should reflect that. When everyone gets the same generic message, no one feels responsible for anything.\n\nThe internal launch is where launches actually succeed or fail. The external announcement is just the moment the work becomes visible.",
+  "intent": "deliverable",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "ama",
+      "author": "Charlene Wang",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Brandon Benke",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Lawrence Chapman",
+      "url": "https://www.productmarketingalliance.com/the-importance-of-internal-communication-plus-how-to-crush-it/",
+      "page_number": null,
+      "section_title": "How to improve your internal communications"
+    },
+    {
+      "source_type": "blog",
+      "author": "Lawrence Chapman",
+      "url": "https://www.productmarketingalliance.com/the-importance-of-internal-communication-plus-how-to-crush-it/",
+      "page_number": null,
+      "section_title": "Product launch challenges"
+    },
+    {
+      "source_type": "blog",
+      "author": "Melissa Breker",
+      "url": "https://www.productmarketingalliance.com/how-to-strengthen-your-change-muscle-for-your-content-teams-success/",
+      "page_number": null,
+      "section_title": "How to improve communication within and across content teams"
+    },
+    {
+      "source_type": "blog",
+      "author": "Lawrence Chapman",
+      "url": "https://www.productmarketingalliance.com/the-importance-of-internal-communication-plus-how-to-crush-it/",
+      "page_number": null,
+      "section_title": "What is internal communication?"
+    },
+    {
+      "source_type": "blog",
+      "author": "Lawrence Chapman",
+      "url": "https://www.productmarketingalliance.com/the-importance-of-internal-communication-plus-how-to-crush-it/",
+      "page_number": null,
+      "section_title": "Holistic thinking is pivotal"
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Pocket+Guide+to+Product+Launches",
+      "page_number": 49,
+      "section_title": null
+    },
+    {
+      "source_type": "book",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=The+Pocket+Guide+to+Product+Launches",
+      "page_number": 21,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Anna Wiggins",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 4040,
+    "outputTokens": 1151
+  }
+}

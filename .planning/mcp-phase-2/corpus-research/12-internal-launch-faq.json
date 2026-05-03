@@ -1,0 +1,88 @@
+[dotenv@17.2.3] injecting env (27) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[QueryPlanner] Flash Lite responded in 1224ms
+[QueryPlanner] Generated 3 RAG queries, web research: NO, web search: NO
+[QueryPlanner] Queries: ["B2B SaaS internal launch FAQ structure and best practices","Key questions for AEs, SEs, CSMs, and support in a B2B SaaS internal launch","Handling objections and 'what to avoid saying' in B2B SaaS internal launch FAQs for sales and customer-facing teams"]
+[MultiQuery] 3 queries → 17 unique chunks → top 10 returned (807ms)
+{
+  "query": "What questions belong in a B2B SaaS internal launch FAQ? Categories: what is it, who's it for, why now, pricing, how it competes, sales process, support model, talking points, what to avoid saying. Audience: AEs, SEs, CSMs, support, exec stakeholders. Failure modes: marketing copy as answers, missing the awkward questions, no how-to-handle objection guidance",
+  "text": "## The Internal Launch FAQ That Actually Gets Used\n\nMost internal FAQs fail the same way: they answer the questions marketing is comfortable with, not the ones reps get asked at 2pm on a Thursday. Here's how to build one that doesn't.\n\n---\n\n## What Is It\n\nSkip the press release language. Write this like you're explaining it to a smart AE who just got back from vacation.\n\n- **What does it actually do?** One sentence, plain English. No product names in the definition.\n- **What's the fastest way to show it working?** (SEs need this immediately)\n- **What does it NOT do yet?** This is the question reps will ask. Answer it here or they'll make something up in front of a prospect.\n- **How is this different from [existing feature/product they might confuse it with]?**\n\n---\n\n## Who's It For\n\nThe failure mode here is a vague ICP that fits everyone and helps no one.\n\n- **Primary buyer persona:** Title, company size, the trigger that makes them care right now\n- **Primary user persona:** (Often different from the buyer. Name both.)\n- **Who is NOT a good fit?** This is the most skipped question and the most valuable one for CSMs handling expansion calls.\n- **Which existing accounts should we be calling first?** Give them a filter, not a philosophy.\n\n---\n\n## Why Now\n\nThis is where you address the unspoken sales objection: \"Why should my prospect care about this today instead of next quarter?\"\n\n- What's changed in the market, the buyer's world, or your product that makes this timely?\n- What's the cost of waiting for the customer? Be specific. A number, a risk, a competitive dynamic.\n- Why did we build this now? (Reps get asked this. Have an honest answer.)\n\n---\n\n## Pricing\n\nAnswer the awkward questions directly. Vague answers here destroy credibility with AEs faster than anything else.\n\n- What does it cost? (Exact tiers or ranges. \"Contact us\" is not an answer for internal audiences.)\n- How does it fit into existing contracts? Expansion motion, new SKU, included in current tier?\n- What's the discount authority? Who approves exceptions?\n- **What do we say when a prospect says it's too expensive?** Script a response, not a principle.\n\n---\n\n## How It Competes\n\nThe failure mode: a feature comparison table that doesn't reflect how buyers actually evaluate.\n\n- Who are we most likely to see in competitive deals? (Name them. Two or three, max.)\n- What's our honest one-line differentiation against each?\n- Where do competitors have a legitimate advantage? (Reps will find out. Better they hear it from you.)\n- What do we say when a prospect says \"Competitor X already does this\"? Script it.\n- **What's the \"do nothing\" case?** The most common competitor in B2B SaaS is the status quo. Address it explicitly.\n\n---\n\n## Sales Process\n\n- What stage does this typically enter a conversation: new logo, expansion, renewal?\n- Who needs to be in the room? (Economic buyer, champion, technical approver)\n- What's the typical deal cycle change, if any?\n- What does a good discovery question look like for surfacing this need?\n- **What's the handoff to SE look like?** Give SEs a specific trigger, not \"when it gets technical.\"\n- What proof points exist right now? (Beta customers, case studies, reference-able names)\n\n---\n\n## Support Model\n\nCSMs and support reps need this section more than anyone. They're the ones who inherit the mess.\n\n- What's in scope for standard support vs. professional services?\n- What's the known limitation or edge case most likely to generate a ticket?\n- Where does the escalation path go when something breaks?\n- What should a CSM say if a customer asks for a feature that's on the roadmap but not committed?\n\n---\n\n## Talking Points and What to Avoid\n\nPut these together. The contrast is what makes both useful.\n\n**Say this:**\n- The one-sentence value statement that's been tested with customers\n- The proof point that's most credible right now (specific customer, specific outcome)\n- The forward-looking statement that's safe to share (roadmap direction without commitments)\n\n**Don't say this:**\n- [List the specific phrases that overclaim, confuse with competitors, or create legal exposure]\n- \"It's AI-powered\" without explaining what that means in your product context\n- Anything about roadmap features as if they're shipped\n- Specific competitor names in writing to prospects (flag this for legal reasons)\n\n---\n\n## The Objection Handling Section Most FAQs Skip\n\nAdd a standalone section with the three or four objections that will actually come up. Not generic objections. The specific ones for this launch.\n\nFormat each one like this:\n\n**Objection:** \"We already have something that does this.\"\n**What they're really saying:** They haven't seen a reason to change.\n**Response:** [Specific language. Not \"explain your value.\" Actual words.]\n**If they push back again:** [The follow-up move.]\n\n---\n\n## One More Thing\n\nThe best internal FAQ includes a \"known issues\" section that most PMMs are afraid to write. List the two or three things that aren't perfect yet. Reps who discover problems in the field and feel blindsided become your loudest internal critics. Reps who were warned become allies.\n\nWhich of these sections is the one your team is most likely to get wrong?",
+  "intent": "deliverable",
+  "citation_count": 10,
+  "citations": [
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/sales-assets-choose-your-weapon/",
+      "page_number": null,
+      "section_title": "Handling objections"
+    },
+    {
+      "source_type": "book_sales",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 129,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": null,
+      "url": "https://www.productmarketingalliance.com/all-you-need-to-know-about-battlecards/",
+      "page_number": null,
+      "section_title": "Handling objections"
+    },
+    {
+      "source_type": "ama",
+      "author": "Gagan Mand",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "blog",
+      "author": "Matt Heng",
+      "url": "https://www.productmarketingalliance.com/five-actionable-strategies-for-collaborating-more-effectively-with-sales-teams/",
+      "page_number": null,
+      "section_title": "Objection handling"
+    },
+    {
+      "source_type": "ama",
+      "author": "Ashley Faus",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Charles Tsang",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Sean Lauer",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "ama",
+      "author": "Anna Wiggins",
+      "url": null,
+      "page_number": null,
+      "section_title": null
+    },
+    {
+      "source_type": "book_sales",
+      "author": null,
+      "url": "https://www.amazon.com/s?k=Sales+Pitch-April+Dunford",
+      "page_number": 127,
+      "section_title": null
+    }
+  ],
+  "usage": {
+    "inputTokens": 4237,
+    "outputTokens": 1258
+  }
+}
