@@ -302,31 +302,31 @@ def run_ingestion(dry_run: bool = False) -> dict:
                     tags=doc.get("tags", []),
                 )
 
-                if doc_id:
-                    existing = (
-                        supabase.table("chunks")
-                        .select("id", count="exact")
-                        .eq("document_id", doc_id)
-                        .execute()
-                    )
-                    if existing.count and existing.count > 0:
-                        mark_ingested(blog_path)
-                        stats["skipped"] += 1
-                        continue
+                if not doc_id:
+                    log.error(f"  Blog insert_document returned None: {blog_path.name} — NOT marking ingested")
+                    stats["errors"] += 1
+                    continue
 
-                    n = insert_chunks(supabase, openai_client, doc_id, doc["chunks"])
-                    stats["documents"] += 1
-                    stats["chunks"] += n
-                    log.info(f"  + Blog: {doc['title'][:60]} ({n} chunks)")
-                else:
+                existing = (
+                    supabase.table("chunks")
+                    .select("id", count="exact")
+                    .eq("document_id", doc_id)
+                    .execute()
+                )
+                if existing.count and existing.count > 0:
+                    mark_ingested(blog_path)
                     stats["skipped"] += 1
+                    continue
 
+                n = insert_chunks(supabase, openai_client, doc_id, doc["chunks"])
+                stats["documents"] += 1
+                stats["chunks"] += n
+                log.info(f"  + Blog: {doc['title'][:60]} ({n} chunks)")
                 mark_ingested(blog_path)
 
             except Exception as e:
                 log.error(f"  Blog error {blog_path.name}: {e}")
                 stats["errors"] += 1
-                # Don't mark as ingested on error — will retry next run
 
     # ── Ingest new Sharebird AMAs ──
     if new_amas:
@@ -352,25 +352,26 @@ def run_ingestion(dry_run: bool = False) -> dict:
                     tags=doc.get("tags", []),
                 )
 
-                if doc_id:
-                    existing = (
-                        supabase.table("chunks")
-                        .select("id", count="exact")
-                        .eq("document_id", doc_id)
-                        .execute()
-                    )
-                    if existing.count and existing.count > 0:
-                        mark_ingested(ama_path)
-                        stats["skipped"] += 1
-                        continue
+                if not doc_id:
+                    log.error(f"  AMA insert_document returned None: {ama_path.name} — NOT marking ingested")
+                    stats["errors"] += 1
+                    continue
 
-                    n = insert_chunks(supabase, openai_client, doc_id, doc["chunks"])
-                    stats["documents"] += 1
-                    stats["chunks"] += n
-                    log.info(f"  + AMA: {doc['title'][:60]} ({n} chunks)")
-                else:
+                existing = (
+                    supabase.table("chunks")
+                    .select("id", count="exact")
+                    .eq("document_id", doc_id)
+                    .execute()
+                )
+                if existing.count and existing.count > 0:
+                    mark_ingested(ama_path)
                     stats["skipped"] += 1
+                    continue
 
+                n = insert_chunks(supabase, openai_client, doc_id, doc["chunks"])
+                stats["documents"] += 1
+                stats["chunks"] += n
+                log.info(f"  + AMA: {doc['title'][:60]} ({n} chunks)")
                 mark_ingested(ama_path)
 
             except Exception as e:
@@ -402,25 +403,26 @@ def run_ingestion(dry_run: bool = False) -> dict:
                     tags=doc.get("tags", []),
                 )
 
-                if doc_id:
-                    existing = (
-                        supabase.table("chunks")
-                        .select("id", count="exact")
-                        .eq("document_id", doc_id)
-                        .execute()
-                    )
-                    if existing.count and existing.count > 0:
-                        mark_ingested(post_path)
-                        stats["skipped"] += 1
-                        continue
+                if not doc_id:
+                    log.error(f"  Substack insert_document returned None: {post_path.name} — NOT marking ingested")
+                    stats["errors"] += 1
+                    continue
 
-                    n = insert_chunks(supabase, openai_client, doc_id, doc["chunks"])
-                    stats["documents"] += 1
-                    stats["chunks"] += n
-                    log.info(f"  + Substack: {doc['title'][:60]} ({n} chunks)")
-                else:
+                existing = (
+                    supabase.table("chunks")
+                    .select("id", count="exact")
+                    .eq("document_id", doc_id)
+                    .execute()
+                )
+                if existing.count and existing.count > 0:
+                    mark_ingested(post_path)
                     stats["skipped"] += 1
+                    continue
 
+                n = insert_chunks(supabase, openai_client, doc_id, doc["chunks"])
+                stats["documents"] += 1
+                stats["chunks"] += n
+                log.info(f"  + Substack: {doc['title'][:60]} ({n} chunks)")
                 mark_ingested(post_path)
 
             except Exception as e:
