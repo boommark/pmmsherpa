@@ -109,18 +109,19 @@ export async function runSherpaChat(input: RunSherpaChatInput): Promise<RunSherp
     { role: 'user' as const, content: message },
   ]
 
-  // Phase 4: Non-streaming LLM call
+  // Phase 4: Non-streaming LLM call.
+  //
+  // Latency note (verified 2026-05-03 via Langfuse trace
+  // 000000000000000080c730265da04009): output rate was ~39 tok/s, well below
+  // Sonnet's normal 70-80 tok/s. Diff was extended-thinking time hidden under
+  // `effort: 'medium'` — invisible reasoning tokens added ~10s with marginal
+  // quality lift on corpus-grounded synthesis. Dropped here.
   const llmModel = getModel(MCP_MODEL)
   const result = await generateText({
     model: llmModel,
     messages: [...systemMessages, ...allMessages],
-    maxOutputTokens: 8192,
+    maxOutputTokens: 2048,
     temperature: 0.7,
-    providerOptions: {
-      anthropic: {
-        output_config: { effort: 'medium' },
-      },
-    },
     experimental_telemetry: {
       isEnabled: true,
       functionId: 'mcp.runSherpaChat',
