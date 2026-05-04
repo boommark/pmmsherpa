@@ -264,10 +264,11 @@ export default function SignupPage() {
             </Button>
 
             <p className="text-xs text-center text-muted-foreground leading-relaxed">
-              By creating an account you agree to our{' '}
+              By continuing with Google or email, you agree to our{' '}
               <Link href="/terms" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">Terms of Service</Link>
               {' '}and{' '}
-              <Link href="/privacy" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">Privacy Policy</Link>.
+              <Link href="/privacy" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">Privacy Policy</Link>
+              , and to receive product updates from PMM Sherpa. You can unsubscribe anytime.
             </p>
           </form>
 
