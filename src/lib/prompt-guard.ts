@@ -41,8 +41,12 @@ const EXTRACTION_PATTERNS = [
   // Indirect/creative extraction
   /\btext\s+between\s+(the\s+)?(first|triple|back\s*tick)/i,
   /\beverything\s+(before|above)\s+(this|my)\s+(line|message|prompt)/i,
-  /\bverbatim/i,
-  /\bword\s+for\s+word/i,
+  // "verbatim" / "word for word" only block when paired with an extraction
+  // target (system prompt / your instructions / your prompt / your rules etc.)
+  // in either order. Standalone keywords produced false positives on legit
+  // research tasks like "cite this verbatim from their website".
+  /\b(verbatim|word\s+for\s+word)\b[\s\S]{0,200}\b(system\s*prompt|system\s*message|your\s+(instructions?|prompt|rules|guidelines|directives|policies)|initial\s*prompt|original\s*prompt|full\s*prompt|hidden\s*prompt|instructions?\s*(above|below))\b/i,
+  /\b(system\s*prompt|system\s*message|your\s+(instructions?|prompt|rules|guidelines|directives|policies)|initial\s*prompt|original\s*prompt|full\s*prompt|hidden\s*prompt|instructions?\s*(above|below))\b[\s\S]{0,200}\b(verbatim|word\s+for\s+word)\b/i,
 ]
 
 // Patterns in output that suggest prompt leakage
