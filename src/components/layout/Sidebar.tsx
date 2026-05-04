@@ -435,6 +435,7 @@ function SidebarContent({
                     style={{ width: `${Math.min(100, (profile.messages_used_this_period / FREE_TIER_MONTHLY_LIMIT) * 100)}%` }}
                   />
                 </div>
+                <p className="text-[10px] text-muted-foreground">Resets on the 1st of each month</p>
                 <Button
                   size="sm"
                   onClick={handleUpgradeToStarter}
