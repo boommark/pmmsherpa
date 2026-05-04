@@ -19,11 +19,13 @@ import {
   parseJsonRpcBody,
   buildResult,
   buildError,
+  encodeSseFrame,
   JSON_RPC_ERRORS,
   MCP_PROTOCOL_VERSION,
   MCP_SESSION_HEADER,
   type JsonRpcRequest,
   type JsonRpcMessage,
+  type JsonRpcId,
 } from '@/lib/mcp/transport'
 import {
   extractBearerToken,
@@ -228,6 +230,24 @@ export async function POST(req: NextRequest): Promise<Response> {
     }
   }
 
+  // Streaming path: single-message tools/call with params._meta.progressToken.
+  // Per MCP spec, the server may respond with text/event-stream and emit
+  // notifications/progress frames before the final tools/call result envelope.
+  // We only enable streaming for tools whose handler honors onProgress
+  // (currently `ask_sherpa`); other tools fall through to the JSON path
+  // even if a progressToken is present.
+  if (parsed.messages.length === 1 && !parsed.isBatch) {
+    const msg = parsed.messages[0]
+    const progressToken = extractProgressToken(msg)
+    if (progressToken !== undefined && msg.method === 'tools/call') {
+      const params = (msg.params ?? {}) as { name?: unknown }
+      const toolName = typeof params.name === 'string' ? params.name : ''
+      if (STREAMING_TOOLS.has(toolName)) {
+        return streamingToolCall(msg, auth, session, progressToken)
+      }
+    }
+  }
+
   // Wrap the whole request in a transport-level observation. Per-tool
   // observations nest under this span via startMcpObservation in dispatch.
   const responses: JsonRpcMessage[] = []
@@ -325,5 +345,126 @@ function jsonResponse(body: JsonRpcMessage, status: number): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+/* ------------------------------------------------------------------ */
+/*  Streaming tools/call (SSE + notifications/progress)                 */
+/* ------------------------------------------------------------------ */
+
+/** Tools whose handler accepts an `onProgress` callback. */
+const STREAMING_TOOLS = new Set(['ask_sherpa'])
+
+/** Extract `params._meta.progressToken` per MCP spec; undefined if absent. */
+function extractProgressToken(msg: JsonRpcRequest): string | number | undefined {
+  const params = msg.params
+  if (!params || typeof params !== 'object' || Array.isArray(params)) return undefined
+  const meta = (params as Record<string, unknown>)._meta
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return undefined
+  const tok = (meta as Record<string, unknown>).progressToken
+  if (typeof tok === 'string' || typeof tok === 'number') return tok
+  return undefined
+}
+
+/**
+ * Run a single tools/call with progress streaming. Emits one
+ * notifications/progress SSE frame per LLM text delta, then the final
+ * tools/call result envelope. Session + tool validation mirrors dispatch().
+ */
+function streamingToolCall(
+  msg: JsonRpcRequest,
+  auth: McpAuthContext,
+  session: McpSession | null,
+  progressToken: string | number,
+): Response {
+  const id: JsonRpcId = msg.id
+
+  if (!session) {
+    return jsonResponse(
+      buildError(
+        id,
+        JSON_RPC_ERRORS.SERVER_NOT_INITIALIZED,
+        'Server not initialized: call initialize first and echo Mcp-Session-Id on subsequent requests',
+      ),
+      400,
+    )
+  }
+  if (!session.initialized) {
+    return jsonResponse(
+      buildError(id, JSON_RPC_ERRORS.SERVER_NOT_INITIALIZED, 'Session exists but initialize handshake has not completed'),
+      400,
+    )
+  }
+  if (session.user_id !== auth.userId) {
+    return jsonResponse(
+      buildError(id, JSON_RPC_ERRORS.INVALID_REQUEST, 'Session does not belong to the authenticated user'),
+      403,
+    )
+  }
+
+  const params = (msg.params ?? {}) as { name?: unknown; arguments?: unknown }
+  const tool = typeof params.name === 'string' ? getTool(params.name) : undefined
+  if (!tool) {
+    return jsonResponse(
+      buildError(id, JSON_RPC_ERRORS.METHOD_NOT_FOUND, `Unknown tool: ${String(params.name)}`),
+      400,
+    )
+  }
+  const args =
+    params.arguments && typeof params.arguments === 'object' && !Array.isArray(params.arguments)
+      ? (params.arguments as Record<string, unknown>)
+      : {}
+
+  const encoder = new TextEncoder()
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      let progressCounter = 0
+      const onProgress = (delta: string) => {
+        progressCounter += 1
+        const note: JsonRpcMessage = {
+          jsonrpc: '2.0',
+          method: 'notifications/progress',
+          params: {
+            progressToken,
+            progress: progressCounter,
+            message: delta,
+          },
+        }
+        controller.enqueue(encoder.encode(encodeSseFrame(note)))
+      }
+
+      ;(async () => {
+        try {
+          const result = await startMcpObservation(
+            `mcp.tool.${tool.name}`,
+            {
+              userId: auth.userId,
+              sessionId: session.id,
+              toolName: tool.name,
+              input: args,
+            },
+            async () => tool.handler(args, { auth, session, onProgress }),
+          )
+          controller.enqueue(encoder.encode(encodeSseFrame(buildResult(id, result))))
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Tool execution failed'
+          controller.enqueue(
+            encoder.encode(encodeSseFrame(buildError(id, JSON_RPC_ERRORS.INTERNAL_ERROR, message))),
+          )
+        } finally {
+          controller.close()
+          touchSession(session.id).catch(() => undefined)
+        }
+      })()
+    },
+  })
+
+  return new Response(stream, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+    },
   })
 }

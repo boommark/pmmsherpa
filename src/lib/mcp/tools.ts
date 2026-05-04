@@ -50,6 +50,14 @@ export interface ToolResult {
 export interface ToolHandlerContext {
   auth: McpAuthContext
   session: McpSession
+  /**
+   * If the host requested progress (params._meta.progressToken on tools/call),
+   * the route handler passes a callback here. Tools that support streaming
+   * (currently `ask_sherpa`) call this with each text delta; tools that
+   * don't simply ignore it. The route is responsible for SSE framing and
+   * for emitting `notifications/progress`.
+   */
+  onProgress?: (delta: string) => void
 }
 
 export interface Tool {
@@ -308,13 +316,14 @@ export const askSherpaTool: Tool = {
           }
         }
 
-        // ---- Run RAG + LLM ----
+        // ---- Run RAG + LLM (streams via onChunk when host asked for progress) ----
         let result
         try {
           result = await runSherpaChat({
             message: query,
             userId: ctx.auth.userId,
             conversationHistory,
+            onChunk: ctx.onProgress,
           })
         } catch (err) {
           console.error('[ask_sherpa] runSherpaChat threw:', err)

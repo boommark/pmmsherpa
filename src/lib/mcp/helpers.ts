@@ -14,7 +14,7 @@
  *   - Optional system prompt suffix appended to the dynamic part
  */
 
-import { generateText } from 'ai'
+import { generateText, streamText } from 'ai'
 import { multiQueryRetrieve, extractCitations, formatContextForPrompt } from '@/lib/rag/retrieval'
 import { planQueries, type QueryPlan } from '@/lib/rag/query-planner'
 import { getSystemPromptParts } from '@/lib/llm/system-prompt'
@@ -33,6 +33,13 @@ export interface RunSherpaChatInput {
   customSystemPromptSuffix?: string
   /** Force a specific intent (skips planner intent for retrieval boosts). */
   intentOverride?: QueryPlan['intent']
+  /**
+   * If provided, the LLM call streams via `streamText` and `onChunk` is invoked
+   * with each text delta as it arrives. The full text is still accumulated
+   * and returned in the result. When omitted, behaves identically to the
+   * non-streaming `generateText` path.
+   */
+  onChunk?: (delta: string) => void
 }
 
 export interface RunSherpaChatOutput {
@@ -44,7 +51,7 @@ export interface RunSherpaChatOutput {
 }
 
 export async function runSherpaChat(input: RunSherpaChatInput): Promise<RunSherpaChatOutput> {
-  const { message, userId, conversationHistory = [], customSystemPromptSuffix, intentOverride } = input
+  const { message, userId, conversationHistory = [], customSystemPromptSuffix, intentOverride, onChunk } = input
 
   // Phase 1: Plan retrieval queries
   const queryPlan = await planQueries(
@@ -109,15 +116,20 @@ export async function runSherpaChat(input: RunSherpaChatInput): Promise<RunSherp
     { role: 'user' as const, content: message },
   ]
 
-  // Phase 4: Non-streaming LLM call.
+  // Phase 4: LLM call.
   //
   // Latency note (verified 2026-05-03 via Langfuse trace
   // 000000000000000080c730265da04009): output rate was ~39 tok/s, well below
   // Sonnet's normal 70-80 tok/s. Diff was extended-thinking time hidden under
   // `effort: 'medium'` — invisible reasoning tokens added ~10s with marginal
   // quality lift on corpus-grounded synthesis. Dropped here.
+  //
+  // Streams via `streamText` when `onChunk` is provided so the route can
+  // emit MCP `notifications/progress` to the host (perceived TTFB ~3s vs
+  // ~14s warm). Without onChunk we still use generateText so tests and
+  // non-MCP callers get a single awaitable.
   const llmModel = getModel(MCP_MODEL)
-  const result = await generateText({
+  const llmCallOpts = {
     model: llmModel,
     messages: [...systemMessages, ...allMessages],
     maxOutputTokens: 2048,
@@ -129,18 +141,38 @@ export async function runSherpaChat(input: RunSherpaChatInput): Promise<RunSherp
         userId,
         model: MCP_MODEL,
         intent,
+        streaming: !!onChunk,
       },
     },
-  })
+  }
+
+  let text: string
+  let inputTokens = 0
+  let outputTokens = 0
+
+  if (onChunk) {
+    const stream = streamText(llmCallOpts)
+    let acc = ''
+    for await (const delta of stream.textStream) {
+      acc += delta
+      onChunk(delta)
+    }
+    text = acc
+    const usage = await stream.usage
+    inputTokens = usage?.inputTokens ?? 0
+    outputTokens = usage?.outputTokens ?? 0
+  } else {
+    const result = await generateText(llmCallOpts)
+    text = result.text
+    inputTokens = result.usage?.inputTokens ?? 0
+    outputTokens = result.usage?.outputTokens ?? 0
+  }
 
   return {
-    text: result.text,
+    text,
     citations,
     chunks,
-    usage: {
-      inputTokens: result.usage?.inputTokens ?? 0,
-      outputTokens: result.usage?.outputTokens ?? 0,
-    },
+    usage: { inputTokens, outputTokens },
     intent,
   }
 }
