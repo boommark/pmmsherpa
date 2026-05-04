@@ -67,8 +67,32 @@ export async function GET(req: NextRequest) {
     )
   }
 
-  // Read the Supabase user + session left on this request by the cookie.
+  // Exchange Supabase's `?code=...` for a session cookie, then read user.
+  //
+  // Supabase's PKCE flow lands here with a `code` query param after the
+  // Google → Supabase round trip. The session cookie is NOT set until we
+  // call exchangeCodeForSession. Without this, fresh logins (no prior
+  // staging session) hit getUser()→null and bounce to /login mid-flow.
+  // The original Phase 1 test worked only because the tester already had
+  // a staging session cookie from another tab.
   const supabase = await createClient()
+  const supabaseCode = req.nextUrl.searchParams.get('code')
+  if (supabaseCode) {
+    const { error: exchangeErr } = await supabase.auth.exchangeCodeForSession(supabaseCode)
+    if (exchangeErr) {
+      console.error('[mcp/callback] supabase exchangeCodeForSession failed', exchangeErr)
+      cookieStore.delete(STASH_COOKIE)
+      return NextResponse.redirect(
+        appendQuery(stash.redirectUri, {
+          error: 'access_denied',
+          error_description: 'failed to exchange supabase code',
+          ...(stash.state ? { state: stash.state } : {}),
+        }),
+        { status: 302 },
+      )
+    }
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser()
