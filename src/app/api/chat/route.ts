@@ -135,6 +135,31 @@ export async function POST(request: NextRequest) {
         handleAbuseEvent(user.id, user.email ?? '', message, guardResult.matchedPattern, 'prompt_injection')
           .catch(err => console.error('[PromptGuard] Abuse logging failed:', err))
 
+        // Ghost-cleanup: the client creates the conversation row before
+        // POSTing here (ChatContainer.tsx). If the guard blocks, we never
+        // save the user message or the safe response, so the conversation
+        // sits empty in the user's sidebar. Delete it iff it has zero
+        // messages — never touch an existing thread mid-flow.
+        if (conversationId) {
+          ;(async () => {
+            try {
+              const { count } = await supabase
+                .from('messages')
+                .select('id', { count: 'exact', head: true })
+                .eq('conversation_id', conversationId)
+              if ((count ?? 0) === 0) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                await (supabase.from('conversations') as any)
+                  .delete()
+                  .eq('id', conversationId)
+                  .eq('user_id', user.id)
+              }
+            } catch (e) {
+              console.error('[PromptGuard] Ghost cleanup failed:', e)
+            }
+          })()
+        }
+
         const encoder = new TextEncoder()
         const safeStream = new ReadableStream({
           start(controller) {
