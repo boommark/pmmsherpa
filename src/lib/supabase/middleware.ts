@@ -31,7 +31,9 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protected routes — require auth + completed profile
+  // Protected routes — require auth only. Profile-completion gate was removed
+  // so users go straight from signup → /chat. Post-signup work runs in
+  // /auth/callback via runPostSignupOnce.
   const protectedRoutes = ['/chat', '/history', '/saved', '/settings']
   const isProtectedRoute = protectedRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route)
@@ -43,21 +45,6 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // If user is authenticated and accessing a protected route, check profile completion
-  if (isProtectedRoute && user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('profile_completed')
-      .eq('id', user.id)
-      .single()
-
-    if (profile && !profile.profile_completed) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/complete-profile'
-      return NextResponse.redirect(url)
-    }
-  }
-
   // Redirect old /request-access to /login
   if (request.nextUrl.pathname.startsWith('/request-access')) {
     const url = request.nextUrl.clone()
@@ -65,22 +52,15 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Redirect authenticated users away from auth pages (except complete-profile)
+  // Authed users hitting /login or /signup → /chat
   const authRoutes = ['/login', '/signup']
   const isAuthRoute = authRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route)
   )
 
   if (isAuthRoute && user) {
-    // Check if profile is complete — if not, send to complete-profile instead of chat
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('profile_completed')
-      .eq('id', user.id)
-      .single()
-
     const url = request.nextUrl.clone()
-    url.pathname = profile?.profile_completed ? '/chat' : '/complete-profile'
+    url.pathname = '/chat'
     return NextResponse.redirect(url)
   }
 

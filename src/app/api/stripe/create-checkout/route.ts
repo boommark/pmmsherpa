@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         },
       ],
       success_url: `${appUrl}/auth/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/complete-profile?cancelled=true`,
+      cancel_url: `${appUrl}/settings?upgrade_cancelled=true`,
       subscription_data: {
         metadata: {
           supabase_user_id: user.id,

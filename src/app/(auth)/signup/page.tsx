@@ -35,11 +35,17 @@ export default function SignupPage() {
   const router = useRouter()
   const supabase = createClient()
 
-  // Persist referral code so it survives OAuth redirects and email confirmation flows
+  // Persist referral code so it survives OAuth redirects + email confirmation.
+  // Cookie is the source of truth for the server-side /auth/callback handler;
+  // localStorage is kept for backward compatibility with the immediate-session path.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const ref = params.get('ref')
-    if (ref) localStorage.setItem('pmmsherpa_ref', ref)
+    if (ref) {
+      localStorage.setItem('pmmsherpa_ref', ref)
+      // 30-day cookie, lax so it survives OAuth round-trip
+      document.cookie = `pmmsherpa_ref=${encodeURIComponent(ref)}; Max-Age=${60 * 60 * 24 * 30}; Path=/; SameSite=Lax`
+    }
   }, [])
 
   const handleGoogleSignup = async () => {
@@ -94,19 +100,31 @@ export default function SignupPage() {
       }
 
       // If Supabase returns a session immediately (email confirmation disabled),
-      // redirect to complete-profile
+      // run post-signup server-side then go straight to /chat.
       if (data.session) {
         posthog.identify(data.session.user.id, {
           email: data.session.user.email,
           name: fullName,
         })
         posthog.capture('user_signed_up', { method: 'email' })
-        router.push('/complete-profile')
+        try {
+          const referralCode = localStorage.getItem('pmmsherpa_ref')
+          await fetch('/api/post-signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ referralCode }),
+          })
+          localStorage.removeItem('pmmsherpa_ref')
+        } catch (err) {
+          console.error('[signup] post-signup call failed:', err)
+        }
+        router.push('/chat')
         router.refresh()
         return
       }
 
-      // Otherwise, email confirmation is required — show confirmation message
+      // Otherwise, email confirmation is required — show confirmation message.
+      // Post-signup work fires when the user clicks the email link → /auth/callback.
       posthog.capture('user_signed_up', { method: 'email', email_confirmation_required: true })
       setEmailSent(true)
     } catch {
@@ -167,6 +185,15 @@ export default function SignupPage() {
               {error}
             </div>
           )}
+
+          {/* Click-wrap consent — covers both Google OAuth and email signup below */}
+          <p className="text-xs text-center text-muted-foreground leading-relaxed mb-4">
+            By continuing with Google or email, you agree to our{' '}
+            <Link href="/terms" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">Terms of Service</Link>
+            {' '}and{' '}
+            <Link href="/privacy" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">Privacy Policy</Link>
+            , and to receive product updates from PMM Sherpa. You can unsubscribe anytime.
+          </p>
 
           {/* Google OAuth — fastest path */}
           <Button
@@ -262,14 +289,6 @@ export default function SignupPage() {
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create Account
             </Button>
-
-            <p className="text-xs text-center text-muted-foreground leading-relaxed">
-              By continuing with Google or email, you agree to our{' '}
-              <Link href="/terms" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">Terms of Service</Link>
-              {' '}and{' '}
-              <Link href="/privacy" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">Privacy Policy</Link>
-              , and to receive product updates from PMM Sherpa. You can unsubscribe anytime.
-            </p>
           </form>
 
           {/* Footer */}
