@@ -7,10 +7,9 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
-import { Loader2, CheckCircle2, Zap, Gift } from 'lucide-react'
+import { Loader2, CheckCircle2 } from 'lucide-react'
 import posthog from 'posthog-js'
 
 export default function CompleteProfilePage() {
@@ -22,12 +21,8 @@ export default function CompleteProfilePage() {
   const router = useRouter()
   const supabase = createClient()
 
-  const [selectedPlan, setSelectedPlan] = useState<'free' | 'starter'>('free')
-
   const [formData, setFormData] = useState({
     linkedinUrl: '',
-    consentGiven: false,
-    termsAccepted: false,
   })
 
   // Pre-fill from authenticated user
@@ -79,16 +74,6 @@ export default function CompleteProfilePage() {
       return
     }
 
-    if (!formData.consentGiven) {
-      setError('Please accept the communication consent to continue')
-      return
-    }
-
-    if (!formData.termsAccepted) {
-      setError('Please accept the Terms of Service and Privacy Policy to continue')
-      return
-    }
-
     setIsLoading(true)
 
     try {
@@ -98,8 +83,8 @@ export default function CompleteProfilePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           linkedinUrl: formData.linkedinUrl,
-          consentGiven: formData.consentGiven,
-          termsAccepted: formData.termsAccepted,
+          consentGiven: true,
+          termsAccepted: true,
           ...(referralCode ? { referralCode } : {}),
         }),
       })
@@ -110,27 +95,10 @@ export default function CompleteProfilePage() {
         throw new Error(data.error || 'Failed to complete profile')
       }
 
-      // Clear the referral code now that attribution is done
       if (typeof window !== 'undefined') localStorage.removeItem('pmmsherpa_ref')
 
-      posthog.capture('profile_completed', { plan: selectedPlan })
+      posthog.capture('profile_completed', { plan: 'free' })
 
-      // If user chose Starter, redirect to Stripe Checkout
-      if (selectedPlan === 'starter') {
-        posthog.capture('starter_plan_selected')
-        const checkoutResp = await fetch('/api/stripe/create-checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || 'price_1TO9jf0VHMhK76TXbpK6gwMr' }),
-        })
-        const checkoutData = await checkoutResp.json()
-        if (checkoutData.url) {
-          window.location.href = checkoutData.url
-          return
-        }
-      }
-
-      // Free plan — go straight to chat
       setIsSubmitted(true)
       setTimeout(() => {
         router.push('/chat')
@@ -177,7 +145,7 @@ export default function CompleteProfilePage() {
               {userName ? `Welcome, ${userName}!` : 'Almost there!'}
             </h1>
             <p className="text-muted-foreground text-sm">
-              Connect your LinkedIn and choose your plan to get started.
+              One quick step — share your LinkedIn so we know who&apos;s joining.
             </p>
           </div>
 
@@ -209,82 +177,6 @@ export default function CompleteProfilePage() {
               />
             </div>
 
-            {/* Plan selection */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Choose your plan</Label>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedPlan('free')}
-                  className={`p-4 rounded-xl border-2 text-left transition-all ${
-                    selectedPlan === 'free'
-                      ? 'border-[#0058be] bg-[#0058be]/5 dark:bg-[#0058be]/10'
-                      : 'border-[#e5e7eb] dark:border-[#3a3d42] hover:border-[#0058be]/50'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Gift className="h-4 w-4 text-[#0058be]" />
-                    <span className="font-semibold text-sm">Free</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">10 messages per month</p>
-                  <p className="text-lg font-bold mt-1">$0</p>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedPlan('starter')}
-                  className={`p-4 rounded-xl border-2 text-left transition-all relative ${
-                    selectedPlan === 'starter'
-                      ? 'border-[#0058be] bg-[#0058be]/5 dark:bg-[#0058be]/10'
-                      : 'border-[#e5e7eb] dark:border-[#3a3d42] hover:border-[#0058be]/50'
-                  }`}
-                >
-                  <div className="absolute -top-2.5 right-3 px-2 py-0.5 bg-[#0058be] text-white text-[10px] font-semibold rounded-full uppercase tracking-wide">
-                    Recommended
-                  </div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Zap className="h-4 w-4 text-[#0058be]" />
-                    <span className="font-semibold text-sm">Starter</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">200 msgs/month, all models</p>
-                  <p className="text-lg font-bold mt-1">$9.99<span className="text-xs font-normal text-muted-foreground">/mo</span></p>
-                </button>
-              </div>
-            </div>
-
-            {/* Consent checkbox — email/marketing */}
-            <div className="flex items-start space-x-3 p-4 rounded-xl bg-[#f2f4f7] dark:bg-[#282b30]">
-              <Checkbox
-                id="consent"
-                checked={formData.consentGiven}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, consentGiven: checked === true }))}
-                className="mt-0.5 border-[#0058be]/30 data-[state=checked]:bg-[#0058be] data-[state=checked]:border-[#0058be]"
-              />
-              <label htmlFor="consent" className="text-sm cursor-pointer leading-relaxed text-muted-foreground">
-                I understand that PMM Sherpa or its founders may reach out to me with product notification emails and promotional emails. *
-              </label>
-            </div>
-
-            {/* Terms & Privacy agreement — required for Free and all paid tiers */}
-            <div className="flex items-start space-x-3 p-4 rounded-xl bg-[#f2f4f7] dark:bg-[#282b30]">
-              <Checkbox
-                id="terms"
-                checked={formData.termsAccepted}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, termsAccepted: checked === true }))}
-                className="mt-0.5 border-[#0058be]/30 data-[state=checked]:bg-[#0058be] data-[state=checked]:border-[#0058be]"
-              />
-              <label htmlFor="terms" className="text-sm cursor-pointer leading-relaxed text-muted-foreground">
-                I agree to the{' '}
-                <Link href="/terms" target="_blank" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">
-                  Terms of Service
-                </Link>
-                {' '}and{' '}
-                <Link href="/privacy" target="_blank" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">
-                  Privacy Policy
-                </Link>
-                {' '}of PMM Sherpa. *
-              </label>
-            </div>
-
             <Button
               type="submit"
               className="w-full h-11 rounded-xl bg-[#0058be] hover:bg-[#004a9e] shadow-none font-medium text-white"
@@ -293,13 +185,33 @@ export default function CompleteProfilePage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {selectedPlan === 'starter' ? 'Proceeding to payment...' : 'Saving...'}
+                  Saving...
                 </>
               ) : (
-                selectedPlan === 'starter' ? 'Continue to Payment' : 'Get Started Free'
+                'Get Started'
               )}
             </Button>
+
+            <p className="text-xs text-center text-muted-foreground leading-relaxed">
+              By continuing, you agree to our{' '}
+              <Link href="/terms" target="_blank" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">
+                Terms of Service
+              </Link>
+              {' '}and{' '}
+              <Link href="/privacy" target="_blank" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">
+                Privacy Policy
+              </Link>
+              , and to receive product updates from PMM Sherpa. You can unsubscribe anytime.
+            </p>
           </form>
+
+          <p className="mt-6 text-xs text-center text-muted-foreground">
+            You&apos;ll start on the Free plan. Upgrade to Starter anytime from{' '}
+            <Link href="/settings" className="text-[#0058be] dark:text-[#a8c0f0] hover:underline">
+              Settings
+            </Link>
+            .
+          </p>
         </div>
 
         <div className="text-center mt-6 flex items-center justify-center gap-4 text-sm text-muted-foreground">
