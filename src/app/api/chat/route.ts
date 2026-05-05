@@ -24,6 +24,68 @@ import { getActiveTraceId } from '@/lib/observability/trace'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
+// Phase tracking: when the chat request fails, we tag the failure with the
+// stage it died in so the fallback message can speak to the actual problem
+// and ops can group failures by class. See logChatError + fallbackForPhase.
+type ChatPhase =
+  | 'guard_blocked'
+  | 'history_load'
+  | 'url_scrape'
+  | 'attachments'
+  | 'query_planner'
+  | 'rag'
+  | 'web_research'
+  | 'llm_stream'
+  | 'unknown'
+
+function fallbackForPhase(phase: ChatPhase): string {
+  switch (phase) {
+    case 'url_scrape':
+      return "I couldn't read the URL you shared. The site likely has bot protection. Paste the relevant copy from the page here and I'll work with that. Tap retry to try the URL again."
+    case 'attachments':
+      return "I had trouble reading your attachment. Try re-uploading the file, or paste its contents here. Tap retry to try again."
+    case 'query_planner':
+    case 'rag':
+      return "Something hiccuped while I was preparing your answer. Tap retry to try again."
+    case 'web_research':
+      return "Web research timed out. Tap retry to try again — or rephrase without asking for current/recent data."
+    case 'llm_stream':
+      return "I hit an error from the model. Tap retry to try again, or switch models in the input bar below."
+    case 'guard_blocked':
+      return "I'm here to help with product marketing. What can I work on with you? Whether it's positioning, competitive analysis, GTM strategy, or creating deliverables, I'm ready to dive in."
+    default:
+      return "Something failed mid-response. Tap retry to try again."
+  }
+}
+
+// chat_errors is super-admin RLS-only, so writes go through the service client.
+// Fire-and-forget — never block the response on a logging failure.
+async function logChatError(params: {
+  userId: string
+  conversationId: string | null
+  messageId: string | null
+  phase: ChatPhase
+  errorClass?: string | null
+  errorMessage?: string | null
+  userMessageExcerpt?: string | null
+}): Promise<void> {
+  try {
+    const admin = await createServiceClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (admin.from('chat_errors') as any).insert({
+      user_id: params.userId,
+      conversation_id: params.conversationId,
+      message_id: params.messageId,
+      phase: params.phase,
+      error_class: params.errorClass ?? null,
+      error_message: params.errorMessage ?? null,
+      user_message_excerpt: params.userMessageExcerpt ?? null,
+    })
+  } catch (e) {
+    console.error('[ChatErrors] log failed:', e)
+  }
+}
+
 async function handleAbuseEvent(
   userId: string,
   email: string,
@@ -109,11 +171,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { message, conversationId, model, attachments } = body as {
+    const { message, conversationId, model, attachments, skipUserSave } = body as {
       message: string
       conversationId?: string
       model: ModelProvider
       attachments?: ChatAttachment[]
+      skipUserSave?: boolean
     }
 
     if (!model) {
@@ -127,6 +190,36 @@ export async function POST(request: NextRequest) {
       return new Response('Message or attachments required', { status: 400 })
     }
 
+    // ========================================
+    // Save user message immediately (before any RAG/LLM work)
+    // ========================================
+    // Why: prior to this, the user message was only persisted at the END of
+    // the streaming success path (after RAG, URL scrape, LLM completion).
+    // Anything that threw between POST entry and that final save left the
+    // conversation as a ghost row in the sidebar with zero messages — the
+    // dominant cause of "blank response" reports. Saving up front means
+    // failures are recoverable threads, not silent ghosts.
+    // skipUserSave is set by /api/chat/retry — the user message already
+    // exists in the conversation and was kept while the failed assistant
+    // message was deleted. We don't want to insert a duplicate.
+    let userMessageId: string | null = null
+    if (conversationId && !skipUserSave) {
+      const userContent = message || (hasAttachments ? '[Attached file(s)]' : '')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: insertedUser, error: userInsertErr } = await (supabase.from('messages') as any).insert({
+        conversation_id: conversationId,
+        role: 'user',
+        content: userContent,
+        model: null,
+        citations: [],
+      }).select('id').single()
+      if (userInsertErr) {
+        console.error('[Chat] Failed to persist user message up-front:', userInsertErr)
+      } else {
+        userMessageId = insertedUser?.id ?? null
+      }
+    }
+
     // Scan for prompt extraction attempts
     if (hasMessage) {
       const guardResult = scanInput(message)
@@ -135,30 +228,35 @@ export async function POST(request: NextRequest) {
         handleAbuseEvent(user.id, user.email ?? '', message, guardResult.matchedPattern, 'prompt_injection')
           .catch(err => console.error('[PromptGuard] Abuse logging failed:', err))
 
-        // Ghost-cleanup: the client creates the conversation row before
-        // POSTing here (ChatContainer.tsx). If the guard blocks, we never
-        // save the user message or the safe response, so the conversation
-        // sits empty in the user's sidebar. Delete it iff it has zero
-        // messages — never touch an existing thread mid-flow.
+        // Save SAFE_RESPONSE as a real assistant message instead of a
+        // streaming-only reply. This replaces the previous ghost-cleanup
+        // pattern (which raced lambda freeze and left dead conversations).
+        // The blocked exchange now sits in the sidebar like any other thread.
         if (conversationId) {
-          ;(async () => {
-            try {
-              const { count } = await supabase
-                .from('messages')
-                .select('id', { count: 'exact', head: true })
-                .eq('conversation_id', conversationId)
-              if ((count ?? 0) === 0) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await (supabase.from('conversations') as any)
-                  .delete()
-                  .eq('id', conversationId)
-                  .eq('user_id', user.id)
-              }
-            } catch (e) {
-              console.error('[PromptGuard] Ghost cleanup failed:', e)
-            }
-          })()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase.from('messages') as any).insert({
+            conversation_id: conversationId,
+            role: 'assistant',
+            content: SAFE_RESPONSE,
+            model: null,
+            citations: [],
+          })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase.from('conversations') as any)
+            .update({ updated_at: new Date().toISOString() })
+            .eq('id', conversationId)
         }
+
+        // Diagnostic row so blocked attempts are countable in chat_errors too
+        waitUntil(logChatError({
+          userId: user.id,
+          conversationId: conversationId ?? null,
+          messageId: userMessageId,
+          phase: 'guard_blocked',
+          errorClass: 'prompt_injection',
+          errorMessage: guardResult.matchedPattern,
+          userMessageExcerpt: message?.slice(0, 200) ?? null,
+        }))
 
         const encoder = new TextEncoder()
         const safeStream = new ReadableStream({
@@ -288,6 +386,10 @@ export async function POST(request: NextRequest) {
           )
         }
 
+        // Track which stage we're in so the catch handler can write a
+        // phase-aware fallback message + chat_errors row.
+        let currentPhase: ChatPhase = 'unknown'
+
         await startActiveObservation('sherpa.chat.request', async (span) => {
           const traceInput = { message, model, hasAttachments: !!hasAttachments }
           span.update({
@@ -312,20 +414,25 @@ export async function POST(request: NextRequest) {
           // ========================================
           // PHASE 1: Gather all inputs (parallel)
           // ========================================
+          currentPhase = 'history_load'
           sendStatus('Loading conversation context...')
 
           // Detect URLs in the message
           const detectedUrls = message ? extractUrls(message) : []
           const hasUrls = detectedUrls.length > 0
 
-          // Gather inputs in parallel: conversation history, URL scraping, attachment processing
+          // Gather inputs in parallel: conversation history, URL scraping, attachment processing.
+          // We persisted the new user message up-front (see top of POST handler), so it's
+          // already in this conversation's messages table. Limit 11 + filter by id keeps
+          // history at last 10 turns BEFORE the current turn — the new turn is passed
+          // separately to buildMessages() further down.
           const historyPromise = conversationId
             ? supabase
                 .from('messages')
-                .select('role, content, created_at')
+                .select('id, role, content, created_at')
                 .eq('conversation_id', conversationId)
                 .order('created_at', { ascending: false })
-                .limit(10)
+                .limit(11)
             : Promise.resolve({ data: null, error: null })
 
           const urlScrapePromise = hasUrls
@@ -343,8 +450,13 @@ export async function POST(request: NextRequest) {
           // Process conversation history (truncate to budget — keeps most recent messages that fit)
           let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
           if (historyResult.data && Array.isArray(historyResult.data)) {
-            const chronologicalMessages = historyResult.data.reverse()
-            const fullHistory = chronologicalMessages.map((m: { role: string; content: string }) => ({
+            // Drop the just-saved user message (we pass it separately as processedMessage),
+            // then reverse to chronological order and trim to last 10.
+            const filtered = (historyResult.data as Array<{ id: string; role: string; content: string }>)
+              .filter(m => m.id !== userMessageId)
+              .slice(0, 10)
+            const chronologicalMessages = filtered.reverse()
+            const fullHistory = chronologicalMessages.map((m) => ({
               role: m.role as 'user' | 'assistant',
               content: m.content,
             }))
@@ -507,6 +619,7 @@ export async function POST(request: NextRequest) {
           // ========================================
           // PHASE 2: Plan queries + Retrieve (parallel)
           // ========================================
+          currentPhase = 'query_planner'
           sendStatus('Analyzing your question...')
 
           const queryPlan = await planQueries({
@@ -530,6 +643,7 @@ export async function POST(request: NextRequest) {
           }
 
           const startRetrieval = Date.now()
+          currentPhase = 'rag'
 
           // Run RAG, Perplexity, and Brave Search in parallel
           const ragPromise = multiQueryRetrieve(queryPlan.ragQueries, 10, user.id, queryPlan.intent)
@@ -681,6 +795,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           const llmModel = getModel(model)
 
           // Status: Generating response
+          currentPhase = 'llm_stream'
           sendStatus(`Generating response...`)
 
           // Start streaming
@@ -804,26 +919,11 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             console.error('Error finalizing LLM result (usage stats unavailable):', finalizeError)
           }
 
-          // Save messages — wrapped so a DB failure doesn't prevent the done event
+          // Save assistant message — user message was already persisted up-front.
+          // Wrapped so a DB failure doesn't prevent the done event.
           if (conversationId) {
             try {
-              console.log(`Saving messages to conversation ${conversationId}`)
-
-              // Save user message
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const { data: userMessageData, error: userMsgError } = await (supabase.from('messages') as any).insert({
-                conversation_id: conversationId,
-                role: 'user',
-                content: message || '[Attachments only]',
-                model: null,
-                citations: [],
-              }).select('id').single()
-
-              if (userMsgError) {
-                console.error('Error saving user message:', userMsgError)
-              } else {
-                console.log('User message saved:', userMessageData?.id)
-              }
+              console.log(`Saving assistant message to conversation ${conversationId}`)
 
               // Save assistant message with citations and expanded research
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -973,10 +1073,61 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             console.error('PostHog capture threw:', phError)
           }
         } catch (error) {
-          console.error('Chat API streaming error:', error)
-          controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ type: 'error', message: 'An error occurred while generating the response' })}\n\n`)
-          )
+          console.error(`Chat API streaming error (phase=${currentPhase}):`, error)
+
+          // Write a phase-aware fallback assistant message so the conversation
+          // becomes a recoverable thread instead of a ghost row. Stream the
+          // fallback text to the client so they see it without reload, then
+          // emit `done` with the assistant message id so retry can target it.
+          const fallbackText = fallbackForPhase(currentPhase)
+          let fallbackMessageId: string | null = null
+
+          if (conversationId) {
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const { data: insertedFallback } = await (supabase.from('messages') as any).insert({
+                conversation_id: conversationId,
+                role: 'assistant',
+                content: fallbackText,
+                model: null,
+                citations: [],
+                error: true,
+              }).select('id').single()
+              fallbackMessageId = insertedFallback?.id ?? null
+
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              await (supabase.from('conversations') as any)
+                .update({ updated_at: new Date().toISOString() })
+                .eq('id', conversationId)
+            } catch (saveFallbackErr) {
+              console.error('[Chat] Failed to persist fallback assistant message:', saveFallbackErr)
+            }
+          }
+
+          // Diagnostic row for ops
+          waitUntil(logChatError({
+            userId: user.id,
+            conversationId: conversationId ?? null,
+            messageId: fallbackMessageId,
+            phase: currentPhase,
+            errorClass: error instanceof Error ? error.name : 'unknown',
+            errorMessage: error instanceof Error ? error.message?.slice(0, 1000) : String(error).slice(0, 1000),
+            userMessageExcerpt: message?.slice(0, 200) ?? null,
+          }))
+
+          // Stream the fallback text + a done event with the new message id
+          // so the client can render the retry button.
+          try {
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ type: 'text', content: fallbackText, error: true })}\n\n`)
+            )
+            const traceId = getActiveTraceId()
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ type: 'done', trace_id: traceId, error: true, message_id: fallbackMessageId })}\n\n`)
+            )
+          } catch (sendErr) {
+            console.error('[Chat] Failed to send fallback to client:', sendErr)
+          }
           controller.close()
         }
         })

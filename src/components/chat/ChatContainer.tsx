@@ -138,6 +138,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         citations: m.citations,
         expandedResearch: m.expanded_research || undefined,
         model: m.model || undefined,
+        error: (m as { error?: boolean }).error === true,
         createdAt: new Date(m.created_at),
       }))
 
@@ -306,7 +307,17 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
                   } else if (data.type === 'done') {
                     receivedDone = true
                     setStatusMessage(null)
-                    finishStreaming(assistantMessageId)
+                    // The server may have hit an error mid-stream and sent a
+                    // fallback message + done event with error=true and the
+                    // DB message_id. Re-key the local message to the DB id so
+                    // /api/chat/retry can address it, and flag it so the
+                    // retry button renders in MessageBubble.
+                    if (data.error && data.message_id) {
+                      updateMessage(assistantMessageId, { id: data.message_id, error: true })
+                      finishStreaming(data.message_id)
+                    } else {
+                      finishStreaming(assistantMessageId)
+                    }
                     if (isNewConversation && activeConversationId) {
                       isNavigatingToNewConversation.current = true
                       router.replace(`/chat/${activeConversationId}`)
@@ -336,7 +347,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         let errorMessage = 'An error occurred'
         if (error instanceof Error) {
           if (error.message.includes('timed out') || error.message.includes('timeout')) {
-            errorMessage = 'The response took too long. Please try again with a simpler question, or disable deep research.'
+            errorMessage = 'The response took too long. Try a shorter prompt or remove URLs from the message.'
           } else if (error.message.includes('Failed to fetch') || error.message.includes('network')) {
             errorMessage = 'Connection lost. Please check your internet and try again.'
           } else {
@@ -505,6 +516,119 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     chatInputRef.current?.setInput(content)
   }, [])
 
+  // Retry: re-run the failed assistant response. The /api/chat/retry
+  // endpoint deletes the failed message server-side, then forwards to
+  // /api/chat with skipUserSave=true. We replace the failed bubble with a
+  // fresh streaming bubble and pipe the SSE response into it.
+  const handleRetry = useCallback(async (failedMessageId: string) => {
+    if (!conversationId || isLoading || isSubmittingRef.current) return
+
+    isSubmittingRef.current = true
+    setIsLoading(true)
+    setError(null)
+    setStatusMessage('Retrying...')
+    isStreamingRef.current = true
+
+    // Swap the failed bubble for an empty streaming bubble at the same
+    // position. We reuse the failed id for the assistantMessageId so the
+    // user sees the retry happen in place.
+    const assistantMessageId = `assistant-retry-${Date.now()}`
+    updateMessage(failedMessageId, { id: assistantMessageId, content: '', error: false, isStreaming: true })
+
+    try {
+      const abortController = new AbortController()
+      setAbortController(abortController)
+
+      const response = await fetch('/api/chat/retry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversationId,
+          retry_message_id: failedMessageId,
+          model: currentModel,
+        }),
+        signal: abortController.signal,
+      })
+
+      if (!response.ok || !response.body) {
+        throw new Error('Failed to retry')
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let receivedDone = false
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) {
+            if (!receivedDone) console.warn('Retry stream ended without done event')
+            break
+          }
+          const chunk = decoder.decode(value)
+          for (const line of chunk.split('\n')) {
+            if (!line.startsWith('data: ')) continue
+            try {
+              const data = JSON.parse(line.slice(6))
+              if (data.type === 'status') {
+                setStatusMessage(data.message)
+              } else if (data.type === 'text') {
+                setStatusMessage(null)
+                appendToStream(assistantMessageId, data.content)
+              } else if (data.type === 'citations') {
+                setCitations(assistantMessageId, data.citations)
+              } else if (data.type === 'expandedResearch') {
+                setExpandedResearch(assistantMessageId, data.expandedResearch)
+              } else if (data.type === 'done') {
+                receivedDone = true
+                setStatusMessage(null)
+                if (data.error && data.message_id) {
+                  updateMessage(assistantMessageId, { id: data.message_id, error: true })
+                  finishStreaming(data.message_id)
+                } else {
+                  finishStreaming(assistantMessageId)
+                }
+              } else if (data.type === 'error') {
+                setError(data.message)
+                setStatusMessage(null)
+              }
+            } catch {
+              // Ignore parse errors
+            }
+          }
+        }
+      } finally {
+        try { reader.cancel() } catch { /* ignore */ }
+      }
+    } catch (error) {
+      if (!(error instanceof Error && error.name === 'AbortError')) {
+        toast.error('Retry failed. Please try again.')
+        setError(error instanceof Error ? error.message : 'Retry failed')
+      }
+      finishStreaming(assistantMessageId)
+    } finally {
+      finishStreaming(assistantMessageId)
+      setIsLoading(false)
+      setStatusMessage(null)
+      isStreamingRef.current = false
+      isSubmittingRef.current = false
+      setAbortController(null)
+    }
+  }, [
+    conversationId,
+    currentModel,
+    isLoading,
+    updateMessage,
+    appendToStream,
+    setCitations,
+    finishStreaming,
+    setExpandedResearch,
+    setIsLoading,
+    setError,
+    setStatusMessage,
+    setAbortController,
+  ])
+
   const handleExpandWithResearch = useCallback(async (messageId: string, content: string, deepResearch: boolean) => {
     setMessageResearching(messageId, true)
     try {
@@ -621,6 +745,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
               messages={messages}
               statusMessage={statusMessage}
               onEditPrompt={handleEditPrompt}
+              onRetry={handleRetry}
             />
           </div>
           <div className="shrink-0">

@@ -40,6 +40,7 @@ export interface ChatMessage {
   attachments?: ChatAttachment[]
   expandedResearch?: ExpandedResearch
   isResearching?: boolean
+  error?: boolean
   createdAt: Date
 }
 

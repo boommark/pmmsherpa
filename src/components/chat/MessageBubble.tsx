@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Loader2, Copy, Pencil, Check, Volume2, VolumeX, FileText, Image as ImageIcon, Film, File, ExternalLink } from 'lucide-react'
+import { Loader2, Copy, Pencil, Check, Volume2, VolumeX, FileText, Image as ImageIcon, Film, File, ExternalLink, RotateCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { copyForGoogleDocs, type CopyOptions } from '@/lib/utils/clipboard'
 import type { ChatMessage } from '@/types/chat'
@@ -18,6 +18,7 @@ interface MessageBubbleProps {
   message: ChatMessage
   messageIndex?: number
   onEditPrompt?: (content: string, messageIndex: number) => void
+  onRetry?: (messageId: string) => void
 }
 
 function getFileIcon(fileType: string) {
@@ -33,7 +34,7 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBubbleProps) {
+export function MessageBubble({ message, messageIndex, onEditPrompt, onRetry }: MessageBubbleProps) {
   const isUser = message.role === 'user'
   const isStreaming = message.isStreaming
   const [copied, setCopied] = useState(false)
@@ -224,6 +225,17 @@ export function MessageBubble({ message, messageIndex, onEditPrompt }: MessageBu
       {/* Action buttons */}
       {!isStreaming && (
         <div className="flex items-center gap-1 mt-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity px-1 sm:px-0">
+          {message.error && onRetry ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onRetry(message.id)}
+              className="h-7 px-2 text-xs text-[#0058be] dark:text-[#a8c0f0] hover:text-[#0058be] hover:bg-[#0058be]/10 gap-1"
+            >
+              <RotateCw className="h-3 w-3" />
+              <span>Retry</span>
+            </Button>
+          ) : null}
           <Button
             variant="ghost"
             size="sm"
