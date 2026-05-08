@@ -18,6 +18,12 @@ import { runSherpaChat, parseCritiqueMarkdown, uniquePrinciplesFromCitations } f
 import { checkUsageGate, incrementUsage } from '@/lib/usage-gate'
 import { createServiceClient } from '@/lib/supabase/server'
 import { getTemplate, listArtifactTypes } from './artifact-templates'
+import {
+  checkMcpCredits,
+  deductMcpCredits,
+  InsufficientCreditsError,
+  MCP_CREDIT_COST_PER_CALL,
+} from './credits'
 
 /* ------------------------------------------------------------------ */
 /*  Tool result types                                                  */
@@ -280,6 +286,14 @@ export const askSherpaTool: Tool = {
           }
         }
 
+        // ---- MCP credit gate ----
+        // Independent from the message gate above. 2 credits per tool call.
+        // INSUFFICIENT_CREDITS surfaces as a JSON-RPC -32000 error to the host.
+        const creditCheck = await checkMcpCredits(ctx.auth.userId)
+        if (!creditCheck.allowed) {
+          throw new InsufficientCreditsError(creditCheck)
+        }
+
         // ---- Load conversation history (last 10 messages) ----
         let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
         if (conversationId) {
@@ -368,6 +382,15 @@ export const askSherpaTool: Tool = {
         incrementUsage(ctx.auth.userId).catch((err) =>
           console.error('[ask_sherpa] incrementUsage failed:', err),
         )
+
+        // ---- Deduct MCP credits atomically (monthly first, then purchased) ----
+        // Founders bypass — checkMcpCredits short-circuits allowed=true with
+        // plan='founder', and we skip deduction in that case.
+        if (creditCheck.balance.plan !== 'founder') {
+          deductMcpCredits(ctx.auth.userId, MCP_CREDIT_COST_PER_CALL).catch((err) =>
+            console.error('[ask_sherpa] deductMcpCredits failed:', err),
+          )
+        }
 
         span.update({
           output: result.text,
@@ -525,6 +548,12 @@ export const draftArtifactTool: Tool = {
           }
         }
 
+        // ---- MCP credit gate ----
+        const creditCheck = await checkMcpCredits(ctx.auth.userId)
+        if (!creditCheck.allowed) {
+          throw new InsufficientCreditsError(creditCheck)
+        }
+
         // ---- Build user-facing message: skeleton + context + notes ----
         // The skeleton is the canonical fill-in scaffold; we ask the model to
         // produce the final artifact by replacing every bracketed inline prompt
@@ -589,6 +618,13 @@ export const draftArtifactTool: Tool = {
         incrementUsage(ctx.auth.userId).catch((err) =>
           console.error('[draft_artifact] incrementUsage failed:', err),
         )
+
+        // ---- Deduct MCP credits atomically ----
+        if (creditCheck.balance.plan !== 'founder') {
+          deductMcpCredits(ctx.auth.userId, MCP_CREDIT_COST_PER_CALL).catch((err) =>
+            console.error('[draft_artifact] deductMcpCredits failed:', err),
+          )
+        }
 
         span.update({
           output: result.text,
@@ -704,6 +740,12 @@ export const getFeedbackTool: Tool = {
           }
         }
 
+        // ---- MCP credit gate ----
+        const creditCheck = await checkMcpCredits(ctx.auth.userId)
+        if (!creditCheck.allowed) {
+          throw new InsufficientCreditsError(creditCheck)
+        }
+
         // ---- Build critique prompt ----
         const kindLabel = kind ?? 'artifact'
         const critiquePrompt =
@@ -770,6 +812,13 @@ export const getFeedbackTool: Tool = {
         incrementUsage(ctx.auth.userId).catch((err) =>
           console.error('[get_feedback] incrementUsage failed:', err),
         )
+
+        // ---- Deduct MCP credits atomically ----
+        if (creditCheck.balance.plan !== 'founder') {
+          deductMcpCredits(ctx.auth.userId, MCP_CREDIT_COST_PER_CALL).catch((err) =>
+            console.error('[get_feedback] deductMcpCredits failed:', err),
+          )
+        }
 
         span.update({
           output: result.text,
@@ -936,6 +985,12 @@ export const scopePmmResearchTool: Tool = {
           }
         }
 
+        // ---- MCP credit gate ----
+        const creditCheck = await checkMcpCredits(ctx.auth.userId)
+        if (!creditCheck.allowed) {
+          throw new InsufficientCreditsError(creditCheck)
+        }
+
         // ---- Build user message ----
         const userMessage =
           `Scope the following PMM research question:\n\n` +
@@ -1050,6 +1105,13 @@ export const scopePmmResearchTool: Tool = {
         incrementUsage(ctx.auth.userId).catch((err) =>
           console.error('[scope_pmm_research] incrementUsage failed:', err),
         )
+
+        // ---- Deduct MCP credits atomically ----
+        if (creditCheck.balance.plan !== 'founder') {
+          deductMcpCredits(ctx.auth.userId, MCP_CREDIT_COST_PER_CALL).catch((err) =>
+            console.error('[scope_pmm_research] deductMcpCredits failed:', err),
+          )
+        }
 
         span.update({
           output: JSON.stringify(capped),

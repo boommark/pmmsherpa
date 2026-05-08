@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
     "eval:layer4": "tsx evals/harness/run_layer4.ts",
     "eval:layer4:cheap": "tsx evals/harness/run_layer4.ts --skip-judge",
     "eval:layer4:braintrust": "braintrust eval evals/braintrust/layer4.eval.ts"
