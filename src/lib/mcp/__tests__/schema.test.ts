@@ -11,13 +11,18 @@
 import { describe, it, expect } from 'vitest'
 import { listToolsForRpc, tools } from '../tools'
 
-const EXPECTED_TOOLS = ['ask_sherpa', 'draft_artifact', 'get_feedback'] as const
+const EXPECTED_TOOLS = [
+  'ask_sherpa',
+  'draft_artifact',
+  'get_feedback',
+  'scope_pmm_research',
+] as const
 const DEPRECATED_TOOLS = ['search_corpus', 'query_pmm_sherpa', 'validate_artifact']
 
 describe('schema: tools/list registry', () => {
-  it('returns exactly 3 tools', () => {
+  it('returns exactly 4 tools', () => {
     const list = listToolsForRpc()
-    expect(list).toHaveLength(3)
+    expect(list).toHaveLength(4)
   })
 
   it('returns the canonical tool name set', () => {
@@ -91,6 +96,12 @@ describe('schema: per-tool required fields', () => {
     const t = listToolsForRpc().find((x) => x.name === 'draft_artifact')!
     const required = (t.inputSchema as { required?: string[] }).required ?? []
     expect(required).toContain('artifact_type')
+  })
+
+  it('scope_pmm_research requires `question`', () => {
+    const t = listToolsForRpc().find((x) => x.name === 'scope_pmm_research')!
+    const required = (t.inputSchema as { required?: string[] }).required ?? []
+    expect(required).toContain('question')
   })
 })
 

@@ -7,11 +7,21 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { makeAuth, makeSession, DENIED_USAGE_GATE, makeSherpaChatResult } from './fixtures/mocks'
+import { makeAuth, makeSession, DENIED_USAGE_GATE } from './fixtures/mocks'
 
-const checkUsageGateMock = vi.fn()
-const incrementUsageMock = vi.fn()
-const runSherpaChatMock = vi.fn(async () => makeSherpaChatResult())
+// vitest 4 hoists `vi.mock` factories above top-level statements; mocks
+// referenced from those factories must live inside `vi.hoisted`.
+const { checkUsageGateMock, incrementUsageMock, runSherpaChatMock } = vi.hoisted(() => ({
+  checkUsageGateMock: vi.fn(),
+  incrementUsageMock: vi.fn(),
+  runSherpaChatMock: vi.fn(async () => ({
+    text: 'stub',
+    citations: [],
+    chunks: [],
+    usage: { inputTokens: 0, outputTokens: 0 },
+    intent: 'explain',
+  })),
+}))
 
 vi.mock('@/lib/usage-gate', () => ({
   checkUsageGate: checkUsageGateMock,

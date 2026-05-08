@@ -10,23 +10,44 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import {
-  makeAuth,
-  makeSession,
-  ALLOWED_USAGE_GATE,
-  makeSherpaChatResult,
-  makeChunk,
-  makeCitation,
-} from './fixtures/mocks'
+import { makeAuth, makeSession } from './fixtures/mocks'
 
-const runSherpaChatMock = vi.fn(async () =>
-  makeSherpaChatResult({
-    text:
-      '## Overall Assessment\nGood foundation, weak differentiation.\n\n## Key Gaps\n- Vague differentiator\n- Missing best-fit account definition\n\n## Recommendations\n- Replace "easy to use" with a measurable claim\n- Add a champion-persona section',
-    citations: [makeCitation(), makeCitation({ source: 'Sales Pitch' })],
-    chunks: [makeChunk(), makeChunk({ id: 'chunk-2' })],
-  }),
-)
+// vitest 4 hoists `vi.mock` factories above top-level statements; mocks
+// referenced from those factories must live inside `vi.hoisted`. The
+// canned result is constructed inside the hoisted block so the closure
+// is safe.
+const { runSherpaChatMock } = vi.hoisted(() => {
+  const makeChunkH = () => ({
+    id: 'chunk-1',
+    content: 'A grounded PMM principle from a trusted book.',
+    similarity: 0.82,
+    sourceType: 'book',
+    documentTitle: 'Obviously Awesome',
+    author: 'April Dunford',
+    url: 'https://example.com/book',
+    pageNumber: 42,
+    sectionTitle: 'Positioning',
+    speakerRole: null,
+    question: null,
+  })
+  const makeCitationH = (source = 'Obviously Awesome') => ({
+    id: 'cite-1',
+    source,
+    author: 'April Dunford',
+    url: 'https://example.com/book',
+    excerpt: 'A grounded PMM principle.',
+  })
+  return {
+    runSherpaChatMock: vi.fn(async () => ({
+      text:
+        '## Overall Assessment\nGood foundation, weak differentiation.\n\n## Key Gaps\n- Vague differentiator\n- Missing best-fit account definition\n\n## Recommendations\n- Replace "easy to use" with a measurable claim\n- Add a champion-persona section',
+      citations: [makeCitationH(), makeCitationH('Sales Pitch')],
+      chunks: [makeChunkH(), { ...makeChunkH(), id: 'chunk-2' }],
+      usage: { inputTokens: 1000, outputTokens: 400 },
+      intent: 'explain',
+    })),
+  }
+})
 
 vi.mock('../helpers', () => ({
   runSherpaChat: runSherpaChatMock,
@@ -41,7 +62,12 @@ vi.mock('../helpers', () => ({
 }))
 
 vi.mock('@/lib/usage-gate', () => ({
-  checkUsageGate: vi.fn(async () => ALLOWED_USAGE_GATE),
+  checkUsageGate: vi.fn(async () => ({
+    allowed: true as const,
+    tier: 'starter' as const,
+    used: 5,
+    limit: 100,
+  })),
   incrementUsage: vi.fn(async () => undefined),
 }))
 
@@ -103,9 +129,9 @@ describe('golden: ask_sherpa structural shape', () => {
             "source": {
               "author": "string",
               "page_number": "number",
-              "question": "null",
+              "question": "object",
               "section_title": "string",
-              "speaker_role": "null",
+              "speaker_role": "object",
               "title": "string",
               "type": "string",
               "url": "string",
@@ -170,8 +196,10 @@ describe('golden: draft_artifact structural shape', () => {
     const sc = (r.structuredContent ?? {}) as Record<string, unknown>
     // artifact_type MUST be present so callers can route on it.
     expect(sc.artifact_type).toBe('positioning_statement')
-    // At least one of: draft / response / content (locked by team).
-    const hasBody = ['draft', 'response', 'content'].some((k) => k in sc)
+    // At least one of: artifact_text (current) / draft / response / content
+    // (legacy aliases — kept so renaming the field across handler + this
+    // test stays a one-line change).
+    const hasBody = ['artifact_text', 'draft', 'response', 'content'].some((k) => k in sc)
     expect(hasBody).toBe(true)
   })
 })
