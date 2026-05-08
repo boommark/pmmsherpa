@@ -230,19 +230,22 @@ export async function POST(req: NextRequest): Promise<Response> {
     }
   }
 
-  // Streaming path: single-message tools/call with params._meta.progressToken.
-  // Per MCP spec, the server may respond with text/event-stream and emit
-  // notifications/progress frames before the final tools/call result envelope.
-  // We only enable streaming for tools whose handler honors onProgress
-  // (currently `ask_sherpa`); other tools fall through to the JSON path
-  // even if a progressToken is present.
+  // Streaming path: single-message tools/call for tools whose handler
+  // honors onProgress (currently `ask_sherpa`). Per MCP spec, the server
+  // may respond with text/event-stream and emit notifications/progress
+  // frames before the final tools/call result envelope. We stream by
+  // default — clients that don't render notifications/progress will
+  // discard them and still receive the final result envelope correctly.
+  // If the client supplied a progressToken we honor it; otherwise we
+  // synthesize one so notifications remain spec-valid.
   if (parsed.messages.length === 1 && !parsed.isBatch) {
     const msg = parsed.messages[0]
-    const progressToken = extractProgressToken(msg)
-    if (progressToken !== undefined && msg.method === 'tools/call') {
+    if (msg.method === 'tools/call') {
       const params = (msg.params ?? {}) as { name?: unknown }
       const toolName = typeof params.name === 'string' ? params.name : ''
       if (STREAMING_TOOLS.has(toolName)) {
+        const progressToken =
+          extractProgressToken(msg) ?? `srv-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
         return streamingToolCall(msg, auth, session, progressToken)
       }
     }
