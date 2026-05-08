@@ -1,0 +1,108 @@
+# Sync the public-facing docs/ directory (only .mdx files + README) into the
+# public mirror repo at https://github.com/boommark/pmmsherpa-mcp.
+#
+# Trigger: every push to `main` that touches docs/.
+#
+# === ONE-TIME SETUP (manual, by repo admin) ===
+# 1. In GitHub UI for the public repo (boommark/pmmsherpa-mcp), generate a
+#    fine-grained Personal Access Token with:
+#       Repository access: Only select repositories → boommark/pmmsherpa-mcp
+#       Permissions: Contents = Read and write, Metadata = Read-only
+# 2. In the SOURCE repo (boommark/pmmsherpa) → Settings → Secrets and variables
+#    → Actions → New repository secret:
+#       Name:  PUBLIC_DOCS_PUSH_TOKEN
+#       Value: <the PAT from step 1>
+# 3. The workflow will start syncing on the next push to main that changes
+#    docs/.
+#
+# What this workflow does:
+# - Checks out the source repo's docs/ at the head of main.
+# - Clones the public mirror repo.
+# - Replaces the public repo's docs/ with the source's *.mdx files.
+# - Regenerates README.md from docs/index.mdx (frontmatter stripped, links
+#   rewritten so /docs/foo points at https://pmmsherpa.com/docs/foo).
+# - Commits and pushes if anything changed. No-op if no diff.
+
+name: Sync docs to public mirror
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**.mdx'
+      - 'docs/README.md'
+      - '.github/workflows/sync-docs-to-public.yml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: sync-docs-to-public
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Clone public mirror
+        env:
+          PUBLIC_TOKEN: ${{ secrets.PUBLIC_DOCS_PUSH_TOKEN }}
+        run: |
+          if [ -z "$PUBLIC_TOKEN" ]; then
+            echo "PUBLIC_DOCS_PUSH_TOKEN secret is not set. Skipping sync."
+            exit 0
+          fi
+          git clone "https://x-access-token:${PUBLIC_TOKEN}@github.com/boommark/pmmsherpa-mcp.git" public-mirror
+          cd public-mirror
+          git config user.name "pmmsherpa-docs-bot"
+          git config user.email "docs-bot@pmmsherpa.com"
+
+      - name: Stage docs into public mirror
+        run: |
+          set -euo pipefail
+          rm -rf public-mirror/docs
+          mkdir -p public-mirror/docs
+          # Only sync .mdx files (.md files in docs/ are internal-only).
+          find docs -maxdepth 1 -name '*.mdx' -print0 \
+            | xargs -0 -I {} cp {} public-mirror/docs/
+
+      - name: Regenerate public README from index.mdx
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          import re, pathlib
+          src = pathlib.Path('docs/index.mdx').read_text()
+          # strip frontmatter
+          src = re.sub(r'^---\n.*?\n---\n?', '', src, count=1, flags=re.DOTALL)
+          # rewrite /docs links to absolute pmmsherpa.com URLs so the README
+          # works on github.com without a webserver.
+          src = re.sub(r'\]\(/docs/([^)]+)\)', r'](https://pmmsherpa.com/docs/\1)', src)
+          src = src.replace('](/docs)', '](https://pmmsherpa.com/docs)')
+          header = (
+              "<!-- This file is auto-generated from docs/index.mdx in the source repo. "
+              "Do not edit by hand. -->\n\n"
+          )
+          pathlib.Path('public-mirror/README.md').write_text(header + src)
+          PY
+
+      - name: Commit and push if changed
+        env:
+          PUBLIC_TOKEN: ${{ secrets.PUBLIC_DOCS_PUSH_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$PUBLIC_TOKEN" ]; then
+            echo "Skipping push (no token)."
+            exit 0
+          fi
+          cd public-mirror
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No docs changes to sync."
+            exit 0
+          fi
+          SRC_SHA="${GITHUB_SHA:0:7}"
+          git commit -m "docs: sync from boommark/pmmsherpa@${SRC_SHA}"
+          git push origin HEAD:main
