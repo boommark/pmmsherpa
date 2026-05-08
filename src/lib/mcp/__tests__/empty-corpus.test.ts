@@ -21,9 +21,21 @@ import {
   makeEmptyCorpusResult,
 } from './fixtures/mocks'
 
-const runSherpaChatMock = vi.fn(async () => makeEmptyCorpusResult())
-const incrementUsageMock = vi.fn(async () => undefined)
-const checkUsageGateMock = vi.fn(async () => ALLOWED_USAGE_GATE)
+// vitest 4 hoists `vi.mock` factories above top-level statements; mocks
+// referenced from those factories must live inside `vi.hoisted`.
+const { runSherpaChatMock, incrementUsageMock, checkUsageGateMock } = vi.hoisted(() => ({
+  // Untyped `vi.fn()` so subsequent `mockResolvedValue(...)` calls in
+  // beforeEach can swap in differently-shaped fixtures (Citation[] etc.)
+  // without TS narrowing the citations array to `never[]`.
+  runSherpaChatMock: vi.fn(),
+  incrementUsageMock: vi.fn(async () => undefined),
+  checkUsageGateMock: vi.fn(async () => ({
+    allowed: true as const,
+    tier: 'starter' as const,
+    used: 5,
+    limit: 100,
+  })),
+}))
 
 vi.mock('../helpers', () => ({
   runSherpaChat: runSherpaChatMock,

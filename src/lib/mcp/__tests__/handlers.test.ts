@@ -24,9 +24,18 @@ import {
   makeCitation,
 } from './fixtures/mocks'
 
-const runSherpaChatMock = vi.fn()
-const incrementUsageMock = vi.fn(async () => undefined)
-const checkUsageGateMock = vi.fn(async () => ALLOWED_USAGE_GATE)
+// vitest 4 hoists `vi.mock` factories above top-level statements; mocks
+// referenced from those factories must live inside `vi.hoisted`.
+const { runSherpaChatMock, incrementUsageMock, checkUsageGateMock } = vi.hoisted(() => ({
+  runSherpaChatMock: vi.fn(),
+  incrementUsageMock: vi.fn(async () => undefined),
+  checkUsageGateMock: vi.fn(async () => ({
+    allowed: true as const,
+    tier: 'starter' as const,
+    used: 5,
+    limit: 100,
+  })),
+}))
 
 vi.mock('../helpers', () => ({
   runSherpaChat: runSherpaChatMock,
@@ -146,7 +155,10 @@ describe('handlers: draft_artifact', () => {
     const r = await t.handler({ artifact_type: 'positioning_statement' }, ctx)
     const sc = (r.structuredContent ?? {}) as Record<string, unknown>
     expect(sc.artifact_type).toBe('positioning_statement')
-    expect(sc.draft ?? sc.response ?? sc.content).toBeDefined()
+    // Handler returns the rendered Markdown under `artifact_text`; legacy test
+    // names (`draft`/`response`/`content`) are accepted for forward-compat
+    // if the field is renamed in a future PR.
+    expect(sc.artifact_text ?? sc.draft ?? sc.response ?? sc.content).toBeDefined()
   })
 })
 

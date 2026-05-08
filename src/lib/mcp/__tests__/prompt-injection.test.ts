@@ -30,13 +30,19 @@ import {
 import {
   makeAuth,
   makeSession,
-  ALLOWED_USAGE_GATE,
   makeSherpaChatResult,
   makeChunk,
   makeCitation,
 } from './fixtures/mocks'
 
-const runSherpaChatMock = vi.fn()
+// vitest 4 hoists `vi.mock` factories above top-level statements; mocks
+// referenced from those factories must live inside `vi.hoisted`.
+const { runSherpaChatMock, conversationHistoryMock } = vi.hoisted(() => ({
+  runSherpaChatMock: vi.fn(),
+  conversationHistoryMock: vi.fn<
+    () => Promise<Array<{ role: string; content: string; created_at: string }> | null>
+  >(async () => null),
+}))
 
 vi.mock('../helpers', () => ({
   // Compliance-permissive mock: returns whatever attackers ask. The handler
@@ -47,13 +53,14 @@ vi.mock('../helpers', () => ({
 }))
 
 vi.mock('@/lib/usage-gate', () => ({
-  checkUsageGate: vi.fn(async () => ALLOWED_USAGE_GATE),
+  checkUsageGate: vi.fn(async () => ({
+    allowed: true as const,
+    tier: 'starter' as const,
+    used: 5,
+    limit: 100,
+  })),
   incrementUsage: vi.fn(async () => undefined),
 }))
-
-const conversationHistoryMock = vi.fn<
-  () => Promise<Array<{ role: string; content: string; created_at: string }> | null>
->(async () => null)
 vi.mock('@/lib/supabase/server', () => ({
   createServiceClient: vi.fn(async () => ({
     from: (table: string) => ({
