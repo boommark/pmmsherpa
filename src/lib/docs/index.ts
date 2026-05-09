@@ -102,6 +102,52 @@ export function listDocPages(): DocPage[] {
   return pages
 }
 
+export interface TocItem {
+  id: string
+  title: string
+  level: 2 | 3
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/`/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+}
+
+export function extractToc(markdown: string): TocItem[] {
+  const items: TocItem[] = []
+  const lines = markdown.split(/\r?\n/)
+  let inFence = false
+  for (const line of lines) {
+    if (/^```/.test(line)) {
+      inFence = !inFence
+      continue
+    }
+    if (inFence) continue
+    const m = line.match(/^(#{2,3})\s+(.+?)\s*$/)
+    if (!m) continue
+    const level = m[1].length === 2 ? 2 : 3
+    const title = m[2].replace(/[*_`]/g, '').trim()
+    items.push({ id: slugify(title), title, level })
+  }
+  return items
+}
+
+export function getAdjacentPages(
+  pages: DocPage[],
+  currentSlug: string,
+): { prev: DocPage | null; next: DocPage | null } {
+  const i = pages.findIndex((p) => p.slug === currentSlug)
+  if (i === -1) return { prev: null, next: null }
+  return {
+    prev: i > 0 ? pages[i - 1] : null,
+    next: i < pages.length - 1 ? pages[i + 1] : null,
+  }
+}
+
 export function getDocPage(slugSegments: string[] | undefined): DocPage | null {
   const slug = slugSegments && slugSegments.length > 0 ? slugSegments.join('/') : ''
   const filename = slug === '' ? 'index.mdx' : `${slug}.mdx`
