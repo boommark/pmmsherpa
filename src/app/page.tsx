@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { AnimatedOrb } from "@/components/ui/animated-orb";
 import { LogoBanner } from "@/components/ui/logo-banner";
 import { PricingSection } from "@/components/landing/PricingSection";
+import { MCPSection } from "@/components/landing/MCPSection";
 import { ArrowRight, Crosshair, MessageSquare, ShieldCheck, TrendingUp, Target, Box, Rocket } from "lucide-react";
 
 function MountainIcon({ className }: { className?: string }) {
@@ -107,6 +108,7 @@ export default function LandingPage() {
             <a href="#how-it-works" className="hover:text-[#191c1e] transition-colors">How It Works</a>
             <a href="#who-its-for" className="hover:text-[#191c1e] transition-colors">Who It&apos;s For</a>
             <a href="#pricing" className="hover:text-[#191c1e] transition-colors">Pricing</a>
+            <a href="#mcp" className="hover:text-[#191c1e] transition-colors">MCP</a>
             <Link href="/docs" className="hover:text-[#191c1e] transition-colors">Docs</Link>
           </div>
           <div className="flex items-center gap-3">
@@ -495,6 +497,9 @@ export default function LandingPage() {
 
       {/* Pricing */}
       <PricingSection />
+
+      {/* MCP */}
+      <MCPSection />
 
       {/* CTA */}
       <section className="py-14 md:py-20" style={{
