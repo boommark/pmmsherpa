@@ -1,8 +1,13 @@
 {
+  "regions": ["iad1"],
   "crons": [
     {
       "path": "/api/cron/reset-monthly-credits",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/warm",
+      "schedule": "*/4 * * * *"
     }
   ]
 }
