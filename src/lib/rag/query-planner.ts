@@ -5,6 +5,7 @@
  * and generate targeted retrieval queries + auto-decide on web research.
  */
 
+import { createHash } from 'node:crypto'
 import { generateText } from 'ai'
 import { getFlashLiteModel } from '@/lib/llm/provider-factory'
 import { trackCost } from '@/lib/cost-tracker'
@@ -127,7 +128,92 @@ function buildPlannerInput(input: QueryPlannerInput): string {
   return parts.join('\n\n')
 }
 
+/**
+ * Short-query bypass: when the user asks a brief, standalone question with
+ * no history/URL/attachment context, the planner LLM call (~1-2s) is overkill.
+ * The message itself becomes the single retrieval query. Tradeoff: no
+ * multi-query expansion, so recall is slightly lower for short queries — but
+ * at this length the message IS the intent, not a paraphrase of it.
+ */
+const SHORT_QUERY_THRESHOLD = 80
+
+function shouldSkipPlanner(input: QueryPlannerInput): boolean {
+  if (input.message.length >= SHORT_QUERY_THRESHOLD) return false
+  if (input.conversationHistory && input.conversationHistory.length > 0) return false
+  if (input.scrapedUrlContent) return false
+  if (input.attachmentContext) return false
+  return true
+}
+
+function rawMessagePlan(message: string): QueryPlan {
+  return {
+    ragQueries: [message],
+    webResearch: { needed: false, query: null, reason: null },
+    webSearch: { needed: false, query: null, reason: null },
+    intent: 'general',
+    contextSummary: message.slice(0, 100),
+  }
+}
+
+/**
+ * In-memory plan cache. Vercel serverless instances reuse this across warm
+ * invocations on the same lambda, so hit rate scales with traffic to a single
+ * warm instance. No cross-instance sharing — KV/Supabase round trip would eat
+ * most of the win we're trying to capture.
+ */
+const PLAN_CACHE = new Map<string, { plan: QueryPlan; expiresAt: number }>()
+const PLAN_CACHE_TTL_MS = 5 * 60 * 1000
+const PLAN_CACHE_MAX = 200
+
+function cacheKey(input: QueryPlannerInput): string {
+  const historyKey = (input.conversationHistory ?? [])
+    .slice(-3)
+    .map((m) => `${m.role}:${m.content.slice(0, 200)}`)
+    .join('|')
+  const urlKey = input.scrapedUrlContent?.slice(0, 200) ?? ''
+  const attachKey = input.attachmentContext?.slice(0, 200) ?? ''
+  return createHash('sha1')
+    .update(input.message)
+    .update('\0')
+    .update(historyKey)
+    .update('\0')
+    .update(urlKey)
+    .update('\0')
+    .update(attachKey)
+    .digest('hex')
+}
+
+function getCachedPlan(key: string): QueryPlan | null {
+  const entry = PLAN_CACHE.get(key)
+  if (!entry) return null
+  if (entry.expiresAt < Date.now()) {
+    PLAN_CACHE.delete(key)
+    return null
+  }
+  return entry.plan
+}
+
+function setCachedPlan(key: string, plan: QueryPlan): void {
+  if (PLAN_CACHE.size >= PLAN_CACHE_MAX) {
+    const oldestKey = PLAN_CACHE.keys().next().value
+    if (oldestKey) PLAN_CACHE.delete(oldestKey)
+  }
+  PLAN_CACHE.set(key, { plan, expiresAt: Date.now() + PLAN_CACHE_TTL_MS })
+}
+
 export async function planQueries(input: QueryPlannerInput, userId?: string): Promise<QueryPlan> {
+  if (shouldSkipPlanner(input)) {
+    console.log('[QueryPlanner] Short-query bypass — using raw message')
+    return rawMessagePlan(input.message)
+  }
+
+  const key = cacheKey(input)
+  const cached = getCachedPlan(key)
+  if (cached) {
+    console.log('[QueryPlanner] Cache hit')
+    return cached
+  }
+
   const startTime = Date.now()
 
   try {
@@ -218,19 +304,13 @@ export async function planQueries(input: QueryPlannerInput, userId?: string): Pr
       console.log(`[QueryPlanner] Brave search query: "${plan.webSearch.query}"`)
     }
 
+    setCachedPlan(key, plan)
     return plan
   } catch (error) {
     console.error('[QueryPlanner] Error:', error)
     const elapsed = Date.now() - startTime
     console.log(`[QueryPlanner] Falling back to raw message after ${elapsed}ms`)
 
-    // Fallback: use the raw message as a single query, no web research
-    return {
-      ragQueries: [input.message],
-      webResearch: { needed: false, query: null, reason: null },
-      webSearch: { needed: false, query: null, reason: null },
-      intent: 'general',
-      contextSummary: input.message.substring(0, 100),
-    }
+    return rawMessagePlan(input.message)
   }
 }
