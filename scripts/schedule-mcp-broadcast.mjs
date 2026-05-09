@@ -82,8 +82,8 @@ const HTML = `<!DOCTYPE html>
                   Or jump straight to the <a href="${GITHUB_URL}" style="color: #0058be; text-decoration: none; font-weight: 600;">GitHub repo</a>.
                 </p>
 
-                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 8px 0 4px 0;">Talk soon,</p>
-                <p style="font-size: 16px; color: #1f2937; margin: 0 0 4px 0;"><strong>Abhishek</strong></p>
+                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 8px 0 4px 0;">With gratitude,</p>
+                <p style="font-size: 16px; color: #1f2937; margin: 0 0 4px 0;"><strong>Dona</strong></p>
                 <p style="font-size: 14px; color: #6b7280; margin: 0;"><a href="mailto:support@pmmsherpa.com" style="color: #6b7280; text-decoration: none;">support@pmmsherpa.com</a></p>
               </td>
             </tr>
@@ -104,7 +104,7 @@ const HTML = `<!DOCTYPE html>
 </html>`
 
 const SUBJECT = 'PMM Sherpa now lives inside Claude, ChatGPT, and Claude Code'
-const FROM = 'Abhishek at PMM Sherpa <hello@pmmsherpa.com>'
+const FROM = 'Dona at PMM Sherpa <hello@pmmsherpa.com>'
 const NAME = 'MCP launch announcement (2026-05-09)'
 
 async function main() {

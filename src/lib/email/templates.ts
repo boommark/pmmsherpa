@@ -479,73 +479,19 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
   const referralLink = `${APP_URL}/signup?ref=${data.referralCode}`
   const isStarter = data.tier === 'starter'
 
-  const CHAT_HOME_IMG = 'https://pmmsherpa.com/email/chat-home.png'
-  const GUIDES_IMG = 'https://pmmsherpa.com/email/guides.png'
-
   const tierSection = isStarter ? `
-    <!-- Starter: full access confirmation -->
     <tr>
-      <td style="padding: 0 40px 28px 40px;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="background: #f0f6ff; border-radius: 10px; border: 1px solid #cce0ff;">
-          <tr>
-            <td style="padding: 20px 24px;">
-              <p style="font-size: 13px; font-weight: 700; color: #0058be; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Starter: Active</p>
-              <p style="font-size: 15px; line-height: 1.6; color: #1f2937; margin: 0;">200 messages per month. Every model: Claude Opus, Sonnet, Gemini. Live web research layered on top of the corpus for every response.</p>
-            </td>
-          </tr>
-        </table>
+      <td style="padding: 0 40px 20px 40px;">
+        <p style="font-size: 14px; line-height: 1.6; color: #1f2937; margin: 0; padding: 12px 16px; background: #f0f6ff; border-radius: 8px; border-left: 3px solid #0058be;"><strong style="color: #0058be;">Starter is active.</strong> 200 messages/month, every model, live web research.</p>
       </td>
     </tr>
   ` : `
-    <!-- Free: upgrade nudge -->
     <tr>
-      <td style="padding: 0 40px 28px 40px;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="background: #f9fafb; border-radius: 10px; border: 1px solid #e5e7eb;">
-          <tr>
-            <td style="padding: 20px 24px;">
-              <p style="font-size: 13px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Starter: $9.99/month</p>
-              <p style="font-size: 15px; line-height: 1.6; color: #1f2937; margin: 0 0 10px 0;">Free gives you 10 messages a month. Starter removes the ceiling: 200 messages, every model, and live web research on every response.</p>
-              <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0 0 12px 0;">When you're deep on a positioning brief or a launch plan, you don't want to watch a counter. Upgrade when you're ready.</p>
-              <a href="${APP_URL}/settings" style="font-size: 14px; color: #0058be; font-weight: 600; text-decoration: none;">Upgrade to Starter →</a>
-            </td>
-          </tr>
-        </table>
+      <td style="padding: 0 40px 20px 40px;">
+        <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0; padding: 12px 16px; background: #f9fafb; border-radius: 8px; border-left: 3px solid #d1d5db;">You're on Free (10 msgs/mo). <a href="${APP_URL}/settings" style="color: #0058be; text-decoration: none; font-weight: 600;">Starter ($9.99)</a> removes the ceiling: 200 msgs, every model, live web research.</p>
       </td>
     </tr>
   `
-
-  const referralSection = `
-    <!-- Referral CTA -->
-    <tr>
-      <td style="padding: 0 40px 32px 40px;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="background: #f0f6ff; border-radius: 10px; border: 1px solid #cce0ff;">
-          <tr>
-            <td style="padding: 20px 24px;">
-              <p style="font-size: 13px; font-weight: 700; color: #0058be; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">Refer 3 PMMs, earn a free month of Starter</p>
-              <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 0 0 14px 0;">Know product marketers who are stuck on the same problems? Share your link. Every 3 people who sign up earns you 30 days of Starter access (200 messages, all models, live web research). Up to 90 days total.</p>
-              <table cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="background: #ffffff; border: 1px solid #cce0ff; border-radius: 8px; padding: 10px 16px;">
-                    <p style="font-size: 13px; color: #0058be; font-family: monospace; margin: 0; word-break: break-all;">${referralLink}</p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  `
-
-  const gtmAreas = [
-    'GTM Strategy: go-to-market planning and sequencing',
-    'Positioning: differentiation and messaging hierarchy',
-    'Launches: launch briefs, GTM readiness, expansion',
-    'Pricing: strategy, tier design, competitive benchmarking',
-    'Sales Enablement: battle cards, talk tracks, objection handling',
-    'Asset Audits: landing pages, decks, messaging review',
-    'Career Growth: interview prep, promotion narratives, strategy',
-  ]
 
   const subject = isStarter ? 'Welcome to PMM Sherpa Starter' : 'Welcome to PMM Sherpa'
 
@@ -561,82 +507,43 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
           <tr>
             <td align="center">
               <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
-                <!-- Logo -->
                 <tr>
-                  <td align="center" style="padding: 32px 0 16px 0;">
+                  <td align="center" style="padding: 32px 0 20px 0;">
                     <img src="${LOGO_URL}" alt="PMM Sherpa" width="56" height="56" style="border-radius: 12px;" />
                   </td>
                 </tr>
-                <!-- Opening -->
                 <tr>
-                  <td style="padding: 0 40px 24px 40px;">
-                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">Hi,</p>
-                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">You're in. Welcome to PMM Sherpa.</p>
-                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 16px 0;">Most conversations with generic AI start from zero. You explain your product, describe your market, establish context, then hope the output isn't too shallow to use. Sherpa starts from a different place.</p>
-                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0;">It's built on 38,000+ pieces of real PMM knowledge, distilled from the frameworks that hold up in the field, the practitioners who've solved these problems at real companies, and the strategic conversations that separate what sounds smart from what actually works. That knowledge shapes every response.</p>
+                  <td style="padding: 0 40px 20px 40px;">
+                    <p style="font-size: 16px; line-height: 1.6; color: #1f2937; margin: 0 0 14px 0;">Hi,</p>
+                    <p style="font-size: 16px; line-height: 1.6; color: #1f2937; margin: 0 0 14px 0;">You're in. PMM Sherpa is your senior PMM on tap, built on 38,000+ pieces of real PMM knowledge: frameworks from leading authors, war stories from 100+ PMM leaders, and the moves that actually ship.</p>
+                    <p style="font-size: 16px; line-height: 1.6; color: #1f2937; margin: 0;">It's calibrated to reason like a senior, not retrieve like search.</p>
                   </td>
                 </tr>
-                <!-- Chat home screenshot -->
                 <tr>
-                  <td style="padding: 0 40px 28px 40px;">
-                    <a href="${APP_URL}/chat" style="display: block; text-decoration: none;">
-                      <img src="${CHAT_HOME_IMG}" alt="PMM Sherpa chat" width="520" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 88, 190, 0.12); display: block;" />
-                    </a>
+                  <td style="padding: 0 40px 8px 40px;">
+                    <p style="font-size: 14px; font-weight: 700; color: #1f2937; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.5px;">Use it for</p>
+                    <p style="font-size: 15px; line-height: 1.7; color: #374151; margin: 0 0 20px 0;">
+                      Positioning &middot; GTM strategy &middot; Launches &middot; Pricing &middot; Sales enablement &middot; Asset audits &middot; PMM career
+                    </p>
                   </td>
                 </tr>
-                <!-- Advisory layer section -->
                 <tr>
                   <td style="padding: 0 40px 24px 40px;">
-                    <p style="font-size: 15px; font-weight: 700; color: #1f2937; margin: 0 0 10px 0;">An expert thinking alongside you</p>
-                    <p style="font-size: 15px; line-height: 1.7; color: #374151; margin: 0;">When you describe a positioning problem, Sherpa doesn't retrieve documents. It reasons through the problem the way a senior PMM would: identifying what's actually at stake, connecting the right framework to your specific context, flagging the question you haven't asked yet. That's the layer that makes it different from search.</p>
+                    <p style="font-size: 14px; font-weight: 700; color: #1f2937; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Start here</p>
+                    <p style="font-size: 15px; line-height: 1.6; color: #374151; margin: 0;">Open <a href="${APP_URL}/guides" style="color: #0058be; text-decoration: none; font-weight: 600;">Guides</a>, pick a prompt closest to a real problem on your plate this week, paste it into chat. That's the fastest way to feel the difference.</p>
                   </td>
                 </tr>
-                <!-- 7 GTM Areas -->
                 <tr>
                   <td style="padding: 0 40px 24px 40px;">
-                    <p style="font-size: 15px; font-weight: 700; color: #1f2937; margin: 0 0 14px 0;">7 areas covered:</p>
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                      ${gtmAreas.map(area => `
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background: #f0f6ff; border-radius: 8px; border-left: 3px solid #0058be;">
                       <tr>
-                        <td style="padding: 7px 0; border-bottom: 1px solid #f3f4f6;">
-                          <table cellpadding="0" cellspacing="0">
-                            <tr>
-                              <td style="width: 16px; padding-top: 3px; vertical-align: top;">
-                                <div style="width: 6px; height: 6px; background: #0058be; border-radius: 50%; margin-top: 1px;"></div>
-                              </td>
-                              <td style="font-size: 14px; color: #374151; line-height: 1.5;">${area}</td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>`).join('')}
-                    </table>
-                  </td>
-                </tr>
-                <!-- Guides section with screenshot -->
-                <tr>
-                  <td style="padding: 0 40px 12px 40px;">
-                    <p style="font-size: 15px; font-weight: 700; color: #1f2937; margin: 0 0 10px 0;">The fastest start: Guides</p>
-                    <p style="font-size: 15px; line-height: 1.7; color: #374151; margin: 0 0 16px 0;">The <a href="${APP_URL}/guides" style="color: #0058be; text-decoration: none; font-weight: 600;">Guides section</a> has 21 ready-to-use prompts across all 7 areas, each with instructions on how to give Sherpa the right context. Use one on a real problem from this week.</p>
-                    <a href="${APP_URL}/guides" style="display: block; text-decoration: none;">
-                      <img src="${GUIDES_IMG}" alt="PMM Sherpa guides" width="520" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 88, 190, 0.12); display: block;" />
-                    </a>
-                  </td>
-                </tr>
-                <!-- Spacer -->
-                <tr><td style="padding: 16px 0;"></td></tr>
-                <!-- MCP: Use Sherpa inside your AI tools -->
-                <tr>
-                  <td style="padding: 0 40px 28px 40px;">
-                    <table width="100%" cellpadding="0" cellspacing="0" style="background: #f0f6ff; border-radius: 10px; border: 1px solid #cce0ff;">
-                      <tr>
-                        <td style="padding: 20px 24px;">
-                          <p style="font-size: 13px; font-weight: 700; color: #0058be; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">New: Sherpa inside your AI tools</p>
-                          <p style="font-size: 15px; line-height: 1.7; color: #1f2937; margin: 0 0 12px 0;">PMM Sherpa is now a secure MCP server. Plug it into Claude, ChatGPT, Claude Code, Antigravity, or Gemini CLI and the same senior-PMM brain shows up inside the tools you already use.</p>
-                          <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 0 0 12px 0;">If you're wiring a GTM agent or a PMM workflow, Sherpa is the brain you plug in. Your agent stops reasoning like a junior.</p>
+                        <td style="padding: 14px 18px;">
+                          <p style="font-size: 13px; font-weight: 700; color: #0058be; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 6px 0;">New &middot; Sherpa inside your AI tools</p>
+                          <p style="font-size: 14px; line-height: 1.6; color: #1f2937; margin: 0 0 6px 0;">Plug Sherpa into Claude, ChatGPT, Claude Code, Antigravity, or Gemini CLI via MCP. Same brain, inside the tools you already use.</p>
                           <p style="font-size: 14px; margin: 0;">
-                            <a href="${APP_URL}/docs" style="color: #0058be; text-decoration: none; font-weight: 600;">Read the docs</a>
-                            <span style="color: #9ca3af; padding: 0 8px;">·</span>
-                            <a href="https://github.com/boommark/pmmsherpa-mcp" style="color: #0058be; text-decoration: none; font-weight: 600;">GitHub repo</a>
+                            <a href="${APP_URL}/docs" style="color: #0058be; text-decoration: none; font-weight: 600;">Docs</a>
+                            <span style="color: #9ca3af; padding: 0 6px;">&middot;</span>
+                            <a href="https://github.com/boommark/pmmsherpa-mcp" style="color: #0058be; text-decoration: none; font-weight: 600;">GitHub</a>
                           </p>
                         </td>
                       </tr>
@@ -644,24 +551,28 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
                   </td>
                 </tr>
                 ${tierSection}
-                ${referralSection}
-                <!-- CTA -->
                 <tr>
-                  <td align="center" style="padding: 0 40px 32px 40px;">
-                    <a href="${APP_URL}/chat" style="display: inline-block; background-color: #0058be; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">Start your first conversation →</a>
+                  <td style="padding: 0 40px 24px 40px;">
+                    <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0;">
+                      <strong style="color: #1f2937;">Refer 3 PMMs, earn a free month of Starter.</strong>
+                      <a href="${referralLink}" style="color: #0058be; text-decoration: none; font-weight: 600;">Your link</a>.
+                    </p>
                   </td>
                 </tr>
-                <!-- Sign off -->
                 <tr>
-                  <td style="padding: 0 40px 32px 40px;">
-                    <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 4px 0;">With gratitude,</p>
-                    <p style="font-size: 16px; color: #1f2937; margin: 0 0 4px 0;"><strong>Dona</strong></p>
-                    <p style="font-size: 14px; color: #6b7280; margin: 0;"><a href="mailto:support@pmmsherpa.com" style="color: #6b7280; text-decoration: none;">support@pmmsherpa.com</a></p>
+                  <td align="center" style="padding: 8px 40px 32px 40px;">
+                    <a href="${APP_URL}/chat" style="display: inline-block; background-color: #0058be; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">Start your first conversation &rarr;</a>
                   </td>
                 </tr>
-                <!-- Footer -->
                 <tr>
-                  <td style="padding: 20px 40px; border-top: 1px solid #e5e7eb; text-align: center;">
+                  <td style="padding: 0 40px 28px 40px;">
+                    <p style="font-size: 15px; line-height: 1.5; color: #1f2937; margin: 0 0 4px 0;">With gratitude,</p>
+                    <p style="font-size: 15px; color: #1f2937; margin: 0 0 4px 0;"><strong>Dona</strong></p>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0;"><a href="mailto:support@pmmsherpa.com" style="color: #6b7280; text-decoration: none;">support@pmmsherpa.com</a></p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 16px 40px; border-top: 1px solid #e5e7eb; text-align: center;">
                     <p style="font-size: 13px; color: #9ca3af; margin: 0;"><a href="${APP_URL}" style="color: #9ca3af; text-decoration: none;">pmmsherpa.com</a></p>
                   </td>
                 </tr>
@@ -675,29 +586,22 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
 
   const text = `Hi,
 
-You're in. Welcome to PMM Sherpa.
+You're in. PMM Sherpa is your senior PMM on tap, built on 38,000+ pieces of real PMM knowledge: frameworks from leading authors, war stories from 100+ PMM leaders, and the moves that actually ship. Calibrated to reason like a senior, not retrieve like search.
 
-Most conversations with generic AI start from zero. Sherpa starts from 38,000+ pieces of real PMM knowledge, distilled from the frameworks that hold up in the field, the practitioners who've solved these problems at real companies, and the strategic conversations that separate what sounds smart from what actually works.
+Use it for: Positioning, GTM strategy, Launches, Pricing, Sales enablement, Asset audits, PMM career.
 
-When you describe a positioning problem, Sherpa doesn't retrieve documents. It reasons through it the way a senior PMM would: what's actually at stake, which framework fits, what you haven't asked yet.
+Start here: open Guides (${APP_URL}/guides), pick a prompt closest to a real problem on your plate this week, paste it into chat.
 
-7 areas covered:
-${gtmAreas.map(a => `- ${a}`).join('\n')}
-
-The Guides section has 21 ready-to-use prompts across all 7 areas. Start there:
-${APP_URL}/guides
-
-New: Sherpa is now an MCP server. Plug it into Claude, ChatGPT, Claude Code, Antigravity, or Gemini CLI and use it inside the tools you already work in. If you're building a GTM agent, Sherpa is the brain you wire in.
+New: Sherpa inside your AI tools. Plug it into Claude, ChatGPT, Claude Code, Antigravity, or Gemini CLI via MCP.
 Docs: ${APP_URL}/docs
 GitHub: https://github.com/boommark/pmmsherpa-mcp
 
 ${isStarter
-  ? `Starter is active: 200 messages/month, every model, live web research on every response.`
-  : `Free gives you 10 messages a month. Starter ($9.99/mo) removes the ceiling: 200 messages, every model, live web research: ${APP_URL}/settings`
+  ? `Starter is active: 200 messages/month, every model, live web research.`
+  : `You're on Free (10 msgs/mo). Starter ($9.99) removes the ceiling: ${APP_URL}/settings`
 }
 
-Refer 3 PMMs, earn a free month of Starter (200 messages, all models, live web research):
-${referralLink}
+Refer 3 PMMs, earn a free month of Starter: ${referralLink}
 
 ${APP_URL}/chat
 
