@@ -1,5 +1,7 @@
-# Sync the public-facing docs/ directory (only .mdx files + README) into the
+# Sync the public-facing docs/ directory (only .mdx files) into the
 # public mirror repo at https://github.com/boommark/pmmsherpa-mcp.
+# README.md, LICENSE, examples/, skills/, and .github/ are maintained
+# directly in the public repo and are NOT touched by this workflow.
 #
 # Trigger: every push to `main` that touches docs/.
 #
@@ -68,25 +70,6 @@ jobs:
           # Only sync .mdx files (.md files in docs/ are internal-only).
           find docs -maxdepth 1 -name '*.mdx' -print0 \
             | xargs -0 -I {} cp {} public-mirror/docs/
-
-      - name: Regenerate public README from index.mdx
-        run: |
-          set -euo pipefail
-          python3 <<'PY'
-          import re, pathlib
-          src = pathlib.Path('docs/index.mdx').read_text()
-          # strip frontmatter
-          src = re.sub(r'^---\n.*?\n---\n?', '', src, count=1, flags=re.DOTALL)
-          # rewrite /docs links to absolute pmmsherpa.com URLs so the README
-          # works on github.com without a webserver.
-          src = re.sub(r'\]\(/docs/([^)]+)\)', r'](https://pmmsherpa.com/docs/\1)', src)
-          src = src.replace('](/docs)', '](https://pmmsherpa.com/docs)')
-          header = (
-              "<!-- This file is auto-generated from docs/index.mdx in the source repo. "
-              "Do not edit by hand. -->\n\n"
-          )
-          pathlib.Path('public-mirror/README.md').write_text(header + src)
-          PY
 
       - name: Commit and push if changed
         env:
