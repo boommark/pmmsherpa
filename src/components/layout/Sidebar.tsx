@@ -447,14 +447,26 @@ function SidebarContent({
                 </Button>
               </div>
             ) : (
-              <div className="px-3">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#0058be]/10">
+              <div className="px-3 space-y-1.5">
+                <Link
+                  href="/settings/billing"
+                  onClick={onNavigate}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#0058be]/10 hover:bg-[#0058be]/15 transition-colors"
+                  title="Billing & credits"
+                >
                   <Zap className="h-3.5 w-3.5 text-[#0058be]" />
                   <span className="text-xs font-semibold text-[#0058be] dark:text-[#a8c0f0]">Starter</span>
                   <span className="ml-auto text-xs text-muted-foreground">
                     {profile.messages_used_this_period ?? 0}/{STARTER_TIER_MONTHLY_LIMIT}
                   </span>
-                </div>
+                </Link>
+                <Link
+                  href="/settings/billing"
+                  onClick={onNavigate}
+                  className="block text-center text-[10px] font-medium text-[#0058be] dark:text-[#a8c0f0] hover:underline"
+                >
+                  + Buy MCP credits
+                </Link>
               </div>
             )}
           </div>
@@ -464,9 +476,10 @@ function SidebarContent({
         {!collapsed && profile && (
           <div className="mt-3 pt-3">
             <Link
-              href="/settings"
+              href="/settings/billing"
               onClick={onNavigate}
               className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-sidebar-accent transition-colors"
+              title="Billing & credits"
             >
               <Avatar className="h-8 w-8">
                 <AvatarImage
@@ -488,7 +501,7 @@ function SidebarContent({
         )}
         {collapsed && profile && (
           <div className="mt-4 pt-4 flex justify-center">
-            <Link href="/settings" onClick={onNavigate}>
+            <Link href="/settings/billing" onClick={onNavigate}>
               <Avatar className="h-8 w-8">
                 <AvatarImage
                   src={profile.avatar_url || undefined}

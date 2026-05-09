@@ -34,6 +34,10 @@ export interface Profile {
   tier: 'free' | 'founder' | 'starter';
   messages_used_this_period: number;
   period_start: string;
+  // MCP credits (migration 020)
+  mcp_credits_monthly_remaining: number | null;
+  mcp_credits_purchased_remaining: number | null;
+  mcp_credits_month_start: string | null;
   created_at: string;
   updated_at: string;
 }

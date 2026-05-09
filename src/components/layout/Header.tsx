@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ModelSelector } from '@/components/chat/ModelSelector'
-import { LogOut, User, Settings, Menu, Mail, Zap, BookOpen } from 'lucide-react'
+import { LogOut, User, Settings, Menu, Mail, Zap, BookOpen, CreditCard } from 'lucide-react'
 
 export function Header() {
   const { profile } = useProfile()
@@ -123,6 +123,10 @@ export function Header() {
               {upgrading ? 'Redirecting…' : 'Upgrade to Starter — $9.99/mo'}
             </DropdownMenuItem>
           )}
+          <DropdownMenuItem onClick={() => router.push('/settings/billing')}>
+            <CreditCard className="mr-2 h-4 w-4" />
+            Billing & credits
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => router.push('/settings')}>
             <User className="mr-2 h-4 w-4" />
             Profile
