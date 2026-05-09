@@ -96,7 +96,12 @@ export async function runSherpaChat(input: RunSherpaChatInput): Promise<RunSherp
           role: 'system' as const,
           content: systemParts.staticPart,
           providerOptions: {
-            anthropic: { cacheControl: { type: 'ephemeral' as const } },
+            // 1-hour TTL: MCP traffic is sparse enough that the default 5-min
+            // ephemeral cache expires between calls (every "warm" trace shows
+            // input_cache_creation_5m=5538, input_cached_tokens=0 — paying
+            // the 1.25× write surcharge every call without ever hitting the
+            // 0.1× read discount). 1h covers normal session bursts.
+            anthropic: { cacheControl: { type: 'ephemeral' as const, ttl: '1h' as const } },
           },
         },
         {
