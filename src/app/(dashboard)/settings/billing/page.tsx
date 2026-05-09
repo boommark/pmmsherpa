@@ -160,7 +160,7 @@ function BillingPageInner() {
                         ? 'Unmetered'
                         : isStarter
                           ? '200 web messages + 200 MCP credits per month'
-                          : '10 web messages + 10 MCP credits per month'}
+                          : '10 web messages + 10 MCP credits per month — top up MCP anytime'}
                     </p>
                   </div>
                 </div>
@@ -245,9 +245,7 @@ function BillingPageInner() {
               <CardHeader>
                 <CardTitle>MCP credit topups</CardTitle>
                 <CardDescription>
-                  {isStarter
-                    ? 'Need more than 200 credits this month? Top up anytime. Topups never expire.'
-                    : 'Topup packs unlock on the Starter plan. Each MCP query costs 2 credits.'}
+                  Top up anytime. Each MCP query costs 2 credits. Topup credits never expire.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -290,15 +288,13 @@ function BillingPageInner() {
                           size="sm"
                           variant={isBest ? 'default' : 'outline'}
                           onClick={() => handleBuyPack(packId)}
-                          disabled={buyingPack !== null || isFree}
+                          disabled={buyingPack !== null}
                           className={`w-full text-xs h-8 ${
                             isBest ? 'bg-[#0058be] hover:bg-[#004a9e] text-white' : ''
                           }`}
                         >
                           {buyingPack === packId ? (
                             <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : isFree ? (
-                            'Starter only'
                           ) : (
                             'Buy'
                           )}
@@ -307,11 +303,6 @@ function BillingPageInner() {
                     )
                   })}
                 </div>
-                {isFree && (
-                  <p className="text-xs text-muted-foreground mt-3">
-                    Upgrade to Starter to unlock topup packs.
-                  </p>
-                )}
               </CardContent>
             </Card>
           )}

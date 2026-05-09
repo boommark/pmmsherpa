@@ -113,21 +113,21 @@ export function MCPSection() {
 
         {/* Pricing callout */}
         <p className="text-center text-sm text-[#5f6368] max-w-3xl mx-auto leading-relaxed mb-8 md:mb-10">
-          Starts free. 10 MCP credits per month. Upgrade to{" "}
+          Starts free. 10 MCP credits per month.{" "}
+          <a
+            href="#pricing"
+            className="text-[#0058be] hover:text-[#004a9e] underline-offset-4 hover:underline"
+          >
+            Top up
+          </a>{" "}
+          anytime, or upgrade to{" "}
           <a
             href="#pricing"
             className="text-[#0058be] hover:text-[#004a9e] underline-offset-4 hover:underline"
           >
             Starter
           </a>{" "}
-          for 200 credits, or{" "}
-          <a
-            href="#pricing"
-            className="text-[#0058be] hover:text-[#004a9e] underline-offset-4 hover:underline"
-          >
-            top up
-          </a>{" "}
-          anytime.
+          for 200 credits/month.
         </p>
 
         {/* CTA */}

@@ -446,6 +446,13 @@ function SidebarContent({
                   <ArrowUpCircle className="h-3.5 w-3.5 mr-1.5" />
                   {upgradingTier ? 'Redirecting…' : 'Upgrade to Starter'}
                 </Button>
+                <Link
+                  href="/settings/billing"
+                  onClick={onNavigate}
+                  className="block text-center text-[10px] font-medium text-[#0058be] dark:text-[#a8c0f0] hover:underline"
+                >
+                  + Buy MCP credits
+                </Link>
               </div>
             ) : (
               <div className="px-3 space-y-1.5">

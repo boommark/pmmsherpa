@@ -34,7 +34,7 @@ const plans: Plan[] = [
       { label: '10 MCP credits / month', included: true },
       { label: 'All 4 tools (Frame, Consult, Validate, Grow)', included: true },
       { label: 'Email support', included: true },
-      { label: 'MCP credit topups', included: false },
+      { label: 'MCP credit topups available', included: true },
     ],
   },
   {
@@ -161,10 +161,6 @@ export function PricingSection() {
       window.location.assign('/signup?next=/settings/billing')
       return
     }
-    if (!isStarter) {
-      window.location.assign('/settings/billing')
-      return
-    }
     setPendingPack(pack)
     try {
       const res = await fetch('/api/stripe/checkout-credits', {
@@ -187,7 +183,6 @@ export function PricingSection() {
   const topupCtaLabel = (): string => {
     if (loading) return '…'
     if (!isLoggedIn) return 'Sign up to buy'
-    if (!isStarter) return 'Starter only'
     return 'Buy'
   }
 
