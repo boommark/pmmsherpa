@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AnimatedOrb } from "@/components/ui/animated-orb";
 import { LogoBanner } from "@/components/ui/logo-banner";
+import { PricingSection } from "@/components/landing/PricingSection";
 import { ArrowRight, Crosshair, MessageSquare, ShieldCheck, TrendingUp, Target, Box, Rocket } from "lucide-react";
 
 function MountainIcon({ className }: { className?: string }) {
@@ -492,6 +493,9 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Pricing */}
+      <PricingSection />
+
       {/* CTA */}
       <section className="py-14 md:py-20" style={{
         background: "linear-gradient(180deg, #ffffff 0%, #f8f9fd 100%)",
@@ -537,6 +541,7 @@ export default function LandingPage() {
               <a href="#what-it-does" className="hover:text-[#191c1e] transition-colors">What It Does</a>
               <a href="#how-it-works" className="hover:text-[#191c1e] transition-colors">How It Works</a>
               <a href="#who-its-for" className="hover:text-[#191c1e] transition-colors">Who It&apos;s For</a>
+              <a href="#pricing" className="hover:text-[#191c1e] transition-colors">Pricing</a>
               <Link href="/terms" className="hover:text-[#191c1e] transition-colors">Terms</Link>
               <Link href="/privacy" className="hover:text-[#191c1e] transition-colors">Privacy</Link>
               <Link href="/login" className="hover:text-[#191c1e] transition-colors">Sign In</Link>
