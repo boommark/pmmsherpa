@@ -30,6 +30,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
+  // ---- Idempotency: ignore replays of the same Stripe event ----
+  // We persist event.id BEFORE branching so a retry never double-applies.
+  // INSERT ... ON CONFLICT DO NOTHING returns 0 rows on a duplicate.
+  const { data: insertedEvent, error: insertErr } = await (supabase
+    .from('stripe_webhook_events') as ReturnType<typeof supabase.from>)
+    .insert({ event_id: event.id, event_type: event.type } as never)
+    .select('event_id')
+    .maybeSingle()
+
+  if (insertErr) {
+    // Unique-violation on event_id is the duplicate path → swallow.
+    // Other DB errors → log but proceed (idempotency is best-effort here;
+    // the per-branch logic is also idempotent at the DB level via UPDATE
+    // semantics for subscription tier flips).
+    if ((insertErr as { code?: string }).code === '23505') {
+      console.log(`[Stripe] Duplicate event ${event.id} (${event.type}); skipping.`)
+      return NextResponse.json({ received: true, duplicate: true })
+    }
+    console.error(`[Stripe] Idempotency insert failed for ${event.id}:`, insertErr)
+  } else if (!insertedEvent) {
+    // maybeSingle() with no row + no error means the conflict was swallowed.
+    console.log(`[Stripe] Duplicate event ${event.id} (${event.type}); skipping.`)
+    return NextResponse.json({ received: true, duplicate: true })
+  }
+
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -37,6 +62,38 @@ export async function POST(request: NextRequest) {
         const userId = session.metadata?.supabase_user_id
         if (!userId) break
 
+        // ---- Credit-pack purchase (mode === 'payment' + metadata.credits) ----
+        // One-time pack purchase from /api/stripe/checkout-credits.
+        if (session.mode === 'payment' && session.metadata?.credits) {
+          const creditsRaw = session.metadata.credits
+          const credits = Number.parseInt(creditsRaw, 10)
+          if (!Number.isFinite(credits) || credits <= 0) {
+            console.error(
+              `[Stripe] Invalid credits metadata "${creditsRaw}" on session ${session.id}`,
+            )
+            break
+          }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error: grantErr } = await (supabase.rpc as any)('grant_mcp_credits', {
+            p_user_id: userId,
+            p_amount: credits,
+          })
+          if (grantErr) {
+            console.error(
+              `[Stripe] grant_mcp_credits failed for user ${userId} (event ${event.id}):`,
+              grantErr,
+            )
+            // Surface a 500 so Stripe retries — idempotency table will
+            // gate the retry properly only if the insert above succeeded.
+            return NextResponse.json({ error: 'Credit grant failed' }, { status: 500 })
+          }
+          console.log(
+            `[Stripe] User ${userId} purchased ${credits} MCP credits (pack=${session.metadata.pack})`,
+          )
+          break
+        }
+
+        // ---- Subscription path (legacy Starter $9.99/mo) ----
         // Save Stripe customer ID and upgrade tier
         await supabase
           .from('profiles')

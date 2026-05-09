@@ -42,6 +42,9 @@ import {
 } from '@/lib/mcp/sessions'
 import { getTool, listToolsForRpc } from '@/lib/mcp/tools'
 import { startMcpObservation } from '@/lib/mcp/tracing'
+import { InsufficientCreditsError } from '@/lib/mcp/credits'
+import { setActiveTraceIO } from '@langfuse/tracing'
+import { LangfuseOtelSpanAttributes } from '@langfuse/core'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -167,10 +170,26 @@ async function dispatch(
           toolName: tool.name,
           input: args,
         },
-        async () => tool.handler(args, { auth, session }),
+        async (span) => {
+          // Set the trace-level name to mcp.tool.<tool_name> so Langfuse
+          // API queries by ?name=mcp.tool.<x> work correctly. Without this
+          // the trace inherits the outer transport span name.
+          span.otelSpan.setAttribute(
+            LangfuseOtelSpanAttributes.TRACE_NAME,
+            `mcp.tool.${tool.name}`,
+          )
+          setActiveTraceIO({ input: args })
+          return tool.handler(args, { auth, session })
+        },
       )
       return { envelope: buildResult(id, result) }
     } catch (err) {
+      // Insufficient-credits is a structured JSON-RPC -32000 error per spec.
+      if (err instanceof InsufficientCreditsError) {
+        return {
+          envelope: buildError(id, err.code, err.message, err.data),
+        }
+      }
       const message = err instanceof Error ? err.message : 'Tool execution failed'
       return {
         envelope: buildError(id, JSON_RPC_ERRORS.INTERNAL_ERROR, message),
@@ -446,14 +465,27 @@ function streamingToolCall(
               toolName: tool.name,
               input: args,
             },
-            async () => tool.handler(args, { auth, session, onProgress }),
+            async (span) => {
+              span.otelSpan.setAttribute(
+                LangfuseOtelSpanAttributes.TRACE_NAME,
+                `mcp.tool.${tool.name}`,
+              )
+              setActiveTraceIO({ input: args })
+              return tool.handler(args, { auth, session, onProgress })
+            },
           )
           controller.enqueue(encoder.encode(encodeSseFrame(buildResult(id, result))))
         } catch (err) {
-          const message = err instanceof Error ? err.message : 'Tool execution failed'
-          controller.enqueue(
-            encoder.encode(encodeSseFrame(buildError(id, JSON_RPC_ERRORS.INTERNAL_ERROR, message))),
-          )
+          if (err instanceof InsufficientCreditsError) {
+            controller.enqueue(
+              encoder.encode(encodeSseFrame(buildError(id, err.code, err.message, err.data))),
+            )
+          } else {
+            const message = err instanceof Error ? err.message : 'Tool execution failed'
+            controller.enqueue(
+              encoder.encode(encodeSseFrame(buildError(id, JSON_RPC_ERRORS.INTERNAL_ERROR, message))),
+            )
+          }
         } finally {
           controller.close()
           touchSession(session.id).catch(() => undefined)
