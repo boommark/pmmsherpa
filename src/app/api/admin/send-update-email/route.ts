@@ -4,7 +4,7 @@ import { Resend } from 'resend'
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 const LOGO_URL = 'https://pmmsherpa.com/email/logo-blue.png'
-const LAUNCH_IMAGE_URL = 'https://staging.pmmsherpa.com/email/mcp-launch.png'
+const LAUNCH_IMAGE_URL = 'https://pmmsherpa.com/email/mcp-launch.png'
 const APP_URL = 'https://pmmsherpa.com'
 const GITHUB_URL = 'https://github.com/boommark/pmmsherpa-mcp'
 const DOCS_URL = 'https://pmmsherpa.com/docs'

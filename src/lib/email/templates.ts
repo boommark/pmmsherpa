@@ -624,6 +624,25 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
                 </tr>
                 <!-- Spacer -->
                 <tr><td style="padding: 16px 0;"></td></tr>
+                <!-- MCP: Use Sherpa inside your AI tools -->
+                <tr>
+                  <td style="padding: 0 40px 28px 40px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background: #f0f6ff; border-radius: 10px; border: 1px solid #cce0ff;">
+                      <tr>
+                        <td style="padding: 20px 24px;">
+                          <p style="font-size: 13px; font-weight: 700; color: #0058be; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px 0;">New: Sherpa inside your AI tools</p>
+                          <p style="font-size: 15px; line-height: 1.7; color: #1f2937; margin: 0 0 12px 0;">PMM Sherpa is now a secure MCP server. Plug it into Claude, ChatGPT, Claude Code, Antigravity, or Gemini CLI and the same senior-PMM brain shows up inside the tools you already use.</p>
+                          <p style="font-size: 14px; line-height: 1.7; color: #374151; margin: 0 0 12px 0;">If you're wiring a GTM agent or a PMM workflow, Sherpa is the brain you plug in. Your agent stops reasoning like a junior.</p>
+                          <p style="font-size: 14px; margin: 0;">
+                            <a href="${APP_URL}/docs" style="color: #0058be; text-decoration: none; font-weight: 600;">Read the docs</a>
+                            <span style="color: #9ca3af; padding: 0 8px;">·</span>
+                            <a href="https://github.com/boommark/pmmsherpa-mcp" style="color: #0058be; text-decoration: none; font-weight: 600;">GitHub repo</a>
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
                 ${tierSection}
                 ${referralSection}
                 <!-- CTA -->
@@ -667,6 +686,10 @@ ${gtmAreas.map(a => `- ${a}`).join('\n')}
 
 The Guides section has 21 ready-to-use prompts across all 7 areas. Start there:
 ${APP_URL}/guides
+
+New: Sherpa is now an MCP server. Plug it into Claude, ChatGPT, Claude Code, Antigravity, or Gemini CLI and use it inside the tools you already work in. If you're building a GTM agent, Sherpa is the brain you wire in.
+Docs: ${APP_URL}/docs
+GitHub: https://github.com/boommark/pmmsherpa-mcp
 
 ${isStarter
   ? `Starter is active: 200 messages/month, every model, live web research on every response.`
