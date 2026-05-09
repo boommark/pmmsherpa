@@ -6,15 +6,17 @@ import { ArrowRight, Plug, Sparkles, Code } from "lucide-react";
 type Client = {
   name: string;
   logo: string;
+  href: string;
   bg?: string;
 };
 
 const clients: Client[] = [
-  { name: "Claude.ai", logo: "/clients/claude.svg", bg: "#fbeee5" },
-  { name: "Claude Code", logo: "/clients/claude-code.png", bg: "#fbeee5" },
-  { name: "ChatGPT", logo: "/clients/chatgpt.png", bg: "#f1f5f4" },
-  { name: "Codex", logo: "/clients/codex.png", bg: "#eef0fb" },
-  { name: "Antigravity", logo: "/clients/antigravity.png", bg: "#eef3ff" },
+  { name: "Claude.ai", logo: "/clients/claude.svg", href: "/docs/connect-claude-ai", bg: "#fbeee5" },
+  { name: "Claude Code", logo: "/clients/claude-code.png", href: "/docs/connect-claude-code", bg: "#fbeee5" },
+  { name: "ChatGPT", logo: "/clients/chatgpt.png", href: "/docs/connect-chatgpt", bg: "#f1f5f4" },
+  { name: "Codex", logo: "/clients/codex.png", href: "/docs/connect-codex", bg: "#eef0fb" },
+  { name: "Gemini CLI", logo: "/clients/gemini-cli.png", href: "/docs/connect-gemini-cli", bg: "#eef3ff" },
+  { name: "Antigravity", logo: "/clients/antigravity.png", href: "/docs/connect-antigravity", bg: "#f3edff" },
 ];
 
 type Feature = {
@@ -60,16 +62,18 @@ export function MCPSection() {
             Use Sherpa in every AI you already use
           </h2>
           <p className="text-base md:text-lg text-[#4a4f57] max-w-2xl mx-auto leading-relaxed">
-            One connector. Five clients. The same senior PMM advisor everywhere.
+            One connector. Six clients. The same senior PMM advisor everywhere.
           </p>
         </div>
 
         {/* Client grid */}
-        <div className="max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-12 md:mb-16">
+        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 mb-12 md:mb-16">
           {clients.map((client) => (
-            <div
+            <Link
               key={client.name}
-              className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-white border border-[#e8ecf4]/80 shadow-[0_2px_10px_rgba(0,0,0,0.03)] py-5 px-3 transition-all hover:shadow-[0_4px_16px_rgba(0,88,190,0.08)] hover:border-[#0058be]/30"
+              href={client.href}
+              className="group flex flex-col items-center justify-center gap-3 rounded-2xl bg-white border border-[#e8ecf4]/80 shadow-[0_2px_10px_rgba(0,0,0,0.03)] py-5 px-3 transition-all hover:shadow-[0_4px_16px_rgba(0,88,190,0.08)] hover:border-[#0058be]/30 hover:-translate-y-0.5"
+              aria-label={`Connect ${client.name}`}
             >
               <div
                 className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden"
@@ -84,10 +88,10 @@ export function MCPSection() {
                   unoptimized
                 />
               </div>
-              <span className="text-xs md:text-sm font-medium text-[#191c1e] text-center leading-tight">
+              <span className="text-xs md:text-sm font-medium text-[#191c1e] text-center leading-tight group-hover:text-[#0058be] transition-colors">
                 {client.name}
               </span>
-            </div>
+            </Link>
           ))}
         </div>
 
