@@ -1,20 +1,20 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Plug, Sparkles, Code } from "lucide-react";
 
 type Client = {
   name: string;
-  initial: string;
-  accent: string;
+  logo: string;
+  bg?: string;
 };
 
 const clients: Client[] = [
-  { name: "Claude.ai", initial: "C", accent: "#cc785c" },
-  { name: "Claude Code", initial: "CC", accent: "#cc785c" },
-  { name: "ChatGPT", initial: "G", accent: "#10a37f" },
-  { name: "Codex", initial: "Cx", accent: "#191c1e" },
-  { name: "Gemini CLI", initial: "Ge", accent: "#1a73e8" },
-  { name: "Antigravity", initial: "A", accent: "#7c3aed" },
+  { name: "Claude.ai", logo: "/clients/claude.svg", bg: "#fbeee5" },
+  { name: "Claude Code", logo: "/clients/claude-code.png", bg: "#fbeee5" },
+  { name: "ChatGPT", logo: "/clients/chatgpt.png", bg: "#f1f5f4" },
+  { name: "Codex", logo: "/clients/codex.png", bg: "#eef0fb" },
+  { name: "Antigravity", logo: "/clients/antigravity.png", bg: "#eef3ff" },
 ];
 
 type Feature = {
@@ -26,7 +26,7 @@ type Feature = {
 const features: Feature[] = [
   {
     icon: Plug,
-    title: "Connects in 60 seconds",
+    title: "Connects in seconds",
     description: "OAuth, no API keys to manage.",
   },
   {
@@ -60,22 +60,29 @@ export function MCPSection() {
             Use Sherpa in every AI you already use
           </h2>
           <p className="text-base md:text-lg text-[#4a4f57] max-w-2xl mx-auto leading-relaxed">
-            One connector. Six clients. The same senior PMM advisor everywhere.
+            One connector. Five clients. The same senior PMM advisor everywhere.
           </p>
         </div>
 
         {/* Client grid */}
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 mb-12 md:mb-16">
+        <div className="max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-12 md:mb-16">
           {clients.map((client) => (
             <div
               key={client.name}
-              className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-white border border-[#e8ecf4]/80 shadow-[0_2px_10px_rgba(0,0,0,0.03)] py-5 px-3 transition-all hover:shadow-[0_4px_16px_rgba(0,88,190,0.08)] hover:border-[#0058be]/30"
+              className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-white border border-[#e8ecf4]/80 shadow-[0_2px_10px_rgba(0,0,0,0.03)] py-5 px-3 transition-all hover:shadow-[0_4px_16px_rgba(0,88,190,0.08)] hover:border-[#0058be]/30"
             >
               <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold text-white"
-                style={{ background: client.accent }}
+                className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden"
+                style={{ background: client.bg ?? "#ffffff" }}
               >
-                {client.initial}
+                <Image
+                  src={client.logo}
+                  alt={`${client.name} logo`}
+                  width={32}
+                  height={32}
+                  className="h-7 w-7 object-contain"
+                  unoptimized
+                />
               </div>
               <span className="text-xs md:text-sm font-medium text-[#191c1e] text-center leading-tight">
                 {client.name}
