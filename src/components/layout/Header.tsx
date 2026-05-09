@@ -1,51 +1,24 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
-import { useProfile, useSignOut } from '@/hooks/useSupabase'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useProfile } from '@/hooks/useSupabase'
 import { useChatStore } from '@/stores/chatStore'
 import { useUIStore } from '@/stores/uiStore'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { ModelSelector } from '@/components/chat/ModelSelector'
-import { LogOut, User, Settings, Menu, Mail, Zap, BookOpen, CreditCard } from 'lucide-react'
+import { UserMenuContent } from '@/components/layout/UserMenuContent'
+import { Menu } from 'lucide-react'
 
 export function Header() {
   const { profile } = useProfile()
-  const signOut = useSignOut()
   const router = useRouter()
-  const pathname = usePathname()
-  const { currentModel, setCurrentModel, clearMessages, setConversationId } = useChatStore()
+  const { clearMessages, setConversationId } = useChatStore()
   const { toggleMobileSidebar } = useUIStore()
-  const [upgrading, setUpgrading] = useState(false)
-
-  const handleSignOut = async () => {
-    await signOut()
-    window.location.href = '/login'
-  }
-
-  const handleUpgrade = async () => {
-    setUpgrading(true)
-    try {
-      const res = await fetch('/api/stripe/create-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID }),
-      })
-      const data = await res.json()
-      if (data.url) window.location.href = data.url
-    } finally {
-      setUpgrading(false)
-    }
-  }
 
   // Handle clicking the logo to start a new chat — single click, no scroll flash
   const handleNewChat = (e: React.MouseEvent) => {
@@ -77,7 +50,7 @@ export function Header() {
         >
           <Menu className="h-4 w-4" />
         </Button>
-        <a href="/chat" onClick={handleNewChat} className="hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
+        <Link href="/chat" onClick={handleNewChat} className="hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
           <div className="w-7 h-7 rounded-md bg-[#0058be] flex items-center justify-center">
             <svg
               viewBox="0 0 24 24"
@@ -92,7 +65,7 @@ export function Header() {
             </svg>
           </div>
           <h1 className="text-base md:text-lg font-semibold text-[#0058be] dark:text-[#a8c0f0]">PMMSherpa</h1>
-        </a>
+        </Link>
         {/* Model selector hidden — defaulting to Claude Sonnet */}
       </div>
 
@@ -105,53 +78,7 @@ export function Header() {
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56" align="end" forceMount>
-          <DropdownMenuLabel className="font-normal">
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium">{profile?.full_name || 'User'}</p>
-              <p className="text-xs text-muted-foreground">{profile?.email}</p>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {profile?.tier === 'free' && (
-            <DropdownMenuItem
-              onClick={handleUpgrade}
-              disabled={upgrading}
-              className="text-[#0058be] dark:text-[#a8c0f0] font-medium focus:text-[#0058be] dark:focus:text-[#a8c0f0]"
-            >
-              <Zap className="mr-2 h-4 w-4" />
-              {upgrading ? 'Redirecting…' : 'Upgrade to Starter — $9.99/mo'}
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuItem onClick={() => router.push('/settings/billing')}>
-            <CreditCard className="mr-2 h-4 w-4" />
-            Billing & credits
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push('/settings')}>
-            <User className="mr-2 h-4 w-4" />
-            Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push('/settings/preferences')}>
-            <Settings className="mr-2 h-4 w-4" />
-            Settings
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push('/docs')}>
-            <BookOpen className="mr-2 h-4 w-4" />
-            Docs
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <a href="mailto:support@pmmsherpa.com" className="cursor-pointer">
-              <Mail className="mr-2 h-4 w-4" />
-              Contact Us
-            </a>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleSignOut}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign out
-          </DropdownMenuItem>
-        </DropdownMenuContent>
+        <UserMenuContent align="end" />
       </DropdownMenu>
     </header>
   )

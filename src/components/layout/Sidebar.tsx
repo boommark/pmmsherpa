@@ -13,6 +13,8 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
+import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { UserMenuContent } from '@/components/layout/UserMenuContent'
 import {
   MessageSquare,
   History,
@@ -28,7 +30,6 @@ import {
   MoreHorizontal,
   Zap,
   ArrowUpCircle,
-  Infinity,
   Mail,
 } from 'lucide-react'
 import { FREE_TIER_MONTHLY_LIMIT, STARTER_TIER_MONTHLY_LIMIT } from '@/lib/constants'
@@ -82,7 +83,7 @@ function SidebarContent({
         body: JSON.stringify({ priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID }),
       })
       const data = await res.json()
-      if (data.url) window.location.href = data.url
+      if (data.url) window.location.assign(data.url)
     } finally {
       setUpgradingTier(false)
     }
@@ -472,44 +473,53 @@ function SidebarContent({
           </div>
         )}
 
-        {/* User Profile Section — spacing divider instead of border */}
+        {/* User Profile Section — opens shared dropdown menu (parity with Header) */}
         {!collapsed && profile && (
           <div className="mt-3 pt-3">
-            <Link
-              href="/settings/billing"
-              onClick={onNavigate}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-sidebar-accent transition-colors"
-              title="Billing & credits"
-            >
-              <Avatar className="h-8 w-8">
-                <AvatarImage
-                  src={profile.avatar_url || undefined}
-                  alt={profile.full_name || ''}
-                />
-                <AvatarFallback className="text-xs bg-[#d8e2ff] text-[#0058be]">{initials}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">
-                  {profile.full_name || 'User'}
-                </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {profile.email}
-                </p>
-              </div>
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-sidebar-accent transition-colors w-full text-left"
+                  aria-label="Open account menu"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src={profile.avatar_url || undefined}
+                      alt={profile.full_name || ''}
+                    />
+                    <AvatarFallback className="text-xs bg-[#d8e2ff] text-[#0058be]">{initials}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {profile.full_name || 'User'}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {profile.email}
+                    </p>
+                  </div>
+                </button>
+              </DropdownMenuTrigger>
+              <UserMenuContent align="start" side="top" onNavigate={onNavigate} />
+            </DropdownMenu>
           </div>
         )}
         {collapsed && profile && (
           <div className="mt-4 pt-4 flex justify-center">
-            <Link href="/settings/billing" onClick={onNavigate}>
-              <Avatar className="h-8 w-8">
-                <AvatarImage
-                  src={profile.avatar_url || undefined}
-                  alt={profile.full_name || ''}
-                />
-                <AvatarFallback className="text-xs bg-[#d8e2ff] text-[#0058be]">{initials}</AvatarFallback>
-              </Avatar>
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" aria-label="Open account menu" className="rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src={profile.avatar_url || undefined}
+                      alt={profile.full_name || ''}
+                    />
+                    <AvatarFallback className="text-xs bg-[#d8e2ff] text-[#0058be]">{initials}</AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <UserMenuContent align="start" side="right" onNavigate={onNavigate} />
+            </DropdownMenu>
           </div>
         )}
       </nav>
