@@ -5,6 +5,7 @@ import { getSystemPromptParts } from './system-prompt'
 // All available model providers (Anthropic and Google only)
 export type ModelProvider =
   | 'claude-sonnet'
+  | 'claude-haiku'
   | 'gemini-3-pro'
 
 export const MODEL_CONFIG = {
@@ -15,6 +16,15 @@ export const MODEL_CONFIG = {
     maxTokens: 64000,
     isThinking: false,
     color: 'bg-orange-400',
+    webSearchSupported: true,
+  },
+  'claude-haiku': {
+    id: 'claude-haiku-4-5',
+    name: 'Claude Haiku 4.5',
+    provider: 'anthropic',
+    maxTokens: 32000,
+    isThinking: false,
+    color: 'bg-orange-300',
     webSearchSupported: true,
   },
   'gemini-3-pro': {

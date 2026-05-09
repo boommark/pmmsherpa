@@ -22,8 +22,18 @@ import { getModel, MODEL_CONFIG } from '@/lib/llm/provider-factory'
 import type { Citation } from '@/types/database'
 import type { RetrievedChunk } from '@/types/chat'
 
-/** Hardcoded for v1. Tool schemas accept `model` but the value is ignored. */
-const MCP_MODEL = 'claude-sonnet' as const
+/**
+ * Hardcoded for v1. Tool schemas accept `model` but the value is ignored.
+ *
+ * 2026-05-09: Switched from Sonnet 4.6 → Haiku 4.5 after a side-by-side
+ * comparison (scripts/compare-models.ts) on a representative positioning
+ * prompt: Haiku decoded ~2x faster (66 vs 37 tok/s on the same Anthropic
+ * account, confirming the Sonnet ceiling is per-model not per-tier) and
+ * produced an answer indistinguishable from Sonnet on voice + grounding.
+ * Cost drops ~5x on input, ~3x on output. Easy to flip back if quality
+ * regresses on longer-form synthesis (draft_artifact / get_feedback).
+ */
+const MCP_MODEL = 'claude-haiku' as const
 
 export interface RunSherpaChatInput {
   message: string
