@@ -2,9 +2,11 @@
  * Warm-up endpoint to keep the /api/mcp serverless function warm.
  *
  * Currently UNWIRED to a cron — Vercel Hobby plan only allows daily
- * cron jobs (verified 2026-05-09: deploy rejected for `*/4 * * * *`
- * schedule), and once-a-day warming is useless for keeping a lambda
- * warm. The endpoint stays in the codebase so that an external pinger
+ * cron jobs (verified 2026-05-09: deploy rejected with the message
+ * "Hobby accounts are limited to daily cron jobs" when an every-4-min
+ * schedule was configured), and once-a-day warming is useless for
+ * keeping a lambda warm. The endpoint stays in the codebase so that
+ * an external pinger
  * (UptimeRobot, Better Uptime, GitHub Actions, etc.) can drive it, or
  * so it can be wired to a sub-daily Vercel cron after a Pro upgrade.
  *
