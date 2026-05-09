@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ModelSelector } from '@/components/chat/ModelSelector'
-import { LogOut, User, Settings, Menu, Mail, Zap } from 'lucide-react'
+import { LogOut, User, Settings, Menu, Mail, Zap, BookOpen } from 'lucide-react'
 
 export function Header() {
   const { profile } = useProfile()
@@ -130,6 +130,10 @@ export function Header() {
           <DropdownMenuItem onClick={() => router.push('/settings/preferences')}>
             <Settings className="mr-2 h-4 w-4" />
             Settings
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push('/docs')}>
+            <BookOpen className="mr-2 h-4 w-4" />
+            Docs
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
