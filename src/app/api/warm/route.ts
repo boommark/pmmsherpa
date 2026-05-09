@@ -1,18 +1,21 @@
 /**
- * Warm-up endpoint hit by Vercel Cron every 4 minutes to keep the
- * /api/mcp serverless function warm (avoid cold-start latency on the
- * next real ask_sherpa call).
+ * Warm-up endpoint to keep the /api/mcp serverless function warm.
  *
- * Auth: Vercel Cron requests carry a bearer token matching CRON_SECRET.
- * Anyone else gets 401 — this endpoint must not be a public health probe
- * because it shares the same lambda pool as /api/mcp and we want to
- * count warmup invocations distinctly in logs.
+ * Currently UNWIRED to a cron — Vercel Hobby plan only allows daily
+ * cron jobs (verified 2026-05-09: deploy rejected for `*/4 * * * *`
+ * schedule), and once-a-day warming is useless for keeping a lambda
+ * warm. The endpoint stays in the codebase so that an external pinger
+ * (UptimeRobot, Better Uptime, GitHub Actions, etc.) can drive it, or
+ * so it can be wired to a sub-daily Vercel cron after a Pro upgrade.
  *
- * The endpoint deliberately does NO LLM call — that would burn ~$15/mo
- * just to keep the Anthropic prompt cache alive, and the 1h cache TTL
- * (helpers.ts) plus organic traffic should cover normal usage. If the
- * cache_create rate stays high after the TTL change, revisit and add a
- * minimal Anthropic ping here.
+ * Auth: callers must send Authorization: Bearer $CRON_SECRET. No
+ * unauthed pingers — keep the endpoint distinguishable from organic
+ * traffic in logs.
+ *
+ * Deliberately does NO LLM call — burning ~$15/mo to keep the Anthropic
+ * prompt cache warm via cron is wasteful given the 1h cache TTL fix in
+ * helpers.ts. If post-deploy traces still show cache_create on every
+ * call, revisit and add a minimal Anthropic ping here.
  */
 
 import { NextRequest } from 'next/server'
