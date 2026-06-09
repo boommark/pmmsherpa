@@ -18,6 +18,7 @@ import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { signPayload } from '@/lib/mcp/pkce'
+import { redirectUriMatches } from '@/lib/mcp/redirect-uri'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -91,7 +92,10 @@ export async function GET(req: NextRequest) {
   const allowed = Array.isArray((client as { redirect_uris?: unknown }).redirect_uris)
     ? ((client as { redirect_uris: string[] }).redirect_uris)
     : []
-  if (allowed.length > 0 && !allowed.includes(redirectUri)) {
+  // Loopback clients (Codex CLI and other native apps) bind an ephemeral
+  // port, so the redirect_uri seen here may differ from the registered one
+  // only by port. RFC 8252 §7.3 requires us to match those port-insensitively.
+  if (allowed.length > 0 && !redirectUriMatches(allowed, redirectUri)) {
     return badRequest('invalid_request', 'redirect_uri not registered for this client')
   }
 
