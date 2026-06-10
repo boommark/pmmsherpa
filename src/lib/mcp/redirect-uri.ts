@@ -19,16 +19,32 @@
  * while web/desktop clients with a stable redirect (e.g. Claude) pass.
  *
  * This module implements that rule: loopback hosts match on
- * scheme + host + path (port ignored); everything else is exact.
+ * scheme + path (host class and port ignored); everything else is exact.
+ *
+ * Loopback HOSTNAMES are treated as equivalent to each other (127.0.0.0/8 ≡
+ * ::1 ≡ localhost), not just port-insensitive. This is required in practice:
+ * Vercel's proxy rewrites IPv4 loopback literals inside incoming query
+ * strings to `localhost` before the handler reads them, so a client that
+ * registered `http://127.0.0.1:<port>/cb` presents as
+ * `http://localhost:<port>/cb` at authorize time (verified empirically on
+ * staging, 2026-06-09 — local dev does not reproduce). POST bodies are NOT
+ * rewritten, so /token sees the original host while the authorize stash holds
+ * the rewritten one. Host-class equivalence inside the loopback set is safe:
+ * all loopback names resolve to the same interface, and client identity is
+ * protected by PKCE, not by the redirect host string.
  */
 
 /** Loopback hosts per RFC 8252 §7.3. `localhost` is included for clients
  * that use it even though the RFC prefers literal IPs. */
-const LOOPBACK_HOSTS = new Set(['127.0.0.1', '::1', '[::1]', 'localhost'])
+const LOOPBACK_HOSTS = new Set(['::1', '[::1]', 'localhost'])
+
+// Any 127.0.0.0/8 address is loopback, not just 127.0.0.1 (RFC 5735 §3).
+const IPV4_LOOPBACK = /^127(?:\.\d{1,3}){3}$/
 
 function isLoopbackHost(hostname: string): boolean {
   // URL.hostname strips brackets from IPv6, so `[::1]` arrives as `::1`.
-  return LOOPBACK_HOSTS.has(hostname.toLowerCase())
+  const h = hostname.toLowerCase()
+  return LOOPBACK_HOSTS.has(h) || IPV4_LOOPBACK.test(h)
 }
 
 /**
@@ -51,16 +67,17 @@ export function redirectUriEquals(registered: string, candidate: string): boolea
     return false
   }
 
-  // Only loopback gets port-flexible treatment, and only when BOTH sides are
-  // loopback on the same host (don't let a loopback registration authorize a
-  // non-loopback redirect or vice versa).
+  // Only loopback gets flexible treatment, and only when BOTH sides are
+  // loopback (don't let a loopback registration authorize a non-loopback
+  // redirect or vice versa). Within the loopback set, host names are
+  // equivalent (see module docs: Vercel rewrites 127.x query-string hosts
+  // to `localhost`, and RFC 8252 clients hop ephemeral ports).
   if (!isLoopbackHost(reg.hostname) || !isLoopbackHost(cand.hostname)) {
     return false
   }
 
   return (
     reg.protocol === cand.protocol &&
-    reg.hostname === cand.hostname &&
     reg.pathname === cand.pathname &&
     reg.search === cand.search
   )

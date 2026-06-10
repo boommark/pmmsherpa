@@ -63,6 +63,48 @@ describe('redirectUriEquals — loopback (RFC 8252 §7.3)', () => {
     ).toBe(false)
   })
 
+  it('treats loopback HOSTS as equivalent (Vercel rewrites 127.x → localhost in query strings)', () => {
+    // The exact production failure: client registered 127.0.0.1, Vercel's
+    // proxy delivers the authorize-time redirect_uri with host `localhost`.
+    expect(
+      redirectUriEquals(
+        'http://127.0.0.1:51111/callback',
+        'http://localhost:51111/callback',
+      ),
+    ).toBe(true)
+    expect(
+      redirectUriEquals(
+        'http://127.0.0.1:51111/callback',
+        'http://localhost:62222/callback',
+      ),
+    ).toBe(true)
+    expect(
+      redirectUriEquals('http://[::1]:5000/cb', 'http://127.0.0.1:6000/cb'),
+    ).toBe(true)
+    expect(
+      redirectUriEquals('http://localhost:5000/cb', 'http://[::1]:6000/cb'),
+    ).toBe(true)
+  })
+
+  it('treats the whole 127.0.0.0/8 range as loopback', () => {
+    expect(
+      redirectUriEquals('http://127.0.0.2:5000/cb', 'http://localhost:6000/cb'),
+    ).toBe(true)
+    expect(
+      redirectUriEquals('http://127.1.2.3:5000/cb', 'http://127.0.0.1:6000/cb'),
+    ).toBe(true)
+    // 128.x is NOT loopback
+    expect(
+      redirectUriEquals('http://128.0.0.1:5000/cb', 'http://127.0.0.1:5000/cb'),
+    ).toBe(false)
+  })
+
+  it('matches loopback URIs without an explicit port', () => {
+    expect(
+      redirectUriEquals('http://127.0.0.1/cb', 'http://localhost:6000/cb'),
+    ).toBe(true)
+  })
+
   it('does not pair a loopback registration with a non-loopback candidate', () => {
     expect(
       redirectUriEquals('http://127.0.0.1:5000/cb', 'http://evil.example/cb'),
