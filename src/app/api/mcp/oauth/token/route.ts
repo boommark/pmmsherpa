@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { verifyPkce } from '@/lib/mcp/pkce'
+import { redirectUriEquals } from '@/lib/mcp/redirect-uri'
 import { createClient as createSbClient } from '@supabase/supabase-js'
 
 export const runtime = 'nodejs'
@@ -134,7 +135,10 @@ async function handleAuthorizationCode(form: URLSearchParams) {
   if (codeRow.client_id !== clientId) {
     return tokenError('invalid_grant', 400, 'client_id mismatch')
   }
-  if (redirectUri && codeRow.redirect_uri !== redirectUri) {
+  // Match RFC 8252 §7.3 loopback port-insensitivity used at /authorize, so a
+  // native client that re-binds an ephemeral port between authorize and token
+  // isn't rejected here for a port-only difference.
+  if (redirectUri && !redirectUriEquals(codeRow.redirect_uri, redirectUri)) {
     return tokenError('invalid_grant', 400, 'redirect_uri mismatch')
   }
 
