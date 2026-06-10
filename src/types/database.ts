@@ -49,6 +49,8 @@ export interface Conversation {
   model_used: 'claude' | 'gemini' | 'openai';
   message_count: number;
   is_archived: boolean;
+  /** Projects P2: conversation locked to a project (nullable). */
+  project_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -88,7 +90,8 @@ export interface Message {
 export type SourceType =
   | 'book' | 'blog' | 'ama' | 'blog_external'
   | 'book_pm' | 'book_sales' | 'book_presentations' | 'book_communication'
-  | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai' | 'substack';
+  | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai' | 'substack'
+  | 'project_doc';
 
 export interface Citation {
   source: string;

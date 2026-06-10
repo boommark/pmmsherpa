@@ -12,6 +12,10 @@ export const MAX_DOCS_PER_PROJECT = 100
 /** Total token budget for the pinned tier (full text in every prompt). */
 export const PINNED_TIER_TOKEN_CAP = 20_000
 
+/** Below this total ready-doc token count, chat stuffs ALL project docs into
+ * the prompt verbatim and skips per-query project RAG (auto-stuff mode). */
+export const PROJECT_STUFF_THRESHOLD_TOKENS = 20_000
+
 /** Per-file upload cap — also enforced by the storage bucket's file_size_limit. */
 export const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024 // 25MB
 

@@ -6,6 +6,13 @@ import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 import { getMonthlyLimitForTier, getEffectiveTier } from '@/lib/constants'
 import { getModel, buildMessages, getModelDisplayName, getDbModelValue, MODEL_CONFIG, type ModelProvider } from '@/lib/llm/provider-factory'
 import { multiQueryRetrieve, formatContextForPrompt, extractCitations } from '@/lib/rag/retrieval'
+import {
+  retrieveProjectContext,
+  getProjectPromptContext,
+  formatProjectContextForPrompt,
+  extractProjectCitations,
+} from '@/lib/projects/retrieval'
+import type { Citation } from '@/types/database'
 import { planQueries } from '@/lib/rag/query-planner'
 import { conductResearch } from '@/lib/llm/perplexity-client'
 import { extractUrls, scrapeUrls } from '@/lib/url-scraper'
@@ -171,12 +178,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { message, conversationId, model, attachments, skipUserSave } = body as {
+    const { message, conversationId, model, attachments, skipUserSave, project_id: projectIdFromBody } = body as {
       message: string
       conversationId?: string
       model: ModelProvider
       attachments?: ChatAttachment[]
       skipUserSave?: boolean
+      project_id?: string
     }
 
     if (!model) {
@@ -188,6 +196,82 @@ export async function POST(request: NextRequest) {
     const hasAttachments = attachments && attachments.length > 0
     if (!hasMessage && !hasAttachments) {
       return new Response('Message or attachments required', { status: 400 })
+    }
+
+    // ========================================
+    // Projects P2: resolve + authorize project context
+    // ========================================
+    // The conversation row's project_id is authoritative once set (the
+    // project is locked when the conversation starts); the body's project_id
+    // seeds it on the first turn. Ownership is verified explicitly against
+    // the authed user — load-bearing, because project retrieval below runs
+    // on the service-role client and bypasses RLS (same pattern as
+    // src/lib/projects/auth.ts). Project chunks must NEVER reach a
+    // conversation whose project_id doesn't match.
+    let activeProject: { id: string; name: string } | null = null
+    {
+      let conversationProjectId: string | null = null
+      if (conversationId) {
+        // User-scoped client: RLS guarantees this is the caller's conversation.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: convRow, error: convErr } = await (supabase.from('conversations') as any)
+          .select('id, project_id')
+          .eq('id', conversationId)
+          .maybeSingle()
+        if (convErr || !convRow) {
+          return new Response(
+            JSON.stringify({ error: 'Conversation not found' }),
+            { status: 404, headers: { 'Content-Type': 'application/json' } }
+          )
+        }
+        conversationProjectId = convRow.project_id ?? null
+      }
+
+      const effectiveProjectId =
+        conversationProjectId ||
+        (typeof projectIdFromBody === 'string' && projectIdFromBody ? projectIdFromBody : null)
+
+      if (effectiveProjectId) {
+        if (!/^[0-9a-f-]{36}$/i.test(effectiveProjectId)) {
+          return new Response(
+            JSON.stringify({ error: 'Invalid project id' }),
+            { status: 400, headers: { 'Content-Type': 'application/json' } }
+          )
+        }
+        const adminClient = await createServiceClient()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: projRow, error: projErr } = await (adminClient.from('projects') as any)
+          .select('id, user_id, name')
+          .eq('id', effectiveProjectId)
+          .maybeSingle()
+        if (projErr) {
+          console.error('[Projects] chat project lookup failed:', projErr)
+          return new Response(
+            JSON.stringify({ error: 'Internal server error' }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+          )
+        }
+        if (!projRow || projRow.user_id !== user.id) {
+          // 404 (not 403) — don't leak project existence to non-owners.
+          return new Response(
+            JSON.stringify({ error: 'Project not found' }),
+            { status: 404, headers: { 'Content-Type': 'application/json' } }
+          )
+        }
+        activeProject = { id: projRow.id, name: projRow.name }
+
+        // Persist the project on the conversation at first use so every
+        // later turn (and /api/chat/retry) inherits it server-side.
+        if (conversationId && !conversationProjectId) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error: linkErr } = await (supabase.from('conversations') as any)
+            .update({ project_id: projRow.id })
+            .eq('id', conversationId)
+          if (linkErr) {
+            console.error('[Projects] failed to link conversation to project:', linkErr)
+          }
+        }
+      }
     }
 
     // ========================================
@@ -638,6 +722,8 @@ export async function POST(request: NextRequest) {
             sendStatus('Searching knowledge base and the web...')
           } else if (hasUrls) {
             sendStatus('Reading URL and searching knowledge base...')
+          } else if (activeProject) {
+            sendStatus('Searching project and knowledge base...')
           } else {
             sendStatus('Searching knowledge base...')
           }
@@ -645,8 +731,25 @@ export async function POST(request: NextRequest) {
           const startRetrieval = Date.now()
           currentPhase = 'rag'
 
-          // Run RAG, Perplexity, and Brave Search in parallel
+          // Run RAG, project retrieval, Perplexity, and Brave Search in parallel
           const ragPromise = multiQueryRetrieve(queryPlan.ragQueries, 10, user.id, queryPlan.intent)
+          // Projects P2: project context loads CONCURRENTLY with global RAG.
+          // Both legs are failure-isolated — a project hiccup degrades to a
+          // plain Sherpa answer instead of killing the request.
+          const projectQuery =
+            message || (attachments ? attachments.map(a => a.fileName).join(' ') : '')
+          const projectPromptPromise = activeProject
+            ? getProjectPromptContext(activeProject.id).catch(err => {
+                console.error('[Projects] prompt context error:', err)
+                return null
+              })
+            : Promise.resolve(null)
+          const projectRagPromise = activeProject && projectQuery
+            ? retrieveProjectContext(projectQuery, activeProject.id, 12, user.id).catch(err => {
+                console.error('[Projects] retrieval error:', err)
+                return { chunks: [], totalTokens: 0 }
+              })
+            : Promise.resolve({ chunks: [], totalTokens: 0 })
           const perplexityPromise = queryPlan.webResearch.needed && queryPlan.webResearch.query
             ? conductResearch(
                 queryPlan.webResearch.query,
@@ -665,10 +768,12 @@ export async function POST(request: NextRequest) {
               })
             : Promise.resolve(null)
 
-          const [ragResult, perplexityResult, braveSearchResult] = await Promise.all([
+          const [ragResult, perplexityResult, braveSearchResult, projectPromptCtx, projectRagResult] = await Promise.all([
             ragPromise,
             perplexityPromise,
             braveSearchPromise,
+            projectPromptPromise,
+            projectRagPromise,
           ])
 
           const retrievalTime = Date.now() - startRetrieval
@@ -685,7 +790,24 @@ export async function POST(request: NextRequest) {
           // PHASE 3: Assemble context + Generate
           // ========================================
           const retrievedContext = formatContextForPrompt(chunks)
-          const citations = extractCitations(chunks)
+
+          // Projects P2: assemble the project block + project citations.
+          // In auto-stuff mode the per-query chunks are dropped (their docs
+          // are already in the prompt verbatim).
+          let projectContextBlock = ''
+          let projectCitations: Citation[] = []
+          if (activeProject && projectPromptCtx) {
+            const projectChunks = projectPromptCtx.useStuffing ? [] : projectRagResult.chunks
+            projectContextBlock = formatProjectContextForPrompt(projectPromptCtx, projectChunks)
+            projectCitations = extractProjectCitations(projectChunks, projectPromptCtx)
+            console.log(
+              `[Projects] context for ${activeProject.id}: stuffing=${projectPromptCtx.useStuffing}, ` +
+              `pinned=${projectPromptCtx.pinnedDocs.length}, index=${projectPromptCtx.knowledgeIndex.length}, ` +
+              `ragChunks=${projectChunks.length}, totalTokens=${projectPromptCtx.totalTokenCount}`
+            )
+          }
+
+          const citations = [...projectCitations, ...extractCitations(chunks)]
 
           // Format Perplexity research for inclusion in context
           let webResearchContext = ''
@@ -810,6 +932,12 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           // changes every request and is not cached.
           // For other providers: use a single system message (no caching API).
           const isAnthropic = MODEL_CONFIG[model].provider === 'anthropic'
+          // Projects P2: the project block joins the DYNAMIC part only —
+          // never the cached static part (it changes per conversation and
+          // must not poison the shared prompt cache).
+          const dynamicSystemPart = projectContextBlock
+            ? `${systemParts.dynamicPart}\n\n${projectContextBlock}`
+            : systemParts.dynamicPart
           const systemMessages = isAnthropic
             ? [
                 {
@@ -821,13 +949,13 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
                 },
                 {
                   role: 'system' as const,
-                  content: systemParts.dynamicPart,
+                  content: dynamicSystemPart,
                 },
               ]
             : [
                 {
                   role: 'system' as const,
-                  content: systemParts.staticPart + systemParts.dynamicPart,
+                  content: systemParts.staticPart + dynamicSystemPart,
                 },
               ]
 
