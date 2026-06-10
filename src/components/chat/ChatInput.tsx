@@ -2,10 +2,19 @@
 
 import { useState, useRef, useEffect, useImperativeHandle, forwardRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Send, Loader2, Mic, MicOff, Square, AudioLines } from 'lucide-react'
+import { Send, Loader2, Mic, MicOff, Square, AudioLines, FolderKanban, Check, X } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { FileUpload, type UploadedFile, getFileCategory } from './FileUpload'
 import { AttachmentPreview } from './AttachmentPreview'
 import { useChatStore } from '@/stores/chatStore'
+import { useProjects } from '@/hooks/useProjects'
 import { useVoiceInput } from '@/hooks/useVoiceInput'
 import { createClient as createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
@@ -56,8 +65,15 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const {
       isLoading,
-      abortStreaming
+      abortStreaming,
+      currentProject,
+      setCurrentProject,
     } = useChatStore()
+
+    // Projects P2: project selector. The project is locked once the
+    // conversation exists (project_id lives on the conversation row).
+    const { projects } = useProjects()
+    const projectLocked = !!conversationId
 
     // Voice input hook
     const { isRecording, isProcessing, startRecording, stopRecording } = useVoiceInput({
@@ -326,6 +342,69 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               onRemove={handleRemoveAttachment}
               disabled={disabled}
             />
+
+            {/* Active project chip / selector — visible when a project is
+                selected, or selectable when the user has projects */}
+            {(currentProject || projects.length > 0) && (
+              <div className="flex items-center gap-1.5 px-2.5 pt-2 sm:px-3 -mb-1">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild disabled={projectLocked}>
+                    <button
+                      type="button"
+                      className={cn(
+                        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
+                        currentProject
+                          ? 'bg-[#0058be]/10 text-[#0058be] dark:text-[#a8c0f0]'
+                          : 'text-muted-foreground/70 hover:text-foreground hover:bg-muted/50',
+                        projectLocked && 'cursor-default'
+                      )}
+                      title={
+                        projectLocked
+                          ? currentProject
+                            ? `This conversation uses the "${currentProject.name}" project`
+                            : undefined
+                          : 'Choose a project for this chat'
+                      }
+                    >
+                      <FolderKanban className="h-3 w-3" />
+                      <span className="truncate max-w-[180px]">
+                        {currentProject ? currentProject.name : 'No project'}
+                      </span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  {!projectLocked && (
+                    <DropdownMenuContent align="start" className="w-56">
+                      <DropdownMenuLabel className="text-xs">Chat in project</DropdownMenuLabel>
+                      <DropdownMenuItem onClick={() => setCurrentProject(null)}>
+                        <span className="flex-1">No project</span>
+                        {!currentProject && <Check className="h-3.5 w-3.5" />}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      {projects.map((p) => (
+                        <DropdownMenuItem
+                          key={p.id}
+                          onClick={() => setCurrentProject({ id: p.id, name: p.name })}
+                        >
+                          <FolderKanban className="h-3.5 w-3.5 mr-2 text-[#0058be]" />
+                          <span className="flex-1 truncate">{p.name}</span>
+                          {currentProject?.id === p.id && <Check className="h-3.5 w-3.5" />}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  )}
+                </DropdownMenu>
+                {currentProject && !projectLocked && (
+                  <button
+                    type="button"
+                    onClick={() => setCurrentProject(null)}
+                    className="p-0.5 rounded-full text-muted-foreground/60 hover:text-foreground transition-colors"
+                    aria-label="Remove project from this chat"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
+            )}
 
             <div className={cn("relative flex items-end gap-1.5 sm:gap-2 md:gap-2.5", isLanding ? "p-2 sm:p-3 md:p-4" : "p-1.5 sm:p-2 md:p-3")}>
               {/* File upload button */}

@@ -3,9 +3,18 @@ import type { ChatMessage, ChatState, ExpandedResearch } from '@/types/chat'
 import type { Citation } from '@/types/database'
 import type { ModelProvider } from '@/lib/llm/provider-factory'
 
+export interface ActiveProject {
+  id: string
+  name: string
+}
+
 interface ChatStore extends ChatState {
   // Status message for inline updates
   statusMessage: string | null
+  // Projects P2: project the current/next conversation is scoped to.
+  // Locked once the conversation exists (project_id lives on the row).
+  currentProject: ActiveProject | null
+  setCurrentProject: (project: ActiveProject | null) => void
   // Abort controller for canceling streaming
   abortController: AbortController | null
   // Flag: sidebar initiated new-chat navigation; ChatContainer should
@@ -48,6 +57,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   currentModel: 'claude-sonnet',
   conversationId: null,
   statusMessage: null,
+  currentProject: null,
   abortController: null,
   pendingNewChat: false,
   messagesRemaining: null,
@@ -55,6 +65,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
   // Actions
   setPendingNewChat: (pending) => set({ pendingNewChat: pending }),
+  setCurrentProject: (currentProject) => set({ currentProject }),
   setUsageState: ({ messagesRemaining, userTier }) => set({ messagesRemaining, userTier }),
   setMessages: (messages) => set({ messages }),
 

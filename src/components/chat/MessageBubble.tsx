@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Loader2, Copy, Pencil, Check, Volume2, VolumeX, FileText, Image as ImageIcon, Film, File, ExternalLink, RotateCw } from 'lucide-react'
+import { Loader2, Copy, Pencil, Check, Volume2, VolumeX, FileText, Image as ImageIcon, Film, File, ExternalLink, RotateCw, FolderKanban } from 'lucide-react'
 import { toast } from 'sonner'
 import { copyForGoogleDocs, type CopyOptions } from '@/lib/utils/clipboard'
 import type { ChatMessage } from '@/types/chat'
@@ -216,6 +216,34 @@ export function MessageBubble({ message, messageIndex, onEditPrompt, onRetry }: 
           )}
         </div>
       </div>
+
+      {/* Project sources — documents from the active project used in this answer */}
+      {!isUser && !isStreaming && (() => {
+        const projectCitations = (message.citations || []).filter(
+          (c: Citation) => c.source_type === 'project_doc'
+        )
+        if (projectCitations.length === 0) return null
+        const seen = new Set<string>()
+        const unique = projectCitations.filter((c) => {
+          if (seen.has(c.source)) return false
+          seen.add(c.source)
+          return true
+        })
+        return (
+          <div className="flex flex-wrap items-center gap-1.5 mt-3 px-1 sm:px-0">
+            {unique.map((c) => (
+              <span
+                key={c.source}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#0058be]/10 px-2.5 py-1 text-[11px] font-medium text-[#0058be] dark:text-[#a8c0f0]"
+                title={`From your project document "${c.source}"`}
+              >
+                <FolderKanban className="h-3 w-3 shrink-0" />
+                Project: {c.source}
+              </span>
+            ))}
+          </div>
+        )
+      })()}
 
       {/* Web Sources — Starter/Founder only */}
       {!isUser && !isStreaming && isPaidUser && message.expandedResearch && (

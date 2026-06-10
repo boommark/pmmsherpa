@@ -34,7 +34,7 @@ export async function updateSession(request: NextRequest) {
   // Protected routes — require auth only. Profile-completion gate was removed
   // so users go straight from signup → /chat. Post-signup work runs in
   // /auth/callback via runPostSignupOnce.
-  const protectedRoutes = ['/chat', '/history', '/saved', '/settings']
+  const protectedRoutes = ['/chat', '/history', '/saved', '/settings', '/projects']
   const isProtectedRoute = protectedRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route)
   )

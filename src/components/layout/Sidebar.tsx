@@ -18,6 +18,7 @@ import { UserMenuContent } from '@/components/layout/UserMenuContent'
 import {
   MessageSquare,
   History,
+  FolderKanban,
   BookOpen,
   Settings,
   Plus,
@@ -161,6 +162,8 @@ function SidebarContent({
     // Immediately clear chat state so welcome screen shows
     chatStore.clearMessages()
     chatStore.setConversationId(null)
+    // Sidebar "New Chat" starts a plain (non-project) conversation
+    chatStore.setCurrentProject(null)
     setPendingNewChat(true)
     onNavigate?.()
     // Force navigation even if already on /chat
@@ -193,6 +196,7 @@ function SidebarContent({
 
   const navItems = [
     { href: '/chat', icon: MessageSquare, label: 'New Chat', isNewChat: true },
+    { href: '/projects', icon: FolderKanban, label: 'Projects' },
     { href: '/history', icon: History, label: 'History' },
     { href: '/guides', icon: BookOpen, label: 'Guides', highlighted: true },
     { href: '/settings/preferences', icon: Settings, label: 'Settings' },
