@@ -14,7 +14,8 @@
  * `initialize`. Clients echo it on every subsequent request.
  */
 
-import { NextRequest } from 'next/server'
+import { NextRequest, after } from 'next/server'
+import { warmMcpPromptCache } from '@/lib/mcp/helpers'
 import {
   parseJsonRpcBody,
   buildResult,
@@ -47,7 +48,11 @@ import { setActiveTraceIO } from '@langfuse/tracing'
 import { LangfuseOtelSpanAttributes } from '@langfuse/core'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60
+// 300s (Fluid compute, confirmed enabled on this project). The old 60s left
+// no headroom for cold start + cold prompt cache + a long draft_artifact
+// generation at the throttled ~40 tok/s decode rate — requests were killed
+// mid-stream and surfaced to MCP clients as timeouts.
+export const maxDuration = 300
 
 const SERVER_INFO = { name: 'pmm-sherpa', version: '0.1.0' }
 
@@ -97,6 +102,10 @@ async function dispatch(
   if (method === 'initialize') {
     const newSession = session ?? (await createSession(auth.userId))
     await markInitialized(newSession.id)
+    // Pre-warm the Anthropic prompt cache so the session's first real tool
+    // call reads the static system prompt from cache instead of writing it.
+    // after() runs post-response; failures are swallowed inside the helper.
+    after(warmMcpPromptCache())
     return {
       envelope: buildResult(id, {
         protocolVersion: MCP_PROTOCOL_VERSION,
