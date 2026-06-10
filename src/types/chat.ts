@@ -78,13 +78,15 @@ export interface RetrievedChunk {
   similarity: number
   documentId: string
   documentTitle: string
-  sourceType: 'book' | 'blog' | 'ama' | 'blog_external' | 'book_pm' | 'book_sales' | 'book_presentations' | 'book_communication' | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai' | 'substack'
+  sourceType: 'book' | 'blog' | 'ama' | 'blog_external' | 'book_pm' | 'book_sales' | 'book_presentations' | 'book_communication' | 'podcast_pm' | 'podcast_pmm' | 'podcast_ai' | 'substack' | 'project_doc'
   author: string | null
   speakerRole: string | null
   pageNumber: number | null
   sectionTitle: string | null
   question: string | null
   url: string | null
+  /** Projects P2: pinned/rag tier for project_doc chunks. */
+  tier?: 'pinned' | 'rag'
 }
 
 export interface ConversationSummary {

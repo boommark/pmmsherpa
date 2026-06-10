@@ -68,7 +68,8 @@ export function useConversations() {
 
   const createConversation = async (
     title: string,
-    model: ModelProvider
+    model: ModelProvider,
+    projectId?: string | null
   ): Promise<Conversation | null> => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
@@ -76,12 +77,16 @@ export function useConversations() {
     // Convert ModelProvider to DB value
     const dbModel = getDbModelValue(model)
 
+    // project_id locks the conversation to a project. Ownership is enforced
+    // server-side in /api/chat (the service-role lookup), so a forged id
+    // here can never pull someone else's project content into the prompt.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.from('conversations') as any)
       .insert({
         user_id: user.id,
         title,
         model_used: dbModel,
+        project_id: projectId || null,
       })
       .select()
       .single()

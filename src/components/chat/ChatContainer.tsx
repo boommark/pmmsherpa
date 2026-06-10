@@ -68,7 +68,46 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     abortStreaming,
     pendingNewChat,
     setPendingNewChat,
+    currentProject,
+    setCurrentProject,
   } = useChatStore()
+
+  // Projects P2: when viewing an existing conversation, sync the active
+  // project from the conversation row (project is locked per conversation).
+  useEffect(() => {
+    if (!conversationId) return
+    let cancelled = false
+    async function syncProject() {
+      try {
+        const { createClient } = await import('@/lib/supabase/client')
+        const supabase = createClient()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: conv } = await (supabase.from('conversations') as any)
+          .select('project_id')
+          .eq('id', conversationId)
+          .maybeSingle()
+        if (cancelled) return
+        const projectId: string | null = conv?.project_id ?? null
+        if (!projectId) {
+          setCurrentProject(null)
+          return
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: proj } = await (supabase.from('projects') as any)
+          .select('id, name')
+          .eq('id', projectId)
+          .maybeSingle()
+        if (cancelled) return
+        setCurrentProject(proj ? { id: proj.id, name: proj.name } : null)
+      } catch (err) {
+        console.error('[Chat] Failed to sync conversation project:', err)
+      }
+    }
+    syncProject()
+    return () => {
+      cancelled = true
+    }
+  }, [conversationId, setCurrentProject])
 
   // Handle pendingNewChat flag (set by sidebar before navigation)
   // Clear stale messages and reset the flag so the welcome screen renders cleanly.
@@ -211,12 +250,12 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     try {
       if (!activeConversationId) {
         const title = content.slice(0, 50) + (content.length > 50 ? '...' : '')
-        const newConv = await createConversation(title, currentModel)
+        const newConv = await createConversation(title, currentModel, currentProject?.id ?? null)
         if (newConv) {
           activeConversationId = newConv.id
           isNewConversation = true
           setConversationId(newConv.id)
-          posthog.capture('conversation_created', { model: currentModel })
+          posthog.capture('conversation_created', { model: currentModel, has_project: !!currentProject })
         } else {
           throw new Error('Failed to create conversation')
         }
@@ -226,6 +265,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         model: currentModel,
         has_attachments: (chatAttachments?.length ?? 0) > 0,
         is_new_conversation: isNewConversation,
+        has_project: !!currentProject,
       })
 
       const abortController = new AbortController()
@@ -239,6 +279,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           conversationId: activeConversationId,
           model: currentModel,
           attachments: chatAttachments,
+          project_id: currentProject?.id ?? undefined,
         }),
         signal: abortController.signal,
       })
@@ -381,6 +422,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     isLoading,
     conversationId,
     currentModel,
+    currentProject,
     addMessage,
     updateMessage,
     removeMessagesFromIndex,

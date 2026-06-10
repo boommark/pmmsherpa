@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useConversations } from '@/hooks/useConversations'
+import { useProjects } from '@/hooks/useProjects'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,11 +20,19 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { Search, MessageSquare, Trash2, Archive, Loader2, Pencil, Check, X } from 'lucide-react'
+import { Search, MessageSquare, Trash2, Archive, Loader2, Pencil, Check, X, FolderKanban } from 'lucide-react'
 
 export default function HistoryPage() {
   const { conversations, loading, deleteConversation, archiveConversation, updateConversation } = useConversations()
+  const { projects } = useProjects()
   const [searchQuery, setSearchQuery] = useState('')
+
+  // Map project_id → name for the project badge on conversation rows
+  const projectNames = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const p of projects) map.set(p.id, p.name)
+    return map
+  }, [projects])
 
   // Rename state
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -166,10 +175,16 @@ export default function HistoryPage() {
                           <CardTitle className="text-base font-medium line-clamp-1">
                             {conv.title}
                           </CardTitle>
-                          <CardDescription className="flex items-center gap-2 mt-1">
+                          <CardDescription className="flex items-center gap-2 mt-1 flex-wrap">
                             <Badge variant="outline" className="text-xs">
                               {conv.model_used === 'claude' ? 'Claude' : 'Gemini'}
                             </Badge>
+                            {conv.project_id && projectNames.has(conv.project_id) && (
+                              <Badge className="text-xs gap-1 bg-[#0058be]/10 text-[#0058be] dark:text-[#a8c0f0] border-0">
+                                <FolderKanban className="h-3 w-3" />
+                                {projectNames.get(conv.project_id)}
+                              </Badge>
+                            )}
                             <span>{conv.message_count} messages</span>
                             <span>•</span>
                             <span>{formatDate(conv.updated_at)}</span>
