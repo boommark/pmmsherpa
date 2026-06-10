@@ -60,23 +60,68 @@ export interface RunSherpaChatOutput {
   intent: QueryPlan['intent']
 }
 
+/**
+ * How long Phase 1 waits for the LLM query planner before proceeding with
+ * baseline retrieval on the raw message. The planner (Gemini Flash Lite)
+ * typically takes 1-2s — longer than the entire baseline hybrid search — so
+ * on most calls it only wins when its in-memory cache hits (instant). The
+ * deadline keeps cache hits and drops cold planner calls out of the
+ * critical path, cutting ~1.5-2s off typical MCP latency.
+ */
+const PLANNER_DEADLINE_MS = Number(process.env.MCP_PLANNER_DEADLINE_MS ?? 900)
+
+/** Loose normalization for "is this planner query just the raw message?" */
+function normalizeQuery(q: string): string {
+  return q.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim()
+}
+
 export async function runSherpaChat(input: RunSherpaChatInput): Promise<RunSherpaChatOutput> {
   const { message, userId, conversationHistory = [], customSystemPromptSuffix, intentOverride, onChunk } = input
 
-  // Phase 1: Plan retrieval queries
-  const queryPlan = await planQueries(
-    {
-      message,
-      conversationHistory,
-    },
-    userId,
-  )
+  // Phases 1+2 run CONCURRENTLY: baseline retrieval on the raw message
+  // starts immediately while the planner races a short deadline. If the
+  // planner returns in time (in practice: its cache hit), we additionally
+  // retrieve its refined queries and merge; if not, the baseline result
+  // ships alone and the planner call is abandoned (its promise settles
+  // harmlessly in the background and seeds the cache for the next turn).
+  const plannerPromise = planQueries({ message, conversationHistory }, userId)
+  plannerPromise.catch(() => {}) // never let an abandoned planner reject unhandled
 
-  const intent: QueryPlan['intent'] = intentOverride ?? queryPlan.intent
+  const baselinePromise = multiQueryRetrieve([message], 10, userId, intentOverride)
 
-  // Phase 2: Multi-query RAG retrieval
-  const ragResult = await multiQueryRetrieve(queryPlan.ragQueries, 10, userId, intent)
-  const chunks = ragResult.chunks
+  const queryPlan = await Promise.race<QueryPlan | null>([
+    plannerPromise,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), PLANNER_DEADLINE_MS)),
+  ]).catch(() => null)
+
+  const intent: QueryPlan['intent'] = intentOverride ?? queryPlan?.intent ?? 'general'
+
+  // Kick off the planner's refined queries (if any) BEFORE awaiting the
+  // baseline so the two retrievals overlap instead of running serially.
+  const rawNorm = normalizeQuery(message)
+  const extraQueries = queryPlan
+    ? queryPlan.ragQueries.filter((q) => normalizeQuery(q) !== rawNorm)
+    : []
+  const extraPromise = extraQueries.length > 0
+    ? multiQueryRetrieve(extraQueries, 10, userId, intent)
+    : null
+
+  const baseline = await baselinePromise
+  let chunks: RetrievedChunk[]
+  if (extraPromise) {
+    const extra = await extraPromise
+    // Merge + dedup by chunk id, keep highest score, re-rank, cap at 10.
+    const merged = new Map<string, RetrievedChunk>()
+    for (const c of [...baseline.chunks, ...extra.chunks]) {
+      const existing = merged.get(c.id)
+      if (!existing || c.similarity > existing.similarity) merged.set(c.id, c)
+    }
+    chunks = Array.from(merged.values())
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, 10)
+  } else {
+    chunks = baseline.chunks
+  }
 
   // Empty-result short-circuit: caller decides what to do.
   if (chunks.length === 0) {
@@ -189,6 +234,46 @@ export async function runSherpaChat(input: RunSherpaChatInput): Promise<RunSherp
     chunks,
     usage: { inputTokens, outputTokens },
     intent,
+  }
+}
+
+/**
+ * Warm the Anthropic prompt cache for the MCP static system prompt.
+ *
+ * Fired (fire-and-forget via `after()`) when an MCP session initializes, so
+ * the user's FIRST real tool call hits the 1h prompt cache instead of paying
+ * the cache-write penalty (~2-3s slower TTFB plus the 1.25× write surcharge).
+ * The warm request reproduces the exact cached prefix: the static system part
+ * with the same cacheControl options, identical to what runSherpaChat sends.
+ * Costs ~1 output token + one cache write that the first real call would have
+ * paid anyway.
+ */
+export async function warmMcpPromptCache(): Promise<void> {
+  if (MODEL_CONFIG[MCP_MODEL].provider !== 'anthropic') return
+  try {
+    const systemParts = getSystemPromptParts('', MCP_MODEL)
+    await generateText({
+      model: getModel(MCP_MODEL),
+      messages: [
+        {
+          role: 'system' as const,
+          content: systemParts.staticPart,
+          providerOptions: {
+            anthropic: { cacheControl: { type: 'ephemeral' as const, ttl: '1h' as const } },
+          },
+        },
+        { role: 'user' as const, content: 'ping' },
+      ],
+      maxOutputTokens: 1,
+      temperature: 0,
+      experimental_telemetry: {
+        isEnabled: true,
+        functionId: 'mcp.warmPromptCache',
+      },
+    })
+  } catch (err) {
+    // Warm-up is best-effort; never let it surface to the caller.
+    console.warn('[MCP] prompt cache warm failed', err)
   }
 }
 
