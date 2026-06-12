@@ -19,7 +19,7 @@ config({ path: join(__dirname, '..', '.env.local') })
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 const AUDIENCE_ID = '9a13ec93-4d2c-422c-9576-e4f74bead02b'
-const FROM = 'Dona at PMM Sherpa <support@pmmsherpa.com>'
+const FROM = 'PMM Sherpa <support@pmmsherpa.com>'
 const REPLY_TO = 'support@pmmsherpa.com'
 const TEST_TO = 'abhishekratna@gmail.com'
 const DRAFTS_DIR = join(__dirname, '..', 'email-drafts', 'onboarding-series')

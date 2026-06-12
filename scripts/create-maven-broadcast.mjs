@@ -15,7 +15,7 @@ const COHORT_URL = 'https://maven.com/abhishek-ratna/master-claude-code-pm-gtm'
 const APP_URL = 'https://pmmsherpa.com'
 
 const SUBJECT = 'Join my upcoming Maven Masterclass to build your own PMM Sherpa'
-const FROM = 'Dona at PMM Sherpa <support@pmmsherpa.com>'
+const FROM = 'PMM Sherpa <support@pmmsherpa.com>'
 const REPLY_TO = 'abhishekratna@gmail.com'
 const NAME = 'Maven cohort announcement (2026-05-28)'
 

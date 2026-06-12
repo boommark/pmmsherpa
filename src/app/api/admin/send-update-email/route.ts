@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: 'Dona at PMM Sherpa <support@pmmsherpa.com>',
+      from: 'PMM Sherpa <support@pmmsherpa.com>',
       to: testEmail,
       subject: 'PMM Sherpa now lives inside Claude, ChatGPT, and Claude Code',
       html: getUpdateEmailHtml(),

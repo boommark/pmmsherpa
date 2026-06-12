@@ -104,7 +104,7 @@ const HTML = `<!DOCTYPE html>
 </html>`
 
 const SUBJECT = 'PMM Sherpa now lives inside Claude, ChatGPT, and Claude Code'
-const FROM = 'Dona at PMM Sherpa <support@pmmsherpa.com>'
+const FROM = 'PMM Sherpa <support@pmmsherpa.com>'
 const NAME = 'MCP launch announcement (2026-05-09)'
 
 async function main() {
