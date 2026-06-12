@@ -17,8 +17,8 @@ config({ path: join(__dirname, '..', '.env.local') })
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 const AUDIENCE_ID = '9a13ec93-4d2c-422c-9576-e4f74bead02b'
-const FROM = 'PMM Sherpa <hello@pmmsherpa.com>'
-const REPLY_TO = 'hello@pmmsherpa.com'
+const FROM = 'Dona at PMM Sherpa <support@pmmsherpa.com>'
+const REPLY_TO = 'support@pmmsherpa.com'
 const TEST_TO = 'abhishekratna@gmail.com'
 const DRAFTS_DIR = join(__dirname, '..', 'email-drafts', 'onboarding-series')
 
@@ -36,7 +36,7 @@ const UNSUBSCRIBE_ROW_BROADCAST = `<tr><td style="padding:16px 40px 24px 40px;bo
 <p style="font-size:13px;color:#9ca3af;margin:0;line-height:1.6;">
   <a href="https://pmmsherpa.com" style="color:#9ca3af;text-decoration:none;">pmmsherpa.com</a>
   <span style="color:#d1d5db;padding:0 6px;">&middot;</span>
-  <a href="mailto:hello@pmmsherpa.com" style="color:#9ca3af;text-decoration:none;">hello@pmmsherpa.com</a>
+  <a href="mailto:support@pmmsherpa.com" style="color:#9ca3af;text-decoration:none;">support@pmmsherpa.com</a>
   <span style="color:#d1d5db;padding:0 6px;">&middot;</span>
   <a href="{{{RESEND_UNSUBSCRIBE_URL}}}" style="color:#9ca3af;text-decoration:underline;">Unsubscribe</a>
 </p>

@@ -15,7 +15,7 @@ const COHORT_URL = 'https://maven.com/abhishek-ratna/master-claude-code-pm-gtm'
 const APP_URL = 'https://pmmsherpa.com'
 
 const SUBJECT = 'Join my upcoming Maven Masterclass to build your own PMM Sherpa'
-const FROM = 'Abhishek Ratna <hello@pmmsherpa.com>'
+const FROM = 'Dona at PMM Sherpa <support@pmmsherpa.com>'
 const REPLY_TO = 'abhishekratna@gmail.com'
 const NAME = 'Maven cohort announcement (2026-05-28)'
 
@@ -64,7 +64,7 @@ const HTML = `<!DOCTYPE html>
                 <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 28px 0; background-color: #eff6ff; border-radius: 8px;">
                   <tr>
                     <td style="padding: 16px 20px;">
-                      <p style="font-size: 15px; line-height: 1.6; color: #1f2937; margin: 0;"><strong style="color: #0058be;">Paid subscribers are eligible for an exclusive 20% discount.</strong> If you're a paid member, please email <a href="mailto:abhishekratna@gmail.com" style="color: #0058be; text-decoration: none; font-weight: 600;">abhishekratna@gmail.com</a> to request the code.</p>
+                      <p style="font-size: 15px; line-height: 1.6; color: #1f2937; margin: 0;"><strong style="color: #0058be;">Paid subscribers are eligible for an exclusive 20% discount.</strong> If you're a paid member, please email <a href="mailto:support@pmmsherpa.com" style="color: #0058be; text-decoration: none; font-weight: 600;">support@pmmsherpa.com</a> to request the code.</p>
                     </td>
                   </tr>
                 </table>
@@ -83,8 +83,8 @@ const HTML = `<!DOCTYPE html>
 
                 <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">Happy to answer any questions if you want to know more before signing up.</p>
 
-                <p style="font-size: 16px; color: #1f2937; margin: 0 0 4px 0;"><strong>Abhishek</strong></p>
-                <p style="font-size: 14px; color: #6b7280; margin: 0;"><a href="mailto:abhishekratna@gmail.com" style="color: #6b7280; text-decoration: none;">abhishekratna@gmail.com</a></p>
+                <p style="font-size: 16px; color: #1f2937; margin: 0 0 4px 0;"><strong>Dona</strong></p>
+                <p style="font-size: 14px; color: #6b7280; margin: 0;"><a href="mailto:support@pmmsherpa.com" style="color: #6b7280; text-decoration: none;">support@pmmsherpa.com</a></p>
               </td>
             </tr>
             <tr>
