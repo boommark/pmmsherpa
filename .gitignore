@@ -79,3 +79,6 @@ supabase/.temp/
 * 3.*
 *\ 2
 *\ 3
+
+# MCP usage analysis (generated, large)
+data/mcp-usage-reports/
