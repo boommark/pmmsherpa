@@ -263,3 +263,78 @@ project_chunks     (id, document_id, project_id, user_id, content, context_heade
 1. **WS1** (half day) — unblocks Codex users now; ship staging→main.
 2. **WS2** (1–2 days) — pinger/Pro + planner skip + instrumentation; decide token strategy after logs.
 3. **WS3** (2–3 wks) — phased; P1 can start in parallel with WS2's observation window.
+
+---
+
+## Workstream 4 — "Pro" $19.99/mo tier (PLANNED, not yet built)
+
+> Added 2026-06-15. Projects is the gated, premium feature. Scoped and
+> data-validated; awaiting go-ahead before build. Effort ≈ half a day,
+> mostly Stripe plumbing.
+
+### Data that drove the recommendation (pulled 2026-06-15)
+
+- **320 free / 3 starter / 1 founder** users; 40 API-active in 30d; 115
+  message-active in 90d.
+- Messages/user/month: **p50 = 4, p90 = 16, p99 = 124, max ever = 311.** The
+  current 200-message Starter cap almost never binds → generous caps cost
+  almost nothing; their value is psychological headroom, not real spend.
+- Unit costs: ask_sherpa ~$0.015, draft_artifact ~$0.036, full 100-doc project
+  ingest ~$0.80, fixed infra ~$45/mo.
+- `.planning/mcp_pricing_model.md` argued AGAINST a $20 *credit pack* (worse
+  value than $5/100). A $20 *subscription with Projects* is a different product
+  and is NOT in conflict — it matches the ChatGPT Plus / Claude Pro $20 anchor.
+
+### Recommended structure
+
+| | Free | Starter $9.99 | **Pro $19.99** |
+|---|---|---|---|
+| Web messages /mo | 10 | 200 | **500** |
+| MCP credits /mo | 10 | 200 | **500** |
+| **Projects** | — | — | **✓ 20 projects, 100 docs each** |
+| Credit top-ups | ✓ | ✓ | ✓ |
+
+### Positioning principles
+
+- **Sell Pro as "Sherpa that knows *your* company" (Projects), not "more
+  messages."** At p99=124 nobody needs more messages; caps are the supporting
+  cast, not the hook.
+- **Projects strictly Pro-only at launch.** A free/Starter teaser muddies the
+  "$19.99 = Projects" anchor and adds gating complexity. Easier to loosen later
+  than tighten. Consider letting free users *see* the Projects UI with an
+  upgrade gate on creation (one `if`) so the feature is visibly demoable —
+  activation/conversion is the real bottleneck (3 paying users), not packaging.
+- **Margin** ≈ 85% for a typical Pro user (~$1–3 LLM + ~$1 ingest). Worst-case
+  user maxing both caps ≈ $12–15 cost → floor never negative. Rate-limit doc
+  re-processing to keep the ingest line honest.
+
+### Optional sweeteners
+
+- Annual **$199/yr** (2 months free) — fits the consultant/agency profile
+  Projects attracts.
+- Founding-member offer for the 3 existing Starter subs: first 3 months of Pro
+  at $9.99 — near-zero cost, converts warmest users.
+
+### Implementation surface (mapped 2026-06-15)
+
+Add a `'pro'` value to the tier union + caps across ~9 files, one Stripe price +
+env var, webhook price-ID→tier mapping, pricing-page card, and a gate in
+`POST /api/projects` + the projects UI. Concrete touch points:
+
+1. `src/types/database.ts:34` — `Profile.tier` union
+2. `src/lib/constants.ts:34,39–43` — `UserTier` type + `getMonthlyLimitForTier()`; add `PRO_TIER_MONTHLY_LIMIT = 500`
+3. `src/lib/mcp/credits.ts:25–26,50–53` — `monthlyLimitForPlan()`; add `MCP_PRO_MONTHLY_LIMIT = 500`
+4. `src/app/api/cron/reset-monthly-credits/route.ts:37,44–47` — `effectivePlanForReset()` + `resetCapForPlan()`
+5. `src/lib/usage-gate.ts:24` — tier union (already flexible)
+6. `src/components/landing/PricingSection.tsx:25–55` — add Pro plan card
+7. `src/app/(dashboard)/settings/billing/page.tsx` — CTA/upgrade logic for the new subscription tier
+8. `src/app/api/webhooks/stripe/route.ts:126–142` — map Pro price ID → `tier='pro'` on `active`
+9. New migration `supabase/migrations/<date>_add_pro_tier.sql` — widen tier CHECK constraint
+10. **Projects gate** — `POST /api/projects` (and project-doc routes) require effective tier ∈ {pro, founder}; UI upgrade prompt on the Projects surface
+11. Stripe: create $19.99/mo recurring price (TEST first) → `NEXT_PUBLIC_STRIPE_PRO_PRICE_ID` (+ TEST/LIVE env vars)
+
+### Open decisions before build
+
+- Confirm caps (500/500) and whether Starter survives unchanged (recommended: yes).
+- Annual price + founding-member offer: in for v1 or later?
+- Free-user "see but can't create" Projects teaser: yes/no.
