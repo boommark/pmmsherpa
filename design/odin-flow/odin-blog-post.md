@@ -1,5 +1,9 @@
 # Odin: AI Research That Thinks Like a Marketer
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a38f6258-66e4-4ffe-a22f-c1c075959d7a" alt="Odin — agentic GTM deep research for Claude Code" width="100%">
+</p>
+
 ## Deep research got good. It still answers the wrong question.
 
 The current generation of research tools is genuinely strong. Claude Deep Research, OpenAI Deep Research, Perplexity, and NotebookLM all run multi-step agent loops, ground their output in retrieved sources, cite as they go, and in some cases connect to your Drive or inbox. If your bar is "fast, multi-source, cited," that bar is met.
@@ -29,6 +33,11 @@ The net effect is qualitative, not incremental. A deep-research agent returns a 
 ## What the orchestration layer adds
 
 Independent of Sherpa, four properties separate Odin from a single-pipeline agent. These are architecture decisions with direct operational consequences.
+
+<p align="center">
+  <img src="./odin-compare.png" alt="Odin vs. typical deep research" width="100%">
+  <br><sub><em>Odin vs. typical deep research: same retrieval and citations, very different control, reach, and judgment.</em></sub>
+</p>
 
 | Concern | Best-in-class deep research | Odin |
 |---|---|---|
@@ -61,6 +70,11 @@ You approve, trim, or downgrade any leg (for instance, dropping sub-question 1 t
 ## Architecture
 
 The pipeline is six phases with three human-in-the-loop gates. The gates are deliberate control points for spend and for sensitive-data handling.
+
+<p align="center">
+  <img src="./odin-flow-diagram.png" alt="How a query flows through Odin" width="100%">
+  <br><sub><em>How a query flows through Odin: six phases, three human gates, and four parallel engines — with PMM Sherpa shaping scope, reasoning, and synthesis.</em></sub>
+</p>
 
 | Phase | Function | Gate |
 |---|---|---|
