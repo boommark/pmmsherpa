@@ -1,13 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createClient } from '@supabase/supabase-js'
+import { Resend } from 'resend'
 import Stripe from 'stripe'
+import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 
 // Use service role client for webhook handler (no user session)
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
+
+let resend: Resend | null = null
+function getResend() {
+  if (!resend) resend = new Resend(process.env.RESEND_API_KEY)
+  return resend
+}
+
+function formatAmount(amountTotal: number | null, currency: string | null) {
+  if (amountTotal == null) return '—'
+  return (amountTotal / 100).toLocaleString('en-US', {
+    style: 'currency',
+    currency: (currency || 'usd').toUpperCase(),
+  })
+}
+
+// Admin alert on a completed purchase — mirrors the signup / MCP-connection
+// notifications so Abhishek gets an email the moment money comes in. Best
+// effort: a send failure must never fail the webhook (Stripe would retry the
+// whole event and we'd double-process the purchase).
+async function notifyAdminPurchase(opts: {
+  kind: string
+  email: string | null
+  amount: string
+  extraRows?: Array<[string, string]>
+}) {
+  const rows: Array<[string, string]> = [
+    ['Type', opts.kind],
+    ['Customer', opts.email || '—'],
+    ['Amount', opts.amount],
+    ...(opts.extraRows || []),
+  ]
+  try {
+    await getResend().emails.send({
+      from: 'PMM Sherpa <noreply@pmmsherpa.com>',
+      to: SUPER_ADMIN_EMAIL,
+      subject: `New purchase: ${opts.kind}${opts.email ? ` — ${opts.email}` : ''}`,
+      html: `
+        <div style="font-family: -apple-system, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #0058be; margin-bottom: 16px;">💳 New Purchase</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            ${rows
+              .map(
+                ([label, value]) =>
+                  `<tr><td style="padding: 8px 0; color: #6b7280; font-size: 13px;">${label}</td><td style="padding: 8px 0; font-weight: 600;">${value}</td></tr>`,
+              )
+              .join('')}
+          </table>
+        </div>
+      `,
+    })
+  } catch (e) {
+    console.error('[Stripe] Failed to send admin purchase notification:', e)
+  }
+}
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -90,6 +146,15 @@ export async function POST(request: NextRequest) {
           console.log(
             `[Stripe] User ${userId} purchased ${credits} MCP credits (pack=${session.metadata.pack})`,
           )
+          await notifyAdminPurchase({
+            kind: 'Credit pack',
+            email: session.customer_details?.email ?? session.customer_email ?? null,
+            amount: formatAmount(session.amount_total, session.currency),
+            extraRows: [
+              ['Pack', session.metadata.pack ?? '—'],
+              ['Credits', String(credits)],
+            ],
+          })
           break
         }
 
@@ -106,6 +171,11 @@ export async function POST(request: NextRequest) {
           .eq('id', userId)
 
         console.log(`[Stripe] User ${userId} upgraded to starter`)
+        await notifyAdminPurchase({
+          kind: 'Starter upgrade ($9.99/mo)',
+          email: session.customer_details?.email ?? session.customer_email ?? null,
+          amount: formatAmount(session.amount_total, session.currency),
+        })
         break
       }
 
