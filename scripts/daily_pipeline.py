@@ -46,6 +46,12 @@ PMA_OUTPUT = PMA_SCRAPER_DIR / "output"
 SHAREBIRD_OUTPUT = SHAREBIRD_SCRAPER_DIR / "output"
 SUBSTACK_OUTPUT = PROJECT_ROOT / "data" / "substacks"
 
+# ── Source toggles ───────────────────────────────────────────────────
+# Sharebird AMA scraping + ingestion disabled at the content owner's
+# request (2026-06). Flip to True (or set PMM_PIPELINE_SCRAPE_SHAREBIRD=1)
+# to re-enable. Leaves PMA blog + Substack pipelines untouched.
+SCRAPE_SHAREBIRD = os.environ.get("PMM_PIPELINE_SCRAPE_SHAREBIRD", "0") == "1"
+
 LOG_DIR = PROJECT_ROOT / "logs" / "pipeline"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -221,7 +227,7 @@ def run_ingestion(dry_run: bool = False) -> dict:
             pma_dirs.append(d)
 
     new_blogs = get_new_files(pma_dirs, checkpoint)
-    new_amas = get_new_files([SHAREBIRD_OUTPUT], checkpoint)
+    new_amas = get_new_files([SHAREBIRD_OUTPUT], checkpoint) if SCRAPE_SHAREBIRD else []
     substack_dirs = [d for d in SUBSTACK_OUTPUT.iterdir() if d.is_dir()] if SUBSTACK_OUTPUT.exists() else []
     new_substacks = get_new_files(substack_dirs, checkpoint)
 
@@ -490,17 +496,20 @@ def main():
     # ── Phase 1: Scraping ──
     if not args.ingest_only:
         if args.dry_run:
-            log.info("[DRY RUN] Would scrape PMA and Sharebird")
+            log.info(f"[DRY RUN] Would scrape PMA{' and Sharebird' if SCRAPE_SHAREBIRD else ''}")
         else:
             pma_result = run_scraper("PMA", PMA_SCRAPER_DIR, ["scrape"], timeout_minutes=30)
             results["pma"] = pma_result
             if pma_result["auth_expired"]:
                 auth_failures.append("PMA")
 
-            sb_result = run_scraper("Sharebird", SHAREBIRD_SCRAPER_DIR, ["scrape", "--headless"], timeout_minutes=30)
-            results["sharebird"] = sb_result
-            if sb_result["auth_expired"]:
-                auth_failures.append("Sharebird")
+            if SCRAPE_SHAREBIRD:
+                sb_result = run_scraper("Sharebird", SHAREBIRD_SCRAPER_DIR, ["scrape", "--headless"], timeout_minutes=30)
+                results["sharebird"] = sb_result
+                if sb_result["auth_expired"]:
+                    auth_failures.append("Sharebird")
+            else:
+                log.info("Sharebird scraping disabled (SCRAPE_SHAREBIRD=False) — skipping.")
 
             # Substack scraper (no browser, no auth — RSS + Jina Reader)
             substack_result = run_substack_scraper(dry_run=False)
