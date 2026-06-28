@@ -103,7 +103,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 export const searchCorpusTool: Tool = {
   name: 'search_corpus',
   description:
-    'Search the PMM Sherpa knowledge base (38K+ chunks across 34 books, 583 podcasts, 532 AMAs, 827 PMA blogs, etc.) and return the most relevant excerpts. Lookup-only, no LLM synthesis.',
+    'Search the PMM Sherpa knowledge base (40K+ chunks across 34 books, 583 podcasts, 827 PMA blogs, etc.) and return the most relevant excerpts. Lookup-only, no LLM synthesis.',
   inputSchema: {
     type: 'object',
     required: ['query'],

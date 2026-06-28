@@ -3,8 +3,8 @@
  *
  * Canonical sources (read first per .planning/mcp-phase-2/methodology.md):
  *   No specific Book Brain canon — practitioner-owned discipline. Authority
- *   from PMA blogs (Maas, Haslam, Tengberg, Emmett, Ganpaul), Sharebird AMAs
- *   (Mulanjur), and specialty-firm methodologies (Clozd, DoubleCheck, Anova).
+ *   from PMA blogs (Maas, Haslam, Tengberg, Emmett, Ganpaul) and
+ *   specialty-firm methodologies (Clozd, DoubleCheck, Anova).
  *
  * Audit trail: .planning/mcp-phase-2/corpus-research/07-win-loss-insights.md
  *

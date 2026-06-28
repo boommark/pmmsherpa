@@ -57,8 +57,8 @@ Required behaviors:
 - Use exactly three benefits. Each benefit must render Value (the transformation), \
 Benefit (the buyer-facing explanation), and Feature (the specific capability that \
 delivers it) in that order
-- Pull buyer language from the RAG corpus when available — customer quotes, AMA \
-transcripts, podcast snippets. Buyers' words outperform marketers' words
+- Pull buyer language from the RAG corpus when available — customer quotes, \
+podcast snippets. Buyers' words outperform marketers' words
 - If a positioning statement exists for this product, inherit its Differentiated \
 Value themes as the input to the three Benefits. Messaging without positioning \
 produces incoherent stacks
@@ -119,7 +119,7 @@ export const messagingFrameworkTemplate: ArtifactTemplate = {
 ## Validation (CAST + plain-language filters)
 
 - **Clear:** [Can a non-expert understand the value prop and each benefit on first read? Mark each line that fails and rewrite.]
-- **Authentic:** [Does this resonate with how the A+ customer actually talks? Cross-check against customer quotes / AMA / call transcripts in the corpus. Marketing-speak that doesn't appear in real buyer language is a red flag.]
+- **Authentic:** [Does this resonate with how the A+ customer actually talks? Cross-check against customer quotes / call transcripts in the corpus. Marketing-speak that doesn't appear in real buyer language is a red flag.]
 - **Simple:** [Is the value prop easy to grasp and repeat? If the buyer can't paraphrase it after one read, simplify.]
 - **Tested:** [What evidence validates each benefit beyond internal opinion — customer interviews, win/loss data, sales call themes, demo reactions? List the source per benefit.]
 - **BBQ Talk filter:** [Read each line aloud as if explaining to a friend at a barbecue. Anything that would make them look confused gets rewritten in plain language.]

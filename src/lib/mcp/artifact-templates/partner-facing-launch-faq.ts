@@ -5,9 +5,8 @@
  *   VandeHei / Allen / Schwartz — Smart Brevity (TEASE → LEDE → optional
  *   GO DEEPER as the per-Q+A craft discipline; Audience First; Fog of
  *   Words; Short, Not Shallow). Corpus amplification: PMA podcast + PMA
- *   blogs (Janani Nagarajan on routes-to-market) + AMAs (Amanda Groves,
- *   Shana Iles, Andrew Kaplan, Jesse Lopez, April Rassa, Sharon Markowitz,
- *   Stephanie Kelman) — synthesizing a 5-block partner-FAQ structure.
+ *   blogs (Janani Nagarajan on routes-to-market) — synthesizing a 5-block
+ *   partner-FAQ structure.
  *   Sibling references: artifact 12 (internal-launch-faq.ts) for craft
  *   discipline; artifact 28 (co-sell-battlecard.ts) for partner-economics
  *   structure.

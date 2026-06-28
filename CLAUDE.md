@@ -22,7 +22,7 @@ npm run build      # Production build check
 
 ## Project Overview
 
-AI-powered Product Marketing advisor with agentic RAG knowledge base (38,213+ chunks across 9 knowledge layers: 34 books, 583 podcast episodes, 532 Sharebird AMAs, 827 PMA blogs, 23 substacks, 790 thought-leader blogs), multi-model LLM support, and real-time streaming. Hundreds of users across 100+ organizations.
+AI-powered Product Marketing advisor with agentic RAG knowledge base (40,000+ chunks across 8 knowledge layers: 34 books, 583 podcast episodes, 827 PMA blogs, 23 substacks, 790 thought-leader blogs), multi-model LLM support, and real-time streaming. Hundreds of users across 100+ organizations.
 
 - **Production**: https://pmmsherpa.com
 - **Staging**: https://staging.pmmsherpa.com

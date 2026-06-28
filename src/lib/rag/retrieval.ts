@@ -294,7 +294,7 @@ function formatSourceInfo(chunk: RetrievedChunk): string {
   } else if (chunk.sourceType === 'blog') {
     parts.push('(PMA Blog)')
   } else if (chunk.sourceType === 'ama') {
-    parts.push('(Sharebird AMA)')
+    parts.push('(Practitioner Insight)')
     if (chunk.question) {
       parts.push(`Q: "${chunk.question}"`)
     }

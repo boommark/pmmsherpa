@@ -25,7 +25,7 @@ const GUIDES: Guide[] = [
     icon: Map,
     label: 'GTM Strategy',
     title: "GTM strategy shouldn't take weeks of guesswork",
-    hook: "Most GTM plans take weeks of research, stakeholder alignment, and framework hunting. PMM Sherpa gives you instant access to 34 books, 534 practitioner AMAs, and 800+ blog posts — applied to your specific problem.",
+    hook: "Most GTM plans take weeks of research, stakeholder alignment, and framework hunting. PMM Sherpa gives you instant access to 34 books, 800+ blog posts, and hundreds of expert podcast episodes — applied to your specific problem.",
     description: "Build a go-to-market strategy grounded in real frameworks",
     prompts: [
       {

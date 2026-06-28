@@ -169,7 +169,7 @@ If any of these are unlocked at T-1 week, the launch slips. No exceptions.
 | **T-3 to T-2 weeks** | Press embargoes briefed, analyst pre-briefs, customer-reference confirmations, internal kickoff, sales enablement training | [PMM + Comms] |
 | **T-1 week** | Pre-launch tease to engaged customers, internal deck distributed, sales talking points finalized, dashboards live | [PMM + Sales] |
 | **Launch day (T+0)** | Press release, blog post, in-app announcement, social, exec post, customer all-hands | [PMM + Comms + Demand Gen] |
-| **Week +1** | Deep-dive webinar or technical session, AMA with PM/PMM, peer community posts | [PMM + Product] |
+| **Week +1** | Deep-dive webinar or technical session, live Q&A with PM/PMM, peer community posts | [PMM + Product] |
 | **Week +2** | Customer story / case study published, sales-led outreach to expansion accounts | [PMM + Customer Marketing + Sales] |
 | **Week +3** | Paid amplification on the highest-performing content from weeks 0-2 | [Demand Gen] |
 | **Week +4** | Post-mortem: hit/miss against primary metric, what to amplify, what to retire | [PMM] |

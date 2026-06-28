@@ -9,7 +9,7 @@
  *   Alex Hormozi — $100M Offers (Value Equation as the page's perceived-value
  *   surface, Trim & Stack as feature-gating discipline, naming/wrapper as
  *   tier-naming discipline).
- *   Tier-2 corpus: Sharebird / PMA pricing AMAs and ProductLed pricing-page
+ *   Tier-2 corpus: PMA pricing guides and ProductLed pricing-page
  *   guides (Wes Bush), Kyle Poyar on usage-based pricing pitfalls,
  *   Maja Voje — Go-To-Market Strategist on packaging.
  *

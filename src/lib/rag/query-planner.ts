@@ -46,8 +46,6 @@ Four source types, each serving a different purpose:
 
 **Communication & Presentation Books:** Negotiation, influence, persuasion, storytelling, executive communication, stakeholder management, and presentation craft. (e.g., Never Split the Difference, Resonate, Storytelling with Data, Crucial Conversations, Illuminate)
 
-**Practitioner AMAs:** Real-world war stories from PMM leaders at major tech companies. Covers: messaging, launches, GTM, sales enablement, competitive positioning, pricing, stakeholder management, team building, career growth, AI in PMM. These are opinionated, specific, and contextual.
-
 **Industry Articles:** How-to guides, templates, case studies, thought leadership, expert interviews, career advice, emerging trends. Includes case studies from real companies and step-by-step tactical playbooks.
 
 ## What the Knowledge Base is Strong On

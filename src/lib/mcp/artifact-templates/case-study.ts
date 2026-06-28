@@ -7,7 +7,7 @@
  *   + the four story-craft components (Identifiable Characters, Authentic
  *   Emotion, Significant Moment, Specific Details). Adjacent: Geoffrey
  *   Moore — Crossing the Chasm (case studies as whole-product proof).
- *   Corpus tier-2: Sharebird customer-marketing AMAs, PMA case study
+ *   Corpus tier-2: PMA case study
  *   guides (Aratrika Rath, Asya Bashina), B2B case-study practitioner
  *   patterns.
  *

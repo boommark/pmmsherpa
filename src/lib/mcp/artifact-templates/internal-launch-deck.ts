@@ -7,7 +7,7 @@
  *   Duarte & Sanchez — Illuminate (Torchbearer model; Empathetic Listening
  *   before telling; Threshold Crossing as commitment moment; Symbolic
  *   Artifacts; Four-Stage Toolkit pointing to next ceremonies).
- *   Corpus (Tier 2) — PMA / Sharebird AMAs for the operational 8-section
+ *   Corpus (Tier 2) — PMA practitioner sources for the operational 8-section
  *   spine, role-by-role asks, outcome-not-activity metrics.
  *
  * Audit trail: .planning/mcp-phase-2/corpus-research/13-internal-launch-deck.md
@@ -95,7 +95,7 @@ people remember (customer clip, shocking stat, demo beat). The symbol is \
 what gets reused for the next 90 days (codename, rallying number, shared \
 phrase)
 - Pull customer voice from the RAG corpus when available — real customer \
-language, AMA snippets, podcast quotes. Buyers' words in front of an \
+language, podcast quotes. Buyers' words in front of an \
 internal audience reset the room from features to outcomes
 - Render the role-by-role asks as a threshold-crossing moment, not a \
 checklist. This is where employees commit to becoming torchbearers \
