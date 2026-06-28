@@ -78,7 +78,7 @@ Render exactly three benefits. Each benefit is a verb-and-result pair. If a \
 messaging_framework artifact exists for this product, pull the three from its \
 Differentiated Value themes — do not re-derive.
 
-Pull customer language from the RAG corpus when available — Sharebird AMAs, \
+Pull customer language from the RAG corpus when available — \
 podcast snippets, customer interviews, sales call transcripts. Prospects respond \
 to other buyers' words, not to marketers' phrasing.
 

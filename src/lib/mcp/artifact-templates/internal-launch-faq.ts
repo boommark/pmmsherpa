@@ -4,8 +4,7 @@
  * Canonical source (read first per .planning/mcp-phase-2/methodology.md):
  *   VandeHei / Allen / Schwartz — Smart Brevity (TEASE → LEDE → optional
  *   GO DEEPER as the per-Q+A craft discipline; Audience First; Short, Not
- *   Shallow). Corpus amplification: Sharebird AMAs (Gagan Mand, Ashley
- *   Faus, Charles Tsang, Sean Lauer, Anna Wiggins) + PMA practitioner
+ *   Shallow). Corpus amplification: PMA practitioner
  *   blogs (sales-asset and battlecard guides; Matt Heng on sales
  *   collaboration); Dunford — Sales Pitch p.127 + p.129 (objection
  *   language).

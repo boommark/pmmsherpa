@@ -80,7 +80,7 @@ RFP question. Reject dimensions that fail this test
 or matches, with a reframe of why it matters less for the ICP. Trust asymmetry: \
 acknowledged weaknesses outperform perfect sweeps
 - Pull buyer-language from the RAG corpus when filling cells — customer quotes, \
-AMA transcripts, podcast snippets describing what was missing in competing \
+podcast snippets describing what was missing in competing \
 products. Buyers' words outperform marketers' words even inside a table
 
 Reference frameworks implicitly. Do not name-drop authors in the output.`

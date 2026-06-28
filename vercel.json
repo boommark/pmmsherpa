@@ -6,6 +6,10 @@
     {
       "path": "/api/cron/reset-monthly-credits",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/schedule-pending-broadcasts",
+      "schedule": "30 8 * * *"
     }
   ]
 }

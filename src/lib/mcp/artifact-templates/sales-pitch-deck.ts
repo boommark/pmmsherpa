@@ -116,7 +116,7 @@ phase). The messaging framework seeds the language register. Do not re-derive \
 proceed with caveats
 - Pull customer language from the RAG corpus when drafting Slide 11 \
 (customer story) and the language register on every body slide. Buyer words \
-outperform marketer words — pull from AMAs, podcast transcripts, customer \
+outperform marketer words — pull from podcast transcripts, customer \
 interview quotes when available
 
 Reference frameworks implicitly. Do not name-drop authors in the output.`

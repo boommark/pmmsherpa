@@ -209,7 +209,7 @@ Avoid: arguments that hedge ("X may sometimes be useful for Y in some contexts")
 - [Competitor or category context — what are others in this space saying, where's the gap]
 - [Historical or anecdotal example to color the argument]
 
-**Sources to mine:** [Specify where the writer should look — corpus / library / internal recordings / a specific Sharebird AMA / a specific PMA blog. The brief surfaces the source, not the search.]]
+**Sources to mine:** [Specify where the writer should look — corpus / library / internal recordings / a specific PMA blog. The brief surfaces the source, not the search.]]
 
 ---
 

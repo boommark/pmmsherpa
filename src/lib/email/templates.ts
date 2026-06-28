@@ -339,7 +339,7 @@ A few tips to get started:
 If you have any questions or feedback, just reply to this email - I'd love to hear from you!
 
 Best,
-Abhishek
+Dona
 
 P.S. Check out the "Try asking" suggestions on the chat page for inspiration!`
   }

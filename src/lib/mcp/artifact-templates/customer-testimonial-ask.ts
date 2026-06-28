@@ -2,7 +2,7 @@
  * Customer Testimonial / Quote Ask template for the generate_artifact MCP tool.
  *
  * Canonical source (read first per .planning/mcp-phase-2/methodology.md):
- *   None — corpus-only artifact (Sharebird customer-marketing AMAs, PMA blogs
+ *   None — corpus-only artifact (PMA blogs
  *   on case studies and storytelling, customer-marketing playbooks). Book-
  *   cards-first rule honored: no book chunks surfaced strongly enough to
  *   override the practitioner spine.

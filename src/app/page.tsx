@@ -517,7 +517,7 @@ export default function LandingPage() {
                 PMMSherpa is what you check your thinking against before it matters.
               </p>
               <p className="mb-8 text-sm text-blue-300/80 max-w-lg mx-auto">
-                Thousands of real, practical GTM principles. 9 knowledge layers. 500+ companies. One conversation away.
+                Thousands of real, practical GTM principles. 8 knowledge layers. 500+ companies. One conversation away.
               </p>
               <Link href="/login">
                 <Button

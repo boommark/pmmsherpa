@@ -186,7 +186,7 @@ Cross-reference: this is the aspirational top of the messaging framework's value
 ## PROOF (customer voice — threaded into LEDE or VALUE, or surfaced here if standalone)
 [At minimum, one quote, data point, or beta-customer line. A launch post without customer voice reads as marketing; with it, the trust level of the entire post changes.
 
-Pull from corpus when available: customer interviews, sales call transcripts, AMA snippets, support cases. Buyers' words outperform marketers' words.
+Pull from corpus when available: customer interviews, sales call transcripts, support cases. Buyers' words outperform marketers' words.
 
 If proof has already been threaded into the LEDE or VALUE sections, mark this section as "(integrated above)" rather than repeating.]
 
