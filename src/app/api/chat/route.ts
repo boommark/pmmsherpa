@@ -475,9 +475,39 @@ export async function POST(request: NextRequest) {
           )
         }
 
+        // Heartbeat: SSE comment lines every 10s so the client's inactivity
+        // timer keeps resetting through long silent phases (RAG, web research,
+        // LLM time-to-first-token). The client parser ignores non-`data:`
+        // lines but any received bytes reset its timers. Cleared once the
+        // first LLM text chunk is sent, and on close/error.
+        let heartbeat: ReturnType<typeof setInterval> | null = setInterval(() => {
+          try {
+            controller.enqueue(encoder.encode(': hb\n\n'))
+          } catch {
+            if (heartbeat) {
+              clearInterval(heartbeat)
+              heartbeat = null
+            }
+          }
+        }, 10_000)
+        const clearHeartbeat = () => {
+          if (heartbeat) {
+            clearInterval(heartbeat)
+            heartbeat = null
+          }
+        }
+
         // Track which stage we're in so the catch handler can write a
         // phase-aware fallback message + chat_errors row.
         let currentPhase: ChatPhase = 'unknown'
+
+        // Partial-response persistence: an assistant placeholder row is
+        // created as soon as the stream starts and updated in place as text
+        // arrives. If Vercel kills the lambda at maxDuration (which skips the
+        // catch block entirely), the partial answer survives in the DB
+        // instead of the whole turn vanishing.
+        let assistantMessageId: string | null = null
+        let fullResponseText = ''
 
         await startActiveObservation('sherpa.chat.request', async (span) => {
           const traceInput = { message, model, hasAttachments: !!hasAttachments }
@@ -500,6 +530,26 @@ export async function POST(request: NextRequest) {
           }
 
         try {
+          if (conversationId) {
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const { data: placeholderRow, error: placeholderErr } = await (supabase.from('messages') as any).insert({
+                conversation_id: conversationId,
+                role: 'assistant',
+                content: '',
+                model: null,
+                citations: [],
+              }).select('id').single()
+              if (placeholderErr) {
+                console.error('[Chat] Failed to create assistant placeholder:', placeholderErr)
+              } else {
+                assistantMessageId = placeholderRow?.id ?? null
+              }
+            } catch (placeholderThrow) {
+              console.error('[Chat] Assistant placeholder insert threw:', placeholderThrow)
+            }
+          }
+
           // ========================================
           // PHASE 1: Gather all inputs (parallel)
           // ========================================
@@ -512,16 +562,18 @@ export async function POST(request: NextRequest) {
 
           // Gather inputs in parallel: conversation history, URL scraping, attachment processing.
           // We persisted the new user message up-front (see top of POST handler), so it's
-          // already in this conversation's messages table. Limit 11 + filter by id keeps
-          // history at last 10 turns BEFORE the current turn — the new turn is passed
-          // separately to buildMessages() further down.
+          // already in this conversation's messages table. Limit 15 + filters keeps
+          // history at last 10 clean turns BEFORE the current turn — the new turn is
+          // passed separately to buildMessages() further down. The extra headroom
+          // absorbs the current user message, this turn's assistant placeholder,
+          // and any error/empty rows that get filtered out below.
           const historyPromise = conversationId
             ? supabase
                 .from('messages')
-                .select('id, role, content, created_at')
+                .select('id, role, content, created_at, error')
                 .eq('conversation_id', conversationId)
                 .order('created_at', { ascending: false })
-                .limit(11)
+                .limit(15)
             : Promise.resolve({ data: null, error: null })
 
           const urlScrapePromise = hasUrls
@@ -540,10 +592,24 @@ export async function POST(request: NextRequest) {
           let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
           if (historyResult.data && Array.isArray(historyResult.data)) {
             // Drop the just-saved user message (we pass it separately as processedMessage),
-            // then reverse to chronological order and trim to last 10.
-            const filtered = (historyResult.data as Array<{ id: string; role: string; content: string }>)
-              .filter(m => m.id !== userMessageId)
-              .slice(0, 10)
+            // this turn's assistant placeholder, error fallbacks ("I hit an error from
+            // the model..." must never be fed back to the LLM as if Sherpa said it),
+            // and empty rows (orphaned placeholders from killed lambdas). Then reverse
+            // to chronological order and trim to last 10.
+            let filtered = (historyResult.data as Array<{ id: string; role: string; content: string; error?: boolean | null }>)
+              .filter(m =>
+                m.id !== userMessageId &&
+                m.id !== assistantMessageId &&
+                m.error !== true &&
+                m.content?.trim() !== ''
+              )
+            // Retry path: the retried user message already exists in history
+            // (userMessageId is null, so the id filter above removes nothing)
+            // AND is re-sent as the current turn. Drop the duplicate.
+            if (skipUserSave && filtered.length > 0 && filtered[0].role === 'user' && filtered[0].content === message) {
+              filtered = filtered.slice(1)
+            }
+            filtered = filtered.slice(0, 10)
             const chronologicalMessages = filtered.reverse()
             const fullHistory = chronologicalMessages.map((m) => ({
               role: m.role as 'user' | 'assistant',
@@ -1009,9 +1075,6 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             )
           }
 
-          // Collect full response text while streaming
-          let fullResponseText = ''
-
           // Build expanded research object for database storage
           const expandedResearchForDb = webCitations.length > 0
             ? {
@@ -1022,9 +1085,13 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
               }
             : null
 
-          // Stream text chunks with output leak detection
+          // Stream text chunks with output leak detection. Partial text is
+          // flushed to the placeholder row every ~3s (fire-and-forget) so a
+          // killed lambda leaves the answer-so-far behind.
           let leakDetected = false
+          let lastPartialFlushAt = Date.now()
           for await (const chunk of result.textStream) {
+            clearHeartbeat()
             fullResponseText += chunk
             // Check accumulated text for leaked prompt content every ~500 chars
             if (!leakDetected && fullResponseText.length % 500 < chunk.length) {
@@ -1036,6 +1103,19 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
                 )
                 break
               }
+            }
+            if (assistantMessageId && Date.now() - lastPartialFlushAt >= 3000) {
+              lastPartialFlushAt = Date.now()
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              void ((supabase.from('messages') as any)
+                .update({ content: fullResponseText })
+                .eq('id', assistantMessageId) as PromiseLike<{ error: unknown }>)
+                .then(
+                  ({ error: flushErr }) => {
+                    if (flushErr) console.error('[Chat] Partial content flush failed:', flushErr)
+                  },
+                  (flushThrow: unknown) => console.error('[Chat] Partial content flush threw:', flushThrow)
+                )
             }
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ type: 'text', content: chunk })}\n\n`)
@@ -1058,23 +1138,40 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             try {
               console.log(`Saving assistant message to conversation ${conversationId}`)
 
-              // Save assistant message with citations and expanded research
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const { data: assistantMsgData, error: assistantMsgError } = await (supabase.from('messages') as any).insert({
-                conversation_id: conversationId,
-                role: 'assistant',
+              // Final save with citations and expanded research. Updates the
+              // placeholder created at stream start; falls back to an insert
+              // if the placeholder was never created.
+              const assistantRow = {
                 content: fullResponseText,
                 model: dbModel,
                 token_count: (usage?.inputTokens || 0) + (usage?.outputTokens || 0) || null,
                 latency_ms: latencyMs,
                 citations,
                 expanded_research: expandedResearchForDb,
-              }).select('id').single()
-
-              if (assistantMsgError) {
-                console.error('Error saving assistant message:', assistantMsgError)
+              }
+              if (assistantMessageId) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { error: assistantMsgError } = await (supabase.from('messages') as any)
+                  .update(assistantRow)
+                  .eq('id', assistantMessageId)
+                if (assistantMsgError) {
+                  console.error('Error saving assistant message:', assistantMsgError)
+                } else {
+                  console.log('Assistant message saved:', assistantMessageId)
+                }
               } else {
-                console.log('Assistant message saved:', assistantMsgData?.id)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { data: assistantMsgData, error: assistantMsgError } = await (supabase.from('messages') as any).insert({
+                  conversation_id: conversationId,
+                  role: 'assistant',
+                  ...assistantRow,
+                }).select('id').single()
+                if (assistantMsgError) {
+                  console.error('Error saving assistant message:', assistantMsgError)
+                } else {
+                  assistantMessageId = assistantMsgData?.id ?? null
+                  console.log('Assistant message saved:', assistantMessageId)
+                }
               }
 
               // Update conversation's updated_at timestamp
@@ -1095,8 +1192,9 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           const traceId = getActiveTraceId()
           span.update({ output: fullResponseText })
           setActiveTraceIO({ input: traceInput, output: fullResponseText })
+          clearHeartbeat()
           controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ type: 'done', trace_id: traceId })}\n\n`)
+            encoder.encode(`data: ${JSON.stringify({ type: 'done', trace_id: traceId, message_id: assistantMessageId })}\n\n`)
           )
           controller.close()
 
@@ -1207,26 +1305,40 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           }
         } catch (error) {
           console.error(`Chat API streaming error (phase=${currentPhase}):`, error)
+          clearHeartbeat()
 
           // Write a phase-aware fallback assistant message so the conversation
-          // becomes a recoverable thread instead of a ghost row. Stream the
-          // fallback text to the client so they see it without reload, then
-          // emit `done` with the assistant message id so retry can target it.
+          // becomes a recoverable thread instead of a ghost row. If the
+          // placeholder row exists, update it with any partial text plus the
+          // fallback line; only insert when the placeholder was never created.
+          // Stream the fallback text to the client so they see it without
+          // reload, then emit `done` with the assistant message id so retry
+          // can target it.
           const fallbackText = fallbackForPhase(currentPhase)
-          let fallbackMessageId: string | null = null
+          const fallbackContent = fullResponseText
+            ? `${fullResponseText}\n\n${fallbackText}`
+            : fallbackText
+          let fallbackMessageId: string | null = assistantMessageId
 
           if (conversationId) {
             try {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const { data: insertedFallback } = await (supabase.from('messages') as any).insert({
-                conversation_id: conversationId,
-                role: 'assistant',
-                content: fallbackText,
-                model: null,
-                citations: [],
-                error: true,
-              }).select('id').single()
-              fallbackMessageId = insertedFallback?.id ?? null
+              if (assistantMessageId) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                await (supabase.from('messages') as any)
+                  .update({ content: fallbackContent, error: true })
+                  .eq('id', assistantMessageId)
+              } else {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { data: insertedFallback } = await (supabase.from('messages') as any).insert({
+                  conversation_id: conversationId,
+                  role: 'assistant',
+                  content: fallbackContent,
+                  model: null,
+                  citations: [],
+                  error: true,
+                }).select('id').single()
+                fallbackMessageId = insertedFallback?.id ?? null
+              }
 
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               await (supabase.from('conversations') as any)
@@ -1252,7 +1364,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           // so the client can render the retry button.
           try {
             controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ type: 'text', content: fallbackText, error: true })}\n\n`)
+              encoder.encode(`data: ${JSON.stringify({ type: 'text', content: fullResponseText ? `\n\n${fallbackText}` : fallbackText, error: true })}\n\n`)
             )
             const traceId = getActiveTraceId()
             controller.enqueue(

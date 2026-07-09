@@ -2,6 +2,12 @@ import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import type { ModelProvider } from '@/lib/llm/provider-factory'
 
+// Mirror /api/chat: the nested fetch below pipes the full chat pipeline
+// (allowed 120s), so retry itself must be allowed to run just as long.
+// Without this, retry dies at the default function timeout.
+export const runtime = 'nodejs'
+export const maxDuration = 120
+
 interface MessageRow {
   id: string
   role: 'user' | 'assistant'

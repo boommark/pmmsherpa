@@ -72,6 +72,92 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setCurrentProject,
   } = useChatStore()
 
+  // Recovery poll: after a client-side timeout the server may still finish
+  // and save the real answer (it has up to 120s). Poll the conversation for
+  // a bounded window and swap the local error bubble for the DB row if one
+  // lands, instead of leaving the answer invisible until reload.
+  const recoveryPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const stopRecoveryPoll = useCallback(() => {
+    if (recoveryPollRef.current) {
+      clearInterval(recoveryPollRef.current)
+      recoveryPollRef.current = null
+    }
+  }, [])
+
+  useEffect(() => stopRecoveryPoll, [stopRecoveryPoll])
+
+  const startRecoveryPoll = useCallback((
+    convId: string,
+    localMessageId: string,
+    sentContent: string,
+    sendStartedAt: number
+  ) => {
+    stopRecoveryPoll()
+    const deadline = sendStartedAt + 120_000
+
+    const tick = async () => {
+      try {
+        const { createClient } = await import('@/lib/supabase/client')
+        const supabase = createClient()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: rows } = await (supabase.from('messages') as any)
+          .select('id, role, content, citations, expanded_research, model, error, created_at')
+          .eq('conversation_id', convId)
+          .order('created_at', { ascending: false })
+          .limit(2)
+        const [latest, prev] = (rows ?? []) as Array<{
+          id: string
+          role: string
+          content: string | null
+          citations: ChatMessage['citations']
+          expanded_research: ChatMessage['expandedResearch'] | null
+          model: ChatMessage['model'] | null
+          error: boolean | null
+        }>
+
+        // New sends call stopRecoveryPoll() up front; this guard covers the
+        // bubble being removed by other means (edit, conversation switch).
+        const state = useChatStore.getState()
+        if (!state.messages.some(m => m.id === localMessageId)) {
+          stopRecoveryPoll()
+          return
+        }
+
+        // Only adopt an assistant answer that belongs to the failed turn:
+        // latest row is a clean assistant message directly after our user turn.
+        if (
+          latest?.role === 'assistant' &&
+          latest.error !== true &&
+          latest.content?.trim() &&
+          prev?.role === 'user' &&
+          prev.content === sentContent
+        ) {
+          updateMessage(localMessageId, {
+            id: latest.id,
+            content: latest.content,
+            citations: latest.citations || undefined,
+            expandedResearch: latest.expanded_research || undefined,
+            model: latest.model || undefined,
+            error: false,
+            isStreaming: false,
+          })
+          setError(null)
+          stopRecoveryPoll()
+          return
+        }
+      } catch (pollErr) {
+        console.error('[Chat] Recovery poll error:', pollErr)
+      }
+      if (Date.now() > deadline) {
+        stopRecoveryPoll()
+      }
+    }
+
+    recoveryPollRef.current = setInterval(tick, 10_000)
+    void tick()
+  }, [stopRecoveryPoll, updateMessage, setError])
+
   // Projects P2: when viewing an existing conversation, sync the active
   // project from the conversation row (project is locked per conversation).
   useEffect(() => {
@@ -210,6 +296,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
     if ((!hasContent && !hasAttachments) || isLoading || isSubmittingRef.current) return
 
+    const sendStartedAt = Date.now()
+    stopRecoveryPoll()
     isSubmittingRef.current = true
     setIsLoading(true)
     setError(null)
@@ -250,15 +338,27 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     try {
       if (!activeConversationId) {
         const title = content.slice(0, 50) + (content.length > 50 ? '...' : '')
-        const newConv = await createConversation(title, currentModel, currentProject?.id ?? null)
-        if (newConv) {
-          activeConversationId = newConv.id
-          isNewConversation = true
-          setConversationId(newConv.id)
-          posthog.capture('conversation_created', { model: currentModel, has_project: !!currentProject })
-        } else {
-          throw new Error('Failed to create conversation')
+        let newConv: Awaited<ReturnType<typeof createConversation>> = null
+        try {
+          newConv = await createConversation(title, currentModel, currentProject?.id ?? null)
+        } catch (convError) {
+          console.error('Failed to create conversation:', convError)
         }
+        if (!newConv) {
+          // Don't lose the typed message: pull the optimistic bubbles back
+          // out of the store and restore the text to the input box.
+          const userIndex = useChatStore.getState().messages.findIndex(m => m.id === userMessage.id)
+          if (userIndex >= 0) {
+            removeMessagesFromIndex(userIndex)
+          }
+          chatInputRef.current?.setInput(content)
+          setError('Could not start a new conversation. Please check your connection and try again.')
+          return
+        }
+        activeConversationId = newConv.id
+        isNewConversation = true
+        setConversationId(newConv.id)
+        posthog.capture('conversation_created', { model: currentModel, has_project: !!currentProject })
       }
 
       posthog.capture('message_sent', {
@@ -293,17 +393,19 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
       if (reader) {
         let receivedDone = false
+        const streamStartTime = Date.now()
         let lastActivityTime = Date.now()
-        const STREAM_TIMEOUT_MS = 90000
-        const INACTIVITY_TIMEOUT_MS = 30000
+        // Server maxDuration is 120s and sends a heartbeat every 10s until
+        // the first text chunk, so these only fire when something is wrong.
+        const STREAM_TIMEOUT_MS = 130000
+        const INACTIVITY_TIMEOUT_MS = 45000
 
         const checkTimeout = () => {
           const now = Date.now()
-          const totalElapsed = now - (lastActivityTime - INACTIVITY_TIMEOUT_MS)
           if (now - lastActivityTime > INACTIVITY_TIMEOUT_MS) {
-            throw new Error('Stream timed out - no data received for 30 seconds')
+            throw new Error('Stream timed out - no data received for 45 seconds')
           }
-          if (totalElapsed > STREAM_TIMEOUT_MS) {
+          if (now - streamStartTime > STREAM_TIMEOUT_MS) {
             throw new Error('Stream timed out - total time exceeded')
           }
         }
@@ -398,6 +500,12 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         setError(errorMessage)
         setStatusMessage(null)
         finishStreaming(assistantMessageId)
+        // The server may still be working (it has up to 120s) and could save
+        // a real answer after this client-side failure. Poll briefly and
+        // surface it if it lands.
+        if (activeConversationId) {
+          startRecoveryPoll(activeConversationId, assistantMessageId, content, sendStartedAt)
+        }
       }
     } finally {
       // If this was a new conversation and the done event never fired (server
@@ -438,6 +546,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     router,
     setExpandedResearch,
     setAbortController,
+    startRecoveryPoll,
+    stopRecoveryPoll,
   ])
 
   // ========================================
@@ -565,6 +675,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   const handleRetry = useCallback(async (failedMessageId: string) => {
     if (!conversationId || isLoading || isSubmittingRef.current) return
 
+    stopRecoveryPoll()
     isSubmittingRef.current = true
     setIsLoading(true)
     setError(null)
@@ -669,6 +780,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     setError,
     setStatusMessage,
     setAbortController,
+    stopRecoveryPoll,
   ])
 
   const handleExpandWithResearch = useCallback(async (messageId: string, content: string, deepResearch: boolean) => {
