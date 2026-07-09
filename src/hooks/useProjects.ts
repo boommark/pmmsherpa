@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import type { SetupState } from '@/lib/projects/setup-state'
 
 export interface ProjectSummary {
   id: string
@@ -15,6 +16,8 @@ export interface ProjectSummary {
   instructions: string | null
   totalTokenCount: number
   documentCount: number
+  /** Raw projects.setup_state JSONB — normalize before use; null/absent on old rows. */
+  setupState?: unknown
   createdAt: string
   updatedAt: string
 }
@@ -38,6 +41,8 @@ export interface ProjectDetail {
   name: string
   instructions: string | null
   totalTokenCount: number
+  /** Raw projects.setup_state JSONB — normalize before use; null/absent on old rows. */
+  setupState?: unknown
   createdAt: string
   updatedAt: string
   documents: ProjectDocument[]
@@ -152,7 +157,7 @@ export function useProject(projectId: string | null) {
   }, [hasProcessing, fetchProject])
 
   const updateProject = useCallback(
-    async (updates: { name?: string; instructions?: string | null }) => {
+    async (updates: { name?: string; instructions?: string | null; setup_state?: SetupState }) => {
       if (!projectId) return
       const res = await fetch(`/api/projects/${projectId}`, {
         method: 'PATCH',

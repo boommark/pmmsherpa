@@ -2,13 +2,14 @@
  * /api/projects/[id] — single-project operations.
  *
  * GET    → project + its documents (sans full_text)
- * PATCH  → update name / instructions
+ * PATCH  → update name / instructions / setup_state
  * DELETE → delete project (rows cascade) + its storage objects
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { requireProject } from '@/lib/projects/auth'
 import { PROJECT_DOCUMENTS_BUCKET } from '@/lib/projects/ingestion'
+import { validateSetupState } from '@/lib/projects/setup-state'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -43,6 +44,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       name: project.name,
       instructions: project.instructions,
       totalTokenCount: project.total_token_count,
+      setupState: project.setup_state ?? null,
       createdAt: project.created_at,
       updatedAt: project.updated_at,
       documents: documents || [],
@@ -60,14 +62,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (!guard.ok) return guard.response
     const { service, project } = guard
 
-    let body: { name?: unknown; instructions?: unknown }
+    let body: { name?: unknown; instructions?: unknown; setup_state?: unknown }
     try {
       body = await request.json()
     } catch {
       return NextResponse.json({ error: 'Expected JSON body' }, { status: 400 })
     }
 
-    const updates: Record<string, string | null> = {}
+    const updates: Record<string, unknown> = {}
 
     if (body.name !== undefined) {
       const name = typeof body.name === 'string' ? body.name.trim() : ''
@@ -98,8 +100,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       updates.instructions = instructions
     }
 
+    if (body.setup_state !== undefined) {
+      const result = validateSetupState(body.setup_state)
+      if (!result.ok) {
+        return NextResponse.json({ error: result.error }, { status: 400 })
+      }
+      updates.setup_state = result.state
+    }
+
     if (Object.keys(updates).length === 0) {
-      return NextResponse.json({ error: 'Nothing to update — provide name and/or instructions' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Nothing to update — provide name, instructions, and/or setup_state' },
+        { status: 400 },
+      )
     }
     updates.updated_at = new Date().toISOString()
 
@@ -119,6 +132,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       name: updated.name,
       instructions: updated.instructions,
       totalTokenCount: updated.total_token_count,
+      setupState: updated.setup_state ?? null,
       createdAt: updated.created_at,
       updatedAt: updated.updated_at,
     })

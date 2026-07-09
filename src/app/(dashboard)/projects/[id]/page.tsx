@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useProject, type ProjectDocument } from '@/hooks/useProjects'
 import { useChatStore } from '@/stores/chatStore'
 import { PINNED_TIER_TOKEN_CAP } from '@/lib/projects/limits'
+import { SetupAssistant } from '@/components/projects/SetupAssistant'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -300,6 +301,16 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             Start chat in this project
           </Button>
         </div>
+
+        {/* Setup assistant */}
+        <SetupAssistant
+          key={project.id}
+          project={project}
+          onSaveInstructions={(instructions) => updateProject({ instructions })}
+          onAddDocument={(title, content) => addText(title, content)}
+          onPersistSetupState={(setup_state) => updateProject({ setup_state })}
+          onUploadRequest={() => fileInputRef.current?.click()}
+        />
 
         {/* Instructions */}
         <div className="mb-8">

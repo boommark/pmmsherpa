@@ -19,6 +19,8 @@ export interface ProjectRow {
   total_token_count: number
   created_at: string
   updated_at: string
+  /** JSONB; absent on rows created before the setup-assistant migration. */
+  setup_state?: unknown
 }
 
 export type ProjectGuardResult =

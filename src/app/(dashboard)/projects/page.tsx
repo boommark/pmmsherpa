@@ -2,11 +2,18 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useProjects } from '@/hooks/useProjects'
+import { useProjects, type ProjectSummary } from '@/hooks/useProjects'
+import {
+  isSetupComplete,
+  normalizeSetupState,
+  resolvedStepCount,
+  SETUP_STEP_IDS,
+} from '@/lib/projects/setup-state'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
@@ -16,9 +23,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { FolderKanban, Plus, FileText, Loader2 } from 'lucide-react'
+import { FolderKanban, Plus, FileText, Loader2, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+
+/**
+ * "Setup 2/3" chip label — null when setup is complete, dismissed, or the
+ * project predates the assistant and already has content.
+ */
+function setupChipLabel(project: ProjectSummary): string | null {
+  const state = normalizeSetupState(project.setupState)
+  if (state.dismissed || isSetupComplete(state)) return null
+  if (project.setupState == null && (project.documentCount > 0 || project.instructions)) return null
+  return `Setup ${resolvedStepCount(state)}/${SETUP_STEP_IDS.length}`
+}
 
 function formatDate(dateString: string) {
   const date = new Date(dateString)
@@ -101,7 +119,9 @@ export default function ProjectsPage() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {projects.map((project) => (
+            {projects.map((project) => {
+              const chipLabel = setupChipLabel(project)
+              return (
               <Link key={project.id} href={`/projects/${project.id}`}>
                 <Card className="h-full hover:bg-accent/50 hover:border-[#0058be]/30 transition-colors cursor-pointer">
                   <CardHeader className="p-4">
@@ -110,6 +130,15 @@ export default function ProjectsPage() {
                       <CardTitle className="text-base font-medium line-clamp-1">
                         {project.name}
                       </CardTitle>
+                      {chipLabel && (
+                        <Badge
+                          variant="outline"
+                          className="ml-auto shrink-0 gap-1 border-[#0058be]/30 text-[10px] text-[#0058be] dark:text-[#a8c0f0]"
+                        >
+                          <Sparkles className="h-2.5 w-2.5" />
+                          {chipLabel}
+                        </Badge>
+                      )}
                     </div>
                     <CardDescription className="flex items-center gap-2 mt-1">
                       <span className="flex items-center gap-1">
@@ -122,7 +151,8 @@ export default function ProjectsPage() {
                   </CardHeader>
                 </Card>
               </Link>
-            ))}
+              )
+            })}
           </div>
         )}
 
