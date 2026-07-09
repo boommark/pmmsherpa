@@ -227,6 +227,11 @@ export function SetupAssistant({
   messagesRef.current = messages
   const kickoffFired = useRef(false)
   const prevDocCount = useRef(project.documents.length)
+  // Set when accepting a drafted document (which bumps documents.length via
+  // onAddDocument). The doc-count watcher consumes it to skip its own note +
+  // advance for that bump, so accepted drafts don't double-fire while
+  // page-side manual uploads still trigger the watcher.
+  const skipDocWatcherRef = useRef(false)
   const threadRef = useRef<HTMLDivElement>(null)
 
   const complete = isSetupComplete(setupState)
@@ -362,12 +367,18 @@ export function SetupAssistant({
   // (covers uploads triggered from the page's existing upload flow).
   useEffect(() => {
     const count = project.documents.length
-    if (count > prevDocCount.current && stateRef.current.steps.documents === 'pending') {
-      advanceAndPersist('documents', 'completed')
-      setAllMessages([
-        ...messagesRef.current,
-        { id: makeId(), role: 'user', content: '[User added a document to the project.]', hidden: true },
-      ])
+    if (count > prevDocCount.current) {
+      if (skipDocWatcherRef.current) {
+        // This bump came from accepting a drafted document; handleAcceptProposal
+        // already appended its note and advanced the step. Consume the flag.
+        skipDocWatcherRef.current = false
+      } else if (stateRef.current.steps.documents === 'pending') {
+        advanceAndPersist('documents', 'completed')
+        setAllMessages([
+          ...messagesRef.current,
+          { id: makeId(), role: 'user', content: '[User added a document to the project.]', hidden: true },
+        ])
+      }
     }
     prevDocCount.current = count
   }, [project.documents.length, advanceAndPersist, setAllMessages])
@@ -432,6 +443,9 @@ export function SetupAssistant({
           },
         ])
       } else {
+        // Tell the doc-count watcher to ignore the bump this upload causes —
+        // we append our own note and advance the step below.
+        skipDocWatcherRef.current = true
         await onAddDocument(proposal.title || 'Untitled document', proposal.content)
         markProposal(message.id, 'accepted')
         advanceAndPersist('documents', 'completed')
@@ -447,6 +461,9 @@ export function SetupAssistant({
         ])
       }
     } catch (err) {
+      // The upload failed, so no count bump is coming — clear the guard so it
+      // doesn't swallow a later legitimate manual upload.
+      skipDocWatcherRef.current = false
       toast.error(
         err instanceof Error
           ? err.message

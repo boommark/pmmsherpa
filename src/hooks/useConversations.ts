@@ -196,7 +196,14 @@ export function useConversationMessages(conversationId: string | null) {
         }
 
         console.log('Fetched messages:', data?.length || 0)
-        setMessages(data || [])
+        // Drop orphaned assistant placeholders (empty content, not an error
+        // fallback) so a lambda killed before its first partial flush doesn't
+        // leave a blank bubble on reload.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const cleaned = (data || []).filter((m: any) =>
+          !(m.role === 'assistant' && !m.content?.trim() && m.error !== true)
+        )
+        setMessages(cleaned)
       } catch (err) {
         console.error('Error fetching messages:', err)
         if (isMounted) {

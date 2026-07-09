@@ -26,9 +26,9 @@ export async function GET() {
     const service = await createServiceClient()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (service.from('projects') as any)
-      // '*' (not an explicit column list) so the query keeps working while the
-      // setup_state migration is still rolling out.
-      .select('*, project_documents(count)')
+      // Explicit column list (avoids over-fetching every column) — setup_state
+      // is included now that its migration has shipped.
+      .select('id, name, instructions, total_token_count, setup_state, created_at, updated_at, project_documents(count)')
       .eq('user_id', user.id)
       .order('updated_at', { ascending: false })
 

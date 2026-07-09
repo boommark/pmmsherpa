@@ -77,6 +77,11 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
   // a bounded window and swap the local error bubble for the DB row if one
   // lands, instead of leaving the answer invisible until reload.
   const recoveryPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  // DB id of the assistant placeholder row for the in-flight turn, learned
+  // from the server's `start` SSE event. Lets the recovery poll target the
+  // exact row by id (instead of guessing via content match). Cleared on each
+  // new send/retry.
+  const activePlaceholderIdRef = useRef<string | null>(null)
 
   const stopRecoveryPoll = useCallback(() => {
     if (recoveryPollRef.current) {
@@ -91,30 +96,48 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     convId: string,
     localMessageId: string,
     sentContent: string,
-    sendStartedAt: number
+    placeholderId: string | null
   ) => {
     stopRecoveryPoll()
-    const deadline = sendStartedAt + 120_000
+    // Anchor the deadline to when polling STARTS. Anchoring to the send time
+    // fails the 130s total-timeout path, where 120s from send has already
+    // elapsed before we get here — the poll would run once and give up.
+    const deadline = Date.now() + 120_000
+
+    // A row is "finalized" only when the success save wrote latency_ms (the
+    // placeholder insert, the partial flushes, and the error UPDATE never set
+    // it), so a mid-stream partial flush — which only rewrites content — is
+    // never mistaken for the final answer. latency_ms is preferred over
+    // token_count because token_count can be null when usage stats are
+    // unavailable, whereas latency_ms is always written on final success.
+    type RecoveryRow = {
+      id: string
+      role: string
+      content: string | null
+      citations: ChatMessage['citations']
+      expanded_research: ChatMessage['expandedResearch'] | null
+      model: ChatMessage['model'] | null
+      error: boolean | null
+      latency_ms: number | null
+    }
+    const adopt = (row: RecoveryRow) => {
+      updateMessage(localMessageId, {
+        id: row.id,
+        content: row.content ?? '',
+        citations: row.citations || undefined,
+        expandedResearch: row.expanded_research || undefined,
+        model: row.model || undefined,
+        error: false,
+        isStreaming: false,
+      })
+      setError(null)
+      stopRecoveryPoll()
+    }
 
     const tick = async () => {
       try {
         const { createClient } = await import('@/lib/supabase/client')
         const supabase = createClient()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: rows } = await (supabase.from('messages') as any)
-          .select('id, role, content, citations, expanded_research, model, error, created_at')
-          .eq('conversation_id', convId)
-          .order('created_at', { ascending: false })
-          .limit(2)
-        const [latest, prev] = (rows ?? []) as Array<{
-          id: string
-          role: string
-          content: string | null
-          citations: ChatMessage['citations']
-          expanded_research: ChatMessage['expandedResearch'] | null
-          model: ChatMessage['model'] | null
-          error: boolean | null
-        }>
 
         // New sends call stopRecoveryPoll() up front; this guard covers the
         // bubble being removed by other means (edit, conversation switch).
@@ -124,27 +147,49 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           return
         }
 
-        // Only adopt an assistant answer that belongs to the failed turn:
-        // latest row is a clean assistant message directly after our user turn.
-        if (
-          latest?.role === 'assistant' &&
-          latest.error !== true &&
-          latest.content?.trim() &&
-          prev?.role === 'user' &&
-          prev.content === sentContent
-        ) {
-          updateMessage(localMessageId, {
-            id: latest.id,
-            content: latest.content,
-            citations: latest.citations || undefined,
-            expandedResearch: latest.expanded_research || undefined,
-            model: latest.model || undefined,
-            error: false,
-            isStreaming: false,
-          })
-          setError(null)
-          stopRecoveryPoll()
-          return
+        if (placeholderId) {
+          // Preferred path: watch the exact placeholder row by id.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: row } = await (supabase.from('messages') as any)
+            .select('id, role, content, citations, expanded_research, model, error, latency_ms')
+            .eq('id', placeholderId)
+            .maybeSingle() as { data: RecoveryRow | null }
+
+          if (row) {
+            if (row.error === true) {
+              // The turn ended in an error fallback — keep the error bubble.
+              stopRecoveryPoll()
+              return
+            }
+            if (row.latency_ms != null && row.content?.trim()) {
+              adopt(row)
+              return
+            }
+          }
+        } else {
+          // Fallback path (no placeholder id received): match the clean
+          // assistant answer sitting directly after our user turn, and require
+          // it to be finalized (token_count set) so a partial flush isn't
+          // adopted as the final answer.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: rows } = await (supabase.from('messages') as any)
+            .select('id, role, content, citations, expanded_research, model, error, latency_ms, created_at')
+            .eq('conversation_id', convId)
+            .order('created_at', { ascending: false })
+            .limit(2)
+          const [latest, prev] = (rows ?? []) as RecoveryRow[]
+
+          if (
+            latest?.role === 'assistant' &&
+            latest.error !== true &&
+            latest.content?.trim() &&
+            latest.latency_ms != null &&
+            prev?.role === 'user' &&
+            prev.content === sentContent
+          ) {
+            adopt(latest)
+            return
+          }
         }
       } catch (pollErr) {
         console.error('[Chat] Recovery poll error:', pollErr)
@@ -256,16 +301,21 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     console.log('Syncing messages - conversationId:', conversationId, 'dbMessages:', dbMessages.length, 'hasInitialized:', hasInitialized, 'storeMessages:', messages.length)
 
     if (conversationId && dbMessages.length > 0) {
-      const chatMessages: ChatMessage[] = dbMessages.map((m) => ({
-        id: m.id,
-        role: m.role,
-        content: m.content,
-        citations: m.citations,
-        expandedResearch: m.expanded_research || undefined,
-        model: m.model || undefined,
-        error: (m as { error?: boolean }).error === true,
-        createdAt: new Date(m.created_at),
-      }))
+      const chatMessages: ChatMessage[] = dbMessages
+        // Drop orphaned assistant placeholders (empty content, not an error
+        // fallback) left behind when a lambda was killed before the first
+        // partial flush — they'd render as blank bubbles.
+        .filter((m) => !(m.role === 'assistant' && !m.content?.trim() && (m as { error?: boolean }).error !== true))
+        .map((m) => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          citations: m.citations,
+          expandedResearch: m.expanded_research || undefined,
+          model: m.model || undefined,
+          error: (m as { error?: boolean }).error === true,
+          createdAt: new Date(m.created_at),
+        }))
 
       const currentIds = messages.map(m => m.id).join(',')
       const newIds = chatMessages.map(m => m.id).join(',')
@@ -296,8 +346,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
     if ((!hasContent && !hasAttachments) || isLoading || isSubmittingRef.current) return
 
-    const sendStartedAt = Date.now()
     stopRecoveryPoll()
+    activePlaceholderIdRef.current = null
     isSubmittingRef.current = true
     setIsLoading(true)
     setError(null)
@@ -410,6 +460,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
           }
         }
 
+        let sseBuffer = ''
         try {
           while (true) {
             const readPromise = reader.read()
@@ -431,14 +482,25 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
               break
             }
 
-            const chunk = decoder.decode(value)
-            const lines = chunk.split('\n')
+            // Decode incrementally and keep the trailing partial line in the
+            // buffer — a `data:` frame can straddle a read boundary, and
+            // splitting the raw chunk would drop it.
+            sseBuffer += decoder.decode(value, { stream: true })
+            const lines = sseBuffer.split('\n')
+            sseBuffer = lines.pop() ?? ''
 
             for (const line of lines) {
               if (line.startsWith('data: ')) {
                 try {
                   const data = JSON.parse(line.slice(6))
-                  if (data.type === 'status') {
+                  if (data.type === 'start') {
+                    // Server created the assistant placeholder row and told us
+                    // its DB id — stash it so the recovery poll (if this turn
+                    // fails) can watch that exact row.
+                    if (data.message_id) {
+                      activePlaceholderIdRef.current = data.message_id
+                    }
+                  } else if (data.type === 'status') {
                     setStatusMessage(data.message)
                   } else if (data.type === 'text') {
                     setStatusMessage(null)
@@ -504,7 +566,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
         // a real answer after this client-side failure. Poll briefly and
         // surface it if it lands.
         if (activeConversationId) {
-          startRecoveryPoll(activeConversationId, assistantMessageId, content, sendStartedAt)
+          startRecoveryPoll(activeConversationId, assistantMessageId, content, activePlaceholderIdRef.current)
         }
       }
     } finally {
@@ -710,6 +772,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       const reader = response.body.getReader()
       const decoder = new TextDecoder()
       let receivedDone = false
+      let sseBuffer = ''
 
       try {
         while (true) {
@@ -718,8 +781,12 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             if (!receivedDone) console.warn('Retry stream ended without done event')
             break
           }
-          const chunk = decoder.decode(value)
-          for (const line of chunk.split('\n')) {
+          // Buffer incrementally so a `data:` frame split across reads isn't
+          // dropped — keep the trailing partial line for the next read.
+          sseBuffer += decoder.decode(value, { stream: true })
+          const lines = sseBuffer.split('\n')
+          sseBuffer = lines.pop() ?? ''
+          for (const line of lines) {
             if (!line.startsWith('data: ')) continue
             try {
               const data = JSON.parse(line.slice(6))

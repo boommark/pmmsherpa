@@ -18,9 +18,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { streamText, tool } from 'ai'
 import { z } from 'zod'
+import { waitUntil } from '@vercel/functions'
+import { startActiveObservation } from '@langfuse/tracing'
+import { LangfuseOtelSpanAttributes } from '@langfuse/core'
 import { requireProject } from '@/lib/projects/auth'
 import { getModel } from '@/lib/llm/provider-factory'
 import { normalizeSetupState, SETUP_STEP_IDS } from '@/lib/projects/setup-state'
+import { langfuseSpanProcessor } from '@/instrumentation'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -136,7 +140,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         const send = (payload: unknown) => {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`))
         }
-        try {
+        // Wrap the turn in a parent span so streamText's telemetry attaches to
+        // a trace carrying the mandated surface:* tag (see project CLAUDE.md).
+        await startActiveObservation('sherpa.project-setup.request', async (span) => {
+          span.otelSpan.setAttribute(LangfuseOtelSpanAttributes.TRACE_NAME, 'sherpa.project-setup.request')
+          span.otelSpan.setAttribute(LangfuseOtelSpanAttributes.TRACE_USER_ID, guard.userId)
+          span.otelSpan.setAttribute(LangfuseOtelSpanAttributes.TRACE_TAGS, ['surface:web'])
+          span.update({ metadata: { userId: guard.userId, projectId: project.id, surface: 'web', endpoint: '/api/projects/[id]/setup' } })
+          try {
           const result = streamText({
             model: getModel('claude-sonnet'),
             system,
@@ -187,12 +198,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             }
           }
           send({ type: 'done' })
-        } catch (error) {
-          console.error('[ProjectSetup] stream error:', error)
-          send({ type: 'error', message: 'Something went wrong. Please try again.' })
-        } finally {
-          controller.close()
-        }
+          } catch (error) {
+            console.error('[ProjectSetup] stream error:', error)
+            send({ type: 'error', message: 'Something went wrong. Please try again.' })
+          } finally {
+            controller.close()
+          }
+        })
+        // Keep the lambda alive until the Langfuse OTLP export completes.
+        waitUntil(langfuseSpanProcessor.forceFlush())
       },
     })
 

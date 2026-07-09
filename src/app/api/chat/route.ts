@@ -178,12 +178,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { message, conversationId, model, attachments, skipUserSave, project_id: projectIdFromBody } = body as {
+    const { message, conversationId, model, attachments, skipUserSave, retriedUserMessageId, project_id: projectIdFromBody } = body as {
       message: string
       conversationId?: string
       model: ModelProvider
       attachments?: ChatAttachment[]
       skipUserSave?: boolean
+      retriedUserMessageId?: string
       project_id?: string
     }
 
@@ -544,6 +545,13 @@ export async function POST(request: NextRequest) {
                 console.error('[Chat] Failed to create assistant placeholder:', placeholderErr)
               } else {
                 assistantMessageId = placeholderRow?.id ?? null
+                // Tell the client which row holds this turn's answer so its
+                // recovery poll can target the exact placeholder by id.
+                if (assistantMessageId) {
+                  controller.enqueue(
+                    encoder.encode(`data: ${JSON.stringify({ type: 'start', message_id: assistantMessageId })}\n\n`)
+                  )
+                }
               }
             } catch (placeholderThrow) {
               console.error('[Chat] Assistant placeholder insert threw:', placeholderThrow)
@@ -562,18 +570,19 @@ export async function POST(request: NextRequest) {
 
           // Gather inputs in parallel: conversation history, URL scraping, attachment processing.
           // We persisted the new user message up-front (see top of POST handler), so it's
-          // already in this conversation's messages table. Limit 15 + filters keeps
+          // already in this conversation's messages table. Limit 25 + filters keeps
           // history at last 10 clean turns BEFORE the current turn — the new turn is
-          // passed separately to buildMessages() further down. The extra headroom
-          // absorbs the current user message, this turn's assistant placeholder,
-          // and any error/empty rows that get filtered out below.
+          // passed separately to buildMessages() further down. The generous headroom
+          // absorbs the current user message, this turn's assistant placeholder, and
+          // any error fallbacks / orphaned placeholders / retry dupes filtered out
+          // below (which would otherwise starve the 10-turn window).
           const historyPromise = conversationId
             ? supabase
                 .from('messages')
                 .select('id, role, content, created_at, error')
                 .eq('conversation_id', conversationId)
                 .order('created_at', { ascending: false })
-                .limit(15)
+                .limit(25)
             : Promise.resolve({ data: null, error: null })
 
           const urlScrapePromise = hasUrls
@@ -605,8 +614,12 @@ export async function POST(request: NextRequest) {
               )
             // Retry path: the retried user message already exists in history
             // (userMessageId is null, so the id filter above removes nothing)
-            // AND is re-sent as the current turn. Drop the duplicate.
-            if (skipUserSave && filtered.length > 0 && filtered[0].role === 'user' && filtered[0].content === message) {
+            // AND is re-sent as the current turn. Drop the duplicate — prefer
+            // the exact id forwarded by /api/chat/retry, and fall back to
+            // content matching only when the id wasn't supplied.
+            if (skipUserSave && retriedUserMessageId) {
+              filtered = filtered.filter(m => m.id !== retriedUserMessageId)
+            } else if (skipUserSave && filtered.length > 0 && filtered[0].role === 'user' && filtered[0].content === message) {
               filtered = filtered.slice(1)
             }
             filtered = filtered.slice(0, 10)
@@ -1090,6 +1103,7 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
           // killed lambda leaves the answer-so-far behind.
           let leakDetected = false
           let lastPartialFlushAt = Date.now()
+          let partialFlushInFlight = false
           for await (const chunk of result.textStream) {
             clearHeartbeat()
             fullResponseText += chunk
@@ -1104,17 +1118,32 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
                 break
               }
             }
-            if (assistantMessageId && Date.now() - lastPartialFlushAt >= 3000) {
+            // Flush partial text ~every 3s, but never while a prior flush is
+            // still outstanding (a slow UPDATE could otherwise land after the
+            // next tick and persist stale, out-of-order text) and never once a
+            // prompt-leak has been detected (leaked text must not be persisted).
+            if (
+              assistantMessageId &&
+              !partialFlushInFlight &&
+              !leakDetected &&
+              Date.now() - lastPartialFlushAt >= 3000
+            ) {
               lastPartialFlushAt = Date.now()
+              partialFlushInFlight = true
+              const flushText = fullResponseText
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               void ((supabase.from('messages') as any)
-                .update({ content: fullResponseText })
+                .update({ content: flushText })
                 .eq('id', assistantMessageId) as PromiseLike<{ error: unknown }>)
                 .then(
                   ({ error: flushErr }) => {
+                    partialFlushInFlight = false
                     if (flushErr) console.error('[Chat] Partial content flush failed:', flushErr)
                   },
-                  (flushThrow: unknown) => console.error('[Chat] Partial content flush threw:', flushThrow)
+                  (flushThrow: unknown) => {
+                    partialFlushInFlight = false
+                    console.error('[Chat] Partial content flush threw:', flushThrow)
+                  }
                 )
             }
             controller.enqueue(
@@ -1322,14 +1351,25 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
 
           if (conversationId) {
             try {
+              // Try to update the placeholder in place. If the UPDATE fails (or
+              // there was no placeholder), fall through to an INSERT so the
+              // fallback isn't silently lost.
+              let fallbackPersisted = false
               if (assistantMessageId) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await (supabase.from('messages') as any)
+                const { error: fallbackUpdateErr } = await (supabase.from('messages') as any)
                   .update({ content: fallbackContent, error: true })
                   .eq('id', assistantMessageId)
-              } else {
+                if (fallbackUpdateErr) {
+                  console.error('[Chat] Failed to update placeholder with fallback:', fallbackUpdateErr)
+                } else {
+                  fallbackMessageId = assistantMessageId
+                  fallbackPersisted = true
+                }
+              }
+              if (!fallbackPersisted) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { data: insertedFallback } = await (supabase.from('messages') as any).insert({
+                const { data: insertedFallback, error: insertedFallbackErr } = await (supabase.from('messages') as any).insert({
                   conversation_id: conversationId,
                   role: 'assistant',
                   content: fallbackContent,
@@ -1337,7 +1377,11 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
                   citations: [],
                   error: true,
                 }).select('id').single()
-                fallbackMessageId = insertedFallback?.id ?? null
+                if (insertedFallbackErr) {
+                  console.error('[Chat] Failed to insert fallback assistant message:', insertedFallbackErr)
+                } else {
+                  fallbackMessageId = insertedFallback?.id ?? null
+                }
               }
 
               // eslint-disable-next-line @typescript-eslint/no-explicit-any

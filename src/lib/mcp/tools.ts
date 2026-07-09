@@ -312,14 +312,18 @@ export const askSherpaTool: Tool = {
             if (convRow) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const { data: msgRows } = await (supabase.from('messages') as any)
-                .select('role, content, created_at')
+                .select('role, content, created_at, error')
                 .eq('conversation_id', conversationId)
                 .order('created_at', { ascending: false })
                 .limit(10)
               if (Array.isArray(msgRows)) {
-                conversationHistory = msgRows
+                // Filter out error-fallback rows (must never be replayed as if
+                // Sherpa said it) and empty-content placeholders (an empty text
+                // block makes Anthropic reject the request with a 400).
+                conversationHistory = (msgRows as Array<{ role: string; content: string; error?: boolean | null }>)
+                  .filter((m) => m.error !== true && !!m.content?.trim())
                   .reverse()
-                  .map((m: { role: string; content: string }) => ({
+                  .map((m) => ({
                     role: m.role as 'user' | 'assistant',
                     content: m.content,
                   }))

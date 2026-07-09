@@ -113,6 +113,9 @@ export async function POST(request: NextRequest) {
         conversationId,
         model,
         skipUserSave: true,
+        // Let /api/chat drop the retried user turn from history by id rather
+        // than by fragile content matching (identical earlier turns are common).
+        retriedUserMessageId: precedingUser.id,
       }),
     })
 
