@@ -308,9 +308,14 @@ export async function POST(request: NextRequest) {
     if (hasMessage) {
       const guardResult = scanInput(message)
       if (guardResult.blocked) {
-        // Fire-and-forget: log to abuse_events + alert admin
-        handleAbuseEvent(user.id, user.email ?? '', message, guardResult.matchedPattern, 'prompt_injection')
-          .catch(err => console.error('[PromptGuard] Abuse logging failed:', err))
+        // Fire-and-forget abuse log + admin email — but only for true
+        // injection attempts. Bulk enumeration is blocked quietly: those
+        // are usually curious users, not attackers, and alerting on them
+        // fires abuse emails at innocent people.
+        if (guardResult.category === 'injection') {
+          handleAbuseEvent(user.id, user.email ?? '', message, guardResult.matchedPattern, 'prompt_injection')
+            .catch(err => console.error('[PromptGuard] Abuse logging failed:', err))
+        }
 
         // Save SAFE_RESPONSE as a real assistant message instead of a
         // streaming-only reply. This replaces the previous ghost-cleanup
@@ -337,7 +342,7 @@ export async function POST(request: NextRequest) {
           conversationId: conversationId ?? null,
           messageId: userMessageId,
           phase: 'guard_blocked',
-          errorClass: 'prompt_injection',
+          errorClass: guardResult.category === 'injection' ? 'prompt_injection' : 'bulk_enumeration',
           errorMessage: guardResult.matchedPattern,
           userMessageExcerpt: message?.slice(0, 200) ?? null,
         }))

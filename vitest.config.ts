@@ -10,6 +10,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: [
+      'src/lib/__tests__/**/*.test.ts',
       'src/lib/mcp/__tests__/**/*.test.ts',
       'src/lib/projects/__tests__/**/*.test.ts',
     ],

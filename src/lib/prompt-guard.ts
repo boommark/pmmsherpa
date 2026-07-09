@@ -6,8 +6,9 @@
 // Canary token embedded in system prompt — if this appears in output, the prompt is leaking
 export const CANARY_TOKEN = 'SHERPA-9f3a7c2e-CONFIDENTIAL'
 
-// Patterns that indicate prompt extraction attempts (case-insensitive)
-const EXTRACTION_PATTERNS = [
+// True injection / jailbreak / system-prompt-extraction attempts.
+// Hard block + abuse alert email — these are hostile by construction.
+const INJECTION_PATTERNS = [
   // Direct extraction
   /ignore\s+(all\s+)?previous\s+instructions/i,
   /ignore\s+(all\s+)?above\s+instructions/i,
@@ -30,14 +31,6 @@ const EXTRACTION_PATTERNS = [
   /\bpretend\s+(you\s+are|to\s+be)\s+(a\s+)?(developer|engineer|admin)\s+(who|that|debugging)/i,
   /\bact\s+as\s+if\s+you\s+have\s+no\s+restrictions/i,
 
-  // Architecture/KB probing
-  /\bwhat\s+books?\s+(are\s+)?(in\s+)?your\s+knowledge\s*base\b/i,
-  /\blist\s+(all\s+)?(your\s+)?(books?|sources?|amas?|articles?)\b/i,
-  /\bhow\s+(do\s+)?you\s+(decide|choose|determine)\s+when\s+to\s+(search|use|query)/i,
-  /\bwhat\s+(writing|voice|style)\s+rules?\s+do\s+you\s+follow/i,
-  /\bdescribe\s+your\s+(architecture|system|retrieval|search|rag)/i,
-  /\bhow\s+(does|do)\s+your\s+(retrieval|search|rag|knowledge|hybrid)/i,
-
   // Indirect/creative extraction
   /\btext\s+between\s+(the\s+)?(first|triple|back\s*tick)/i,
   /\beverything\s+(before|above)\s+(this|my)\s+(line|message|prompt)/i,
@@ -47,6 +40,15 @@ const EXTRACTION_PATTERNS = [
   // research tasks like "cite this verbatim from their website".
   /\b(verbatim|word\s+for\s+word)\b[\s\S]{0,200}\b(system\s*prompt|system\s*message|your\s+(instructions?|prompt|rules|guidelines|directives|policies)|initial\s*prompt|original\s*prompt|full\s*prompt|hidden\s*prompt|instructions?\s*(above|below))\b/i,
   /\b(system\s*prompt|system\s*message|your\s+(instructions?|prompt|rules|guidelines|directives|policies)|initial\s*prompt|original\s*prompt|full\s*prompt|hidden\s*prompt|instructions?\s*(above|below))\b[\s\S]{0,200}\b(verbatim|word\s+for\s+word)\b/i,
+]
+
+// Bulk knowledge-base enumeration. Hard block (SAFE_RESPONSE), but NO abuse
+// email — these are usually curious users, not attackers. Targeted attribution
+// requests ("list your sources", "cite your sources for that answer") must
+// NOT match; only attempts to dump the whole catalog do.
+const BULK_ENUMERATION_PATTERNS = [
+  /\bwhat\s+books?\s+(are\s+)?(in\s+)?your\s+knowledge\s*base\b/i,
+  /\blist\s+(all|every|your\s+(entire|complete|full))\s+(of\s+)?(your\s+|the\s+)?(books?|sources?|titles?|authors?|amas?|articles?)\b/i,
 ]
 
 // Patterns in output that suggest prompt leakage
@@ -65,8 +67,11 @@ const OUTPUT_LEAK_PATTERNS = [
   new RegExp(CANARY_TOKEN, 'i'),
 ]
 
+export type ScanCategory = 'injection' | 'bulk_enumeration'
+
 export interface ScanResult {
   blocked: boolean
+  category: ScanCategory | null
   reason: string | null
   matchedPattern: string | null
 }
@@ -74,19 +79,33 @@ export interface ScanResult {
 /**
  * Scan user input for prompt extraction attempts.
  * Returns blocked=true if the message looks like an extraction attempt.
+ * `category` tells the caller how to respond: 'injection' warrants an abuse
+ * alert; 'bulk_enumeration' is blocked quietly (no abuse email).
  */
 export function scanInput(message: string): ScanResult {
-  for (const pattern of EXTRACTION_PATTERNS) {
+  for (const pattern of INJECTION_PATTERNS) {
     if (pattern.test(message)) {
-      console.warn(`[PromptGuard] Blocked extraction attempt: ${pattern.source}`)
+      console.warn(`[PromptGuard] Blocked injection attempt: ${pattern.source}`)
       return {
         blocked: true,
+        category: 'injection',
         reason: 'extraction_attempt',
         matchedPattern: pattern.source,
       }
     }
   }
-  return { blocked: false, reason: null, matchedPattern: null }
+  for (const pattern of BULK_ENUMERATION_PATTERNS) {
+    if (pattern.test(message)) {
+      console.warn(`[PromptGuard] Blocked bulk enumeration attempt: ${pattern.source}`)
+      return {
+        blocked: true,
+        category: 'bulk_enumeration',
+        reason: 'bulk_enumeration',
+        matchedPattern: pattern.source,
+      }
+    }
+  }
+  return { blocked: false, category: null, reason: null, matchedPattern: null }
 }
 
 /**
