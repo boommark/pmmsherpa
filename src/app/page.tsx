@@ -110,6 +110,7 @@ export default function LandingPage() {
             <a href="#pricing" className="hover:text-[#191c1e] transition-colors">Pricing</a>
             <a href="#mcp" className="hover:text-[#191c1e] transition-colors">MCP</a>
             <Link href="/docs" className="hover:text-[#191c1e] transition-colors">Docs</Link>
+            <Link href="/blog" className="hover:text-[#191c1e] transition-colors">Blog</Link>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login">
@@ -547,6 +548,8 @@ export default function LandingPage() {
               <a href="#how-it-works" className="hover:text-[#191c1e] transition-colors">How It Works</a>
               <a href="#who-its-for" className="hover:text-[#191c1e] transition-colors">Who It&apos;s For</a>
               <a href="#pricing" className="hover:text-[#191c1e] transition-colors">Pricing</a>
+              <Link href="/docs" className="hover:text-[#191c1e] transition-colors">Docs</Link>
+              <Link href="/blog" className="hover:text-[#191c1e] transition-colors">Blog</Link>
               <Link href="/terms" className="hover:text-[#191c1e] transition-colors">Terms</Link>
               <Link href="/privacy" className="hover:text-[#191c1e] transition-colors">Privacy</Link>
               <Link href="/login" className="hover:text-[#191c1e] transition-colors">Sign In</Link>
