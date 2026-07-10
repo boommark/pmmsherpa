@@ -864,3 +864,116 @@ Need help? Reply to this email and we'll assist you.
     `.trim()
   }
 }
+
+// Double-opt-in confirmation email for blog newsletter subscribers
+export function getNewsletterConfirmEmail(data: {
+  email: string
+  confirmUrl: string
+  unsubscribeUrl: string
+}) {
+  return {
+    to: data.email,
+    subject: 'Confirm your PMM Sherpa blog subscription',
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>${emailStyles}</style>
+        </head>
+        <body>
+          <div class="wrapper">
+            <div class="container">
+              <div class="header">
+                <img src="${LOGO_URL}" alt="PMM Sherpa" width="48" height="48" style="border-radius: 10px;" />
+                <h1>One click to confirm</h1>
+                <p>You asked for new PMM Sherpa blog posts in your inbox</p>
+              </div>
+              <div class="content">
+                <p style="font-size: 15px; color: #374151; line-height: 1.6; margin: 0 0 8px 0;">
+                  Confirm your subscription and we'll send you new essays on positioning,
+                  messaging, and go-to-market as they publish. No spam, unsubscribe anytime.
+                </p>
+                <div style="text-align: center; margin: 28px 0 8px;">
+                  <a href="${data.confirmUrl}"
+                     style="display: inline-block; background: #0058be; color: #ffffff; font-size: 15px; font-weight: 600; text-decoration: none; padding: 13px 32px; border-radius: 9999px;">
+                    Confirm subscription
+                  </a>
+                </div>
+                <p style="font-size: 13px; color: #9ca3af; text-align: center; margin: 16px 0 0 0;">
+                  If the button doesn't work, paste this link into your browser:<br/>
+                  <a href="${data.confirmUrl}" style="color: #0058be; word-break: break-all;">${data.confirmUrl}</a>
+                </p>
+              </div>
+              <div class="footer">
+                <p>You're receiving this because someone entered this address at <a href="${APP_URL}/blog">pmmsherpa.com/blog</a>.<br/>
+                Didn't sign up? Ignore this email or <a href="${data.unsubscribeUrl}">unsubscribe</a>.</p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+Confirm your PMM Sherpa blog subscription
+
+Confirm your subscription and we'll send you new essays on positioning, messaging, and go-to-market as they publish.
+
+Confirm: ${data.confirmUrl}
+
+Didn't sign up? Ignore this email or unsubscribe: ${data.unsubscribeUrl}
+    `.trim(),
+  }
+}
+
+// Admin notification when a newsletter subscriber confirms
+export function getNewsletterAdminNotificationEmail(data: {
+  email: string
+  source?: string | null
+}) {
+  return {
+    to: SUPER_ADMIN_EMAIL,
+    subject: `New newsletter subscriber: ${data.email}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>${emailStyles}</style>
+        </head>
+        <body>
+          <div class="wrapper">
+            <div class="container">
+              <div class="header">
+                <img src="${LOGO_URL}" alt="PMM Sherpa" width="48" height="48" style="border-radius: 10px;" />
+                <h1>New Newsletter Subscriber</h1>
+                <p>A reader confirmed their blog subscription</p>
+              </div>
+              <div class="content">
+                <div class="field">
+                  <div class="field-label">Email Address</div>
+                  <div class="field-value">${data.email}</div>
+                </div>
+                <div class="field">
+                  <div class="field-label">Source</div>
+                  <div class="field-value">${data.source || 'unknown'}</div>
+                </div>
+              </div>
+              <div class="footer">
+                <p><a href="${APP_URL}">pmmsherpa.com</a></p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+New newsletter subscriber (confirmed)
+
+Email: ${data.email}
+Source: ${data.source || 'unknown'}
+    `.trim(),
+  }
+}
