@@ -11,6 +11,7 @@ export default defineConfig({
     environment: 'node',
     include: [
       'src/lib/__tests__/**/*.test.ts',
+      'src/lib/blog/__tests__/**/*.test.ts',
       'src/lib/mcp/__tests__/**/*.test.ts',
       'src/lib/projects/__tests__/**/*.test.ts',
     ],
