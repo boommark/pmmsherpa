@@ -9,7 +9,7 @@ import { ChatInput, type ChatInputRef } from './ChatInput'
 import { BlobBackground } from '@/components/ui/blob-background'
 import { AnimatedOrb } from '@/components/ui/animated-orb'
 // Image import removed — tiles now use Lucide icons
-import { Loader2, Crosshair, ShieldCheck, Rocket, Target, TrendingUp, DollarSign, Map, ArrowRight } from 'lucide-react'
+import { Loader2, Crosshair, ShieldCheck, Rocket, Target, TrendingUp, DollarSign, Map, ArrowRight, AlertCircle, X } from 'lucide-react'
 import Link from 'next/link'
 
 // Landing tiles — aligned with /guides icons and first prompts
@@ -33,6 +33,34 @@ interface ChatContainerProps {
   conversationId?: string
 }
 
+// Turn a non-OK /api/chat response into a user-facing message. The 429
+// usage-limit response carries structured JSON (error, message, reset_at,
+// upgrade_url); everything else falls back to a generic message that at
+// least includes the status code so failures are diagnosable.
+async function describeChatError(response: Response): Promise<{ message: string; isLimit: boolean }> {
+  try {
+    const data = await response.json()
+    if (data?.error === 'message_limit_exceeded') {
+      const resetDate = data.reset_at
+        ? new Date(data.reset_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })
+        : null
+      return {
+        isLimit: true,
+        message: `${data.message ?? "You've reached your monthly message limit."}${resetDate ? ` Your quota resets on ${resetDate}.` : ''}`,
+      }
+    }
+    if (typeof data?.message === 'string' && data.message) {
+      return { isLimit: false, message: data.message }
+    }
+  } catch {
+    // Body wasn't JSON (or was already consumed) — fall through to generic.
+  }
+  return {
+    isLimit: false,
+    message: `Something went wrong sending your message (HTTP ${response.status}). Please try again.`,
+  }
+}
+
 export function ChatContainer({ conversationId }: ChatContainerProps) {
   const router = useRouter()
   const chatInputRef = useRef<ChatInputRef>(null)
@@ -53,6 +81,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     removeMessagesFromIndex,
     isLoading,
     setIsLoading,
+    error,
     setError,
     currentModel,
     setConversationId,
@@ -435,14 +464,27 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to send message')
+        const { message: errMsg, isLimit } = await describeChatError(response)
+        if (isLimit) {
+          // The usage gate runs before anything is persisted server-side, so
+          // nothing was saved — pull the optimistic bubbles back out of the
+          // store and restore the draft so the user's text isn't lost.
+          const userIndex = useChatStore.getState().messages.findIndex(m => m.id === userMessage.id)
+          if (userIndex >= 0) {
+            removeMessagesFromIndex(userIndex)
+          }
+          chatInputRef.current?.setInput(content)
+          setError(errMsg)
+          return
+        }
+        throw new Error(errMsg)
       }
 
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
+      let receivedDone = false
 
       if (reader) {
-        let receivedDone = false
         const streamStartTime = Date.now()
         let lastActivityTime = Date.now()
         // Server maxDuration is 120s and sends a heartbeat every 10s until
@@ -544,6 +586,16 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             // Ignore cancel errors
           }
         }
+      }
+
+      if (reader && !receivedDone) {
+        // The socket closed without the server's `done` event — the lambda
+        // was killed or the connection dropped. Previously this was only a
+        // console.warn, which left the user staring at nothing (incident
+        // 2026-07-17). Throw so the catch below shows an error AND starts
+        // the recovery poll — the server may still finish and save the
+        // answer, in which case the poll swaps it in.
+        throw new Error('The connection dropped before the response finished. If an answer was generated it will appear here shortly — otherwise, please retry.')
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
@@ -766,7 +818,8 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
       })
 
       if (!response.ok || !response.body) {
-        throw new Error('Failed to retry')
+        const { message: errMsg } = await describeChatError(response)
+        throw new Error(errMsg)
       }
 
       const reader = response.body.getReader()
@@ -878,6 +931,26 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
     }
   }, [setMessageResearching, setExpandedResearch])
 
+  // Visible error surface. setError() calls used to update store state that
+  // nothing rendered — failures (429 limit, dropped streams, retry errors)
+  // were completely invisible to the user (incident 2026-07-17).
+  const errorBanner = error ? (
+    <div
+      role="alert"
+      className="w-full max-w-3xl mx-auto mb-2 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
+    >
+      <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+      <span className="flex-1">{error}</span>
+      <button
+        onClick={() => setError(null)}
+        aria-label="Dismiss error"
+        className="shrink-0 hover:opacity-70 transition-opacity"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+  ) : null
+
   const showLoadingState = conversationId && !pendingNewChat && (messagesLoading || !hasInitialized) && messages.length === 0
   // Show welcome screen immediately when pendingNewChat is set (even before
   // the effect clears messages), or when there's no conversation and no messages.
@@ -929,6 +1002,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
 
             {/* Chat input — prominent, centered */}
             <div className="w-full max-w-3xl mb-6 md:mb-8">
+              {errorBanner}
               <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} onOpenVoiceMode={handleOpenVoiceMode} isLanding />
             </div>
 
@@ -970,6 +1044,7 @@ export function ChatContainer({ conversationId }: ChatContainerProps) {
             />
           </div>
           <div className="shrink-0">
+            {errorBanner && <div className="px-2 sm:px-3 md:px-4">{errorBanner}</div>}
             <ChatInput ref={chatInputRef} onSend={handleSendMessage} disabled={isLoading} conversationId={conversationId} onOpenVoiceMode={handleOpenVoiceMode} />
           </div>
         </>

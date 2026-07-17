@@ -32,8 +32,9 @@ import {
   Zap,
   ArrowUpCircle,
   Mail,
+  Lock,
 } from 'lucide-react'
-import { FREE_TIER_MONTHLY_LIMIT, STARTER_TIER_MONTHLY_LIMIT } from '@/lib/constants'
+import { FREE_TIER_MONTHLY_LIMIT, STARTER_TIER_MONTHLY_LIMIT, getEffectiveTier } from '@/lib/constants'
 
 // Helper to group conversations by date
 function getDateGroup(date: Date): string {
@@ -194,9 +195,15 @@ function SidebarContent({
 
   const groupOrder = ['Today', 'Yesterday', 'Previous 7 Days', 'Previous 30 Days', 'Older']
 
+  // Projects is a paid feature — free-tier users see it with a lock icon
+  // that leads to the upgrade prompt on /projects (the /api/projects
+  // surface enforces the same gate server-side).
+  const projectsLocked =
+    !!profile && getEffectiveTier(profile.tier, profile.starter_access_until) === 'free'
+
   const navItems = [
     { href: '/chat', icon: MessageSquare, label: 'New Chat', isNewChat: true },
-    { href: '/projects', icon: FolderKanban, label: 'Projects' },
+    { href: '/projects', icon: FolderKanban, label: 'Projects', locked: projectsLocked },
     { href: '/history', icon: History, label: 'History' },
     { href: '/guides', icon: BookOpen, label: 'Guides', highlighted: true },
     { href: '/settings/preferences', icon: Settings, label: 'Settings' },
@@ -388,6 +395,7 @@ function SidebarContent({
                   <Link
                     href={item.href}
                     onClick={onNavigate}
+                    title={item.locked ? 'Projects is a paid feature — upgrade to unlock' : undefined}
                     className={cn(
                       'flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                       'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
@@ -401,6 +409,9 @@ function SidebarContent({
                   >
                     <item.icon className="h-4 w-4" />
                     {!collapsed && <span className="ml-3">{item.label}</span>}
+                    {!collapsed && item.locked && (
+                      <Lock className="h-3 w-3 ml-auto text-muted-foreground" />
+                    )}
                   </Link>
                 )}
               </li>

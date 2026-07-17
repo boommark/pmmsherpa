@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useProjects, type ProjectSummary } from '@/hooks/useProjects'
+import { useProfile } from '@/hooks/useSupabase'
+import { getEffectiveTier } from '@/lib/constants'
 import {
   isSetupComplete,
   normalizeSetupState,
@@ -49,6 +51,7 @@ function formatDate(dateString: string) {
 
 export default function ProjectsPage() {
   const router = useRouter()
+  const { profile } = useProfile()
   const { projects, loading, error, createProject } = useProjects()
   const [createOpen, setCreateOpen] = useState(false)
   const [name, setName] = useState('')
@@ -69,6 +72,41 @@ export default function ProjectsPage() {
     } finally {
       setCreating(false)
     }
+  }
+
+  // Projects is a paid feature — show an upgrade prompt to free-tier users
+  // (the API enforces the same gate server-side).
+  const upgradeRequired =
+    !!profile && getEffectiveTier(profile.tier, profile.starter_access_until) === 'free'
+
+  if (upgradeRequired) {
+    return (
+      <div className="flex items-center justify-center h-full p-6">
+        <Card className="max-w-md text-center">
+          <CardHeader>
+            <FolderKanban className="h-10 w-10 mx-auto text-muted-foreground" />
+            <CardTitle>Projects is a Starter feature</CardTitle>
+            <CardDescription className="space-y-2">
+              <span className="block">
+                Load your positioning docs, launch plans, and research into a
+                project once — every chat inside it answers with your product,
+                your market, and your voice already in context. No re-uploading,
+                no re-explaining.
+              </span>
+              <span className="block">
+                Starter includes up to 20 projects with 100 documents each —
+                room for your whole GTM library.
+              </span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link href="/settings/billing">Upgrade to Starter</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   if (loading) {

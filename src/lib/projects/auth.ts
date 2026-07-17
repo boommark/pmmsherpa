@@ -10,6 +10,7 @@
 import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { requireProjectsTier } from '@/lib/projects/access'
 
 export interface ProjectRow {
   id: string
@@ -62,6 +63,11 @@ export async function requireProject(projectId: string): Promise<ProjectGuardRes
   }
   if (!project || project.user_id !== user.id) {
     return { ok: false, response: NextResponse.json({ error: 'Project not found' }, { status: 404 }) }
+  }
+
+  const tierGate = await requireProjectsTier(service, user.id)
+  if (tierGate) {
+    return { ok: false, response: tierGate }
   }
 
   return { ok: true, userId: user.id, service, project: project as ProjectRow }

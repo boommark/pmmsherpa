@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { MAX_PROJECTS_PER_USER } from '@/lib/projects/limits'
+import { requireProjectsTier } from '@/lib/projects/access'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
@@ -24,6 +25,9 @@ export async function GET() {
     }
 
     const service = await createServiceClient()
+    const tierGate = await requireProjectsTier(service, user.id)
+    if (tierGate) return tierGate
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (service.from('projects') as any)
       // Explicit column list (avoids over-fetching every column) — setup_state
@@ -97,6 +101,8 @@ export async function POST(request: NextRequest) {
     }
 
     const service = await createServiceClient()
+    const tierGate = await requireProjectsTier(service, user.id)
+    if (tierGate) return tierGate
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { count, error: countErr } = await (service.from('projects') as any)

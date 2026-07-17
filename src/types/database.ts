@@ -34,6 +34,8 @@ export interface Profile {
   tier: 'free' | 'founder' | 'starter';
   messages_used_this_period: number;
   period_start: string;
+  /** Referral system (migration 019): time-boxed starter access. */
+  starter_access_until: string | null;
   // MCP credits (migration 020)
   mcp_credits_monthly_remaining: number | null;
   mcp_credits_purchased_remaining: number | null;

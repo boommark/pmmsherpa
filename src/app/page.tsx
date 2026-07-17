@@ -4,7 +4,8 @@ import { AnimatedOrb } from "@/components/ui/animated-orb";
 import { LogoBanner } from "@/components/ui/logo-banner";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { MCPSection } from "@/components/landing/MCPSection";
-import { ArrowRight, Crosshair, MessageSquare, ShieldCheck, TrendingUp, Target, Box, Rocket } from "lucide-react";
+import { MobileNav } from "@/components/landing/MobileNav";
+import { ArrowRight, Crosshair, MessageSquare, ShieldCheck, TrendingUp, Target, Box, Rocket, FolderKanban, Sparkles, Layers, Library } from "lucide-react";
 
 function MountainIcon({ className }: { className?: string }) {
   return (
@@ -105,14 +106,16 @@ export default function LandingPage() {
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-[#5f6368]">
             <a href="#what-it-does" className="hover:text-[#191c1e] transition-colors">What It Does</a>
+            <a href="#projects" className="hover:text-[#191c1e] transition-colors">Projects</a>
             <a href="#how-it-works" className="hover:text-[#191c1e] transition-colors">How It Works</a>
             <a href="#who-its-for" className="hover:text-[#191c1e] transition-colors">Who It&apos;s For</a>
             <a href="#pricing" className="hover:text-[#191c1e] transition-colors">Pricing</a>
             <a href="#mcp" className="hover:text-[#191c1e] transition-colors">MCP</a>
             <Link href="/docs" className="hover:text-[#191c1e] transition-colors">Docs</Link>
+            <Link href="/blog" className="hover:text-[#191c1e] transition-colors">Blog</Link>
           </div>
-          <div className="flex items-center gap-3">
-            <Link href="/login">
+          <div className="flex items-center gap-2 md:gap-3">
+            <Link href="/login" className="hidden sm:block">
               <Button variant="ghost" className="rounded-full text-[#5f6368] hover:text-[#191c1e] hover:bg-[#f2f4f7]">
                 Sign In
               </Button>
@@ -122,6 +125,7 @@ export default function LandingPage() {
                 Get Started
               </Button>
             </Link>
+            <MobileNav />
           </div>
         </nav>
       </header>
@@ -142,6 +146,17 @@ export default function LandingPage() {
           <div className="mx-auto max-w-3xl">
             <div className="flex justify-center mb-8">
               <AnimatedOrb size="md" />
+            </div>
+
+            <div className="flex justify-center mb-6">
+              <a
+                href="#projects"
+                className="inline-flex items-center gap-2 rounded-full border border-[#0058be]/20 bg-[#0058be]/[0.06] px-4 py-1.5 text-sm font-medium text-[#0058be] hover:bg-[#0058be]/[0.1] transition-colors"
+              >
+                <span className="rounded-full bg-[#0058be] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">New</span>
+                Projects: give Sherpa your company context
+                <ArrowRight className="h-3.5 w-3.5" />
+              </a>
             </div>
 
             <h1 className="mb-6 text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e] sm:text-5xl md:text-[3.5rem] leading-[1.1]">
@@ -240,6 +255,117 @@ export default function LandingPage() {
                 <p className="text-xs font-medium text-[#0058be] tracking-wide">{item.tags}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Projects - NEW: durable company context */}
+      <section id="projects" className="py-14 md:py-20 scroll-mt-20 bg-white">
+        <div className="max-w-6xl mx-auto px-5 md:px-8">
+          <div className="text-center mb-10 md:mb-14">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0058be] mb-3">
+              Projects <span className="ml-1 rounded-full bg-[#0058be] px-2 py-0.5 text-[10px] font-bold text-white normal-case tracking-normal">New</span>
+            </p>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.03em] text-[#191c1e] mb-4">
+              Give Sherpa your context. Once.
+            </h2>
+            <p className="text-base text-[#4a4f57] max-w-2xl mx-auto leading-relaxed">
+              Load your positioning docs, ICPs, brand voice, and past assets into a project.
+              Every chat inside starts already grounded in your product, your market, and your voice.
+              No re-uploading, no re-explaining.
+            </p>
+          </div>
+
+          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center mb-12">
+            {/* Left: proof points */}
+            <div className="space-y-7">
+              <div className="flex gap-4">
+                <div className="w-11 h-11 rounded-xl bg-[#0058be]/[0.08] flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="h-5 w-5 text-[#0058be]" strokeWidth={1.75} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#191c1e] mb-1.5">Set up in chat, not forms</h3>
+                  <p className="text-sm text-[#4a4f57] leading-relaxed">
+                    Sherpa interviews you, drafts your project instructions, and recommends which
+                    documents to add. Setup feels like a conversation because it is one.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-11 h-11 rounded-xl bg-[#0058be]/[0.08] flex items-center justify-center flex-shrink-0">
+                  <Layers className="h-5 w-5 text-[#0058be]" strokeWidth={1.75} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#191c1e] mb-1.5">No knowledge cap</h3>
+                  <p className="text-sm text-[#4a4f57] leading-relaxed">
+                    Up to 100 documents per project, 300 pages each. Sherpa retrieves what each
+                    question needs, so your library keeps growing without degrading answers.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-11 h-11 rounded-xl bg-[#0058be]/[0.08] flex items-center justify-center flex-shrink-0">
+                  <Library className="h-5 w-5 text-[#0058be]" strokeWidth={1.75} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#191c1e] mb-1.5">Your docs + the Sherpa brain</h3>
+                  <p className="text-sm text-[#4a4f57] leading-relaxed">
+                    Answers combine your company context with 40,000+ curated GTM insights.
+                    Generic AI knows marketing. Sherpa knows yours.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: setup-assistant mockup */}
+            <div className="rounded-2xl bg-white border border-[#e8ecf4] shadow-[0_8px_30px_rgba(0,88,190,0.08)] overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#f0f2f5]">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-[#0058be]" strokeWidth={2} />
+                  <span className="text-sm font-semibold text-[#191c1e]">Project setup</span>
+                  <span className="text-xs text-[#9ca3af]">2/3</span>
+                </div>
+                <FolderKanban className="h-4 w-4 text-[#9ca3af]" strokeWidth={1.75} />
+              </div>
+              <div className="px-5 py-3 flex items-center gap-2 text-xs border-b border-[#f0f2f5]">
+                <span className="flex items-center gap-1.5 font-medium text-[#0058be]">
+                  <span className="w-2 h-2 rounded-full bg-[#0058be]" /> Describe
+                </span>
+                <span className="text-[#d1d5db]">&rsaquo;</span>
+                <span className="flex items-center gap-1.5 font-medium text-[#0058be]">
+                  <span className="w-2 h-2 rounded-full bg-[#0058be]" /> Instructions
+                </span>
+                <span className="text-[#d1d5db]">&rsaquo;</span>
+                <span className="flex items-center gap-1.5 text-[#9ca3af]">
+                  <span className="w-2 h-2 rounded-full border border-[#d1d5db]" /> Documents
+                </span>
+              </div>
+              <div className="p-5 space-y-3">
+                <div className="rounded-xl rounded-tl-sm bg-[#f2f6fc] px-4 py-3 text-sm text-[#3a3f47] leading-relaxed">
+                  What&apos;s the product this workspace is for, and what&apos;s the main thing
+                  you&apos;re trying to accomplish with it?
+                </div>
+                <div className="rounded-xl rounded-tr-sm bg-[#0058be] px-4 py-3 text-sm text-white leading-relaxed ml-8">
+                  Acme Pipeline. We sell to mid-market RevOps leaders. Direct, no-fluff voice.
+                </div>
+                <div className="rounded-xl rounded-tl-sm bg-[#f2f6fc] px-4 py-3 text-sm text-[#3a3f47] leading-relaxed">
+                  Got it. I&apos;ve drafted your project instructions. Next, add your messaging
+                  doc and latest launch plan and I&apos;ll read them in.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <Link href="/login">
+              <Button
+                size="lg"
+                className="gap-2 rounded-full bg-[#0058be] hover:bg-[#004a9e] text-white font-medium px-8 shadow-none h-12 text-base"
+              >
+                Try Projects <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <p className="mt-3 text-xs text-[#9ca3af]">Included in the Starter plan</p>
           </div>
         </div>
       </section>
@@ -544,9 +670,12 @@ export default function LandingPage() {
             </div>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-[#5f6368]">
               <a href="#what-it-does" className="hover:text-[#191c1e] transition-colors">What It Does</a>
+              <a href="#projects" className="hover:text-[#191c1e] transition-colors">Projects</a>
               <a href="#how-it-works" className="hover:text-[#191c1e] transition-colors">How It Works</a>
               <a href="#who-its-for" className="hover:text-[#191c1e] transition-colors">Who It&apos;s For</a>
               <a href="#pricing" className="hover:text-[#191c1e] transition-colors">Pricing</a>
+              <Link href="/docs" className="hover:text-[#191c1e] transition-colors">Docs</Link>
+              <Link href="/blog" className="hover:text-[#191c1e] transition-colors">Blog</Link>
               <Link href="/terms" className="hover:text-[#191c1e] transition-colors">Terms</Link>
               <Link href="/privacy" className="hover:text-[#191c1e] transition-colors">Privacy</Link>
               <Link href="/login" className="hover:text-[#191c1e] transition-colors">Sign In</Link>

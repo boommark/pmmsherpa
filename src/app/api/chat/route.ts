@@ -12,6 +12,7 @@ import {
   formatProjectContextForPrompt,
   extractProjectCitations,
 } from '@/lib/projects/retrieval'
+import { requireProjectsTier } from '@/lib/projects/access'
 import type { Citation } from '@/types/database'
 import { planQueries } from '@/lib/rag/query-planner'
 import { conductResearch } from '@/lib/llm/perplexity-client'
@@ -259,6 +260,11 @@ export async function POST(request: NextRequest) {
             { status: 404, headers: { 'Content-Type': 'application/json' } }
           )
         }
+        // Paid-tier gate: project context is a paid feature (same gate as
+        // the /api/projects surface — see src/lib/projects/access.ts).
+        const tierGate = await requireProjectsTier(adminClient, user.id)
+        if (tierGate) return tierGate
+
         activeProject = { id: projRow.id, name: projRow.name }
 
         // Persist the project on the conversation at first use so every
@@ -276,99 +282,17 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================
-    // Save user message immediately (before any RAG/LLM work)
-    // ========================================
-    // Why: prior to this, the user message was only persisted at the END of
-    // the streaming success path (after RAG, URL scrape, LLM completion).
-    // Anything that threw between POST entry and that final save left the
-    // conversation as a ghost row in the sidebar with zero messages — the
-    // dominant cause of "blank response" reports. Saving up front means
-    // failures are recoverable threads, not silent ghosts.
-    // skipUserSave is set by /api/chat/retry — the user message already
-    // exists in the conversation and was kept while the failed assistant
-    // message was deleted. We don't want to insert a duplicate.
-    let userMessageId: string | null = null
-    if (conversationId && !skipUserSave) {
-      const userContent = message || (hasAttachments ? '[Attached file(s)]' : '')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: insertedUser, error: userInsertErr } = await (supabase.from('messages') as any).insert({
-        conversation_id: conversationId,
-        role: 'user',
-        content: userContent,
-        model: null,
-        citations: [],
-      }).select('id').single()
-      if (userInsertErr) {
-        console.error('[Chat] Failed to persist user message up-front:', userInsertErr)
-      } else {
-        userMessageId = insertedUser?.id ?? null
-      }
-    }
-
-    // Scan for prompt extraction attempts
-    if (hasMessage) {
-      const guardResult = scanInput(message)
-      if (guardResult.blocked) {
-        // Fire-and-forget abuse log + admin email — but only for true
-        // injection attempts. Bulk enumeration is blocked quietly: those
-        // are usually curious users, not attackers, and alerting on them
-        // fires abuse emails at innocent people.
-        if (guardResult.category === 'injection') {
-          handleAbuseEvent(user.id, user.email ?? '', message, guardResult.matchedPattern, 'prompt_injection')
-            .catch(err => console.error('[PromptGuard] Abuse logging failed:', err))
-        }
-
-        // Save SAFE_RESPONSE as a real assistant message instead of a
-        // streaming-only reply. This replaces the previous ghost-cleanup
-        // pattern (which raced lambda freeze and left dead conversations).
-        // The blocked exchange now sits in the sidebar like any other thread.
-        if (conversationId) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase.from('messages') as any).insert({
-            conversation_id: conversationId,
-            role: 'assistant',
-            content: SAFE_RESPONSE,
-            model: null,
-            citations: [],
-          })
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase.from('conversations') as any)
-            .update({ updated_at: new Date().toISOString() })
-            .eq('id', conversationId)
-        }
-
-        // Diagnostic row so blocked attempts are countable in chat_errors too
-        waitUntil(logChatError({
-          userId: user.id,
-          conversationId: conversationId ?? null,
-          messageId: userMessageId,
-          phase: 'guard_blocked',
-          errorClass: guardResult.category === 'injection' ? 'prompt_injection' : 'bulk_enumeration',
-          errorMessage: guardResult.matchedPattern,
-          userMessageExcerpt: message?.slice(0, 200) ?? null,
-        }))
-
-        const encoder = new TextEncoder()
-        const safeStream = new ReadableStream({
-          start(controller) {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'text', content: SAFE_RESPONSE })}\n\n`))
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'done' })}\n\n`))
-            controller.close()
-          },
-        })
-        return new Response(safeStream, {
-          headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
-        })
-      }
-    }
-
-    // ========================================
     // Monthly usage gate (Phase 1 — GATE-01..05)
     // ========================================
     // Pre-LLM: (a) lazy-reset the counter if period_start is in a prior
     // calendar month, (b) SELECT tier + messages_used_this_period,
     // (c) decide in JS whether to 429. NO increment here — the increment
     // is an atomic RPC call in the post-LLM block (see Task 2b).
+    //
+    // ORDER MATTERS: this gate must run BEFORE the user message is saved.
+    // When it ran after the save, a 429 left an orphaned user row with no
+    // assistant reply — the user saw their bubble, no answer, and no
+    // explanation (incident 2026-07-17, .planning/incident_2026-07-17_*).
     //
     // Race note: a user at exactly 9/10 with concurrent requests could
     // still get 1 extra message (pre-check is SELECT + JS comparison,
@@ -464,8 +388,95 @@ export async function POST(request: NextRequest) {
         }
       )
     }
-    // Gate passed — control falls through to the SSE stream below.
+    // Gate passed — control falls through to the user-message save + SSE stream below.
     // Post-LLM increment lives in Task 2b (calls supabase.rpc('increment_messages_used', ...)).
+
+    // ========================================
+    // Save user message immediately (before any RAG/LLM work)
+    // ========================================
+    // Why: prior to this, the user message was only persisted at the END of
+    // the streaming success path (after RAG, URL scrape, LLM completion).
+    // Anything that threw between POST entry and that final save left the
+    // conversation as a ghost row in the sidebar with zero messages — the
+    // dominant cause of "blank response" reports. Saving up front means
+    // failures are recoverable threads, not silent ghosts.
+    // skipUserSave is set by /api/chat/retry — the user message already
+    // exists in the conversation and was kept while the failed assistant
+    // message was deleted. We don't want to insert a duplicate.
+    let userMessageId: string | null = null
+    if (conversationId && !skipUserSave) {
+      const userContent = message || (hasAttachments ? '[Attached file(s)]' : '')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: insertedUser, error: userInsertErr } = await (supabase.from('messages') as any).insert({
+        conversation_id: conversationId,
+        role: 'user',
+        content: userContent,
+        model: null,
+        citations: [],
+      }).select('id').single()
+      if (userInsertErr) {
+        console.error('[Chat] Failed to persist user message up-front:', userInsertErr)
+      } else {
+        userMessageId = insertedUser?.id ?? null
+      }
+    }
+
+    // Scan for prompt extraction attempts
+    if (hasMessage) {
+      const guardResult = scanInput(message)
+      if (guardResult.blocked) {
+        // Fire-and-forget abuse log + admin email — but only for true
+        // injection attempts. Bulk enumeration is blocked quietly: those
+        // are usually curious users, not attackers, and alerting on them
+        // fires abuse emails at innocent people.
+        if (guardResult.category === 'injection') {
+          handleAbuseEvent(user.id, user.email ?? '', message, guardResult.matchedPattern, 'prompt_injection')
+            .catch(err => console.error('[PromptGuard] Abuse logging failed:', err))
+        }
+
+        // Save SAFE_RESPONSE as a real assistant message instead of a
+        // streaming-only reply. This replaces the previous ghost-cleanup
+        // pattern (which raced lambda freeze and left dead conversations).
+        // The blocked exchange now sits in the sidebar like any other thread.
+        if (conversationId) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase.from('messages') as any).insert({
+            conversation_id: conversationId,
+            role: 'assistant',
+            content: SAFE_RESPONSE,
+            model: null,
+            citations: [],
+          })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase.from('conversations') as any)
+            .update({ updated_at: new Date().toISOString() })
+            .eq('id', conversationId)
+        }
+
+        // Diagnostic row so blocked attempts are countable in chat_errors too
+        waitUntil(logChatError({
+          userId: user.id,
+          conversationId: conversationId ?? null,
+          messageId: userMessageId,
+          phase: 'guard_blocked',
+          errorClass: guardResult.category === 'injection' ? 'prompt_injection' : 'bulk_enumeration',
+          errorMessage: guardResult.matchedPattern,
+          userMessageExcerpt: message?.slice(0, 200) ?? null,
+        }))
+
+        const encoder = new TextEncoder()
+        const safeStream = new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'text', content: SAFE_RESPONSE })}\n\n`))
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'done' })}\n\n`))
+            controller.close()
+          },
+        })
+        return new Response(safeStream, {
+          headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
+        })
+      }
+    }
 
     // Create streaming response with status updates
     const stream = new ReadableStream({
@@ -731,6 +742,7 @@ export async function POST(request: NextRequest) {
             let announcedParseWait = false
             for (const attachment of attachmentsById.values()) {
               let text: string | undefined = attachment.clientText
+              let parseFailed = false
               if (!text) {
                 // Fetch the current DB state — may already be completed,
                 // may still be processing with a job_id.
@@ -743,6 +755,8 @@ export async function POST(request: NextRequest) {
                 if (dbAttachment?.extracted_text) {
                   text = dbAttachment.extracted_text as string
                   console.log(`[Attachments] Using persisted extracted_text for ${attachment.fileName}`)
+                } else if (dbAttachment?.processing_status === 'failed') {
+                  parseFailed = true
                 } else if (
                   dbAttachment?.llamaparse_job_id &&
                   dbAttachment.processing_status === 'processing'
@@ -777,6 +791,10 @@ export async function POST(request: NextRequest) {
               }
               if (text) {
                 attachmentContext += `\n\n--- Attached File: ${attachment.fileName} ---\n${text}\n--- End of ${attachment.fileName} ---`
+              } else if (parseFailed) {
+                // Be honest with the model — the old "parsing in progress"
+                // line here made it promise content that would never arrive.
+                attachmentContext += `\n\n[Attached file: ${attachment.fileName} (${attachment.fileType}) — processing FAILED, its content is NOT available. Tell the user this file could not be read and suggest re-uploading it or pasting its content directly.]`
               } else {
                 attachmentContext += `\n\n[Attached file: ${attachment.fileName} (${attachment.fileType}) — parsing in progress, content will be available on your next message]`
               }
