@@ -4,6 +4,7 @@ import { AnimatedOrb } from "@/components/ui/animated-orb";
 import { LogoBanner } from "@/components/ui/logo-banner";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { MCPSection } from "@/components/landing/MCPSection";
+import { MobileNav } from "@/components/landing/MobileNav";
 import { ArrowRight, Crosshair, MessageSquare, ShieldCheck, TrendingUp, Target, Box, Rocket, FolderKanban, Sparkles, Layers, Library } from "lucide-react";
 
 function MountainIcon({ className }: { className?: string }) {
@@ -113,8 +114,8 @@ export default function LandingPage() {
             <Link href="/docs" className="hover:text-[#191c1e] transition-colors">Docs</Link>
             <Link href="/blog" className="hover:text-[#191c1e] transition-colors">Blog</Link>
           </div>
-          <div className="flex items-center gap-3">
-            <Link href="/login">
+          <div className="flex items-center gap-2 md:gap-3">
+            <Link href="/login" className="hidden sm:block">
               <Button variant="ghost" className="rounded-full text-[#5f6368] hover:text-[#191c1e] hover:bg-[#f2f4f7]">
                 Sign In
               </Button>
@@ -124,6 +125,7 @@ export default function LandingPage() {
                 Get Started
               </Button>
             </Link>
+            <MobileNav />
           </div>
         </nav>
       </header>
