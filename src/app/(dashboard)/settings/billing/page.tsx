@@ -143,7 +143,7 @@ function BillingPageInner() {
                 {isFounder
                   ? 'Founder access. Unlimited usage.'
                   : isStarter
-                    ? "You're on Starter. $9.99 per month."
+                    ? "You're on Starter."
                     : "You're on the Free plan."}
               </CardDescription>
             </CardHeader>
@@ -218,7 +218,7 @@ function BillingPageInner() {
                     ) : (
                       <ArrowUpCircle className="mr-2 h-4 w-4" />
                     )}
-                    {upgrading ? 'Redirecting…' : 'Upgrade to Starter — $9.99/mo'}
+                    {upgrading ? 'Redirecting…' : 'Upgrade to Starter — $14.99/mo'}
                   </Button>
                 )}
                 {isStarter && (

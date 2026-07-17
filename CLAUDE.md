@@ -39,7 +39,7 @@ AI-powered Product Marketing advisor with agentic RAG knowledge base (40,000+ ch
 | Framework | Next.js 16 (App Router), TypeScript, Turbopack |
 | Database | Supabase PostgreSQL + pgvector |
 | Auth | Supabase Auth (Google OAuth + email/password, profile completion gate) |
-| Billing | Stripe Checkout ($9.99/mo Starter), webhooks, customer portal |
+| Billing | Stripe Checkout ($14.99/mo Starter), webhooks, customer portal |
 | LLM | Claude Opus 4.5, Claude Sonnet 4.5, Gemini 3 Pro, Gemini 2.5 Pro |
 | Embeddings | OpenAI `text-embedding-3-small` (512 dim) |
 | UI | Tailwind CSS v4 + shadcn/ui + Lucide icons, dark mode |
