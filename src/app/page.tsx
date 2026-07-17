@@ -64,7 +64,7 @@ const testimonials = [
     quote: "PMM Sherpa is the GTM tool you’ve always wanted but never quite believed existed. As someone who’s built campaigns across 40+ B2B SaaS companies and spends a lot of time exploring how AI can support go-to-market work, I’ve gotten used to tools that generate plenty of output but very little real judgment. PMM Sherpa is different. Its answers are concise, concrete, and genuinely actionable. It feels less like a generic AI assistant and more like a sharp thought partner who understands the craft and helps you think through the why, the so what, and the tradeoffs, especially when you’re stuck.",
     name: "Dana Toneva",
     role: "Content Lead, Verbatim · Forbes Contributor",
-    photo: "",
+    photo: "/homepage/dana-toneva.png",
   },
 ];
 
@@ -230,17 +230,17 @@ export default function LandingPage() {
 
         {/* Spotlight testimonials: Brian + Dana */}
         <div className="max-w-5xl mx-auto px-5 md:px-8 py-6 md:py-8 relative">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
             {[testimonials[4], testimonials[6]].map((t, i) => (
-              <div key={i} className="rounded-2xl bg-white p-6 md:p-7 shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-[#e8ecf4]/40">
+              <div key={i} className="flex flex-col rounded-2xl bg-white p-6 md:p-7 shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-[#e8ecf4]/40">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="text-2xl text-[#0058be] font-serif leading-none">&ldquo;</div>
                   <Stars />
                 </div>
-                <p className="text-[15px] text-[#3a3f47] leading-[1.7] mb-4">
+                <p className="flex-1 text-[15px] text-[#3a3f47] leading-[1.7] mb-4">
                   {t.quote}
                 </p>
-                <div className="flex items-center gap-3 pt-3 border-t border-[#f0f2f5]">
+                <div className="mt-auto flex items-center gap-3 pt-3 border-t border-[#f0f2f5]">
                   {t.photo && (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={t.photo} alt={t.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
