@@ -12,6 +12,7 @@ import {
   formatProjectContextForPrompt,
   extractProjectCitations,
 } from '@/lib/projects/retrieval'
+import { requireProjectsTier } from '@/lib/projects/access'
 import type { Citation } from '@/types/database'
 import { planQueries } from '@/lib/rag/query-planner'
 import { conductResearch } from '@/lib/llm/perplexity-client'
@@ -259,6 +260,11 @@ export async function POST(request: NextRequest) {
             { status: 404, headers: { 'Content-Type': 'application/json' } }
           )
         }
+        // Paid-tier gate: project context is a paid feature (same gate as
+        // the /api/projects surface — see src/lib/projects/access.ts).
+        const tierGate = await requireProjectsTier(adminClient, user.id)
+        if (tierGate) return tierGate
+
         activeProject = { id: projRow.id, name: projRow.name }
 
         // Persist the project on the conversation at first use so every
