@@ -28,13 +28,14 @@ const plans: Plan[] = [
     name: 'Free',
     price: '$0',
     cadence: 'forever',
-    tagline: 'Try every tool. See if Sherpa thinks like you do.',
+    tagline: 'See if Sherpa thinks like you do.',
     features: [
       { label: '10 web chat messages / month', included: true },
       { label: '10 MCP credits / month', included: true },
-      { label: 'All 4 tools (Frame, Consult, Validate, Grow)', included: true },
+      { label: '39 ready-made PMM artifact templates', included: true },
       { label: 'Email support', included: true },
       { label: 'MCP credit topups available', included: true },
+      { label: 'Projects: Sherpa remembers your company context', included: false },
     ],
   },
   {
@@ -44,9 +45,10 @@ const plans: Plan[] = [
     cadence: 'per month',
     tagline: 'For PMMs who use Sherpa as a daily thinking partner.',
     features: [
+      { label: 'Projects: Sherpa remembers your company context', included: true },
       { label: '200 web chat messages / month', included: true },
       { label: '200 MCP credits / month', included: true },
-      { label: 'All 4 tools (Frame, Consult, Validate, Grow)', included: true },
+      { label: '39 ready-made PMM artifact templates', included: true },
       { label: 'MCP credit topups available', included: true },
       { label: 'Priority email support', included: true },
     ],

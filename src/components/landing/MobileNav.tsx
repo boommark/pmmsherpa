@@ -11,7 +11,7 @@ import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 
 const NAV_LINKS = [
-  { href: '#what-it-does', label: 'What It Does' },
+  { href: '#why-sherpa', label: 'Why Sherpa' },
   { href: '#projects', label: 'Projects' },
   { href: '#how-it-works', label: 'How It Works' },
   { href: '#who-its-for', label: "Who It's For" },
