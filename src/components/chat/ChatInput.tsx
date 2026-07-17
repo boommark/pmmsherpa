@@ -225,6 +225,27 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
             throw new Error('Server returned an unexpected response')
           }
 
+          // The server creates the attachment row even when document parsing
+          // fails to start (processingStatus 'failed') — that used to be
+          // shown as "completed", so the file looked attached but its content
+          // never reached the model. Surface it as a failure instead.
+          if (data.processingStatus === 'failed') {
+            toast.error(`${attachment.file.name} couldn't be processed. Try re-uploading it, or paste its content into the message.`)
+            setAttachments((prev) =>
+              prev.map((a) =>
+                a.id === attachment.id
+                  ? {
+                      ...a,
+                      id: data.id,
+                      status: 'error' as const,
+                      error: 'Processing failed — remove and re-upload, or paste the content instead',
+                    }
+                  : a,
+              ),
+            )
+            continue
+          }
+
           setAttachments((prev) =>
             prev.map((a) =>
               a.id === attachment.id
@@ -271,7 +292,12 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
         URL.revokeObjectURL(attachment.preview)
       }
 
-      if (attachment?.storagePath && attachment.status === 'completed') {
+      // Also clean up 'error' chips: a failed-parse attachment still has a DB
+      // row (with processing_status 'failed'), and if it stays linked to the
+      // conversation the chat route will keep telling the model about a
+      // failed file the user already dismissed. A 404 for chips that never
+      // got a row is harmless.
+      if (attachment && (attachment.status === 'completed' || attachment.status === 'error')) {
         try {
           await fetch(`/api/upload?id=${id}`, {
             method: 'DELETE',
@@ -287,6 +313,18 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
     const handleSubmit = useCallback(() => {
       const hasText = input.trim()
       const hasCompletedAttachments = attachments.some((a) => a.status === 'completed')
+
+      // Failed attachments used to be silently dropped from the send — the
+      // user believed the file went through when it never did. Block the
+      // send until they remove the failed chip (one click) so the state is
+      // always honest.
+      const failedAttachments = attachments.filter((a) => a.status === 'error')
+      if (failedAttachments.length > 0) {
+        toast.error(
+          `${failedAttachments.map((a) => a.file.name).join(', ')} failed to upload and can't be included. Remove the failed file${failedAttachments.length > 1 ? 's' : ''} to send your message.`,
+        )
+        return
+      }
 
       if ((hasText || hasCompletedAttachments) && !disabled) {
         const completedAttachments = attachments.filter((a) => a.status === 'completed')
