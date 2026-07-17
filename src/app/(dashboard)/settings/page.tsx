@@ -504,7 +504,7 @@ export default function SettingsPage() {
                   <p className="text-sm font-semibold">PMM Sherpa Starter</p>
                   <p className="text-xs text-muted-foreground">200 msgs/month · all models · file uploads</p>
                 </div>
-                <p className="text-lg font-bold">$9.99<span className="text-xs font-normal text-muted-foreground">/mo</span></p>
+                <p className="text-lg font-bold">$14.99<span className="text-xs font-normal text-muted-foreground">/mo</span></p>
               </div>
               <Button
                 onClick={handleUpgrade}
@@ -516,7 +516,7 @@ export default function SettingsPage() {
                 ) : (
                   <Zap className="mr-2 h-4 w-4" />
                 )}
-                {upgrading ? 'Redirecting to payment…' : 'Upgrade to Starter — $9.99/mo'}
+                {upgrading ? 'Redirecting to payment…' : 'Upgrade to Starter — $14.99/mo'}
               </Button>
             </CardContent>
           </Card>
@@ -535,7 +535,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">PMM Sherpa Starter</p>
-                  <p className="text-xs text-muted-foreground">$9.99 / month</p>
+                  <p className="text-xs text-muted-foreground">$14.99 / month</p>
                 </div>
                 <span className="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded-full font-medium">Active</span>
               </div>

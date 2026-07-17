@@ -40,7 +40,7 @@ const plans: Plan[] = [
   {
     key: 'starter',
     name: 'Starter',
-    price: '$9.99',
+    price: '$14.99',
     cadence: 'per month',
     tagline: 'For PMMs who use Sherpa as a daily thinking partner.',
     features: [

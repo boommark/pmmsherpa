@@ -79,7 +79,7 @@ export function UserMenuContent({ align = 'end', side, onNavigate }: Props) {
           className="text-[#0058be] dark:text-[#a8c0f0] focus:text-[#0058be] dark:focus:text-[#a8c0f0]"
         >
           <Zap className="mr-2 h-4 w-4" />
-          {upgrading ? 'Redirecting…' : 'Upgrade to Starter — $9.99/mo'}
+          {upgrading ? 'Redirecting…' : 'Upgrade to Starter — $14.99/mo'}
         </DropdownMenuItem>
       )}
 

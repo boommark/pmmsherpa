@@ -488,7 +488,7 @@ export function getOnboardingEmail(data: { fullName: string; email: string; refe
   ` : `
     <tr>
       <td style="padding: 0 40px 20px 40px;">
-        <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0; padding: 12px 16px; background: #f9fafb; border-radius: 8px; border-left: 3px solid #d1d5db;">You're on Free (10 msgs/mo). <a href="${APP_URL}/settings" style="color: #0058be; text-decoration: none; font-weight: 600;">Starter ($9.99)</a> removes the ceiling: 200 msgs, every model, live web research.</p>
+        <p style="font-size: 14px; line-height: 1.6; color: #374151; margin: 0; padding: 12px 16px; background: #f9fafb; border-radius: 8px; border-left: 3px solid #d1d5db;">You're on Free (10 msgs/mo). <a href="${APP_URL}/settings" style="color: #0058be; text-decoration: none; font-weight: 600;">Starter ($14.99)</a> removes the ceiling: 200 msgs, every model, live web research.</p>
       </td>
     </tr>
   `
@@ -598,7 +598,7 @@ GitHub: https://github.com/boommark/pmmsherpa-mcp
 
 ${isStarter
   ? `Starter is active: 200 messages/month, every model, live web research.`
-  : `You're on Free (10 msgs/mo). Starter ($9.99) removes the ceiling: ${APP_URL}/settings`
+  : `You're on Free (10 msgs/mo). Starter ($14.99) removes the ceiling: ${APP_URL}/settings`
 }
 
 Refer 3 PMMs, earn a free month of Starter: ${referralLink}

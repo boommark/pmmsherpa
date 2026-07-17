@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
           break
         }
 
-        // ---- Subscription path (legacy Starter $9.99/mo) ----
+        // ---- Subscription path (Starter subscription) ----
         // Save Stripe customer ID and upgrade tier
         await supabase
           .from('profiles')
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
 
         console.log(`[Stripe] User ${userId} upgraded to starter`)
         await notifyAdminPurchase({
-          kind: 'Starter upgrade ($9.99/mo)',
+          kind: 'Starter upgrade (subscription)',
           email: session.customer_details?.email ?? session.customer_email ?? null,
           amount: formatAmount(session.amount_total, session.currency),
         })
