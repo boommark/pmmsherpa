@@ -4,12 +4,9 @@ import { Resend } from 'resend'
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 const LOGO_URL = 'https://pmmsherpa.com/email/logo-blue.png'
-const LAUNCH_IMAGE_URL = 'https://pmmsherpa.com/email/mcp-launch.png'
 const APP_URL = 'https://pmmsherpa.com'
-const GITHUB_URL = 'https://github.com/boommark/pmmsherpa-mcp'
-const DOCS_URL = 'https://pmmsherpa.com/docs'
 
-function getUpdateEmailHtml() {
+function getUpdateEmailHtml(firstName: string) {
   return `<!DOCTYPE html>
 <html>
   <head>
@@ -27,58 +24,35 @@ function getUpdateEmailHtml() {
                 <img src="${LOGO_URL}" alt="PMM Sherpa" width="56" height="56" style="border-radius: 12px;" />
               </td>
             </tr>
-            <!-- Hero Image -->
-            <tr>
-              <td align="center" style="padding: 0 40px 24px 40px;">
-                <img src="${LAUNCH_IMAGE_URL}" alt="PMM Sherpa MCP launch" width="520" style="width: 100%; max-width: 520px; height: auto; border-radius: 8px; display: block;" />
-              </td>
-            </tr>
             <!-- Body -->
             <tr>
-              <td style="padding: 0 40px 32px 40px;">
-                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">Hi,</p>
+              <td style="padding: 8px 40px 32px 40px;">
+                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">Hey ${firstName},</p>
 
-                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">PMM Sherpa just got a major upgrade. It's now a <strong>secure MCP server with a PMM skills pack</strong> that plugs directly into Claude, ChatGPT, Claude Code, Antigravity, and Gemini CLI.</p>
+                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">If you asked Sherpa something earlier today and watched it think, then come back with nothing at all, that was not you. That was us.</p>
 
-                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 28px 0;">The senior-PMM brain you've been working with on pmmsherpa.com now shows up inside the tools you already use, with the corpus and the calibrated voice intact.</p>
+                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">For a few hours today, a backend API issue on our side caused responses to fail silently. Your messages went through, Sherpa looked like it was analyzing, and then nothing showed up. To make it worse, those attempts still counted against your monthly chats.</p>
 
-                <!-- Divider -->
-                <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px 0;">
-                  <tr><td style="border-top: 1px solid #e5e7eb;"></td></tr>
-                </table>
+                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 12px 0;"><strong>Here is where things stand:</strong></p>
 
-                <p style="font-size: 18px; font-weight: 700; color: #1f2937; margin: 0 0 12px 0;">What you can do with it</p>
-
-                <p style="font-size: 16px; line-height: 1.8; color: #1f2937; margin: 0 0 28px 0;">
-                  &#9656; Plan a GTM launch end-to-end with named frameworks<br>
-                  &#9656; Audit your landing page or homepage in minutes<br>
-                  &#9656; Draft positioning that doesn't sound like everyone else's<br>
-                  &#9656; Build a competitive battlecard your sales team will actually open<br>
-                  &#9656; Pressure-test pricing and packaging before you ship<br>
-                  &#9656; Prep for PMM interviews with senior-level answer scaffolds
+                <p style="font-size: 16px; line-height: 1.8; color: #1f2937; margin: 0 0 20px 0;">
+                  &#9656; The issue is fixed, and everything has been running normally since this afternoon<br>
+                  &#9656; Every chat those failed messages used has been restored to your account<br>
+                  &#9656; We're adding safeguards so a failure like this shows a clear error instead of a blank screen
                 </p>
 
-                <!-- Divider -->
-                <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px 0;">
-                  <tr><td style="border-top: 1px solid #e5e7eb;"></td></tr>
-                </table>
+                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 28px 0;">No action needed on your end. If anything still feels off, just reply to this email and I will personally take a look.</p>
 
-                <p style="font-size: 18px; font-weight: 700; color: #1f2937; margin: 0 0 12px 0;">The bigger unlock is for your agents</p>
-
-                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 28px 0;">If you're wiring a GTM agent or a PMM workflow, Sherpa is the brain you plug in. Your agent stops reasoning like a junior. It reasons like a senior PMM from the first prompt.</p>
-
-                <!-- CTA Buttons -->
-                <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px 0;">
+                <!-- CTA Button -->
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 28px 0;">
                   <tr>
                     <td align="center">
-                      <a href="${DOCS_URL}" style="display: inline-block; background-color: #0058be; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">Read the docs</a>
+                      <a href="${APP_URL}/chat" style="display: inline-block; background-color: #0058be; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">Pick up where you left off</a>
                     </td>
                   </tr>
                 </table>
 
-                <p style="font-size: 15px; line-height: 1.7; color: #6b7280; margin: 0 0 28px 0; text-align: center;">
-                  Or jump straight to the <a href="${GITHUB_URL}" style="color: #0058be; text-decoration: none; font-weight: 600;">GitHub repo</a>.
-                </p>
+                <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 0 0 20px 0;">Sorry for the bump, and thank you for your patience.</p>
 
                 <!-- Sign off -->
                 <p style="font-size: 16px; line-height: 1.7; color: #1f2937; margin: 8px 0 4px 0;">With gratitude,</p>
@@ -102,7 +76,7 @@ function getUpdateEmailHtml() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { testEmail } = await request.json()
+    const { testEmail, firstName } = await request.json()
 
     if (!testEmail) {
       return NextResponse.json({ error: 'testEmail required' }, { status: 400 })
@@ -111,8 +85,8 @@ export async function POST(request: NextRequest) {
     const { data, error } = await resend.emails.send({
       from: 'PMM Sherpa <support@pmmsherpa.com>',
       to: testEmail,
-      subject: 'PMM Sherpa now lives inside Claude, ChatGPT, and Claude Code',
-      html: getUpdateEmailHtml(),
+      subject: 'About today\'s blank responses (fixed, and your chats restored)',
+      html: getUpdateEmailHtml(firstName || 'there'),
     })
 
     if (error) {
