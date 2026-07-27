@@ -1065,6 +1065,15 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             console.log(`[PromptCaching] Anthropic prompt caching enabled — static system prompt (${systemParts.staticPart.length} chars) marked as ephemeral`)
           }
 
+          // streamText never rejects: provider errors (bad key, exhausted
+          // credits, rate limits) surface only as an error part inside the
+          // stream, so textStream just ENDS with zero chunks. Without the
+          // onError capture + rethrow below, the request completes the
+          // success path — an empty assistant message is persisted, the
+          // usage counter increments, and the user sees a silent hang
+          // (incident 2026-07-27: every Claude call failed for ~2h and no
+          // error was ever rendered, logged to chat_errors, or refunded).
+          let streamError: unknown = null
           const result = streamText({
             model: llmModel,
             messages: [...systemMessages, ...allMessages],
@@ -1074,6 +1083,9 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
               anthropic: {
                 output_config: { effort: 'medium' },
               },
+            },
+            onError: ({ error }) => {
+              streamError = error
             },
             experimental_telemetry: {
               isEnabled: true,
@@ -1167,6 +1179,19 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ type: 'text', content: chunk })}\n\n`)
             )
+          }
+
+          // Reroute LLM failures into the catch handler (fallback message,
+          // chat_errors row, NO usage increment). Covers both the captured
+          // onError case and any SDK path where the stream ends empty
+          // without invoking onError.
+          if (streamError) {
+            throw streamError instanceof Error
+              ? streamError
+              : new Error(`LLM stream error: ${String(streamError)}`)
+          }
+          if (!fullResponseText && !leakDetected) {
+            throw new Error('LLM stream ended with no output (provider returned no text)')
           }
 
           // Finalize usage stats — wrapped so a SDK hiccup doesn't block the done event
