@@ -3,14 +3,14 @@
 **Supabase project:** Flytr (`ogbjdvnkejkqqebyetqx`)
 **Embedding model:** OpenAI `text-embedding-3-small` (512 dims)
 **Search:** Hybrid (70% semantic + 30% keyword via `hybrid_search()`)
-**Last updated:** 2026-04-07
-**Total:** ~2,792 documents, ~38,213 chunks
+**Last updated:** 2026-08-02
+**Total:** ~2,347 documents, ~37,264 chunks
 
 ---
 
 ## Layer 1: Books (Frameworks & Theory)
 
-**source_type:** `book` | **Documents:** 31 | **Chunks:** 7,210
+**source_type:** `book` | **Documents:** 23 | **Chunks:** 4,508
 
 | Title | Author | Topic |
 |---|---|---|
@@ -51,7 +51,7 @@
 
 ## Layer 1b: Product Management Books (Product Strategy)
 
-**source_type:** `book_pm` | **Documents:** 3 | **Chunks:** 609
+**source_type:** `book_pm` | **Documents:** 10 | **Chunks:** 2,294
 
 | Title | Author | Topic |
 |---|---|---|
@@ -70,14 +70,14 @@
 YouTube transcript ingestions from product leaders, marketers, and GTM experts. Three-way classification:
 
 ### podcast_pm — Product Strategy Conversations
-**Documents:** 160 | **Chunks:** 5,048
+**Documents:** 236 | **Chunks:** 7,368
 
 Product management episodes from Lenny's Podcast: product strategy, leadership, team building, product vision, roadmaps, scaling.
 
 Notable: Marty Cagan (SVPG), Brian Chesky (Airbnb), Yuhki Yamashita (Figma CPO), Claire Hughes Johnson (Stripe), Hamilton Helmer (7 Powers), Richard Rumelt (Good Strategy Bad Strategy), Stewart Butterfield (Slack), Tobi Lutke (Shopify)
 
 ### podcast_pmm — GTM & Marketing Conversations
-**Documents:** 357 | **Chunks:** 4,514
+**Documents:** 358 | **Chunks:** 4,524
 
 - **Lenny's GTM episodes (90):** April Dunford (positioning), Andy Raskin (strategic narrative), Elena Verna (PLG, 4 episodes), Madhavan Ramanujam (pricing), Christopher Lochhead (category design), Rory Sutherland (marketing psychology), Seth Godin, Emily Kramer (MKT1), Sean Ellis (growth hacking)
 - **PMA episodes (267):** Pure product marketing — positioning, messaging, CI, sales enablement, GTM strategy, pricing, personas, product launches, win-loss analysis
@@ -108,7 +108,7 @@ Practitioner Q&A from PMMs at Salesforce, Adobe, Shopify, Atlassian, Twilio, Toa
 
 ## Layer 3: PMA Blogs (Tactical Guides)
 
-**source_type:** `blog` | **Documents:** 827 | **Chunks:** 11,016
+**source_type:** `blog` | **Documents:** 841 | **Chunks:** 11,141
 
 **Cleaned (2026-04-07 audit):** Removed 86 docs — duplicate articles (3x ingestions from overlapping scrape batches), junk entries (".Md" broken files), and PMA self-promotion pages (ambassador programs, influencer listicles, partner perks).
 

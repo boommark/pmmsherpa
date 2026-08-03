@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1584px; height:396px; }
+  .banner {
+    position:relative; width:1584px; height:396px; overflow:hidden;
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:
+      radial-gradient(1200px 600px at 88% 45%, rgba(33,112,228,0.10) 0%, rgba(33,112,228,0) 60%),
+      linear-gradient(115deg,#ffffff 0%,#f6f9ff 52%,#eef4ff 100%);
+  }
+
+  /* faint network sketch, confined to the right */
+  .net { position:absolute; inset:0; pointer-events:none; }
+
+  /* ---- text block: left-center, clear of bottom-left logo ---- */
+  .copy {
+    position:absolute; left:300px; top:50%; transform:translateY(-50%);
+    max-width:760px;
+  }
+  .eyebrow {
+    font-size:15px; font-weight:600; letter-spacing:0.18em; text-transform:uppercase;
+    color:#2170e4; margin-bottom:18px;
+  }
+  h1 {
+    font-size:62px; line-height:1.04; font-weight:800; letter-spacing:-0.03em;
+    color:#191c1e;
+  }
+  h1 .grad {
+    background:linear-gradient(90deg,#0058be 0%,#2170e4 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .sub {
+    margin-top:22px; font-size:21px; font-weight:450; color:#4a4f57; letter-spacing:-0.01em;
+  }
+
+  /* ---- orb: right side ---- */
+  .orb-wrap { position:absolute; right:150px; top:50%; transform:translateY(-50%); width:260px; height:260px; }
+  .glow-outer {
+    position:absolute; inset:-30px; border-radius:50%;
+    background:radial-gradient(circle, rgba(33,112,228,0.45) 0%, rgba(33,112,228,0) 68%);
+    filter:blur(26px);
+  }
+  .orb {
+    position:absolute; inset:0; border-radius:50%;
+    background:linear-gradient(135deg,#0058be 0%,#2170e4 50%,#5a9cf5 100%);
+    box-shadow:0 30px 70px rgba(0,88,190,0.40), inset -14px -18px 50px rgba(0,30,90,0.45), inset 16px 14px 44px rgba(255,255,255,0.45);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .orb svg { width:118px; height:118px; }
+  .shine {
+    position:absolute; inset:0; border-radius:50%; overflow:hidden;
+    background:linear-gradient(118deg, transparent 42%, rgba(255,255,255,0.40) 50%, transparent 58%);
+  }
+  .spark { position:absolute; border-radius:50%; }
+  .s1 { width:14px; height:14px; top:-6px; right:30px; background:#9cc4ff; box-shadow:0 0 14px 3px rgba(156,196,255,0.8); }
+  .s2 { width:9px; height:9px; bottom:18px; left:-10px; background:#7eb3ff; box-shadow:0 0 12px 2px rgba(126,179,255,0.7); }
+  .s3 { width:7px; height:7px; top:64px; right:-14px; background:#ffffff; box-shadow:0 0 12px 3px rgba(255,255,255,0.9); }
+</style>
+</head>
+<body>
+  <div class="banner">
+    <!-- faint network sketch on the right, behind/around the orb -->
+    <svg class="net" viewBox="0 0 1584 396" fill="none">
+      <g stroke="#9fb6d6" stroke-width="1.2" opacity="0.42">
+        <line x1="1180" y1="70" x2="1330" y2="150"/>
+        <line x1="1330" y1="150" x2="1470" y2="92"/>
+        <line x1="1330" y1="150" x2="1280" y2="300"/>
+        <line x1="1280" y1="300" x2="1430" y2="330"/>
+        <line x1="1280" y1="300" x2="1150" y2="250"/>
+        <line x1="1470" y1="92" x2="1540" y2="200"/>
+        <line x1="1150" y1="250" x2="1120" y2="120"/>
+        <line x1="1430" y1="330" x2="1540" y2="200"/>
+      </g>
+      <g fill="#ffffff" stroke="#9fb6d6" stroke-width="1.4" opacity="0.55">
+        <circle cx="1180" cy="70" r="9"/>
+        <circle cx="1470" cy="92" r="11"/>
+        <circle cx="1280" cy="300" r="13"/>
+        <circle cx="1430" cy="330" r="8"/>
+        <circle cx="1150" cy="250" r="7"/>
+        <circle cx="1120" cy="120" r="9"/>
+        <circle cx="1540" cy="200" r="10"/>
+      </g>
+    </svg>
+
+    <div class="copy">
+      <div class="eyebrow">PMM Sherpa</div>
+      <h1>Stop guessing,<br><span class="grad">start converting.</span></h1>
+      <div class="sub">The AI assistant for world-class GTM.</div>
+    </div>
+
+    <div class="orb-wrap">
+      <div class="glow-outer"></div>
+      <div class="orb">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 20L7 10l5 6 4-10 6 14"/>
+        </svg>
+        <div class="shine"></div>
+      </div>
+      <div class="spark s1"></div>
+      <div class="spark s2"></div>
+      <div class="spark s3"></div>
+    </div>
+  </div>
+</body>
+</html>
