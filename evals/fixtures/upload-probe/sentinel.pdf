@@ -9,11 +9,13 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
 endobj
 4 0 obj
-<< /Length 241 >>
+<< /Length 470 >>
 stream
-BT /F1 24 Tf 72 700 Td (PMM Sherpa Upload Probe Document) Tj ET
-BT /F1 18 Tf 72 650 Td (The secret code word in this document is MOONSTONE-2288.) Tj ET
-BT /F1 14 Tf 72 600 Td (If you can read this document, report the code word above.) Tj ET
+BT /F1 22 Tf 72 700 Td (Positioning Brief - Project MOONSTONE-2288) Tj ET
+BT /F1 14 Tf 72 660 Td (Product codename: MOONSTONE-2288, an AI analytics copilot for RevOps teams.) Tj ET
+BT /F1 14 Tf 72 630 Td (Target segment: mid-market B2B SaaS revenue operations leaders.) Tj ET
+BT /F1 14 Tf 72 600 Td (Key differentiator: real-time pipeline anomaly detection.) Tj ET
+BT /F1 14 Tf 72 570 Td (Primary competitor: legacy BI dashboards used for weekly pipeline reviews.) Tj ET
 endstream
 endobj
 5 0 obj
@@ -26,9 +28,9 @@ xref
 0000000058 00000 n 
 0000000115 00000 n 
 0000000241 00000 n 
-0000000533 00000 n 
+0000000762 00000 n 
 trailer
 << /Size 6 /Root 1 0 R >>
 startxref
-603
+832
 %%EOF

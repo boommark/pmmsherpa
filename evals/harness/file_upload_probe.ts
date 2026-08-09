@@ -255,7 +255,7 @@ async function runCase(
   const firstPrompt =
     name === 'image'
       ? 'I attached an image. What is the code written in it? Reply with just the code.'
-      : 'I attached a document. What is the secret code word in it? Reply with just the code word.'
+      : 'I attached our positioning brief. What is the product codename mentioned in it? Reply with just the codename.'
 
   // 1. Upload
   const uploaded = await uploadFixture(supabase, cookie, userId, fixture, fileType)
@@ -303,7 +303,7 @@ async function runCase(
       console.log('  … pdf not parsed in turn1 (legit async window), retrying in 20s')
       await new Promise((r) => setTimeout(r, 20_000))
       turn1 = await sendChat(cookie, {
-        message: 'What is the secret code word in the attached document? Reply with just the code word.',
+        message: 'What is the product codename in the positioning brief I attached? Reply with just the codename.',
         conversationId,
         model: MODEL,
       })
@@ -319,7 +319,7 @@ async function runCase(
     // the exact path behind the Aug 2026 "your PNG is still parsing" bug.
     const turn2 = await sendChat(cookie, {
       message:
-        'Without me re-attaching anything: what was the code in the file I uploaded earlier in this conversation? Reply with just the code.',
+        'Without me re-attaching anything: what was the product codename (or code, for an image) in the file I uploaded earlier in this conversation? Reply with just that.',
       conversationId,
       model: MODEL,
     })
