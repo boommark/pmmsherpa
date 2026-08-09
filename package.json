@@ -9,6 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "eval:layer4": "tsx evals/harness/run_layer4.ts",
+    "eval:uploads": "tsx evals/harness/file_upload_probe.ts",
+    "eval:uploads:prod": "tsx evals/harness/file_upload_probe.ts --base-url https://pmmsherpa.com",
     "eval:layer4:cheap": "tsx evals/harness/run_layer4.ts --skip-judge",
     "eval:layer4:braintrust": "braintrust eval evals/braintrust/layer4.eval.ts"
   },
