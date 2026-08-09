@@ -32,6 +32,11 @@
  */
 
 import { createClient, type Session } from '@supabase/supabase-js'
+
+// The probe uses untyped queries; keep the client loose so Next's build
+// typecheck (which includes evals/) doesn't fight supabase-js generics.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnySupabase = any
 import { config as dotenv } from 'dotenv'
 import { readFileSync } from 'fs'
 import { resolve, dirname } from 'path'
@@ -187,7 +192,7 @@ async function sendChat(
 type Uploaded = { id: string; storagePath: string; processingStatus: string; objectPath: string }
 
 async function uploadFixture(
-  supabase: ReturnType<typeof createClient>,
+  supabase: AnySupabase,
   cookie: string,
   userId: string,
   fixtureFile: string,
@@ -237,7 +242,7 @@ function check(results: CaseResult, name: string, pass: boolean, detail?: string
 
 async function runCase(
   name: 'image' | 'pdf',
-  supabase: ReturnType<typeof createClient>,
+  supabase: AnySupabase,
   cookie: string,
   userId: string,
 ): Promise<CaseResult> {
@@ -263,7 +268,7 @@ async function runCase(
   )
 
   // 2. Conversation
-  const { data: conv, error: convErr } = await (supabase.from('conversations') as ReturnType<typeof supabase.from>)
+  const { data: conv, error: convErr } = await supabase.from('conversations')
     .insert({ user_id: userId, title: `[probe] file upload ${name}`, model_used: 'claude' })
     .select()
     .single()
@@ -328,7 +333,7 @@ async function runCase(
       method: 'DELETE',
       headers: { Cookie: cookie },
     }).catch(() => {})
-    await (supabase.from('conversations') as ReturnType<typeof supabase.from>)
+    await supabase.from('conversations')
       .delete()
       .eq('id', conversationId)
   }
