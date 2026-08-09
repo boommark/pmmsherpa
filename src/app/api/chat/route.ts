@@ -674,6 +674,7 @@ export async function POST(request: NextRequest) {
             extracted_text: string | null
             llamaparse_job_id: string | null
             processing_status: string | null
+            storage_path: string | null
           }
 
           const attachmentsById = new Map<
@@ -683,6 +684,8 @@ export async function POST(request: NextRequest) {
               fileName: string
               fileType: string
               clientText?: string
+              storagePath?: string
+              fromCurrentTurn?: boolean
             }
           >()
 
@@ -693,6 +696,8 @@ export async function POST(request: NextRequest) {
                 fileName: a.fileName,
                 fileType: a.fileType,
                 clientText: a.extractedText ?? undefined,
+                storagePath: a.storagePath || undefined,
+                fromCurrentTurn: true,
               })
             }
 
@@ -721,7 +726,7 @@ export async function POST(request: NextRequest) {
           if (conversationId) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { data: priorRows } = await (supabase.from('conversation_attachments') as any)
-              .select('id, file_name, file_type, extracted_text, llamaparse_job_id, processing_status')
+              .select('id, file_name, file_type, extracted_text, llamaparse_job_id, processing_status, storage_path')
               .eq('conversation_id', conversationId)
               .eq('user_id', user.id)
               .order('created_at', { ascending: true })
@@ -732,15 +737,42 @@ export async function POST(request: NextRequest) {
                   id: row.id,
                   fileName: row.file_name,
                   fileType: row.file_type,
+                  storagePath: row.storage_path || undefined,
                 })
               }
             }
           }
 
           let attachmentContext = ''
+          // Vision images collected while walking the attachment set. Split by
+          // origin so this turn's uploads always win the cap over older ones.
+          const currentTurnImageUrls: string[] = []
+          const priorTurnImageUrls: string[] = []
           if (attachmentsById.size > 0) {
             let announcedParseWait = false
             for (const attachment of attachmentsById.values()) {
+              // Images have no text to extract — they're sent to the model as
+              // vision content blocks. They must NOT fall through to the
+              // document branches below: an image row is 'completed' with null
+              // extracted_text, which the old code read as "parsing in
+              // progress" and injected on every turn — making the model tell
+              // users their PNG was "still parsing" forever.
+              if (attachment.fileType.startsWith('image/')) {
+                if (attachment.fileType === 'image/heic') {
+                  // Anthropic's API rejects HEIC; a bad block fails the whole call
+                  attachmentContext += `\n\n[Attached image: ${attachment.fileName} — HEIC format cannot be viewed. Ask the user to re-upload it as JPG or PNG.]`
+                } else if (attachment.storagePath) {
+                  ;(attachment.fromCurrentTurn ? currentTurnImageUrls : priorTurnImageUrls).push(attachment.storagePath)
+                  attachmentContext += `\n\n[Attached image: ${attachment.fileName} — the image itself is included in this message. Look at it directly. Never tell the user it is parsing, processing, or loading.]`
+                } else {
+                  attachmentContext += `\n\n[Attached image: ${attachment.fileName} — the image could not be loaded. Ask the user to re-upload it.]`
+                }
+                continue
+              }
+              if (attachment.fileType.startsWith('video/')) {
+                attachmentContext += `\n\n[Attached file: ${attachment.fileName} (${attachment.fileType}) — video content cannot be viewed. Ask the user to describe it or share key frames as images.]`
+                continue
+              }
               let text: string | undefined = attachment.clientText
               let parseFailed = false
               if (!text) {
@@ -748,9 +780,13 @@ export async function POST(request: NextRequest) {
                 // may still be processing with a job_id.
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const { data: dbAttachment } = await (supabase.from('conversation_attachments') as any)
-                  .select('extracted_text, llamaparse_job_id, processing_status')
+                  .select('extracted_text, llamaparse_job_id, processing_status, created_at')
                   .eq('id', attachment.id)
                   .maybeSingle()
+
+                const ageMs = dbAttachment?.created_at
+                  ? Date.now() - new Date(dbAttachment.created_at as string).getTime()
+                  : 0
 
                 if (dbAttachment?.extracted_text) {
                   text = dbAttachment.extracted_text as string
@@ -786,7 +822,28 @@ export async function POST(request: NextRequest) {
                     console.warn(
                       `[Attachments] LlamaParse still running after 25s for ${attachment.fileName}`,
                     )
+                    if (ageMs > 15 * 60 * 1000) {
+                      // The job has had 15+ minutes and still isn't done — it
+                      // never will be. Mark failed so we stop burning a 25s
+                      // poll on every turn and stop promising content.
+                      parseFailed = true
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      await (supabase.from('conversation_attachments') as any)
+                        .update({ processing_status: 'failed' })
+                        .eq('id', attachment.id)
+                    }
                   }
+                } else if (dbAttachment) {
+                  // Row exists but has no text and no running parse job. This
+                  // is a dead end (e.g. a text/csv upload whose inline content
+                  // never arrived, stuck 'pending' forever) — mark failed and
+                  // be honest instead of claiming "parsing in progress" on
+                  // every turn.
+                  parseFailed = true
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  await (supabase.from('conversation_attachments') as any)
+                    .update({ processing_status: 'failed' })
+                    .eq('id', attachment.id)
                 }
               }
               if (text) {
@@ -991,17 +1048,19 @@ ${webCitations.map((c, i) => `[${i + 1}] ${c.title}: ${c.url}`).join('\n')}`
             }
           }
 
-          // Extract image URLs from attachments for vision
-          const imageUrls: string[] = []
-          if (hasAttachments && attachments) {
-            for (const attachment of attachments) {
-              if (attachment.fileType.startsWith('image/') && attachment.storagePath) {
-                imageUrls.push(attachment.storagePath)
-              }
-            }
-          }
+          // Attach images for vision. The client only sends attachment
+          // payloads on the turn they were uploaded, so images from earlier
+          // turns come from conversation_attachments (collected above). This
+          // turn's uploads take priority; cap the total to bound token cost.
+          const MAX_VISION_IMAGES = 5
+          const imageUrls = [
+            ...currentTurnImageUrls,
+            ...priorTurnImageUrls.slice(
+              -Math.max(0, MAX_VISION_IMAGES - currentTurnImageUrls.length),
+            ),
+          ].slice(0, MAX_VISION_IMAGES)
           if (imageUrls.length > 0) {
-            console.log(`[Vision] Sending ${imageUrls.length} image(s) to LLM`)
+            console.log(`[Vision] Sending ${imageUrls.length} image(s) to LLM (${currentTurnImageUrls.length} from this turn)`)
           }
 
           console.log(`Building messages with ${conversationHistory.length} history messages for model: ${model}`)
