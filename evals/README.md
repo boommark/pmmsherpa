@@ -7,6 +7,19 @@ Benchmark suite comparing **PMM Sherpa** against vanilla LLMs, commercial agenti
 
 ---
 
+## Operational evals (live, runnable today)
+
+These run against real deployments and log to Braintrust (project **PMMSherpa**), alongside the layer4 voice experiment:
+
+| Eval | What it verifies | Commands |
+|---|---|---|
+| **Layer 4 voice** | Sherpa's voice/style on the system prompt alone (em dashes, AI tells, length, LLM judge) | `npm run eval:layer4` (local) · `npm run eval:layer4:braintrust` (experiment `layer4-voice-v1`) |
+| **Upload pipeline E2E** | Full attachment path against a live deployment: storage upload → `/api/upload` → `/api/chat` SSE → model actually reports sentinel content from a PNG (vision) and PDF (LlamaParse), including on a follow-up turn with no attachment payload — the cross-turn path behind the Aug 2026 "your PNG is still parsing" bug. Also fails on "still parsing"-style stall phrases. | `npm run eval:uploads` (staging, CLI) · `npm run eval:uploads:prod` (prod, CLI) · `npm run eval:uploads:braintrust` (experiment `upload-pipeline-e2e`; prefix `UPLOAD_PROBE_BASE_URL=https://pmmsherpa.com` for prod) |
+
+The upload probe signs in as `upload-probe@pmmsherpa.com` (founder tier; `UPLOAD_PROBE_EMAIL`/`UPLOAD_PROBE_PASSWORD` in `.env.local`, recreate with `--bootstrap`). Fixtures live in `evals/fixtures/upload-probe/` and are deliberately framed as PMM artifacts — the Sherpa persona refuses to reveal a "secret code word" and deflects non-PMM asks, which false-negatives evals.
+
+---
+
 ## Directory structure
 
 ```
