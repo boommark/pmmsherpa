@@ -671,10 +671,6 @@ html {
   margin-bottom: 0.35em;
 }
 
-.prose-blog p {
-  margin: 0;
-}
-
 .prose-blog a {
   color: var(--blog-link);
   text-decoration: none;
@@ -695,7 +691,6 @@ html {
 .prose-blog ul,
 .prose-blog ol {
   padding-left: 1.5em;
-  margin: 0;
 }
 
 .prose-blog ul {
@@ -724,7 +719,6 @@ html {
 }
 
 .prose-blog blockquote {
-  margin: 0;
   padding: 0.6em 1.1em;
   border-left: 3px solid var(--blog-accent);
   background: color-mix(in srgb, var(--blog-accent) 6%, transparent);
