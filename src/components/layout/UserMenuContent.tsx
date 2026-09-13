@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useProfile, useSignOut } from '@/hooks/useSupabase'
+import { getEffectiveTier } from '@/lib/constants'
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -72,7 +73,7 @@ export function UserMenuContent({ align = 'end', side, onNavigate }: Props) {
         Billing & credits
       </DropdownMenuItem>
 
-      {profile?.tier === 'free' && (
+      {!!profile && getEffectiveTier(profile.tier, profile.starter_access_until) === 'free' && (
         <DropdownMenuItem
           onClick={handleUpgrade}
           disabled={upgrading}
