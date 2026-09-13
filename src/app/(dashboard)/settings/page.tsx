@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useProfile, useUser } from '@/hooks/useSupabase'
 import { createClient } from '@/lib/supabase/client'
+import { getEffectiveTier } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -490,7 +491,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Upgrade card — free users only */}
-        {profile?.tier === 'free' && (
+        {!!profile && getEffectiveTier(profile.tier, profile.starter_access_until) === 'free' && (
           <Card>
             <CardHeader>
               <CardTitle>Upgrade to Starter</CardTitle>

@@ -198,8 +198,9 @@ function SidebarContent({
   // Projects is a paid feature — free-tier users see it with a lock icon
   // that leads to the upgrade prompt on /projects (the /api/projects
   // surface enforces the same gate server-side).
-  const projectsLocked =
-    !!profile && getEffectiveTier(profile.tier, profile.starter_access_until) === 'free'
+  const effectiveTier = profile ? getEffectiveTier(profile.tier, profile.starter_access_until) : 'free'
+
+  const projectsLocked = !!profile && effectiveTier === 'free'
 
   const navItems = [
     { href: '/chat', icon: MessageSquare, label: 'New Chat', isNewChat: true },
@@ -437,7 +438,7 @@ function SidebarContent({
         {/* Tier Badge + Upgrade */}
         {!collapsed && profile && profile.tier !== 'founder' && (
           <div className="mt-4 pt-4">
-            {profile.tier === 'free' ? (
+            {effectiveTier === 'free' ? (
               <div className="px-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Free Plan</span>
